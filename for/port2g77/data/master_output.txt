@@ -1,0 +1,57 @@
+Process  0 of  1 is alive on yantranaa         
+ dt =   0.002
+Process  0 of  1 is alive on yantranaa         
+ dt =   0.002
+Process  0 of  1 is alive on yantranaa         
+ dt =   0.002
+Process  0 of  1 is alive on yantranaa         
+ dt =   0.002
+Process  0 of  1 is alive on yantranaa         
+ dt =   0.002
+Process  0 of  1 is alive on yantranaa         
+ dt =   0.002
+Process  0 of  1 is alive on yantranaa         
+ dt =   0.002
+Process  0 of  1 is alive on yantranaa         
+ dt =   0.002
+Process  0 of  1 is alive on yantranaa         
+ dt =   0.002
+Process  0 of  1 is alive on yantranaa         
+ dt =   0.002
+Process  0 of  1 is alive on yantranaa         
+ dt =   0.002
+Process  0 of  1 is alive on yantranaa         
+ dt =   0.002
+Process  0 of  1 is alive on yantranaa         
+ dt =   0.002
+Process  0 of  1 is alive on yantranaa         
+ dt =   0.002
+Fatal error in MPI_Bcast: Invalid root, error stack:
+MPI_Bcast(786): MPI_Bcast(buf=0x7fff413a3120, count=50, MPI_DOUBLE_PRECISION, root=1, MPI_COMM_WORLD) failed
+MPI_Bcast(722): Invalid root (value given was 1)[unset]: aborting job:
+Fatal error in MPI_Bcast: Invalid root, error stack:
+MPI_Bcast(786): MPI_Bcast(buf=0x7fff413a3120, count=50, MPI_DOUBLE_PRECISION, root=1, MPI_COMM_WORLD) failed
+MPI_Bcast(722): Invalid root (value given was 1)
+Fatal error in MPI_Bcast: Invalid root, error stack:
+MPI_Bcast(786): MPI_Bcast(buf=0x7fffbe31e090, count=50, MPI_DOUBLE_PRECISION, root=1, MPI_COMM_WORLD) failed
+MPI_Bcast(722): Invalid root (value given was 1)[unset]: aborting job:
+Fatal error in MPI_Bcast: Invalid root, error stack:
+MPI_Bcast(786): MPI_Bcast(buf=0x7fffbe31e090, count=50, MPI_DOUBLE_PRECISION, root=1, MPI_COMM_WORLD) failed
+MPI_Bcast(722): Invalid root (value given was 1)
+-----------------------------------------------------------------------------
+It seems that [at least] one of the processes that was started with
+mpirun did not invoke MPI_INIT before quitting (it is possible that
+more than one process did not invoke MPI_INIT -- mpirun was only
+notified of the first one, which was on node n0).
+
+mpirun can *only* be used with MPI programs (i.e., programs that
+invoke MPI_INIT and MPI_FINALIZE).  You can use the "lamexec" program
+to run non-MPI programs over the lambooted nodes.
+-----------------------------------------------------------------------------
+Killed
+Killed
+Killed
+Killed
+Killed
+Killed
+groucho end: Fri Dec 5 09:54:49 IST 2008
