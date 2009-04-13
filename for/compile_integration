@@ -1,0 +1,25 @@
+
+#FLAGS1 = -O3 -c -w  -save
+#FLAGS1 = -C -g -d1 -c -w  -save
+
+
+	gfortran  -O3 -save  -c -w  integrate_suppyrRS.f
+#	gfortran  -C -g -d1 -c -w  integrate_suppyrRS.f
+	gfortran  -O3 -save  -c -w  integrate_suppyrFRB.f
+#	gfortran  -C -g -d1  -c -w  -save integrate_suppyrFRB.f
+	gfortran  -O3 -save  -c -w  integrate_supbask.f
+	gfortran  -O3 -save  -c -w  integrate_supaxax.f
+	gfortran  -O3 -save  -c -w  integrate_deepbask.f
+	gfortran  -O3 -save  -c -w  integrate_deepaxax.f
+	gfortran  -O3 -save  -c -w  integrate_supLTS.f
+	gfortran  -O3 -save  -c -w  integrate_deepLTS.f
+       gfortran  -O3 -save  -c -w  integrate_tcr.f
+ 	gfortran  -O3 -save  -c -w  integrate_nRT.f
+ 	gfortran  -O3 -save  -c -w  integrate_spinstell.f
+	gfortran  -O3 -save  -c -w  integrate_nontuftRS.f
+	gfortran  -O3 -save  -c -w  integrate_tuftRS.f
+#	gfortran  -C -g -d1  -c -w  integrate_tuftRS.f
+ 	gfortran  -O3 -save  -c -w  integrate_tuftIB.f
+#	gfortran  -C -g -d1  -c -w  integrate_tuftIB.f
+
+	
