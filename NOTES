@@ -1,0 +1,528 @@
+-*- mode: org; fill-column: 78 -*-
+
+* Converting Kahp and Kc
+   I_K(AHP) is calculated like this:
+   I_K(AHP) = Gbar*m*(V-Ek)
+   where m is the activation constant calculated from:
+
+	m' = alpha * ( 1 - m ) - beta * m 
+   
+	if( chi < 100 ) {
+		alpha = chi * 1e-4
+	}else{
+		alpha = 0.01
+	}
+	beta = 0.01
+
+   where chi is Ca2+ concentration in mM. The rates alpha and beta are in
+   ms^-1
+   
+   So we created an HHChannel KAHP.  Since the channel activation is Ca+2
+   concentration dependent, we have to use the zGate, which calculates the
+   activation parameter from incoming concentration message rather than the
+   voltage message. So we keep the Xpower and Ypower at 0 but change Zpower
+   to 1. This creates an HHGate named "zGate" under the channel. Now we assume
+   that the Ca2+ concentration remains in the range 0 - 1000.00 Mol/m^3 (= mM
+   ) all the time. So we create the look-up tables in the HHgate with xmin =
+   0.0, xmax = 1000.0, xdivs = 3000 ( we want the interpolation table to have
+   3001 division).
+   Now we calculate the A and B table entries using the formula coded above:
+   ( we have multiplied by 1000 to convert ms to s )
+
+   A = alpha = chi*1e-1 , when chi < 100
+
+		10.0 , otherwise
+
+   B = alpha + beta = chi*1e-1 + 10 , when chi < 100
+
+			20 , otherwise.
+
+
+   We connect the CaConc object "caConc" to this channel:
+
+   caConc.connect("concSrc", kAHP, "concen")
+  
+  that is, the "concSrc" message-source from caConc is connected to the
+  "concen" message-destination of the kAHP channel.
+  
+  We further tell the kAHP channel to calculate the conductance using
+  concentration rather than compartement voltage by:
+
+  kAHP.useConcentration = True
+
+
+
+  The K(C) channel is somewhat different. The K(C) current is calculated as:
+  
+	if( 0.004(1/mM) * chi < 1 ) {
+		iktmp =  m * 0.004(1/mM) * chi * ( v - ek ) 
+		gamma = 0.004 * chi
+	}else{
+		iktmp =  m * ( v - ek )
+	        gamma = 1.0
+	}
+	df = v-ek
+	ik = gbar*iktmp
+
+
+    here m is a regular activation variable and independent of [Ca2+]. 
+    To plug in the [Ca+2] we use the zGate again: 
+
+    But now we do not have any rate constants alpha and beta and no
+    integration is needed for the zGate. We tell the channel to do this by:
+
+    kC.instant = 4 
+
+    now, for the zGate parameter is calculated as A/B instead of solving the
+    first order rate equation. Let us call this instantaneous value.
+
+    The first, second and third least significant bit of the "instant" field,
+    if set, avoids the integration for x, y and z gate respectively. For
+    example, if we set kC.instant = 1, only Y and Z gate and not the X gate
+    parameters will be calculated by solving the rate equation. If we set
+    kC.instant = 2, Y gate parameter will have instantaneous value. 
+    kC.instant = 3 (011)binary: only X and Y gate give instantaneous values
+    kC.instant = 5 (101)binary: only X and Z gate give instantaneous values
+    kC.instant = 6 (110)binary: Y and Z gate give instantaneous values
+    kC.instant = 7 (111)binary: all three gates give instantaneous values
+
+    and so on.
+
+    Since the conductance multiplier is calculated as A/B here, we set B = 1.0 and 
+
+    A = 0.004*chi , when chi < 250,
+	1.0 ,otherwise.
+
+	The range of chi and the number of divisions is same as kAHP.
+
+* <2008-03-11 Tue> Completed TCR cell.
+  Getting funny timing results for cell creation. For large number of cells,
+  creating the cells from scratch is faster than using deepcopy in
+  moose. This happens for as few as 10 cells.
+
+  Working on Spiny Stellates. for NaP, neuron model has a separate channel
+  mechanism.
+
+* <2008-03-12 Wed> Copy construction for TCR too slow
+  Noticable difference in making multiple copies of TCR cells. For creating a
+  cell from scratch, TCR takes much less time(~4s) than Spiny
+  Stellate(~8s). But when making 10 copies, TCR takes ~20s while SS takes
+  ~3s. 
+* <2008-03-18 Tue> Testing the channels.
+  The sample compartments are not behaving properly. Going into checking each
+  channel type. Compartment with NaF channel only does not behave like that
+  in squid. The compartment passive properties influence the behaviour.
+  
+* <2008-03-20 Thu> Upi suggested a check on input impedance
+  Vm stabilizes at around -50mV for 1pA injection current.  Rin = 50e9 Ohm
+  The plot is in: [[file:VmSS_20080320.png][Vm plot]] The plot looks like a series of backslashes. What
+  is wrong? Not passive properties!
+* <2008-03-21 Fri> Redoing from scratch incrementally.
+  traub_incr.py is the file in which I am trying to incrementally test and
+  develop the model. Funny behaviour. NaF.py has an identical compartment
+  with NaFGluta channel. But the Vm for the traub_incr remains at 0.
+* <2008-03-25 Tue> Found the problem source
+  Whenever something is not directly given to useClock() function, it screws
+  up.  In the flat script (flat_naf.py) I was giving useClock(0,
+  "/soma,/soma/#") In object oriented version (naf.py) I was giving
+  useClock(0,"/model/#") where model is the container for soma. Looks like
+  /model/soma/naf was not getting the clock ticks properly.
+
+* <2008-04-01 Tue> Resolved table dump problem
+  Have been groping around for zero channel current in refactored code. It
+  turns out to be a problem with how to dump table object into a file. I was
+  passing "-mode xy" as parameter to tab2file assuming it will put the x
+  values also. But this screws up and all y values are saved as 0.
+* <2008-04-03 Thu> Partly working
+  genesis and moose output are identical. pymoose version was slightly
+  off. One of the reasons turns out to be difference in nap definition in
+  genesis script. fixed.  first tried with NaF, NaP, KA, KDR - data in
+  xxx.plot.multi then added K2 - data in xxx.plot.multi.k2 then added KAR -
+  everythin screwed up - KAR taking over all types of channels and the nice
+  spikies are replaced by an ugly single spike typical of KAR.
+
+  This IS VOODOOOOOOOOOOOOOOOOO. After a break, rerunning the stuff gives
+  nice result. Earlier an independent kar.g was giving different result from
+  the kachannle.g implementation. Now they are identical.
+* <2008-04-08 Tue> Finally done with KC
+  KC channel was giving a terrible headache - although everything seemed to
+  be set properly, its Ik/ Gk were remaining at zero. moving the setting of
+  field instant to INSTANTZ before creating the Z table solved it. VOODOO.
+
+  Still the currents in KC and KAHP seem ridiculusly small of the order of
+  10^-22, Am I making some mistake in units of Z table?
+
+* <2008-04-09 Wed> Ca conc - not understanding
+  Put scale factor = 5.6e-6 as in genesis model for Traub 91. KAHP and KC
+  currents were still negligible ( ~ 10^15 A ). Traub 94 mentioned 1000 fold
+  mistake in it, so changing to 5.6e-3 helped. The thickness of shell was 0.2
+  microns. B = scale/(Ad). It is of ~10^12 now - matching the prototype CA3
+  in traub94 in genesis. But now [Ca] is 3.6 mM.
+
+  Running same thing on moose - different results - most entries for kc
+  current are 0. The nonzero ones are very small. Though for the first part
+  the current spikes are coincident.
+
+* <2008-04-10 Thu> Figuring out Ca dependent channels.
+  still there is no effect of the Ca dependent channels on the vm plot. These
+  are in 10^-12 range now. Several other currents seem to be negligible
+  compared to naf and ka.
+  the orders of the currents are:
+	cal  ~ 10^-11		(+ -)
+	km   ~ 10^-11		(- /)
+	ar   ~ 10^-11		(- \)
+	cat  ~ 10^-12		(+ /)
+	kc   ~ 10^-12 - 10^-11	(- /)
+	kahp ~ 10^-13 - 10^-12	(- /)
+	k2   ~ 10^-12		(- -)
+	ar   ~ 10^-12 - 10^-11	(- \)
+	nap  ~ 10^-10           (+ -)
+	naf  ~ 10^-9 - 10^-10   (+ -)
+	ka   ~ 10^-9		(- /)
+
+  SUCCESS!  finally managed to match both genesis and moose output: the
+  problem was obviously in Ca+2 dependent channels. The field
+  useConcentration is 0 by default in MOOSE even if we set Zpower to 1. That
+  is why kahp and kc were not behaving. Also, CaConc object did not have the
+  genesis compatible message field for incoming Ca+2 current. Had to add in
+  MOOSE sourcecode.
+* <2008-04-11 Fri> PyMoose and genesis matching nicely.
+
+* <2008-04-14 Mon> ss.g - implemented spiney stellate - but no spike is coming up. 
+   The single compartment simulation in ss.g matchess well with the
+   runmultichan.g with single compartment having ss parameters.
+ 
+* <2008-11-10 Mon 17:29> Restarting work on the model
+  Up to last version the MOOSE and PyMOOSE models were not matching. Recently
+  discovered that channels in bulbchan needed two reset() calls in pymoose in
+  order to function properly.
+
+  According to discussion with Upi today, the reset() method is there for
+  backward compatibility, we need to separate out resched and reinit.
+* <2008-11-11 Tue 11:54> Everything is flat
+  Have been searching for the starting point. pymoose/trbtest.py was the
+  script for creating a single compartment with all the channels in it. But
+  now all the plots are flat. May be due to the reset bug.
+
+  Added an extra reset - but no improvement.
+
+  All seems to be broken - even the single compartment with single channel has
+  only flat line Ik, Vm. The output file has only two 0 entries. Looks like
+  Table is not getting input.
+
+  The error was because I had removed 'stepmode' from PyMOOSE Table and now
+  everything must be camelCase ( stepMode ) - after replacing stepmode with
+  stepMode, ar.py works.
+
+  trbtest.py also works.
+
+* <2008-11-11 Tue 14:40> Get the genesis version up
+  Trying to run the MOOSE version
+
+  The genesis output is somewhat decent, but when I run the same file with
+  MOOSE, it looks like just the output of an rc circuit. The channel outputs
+  are also not appearing. By the way I implemented arglist command in MOOSE so
+  that the script runs on both MOOSE and GENESIS.
+
+* <2008-11-11 Tue 20:58> Found the original
+  Just recovered the subversion copy of traub2005 from chikki. Current
+  directory will be backed up was a tbz archive with today's date. Will
+  compare with svn version and this one.
+* <2008-11-14 Fri 17:38> Comparing genesis and MOOSE
+  I passed genesis and moose versions through ediff. The only significant
+  difference seems to be in setclock. Also, there are differences in ss.g
+  which I am currently not using.
+* <2008-11-14 Fri 23:10> Matching GENESIS and MOOSE
+  GENESIS and MOOSE can now run the same script and the outputs are
+  matching. But I have a feeling that this was so before. The outputs fork off
+  when we use a multicompartmental cell. Upi had warned about symcompartment
+  before.
+
+  Now I am trying to make sure the PyMOOSE script also matches the output. It
+  is kind of pain to verify the compartment connectivity. I don't know if a
+  visual editor might help. May need to write GUI for myself. Or should I wait
+  for Neuroconstruct or something becoming our GUI?
+* <2008-11-27 Thu 00:17> Compare MOOSE and PyMOOSE
+  Till now even for a single compartment with multiple channels the pymoose
+  and moose outputs are varying. I just checked all the biophysical properties
+  of the compartmen and all the channels in the two simulations, but they are
+  IDENTICAL. So the whole thing seems to be very shady.
+
+  Realized that the INJECTION was 1e-11 for PyMOOSE and 1e-13 for
+  MOOSE/GENESIS. But even after correcting, the ouputs don't match. While
+  MOOSE simulation shows a little discontinuity at the instant of current
+  injection start, the PyMOOSE does not show any effect of the sudden
+  injection current change.
+
+  Feel that it would have been far better if we could compare them
+  programmatically - what if the all object paths were identical and we could
+  run the MOOSE simulation inside PyMOOSE and compare the states after every
+  single step.
+
+ * <2008-11-27 Thu 02:12> Lots of Dots 
+   I noticed a lot of dot in the output when I run with pulsegen instead of
+   explicitly setting inject. When investigating it, I realized the addmsg for
+   pulsegen and compartment was failing in PyMOOSE because of a typo in the
+   script. But even after correcting that the dots are there. Looks like one
+   dot is printed for each step. Don't understand why.
+
+   Now the MOOSE and PyMOOSE outputs are somewhat closer. Within 1500 steps
+   (0.15 s) the number of spikes is same but pymoose output has slightly lower
+   frequencey. The last spike is 0.004 s delayed in PyMOOSE.
+
+* <2008-11-29 Sat 01:51> Stuck
+  What is a better way to verify the two versions? How to match things piece
+  by piece?
+  
+  I was thinking of using readcell to share some more space of the two
+  versions - but that breaks GENESIS compatibility.
+
+  Perhaps run MOOSE code inside pymoose.
+
+  Use one container for the PyMOOSE model and one for MOOSE. Then replicate
+  the same structure in both systems and see if they are identical.
+
+  Design it well - that is the first step.
+
+  May be start it from scratch.
+
+* <2008-11-29 Sat 02:08> Restarting 
+  Now I am going to move evrything from the cortical_network/traub2005 to
+  here - checking each implementation and cleaning it up.
+
+* TODO Document what I am doing. Keep track of the files.
+* TODO Clean up trbutil.py and utility.g with verification in mind.
+* <2008-12-02 Tue 23:01> Organizing tests
+  Created file trb_tests.g. This file will contain all the tests as I build
+  the simulation incrementally.  The test parameters will be common for single
+  compartment. These variables are prefixed TEST. The RA, RM and CM are
+  specific values.  I implemented a passive single compartment test to start
+  with.
+
+* <2008-12-03 Wed 00:04> Implemeting the PyMOOSE tests
+  Started with replicating the passive single compartment in pymoose
+  (trb_tests.py). In order to compare the whole model tree, I feel the need of
+  comparison operator in Id.
+  
+  For the time being I'll go for sorting based on path.
+
+* <2008-12-03 Wed 01:53> Single passive compartment test
+  In the trb_tests.py I added a test to compare whole moose subtrees. I load
+  the MOOSE model using loadG and construct the PyMOOSE model inside a
+  class. The two are matching within floating point error limit 0.001.
+
+* <2008-12-03 Wed 20:53> Multiple channels
+  When going to add test for multiple channels I realized that the tests could
+  be organized in a better way using a class hierarchy. This re-organization
+  took up a lot of time and coding. But I feel this will reduce a lot of work
+  as the code becomes more complex.
+  Right now I am trying a single compartment with NaF and KDR channels only.
+  - not working. output same as passive compartment. - I had forgotten to set
+    Gbar for the channels.
+* <2008-12-04 Thu 22:00> Multiple channels implemented
+  Managed to simulate a single compartment with NaF and KDR channels on MOOSE
+  and GENESIS  and while the MOOSE and GENESIS outputs are identical, they do
+  not match pymoose output.
+  The divergence is similar as earlier version - the spikes gradually go out
+  of sync. According to Upi this indicates a mismatch in passive
+  properties. Will do a field by field comparison using Python.
+
+* <2008-12-04 Thu 22:23> Field by field comparison
+  Just did a test case with field by field comparison of channels and
+  compartments and it could not find any discrepancy between the pymoose model
+  and the moose model in terms of field values.
+
+  IS IT A BUG IN PYMOOSE? DID SOME OF THE BIOPHYSICAL OBJECTS CHANGE BEHAVIOUR
+  WITHOUT PYMOOSE BEING UPDATED?
+
+* <2008-12-05 Fri 01:16> FOUND THE BUG!
+  At last!!! I was getting same gradual deviation of PyMOOSE and MOOSE
+  Vm even with just NaF and KDR channels. 
+  After confirming that all other fields were identical within 1 in 1000
+  error, I set out to compare the individual gate tables, manually dumping the
+  tables after running the comparison test case in PyMoose
+  (MOOSEPySingleCompMultiChannelTestCase). And voila, the kdr channel's
+  xGate/A tables were slightly different. When I looked into the code I
+  realized that there is another variant of KDR channel for fast spiking
+  neurons. The equation for Tau_m is identical for both, but the equations for
+  m_inf vary slightly in terms of the constants ( 27e-3 instead of 29.5e-3 and
+  11.5e-3 instead of 10e-3 ). And that was the culprit!!
+
+* <2008-12-05 Fri 13:53> Reading Traub model
+  I am verifying my code by checking out the fortran code and it looks
+  cool. They have added all the conductances for the same ion and then
+  calculated the overall ionic current. In MOOSE we don't have this
+  facility. May be we can use this technique in solver.
+  n a second thought, this is not such a big deal. Because, still we have to
+  calculate the Gk for each channel ( in fortran code ). We are just saving
+  n-multiplications for n channels of the same ion. 
+
+  I could not find the shift while calculating Gnap in the fortran code.
+
+  250:      DO 88, I = 1, numcomp
+  251:       gna_tot(i) = gnaf(i) * (mnaf(i,L)**3) * hnaf(i,L) +
+  252:     x     gnap(i) * (mnaf(i,L)**3)
+
+  - this seems to indicate that the equation for gk_nap is:
+    gbar_nap * mnaf^3 where gbar_nap is dependent on compartment (gnap(i)) and
+    mnaf is parameterized with both compartment no. (i) and level (L).
+    
+* <2008-12-07 Sun 06:05> Fell into some design problems
+  I was tempted into setting the Ek values inside channel creation code. E_NA
+  and E_K is constant for naf and kdr and kdr_fs channels. But this was
+  actually a bad idea because this actually depends on the cell type and the
+  compartment. I realized that for the same type of KA channel, the Ek value
+  was different in different cells - although the same channel definition is
+  being used all over the place. 
+
+* <2008-12-07 Sun 06:21> Correcting the PyMOOSE code
+  I tried the pymoose version now and it seems to require some cleaning
+  up. The output is actually same as with two channels only.
+
+* <2008-12-08 Mon 10:50> Voodoo Ik in KDR
+  Now after adding more field comparisons and adding NapSS in the models, I
+  find that the models are not matching on KDR. The problem field was Ik -
+  which should have been initialized to zero but somehow gets a small positive
+  value (~10^-12 A) in PyMOOSE. However a newly created HHChannel has Ik = 0.0
+  in PyMOOSE.
+
+  Realized that the included GENESIS/MOOSE script had the main code where it
+  executed one test - since include in MOOSE causes execution of the whole
+  script, the test was actually being executed - and the reset call was
+  causing calculation of Ik.
+
+  Further strange behaviour: After fixing the above, it fails on yGate/A
+  table. When I dump the tables in channel creation code, the plots are
+  identical. But when I plot them in Python after the test ( using pylab ) -
+  the behaviour is quite different. The PyMOOSE channel's yGate/A and yGate/B
+  are both straight lines.
+
+* <2008-12-09 Tue 07:46> My mistake
+  Yesterday's mismath in yGates turned out to be errors in the formula I had
+  put in - missing parentheses changed the whole thing.
+
+  Now I have a matching output from PyMOOSE and GENESIS on naf2, kdr_fs, nap
+  and ka.
+
+* <2008-12-09 Tue 08:30> Added K2 and KM
+  The outputs match after adding K2.  Almost matching after adding km, but I
+  can see slight deviation at longer interval. There seems to be an error in
+  order magnitude of KM current/conductance.
+  
+* <2008-12-09 Tue 09:59> AR drastically increases frequency
+  Am I doing something wrong? I am worried about the units of alpha, beta. The
+  equations for AR are somewhat different, and I am assuming everything in the
+  exponent is dimensionless.
+
+* <2008-12-11 Thu 17:10> Trying to understand KC 
+  The way I am doing KC setup is not exactly matching neuron model. They
+  calculate the Ik depending on the Ca conc at the moment. In MOOSE we can
+  only set the Z table ahead. Not sure if applying the same formula ahead of
+  time on the interpolation table will give same result.
+
+* <2008-12-11 Thu 20:53> Not sure how to handle Ca2+
+  Going through book of GENESIS, I am confused about implementing Ca2+
+  dynamics. The book of GENESIS discusses the implementation of Traub 91 model
+  where an additional message is created between the compartment and the
+  Ca_conc object. But is this required in MOOSE? And how can I incorporate
+  this kind of thing in PyMOOSE? MOOSE is not supposed to know about Python in
+  any way. May be look up how MOOSE allows addition of new fields / messages
+  and provide functions in python to re-implement those things.
+
+  Initially I was just adding I_Ca Ik messages from Ca2+ channels to the
+  Ca_conc object.
+
+  Also, in the NEURON model they put a ceiling and a floor (=0) on the Ca
+  conc. I don't see how to incorporate this in MOOSE Ca_conc object.
+
+* <2008-12-13 Sat 12:37> Looking at channel behaviour
+  After almost completing the single compartment model with GENESIS Ca_concen object from my old implementation I see that
+  the frequency has increased drastically. Actually there is no structure in
+  the spikes. To understand the contribution of each channel I am commenting
+  out most of them and incrementally enabling a few channels.
+
+  NaF2 on SS gives a typical spike at the start of simulation due to the
+  difference between the cell's resting Vm and Ek of the channel, which slowly
+  inactivates. During the current injection it acts just like an RC circuit.
+
+  When I add NaP, the nature of the curve remains the same, only it stays at a
+  higher Vm.
+
+  On adding KDR there is nice spiking.
+
+* <2008-12-17 Wed 12:29> Individual channel effects
+  Put details in lab notebook. CaT and KAHP I copied from my old
+  implementation. Did not verify the equations.
+  I need to incorporate CaT, CaL, KC and KAHP in PyMOOSE model.
+  Next I should start implementing a whole cell.
+* <2008-12-18 Thu 16:01> Corrected the KC and KAHP channels
+  Compared my implementation with Traub91 in MOOSE demos. There were a few
+  fields I missed to set. One was setting calc_mode for the Z gate tables to
+  0. That should not have affected the output. But I also missed the instant
+  field (INSTANTZ). After correcting these the frequency has increased
+  slightly.  
+    
+* <2008-12-22 Mon 21:13> Tried a hoc script 
+  to simulate a single compartment soma but it is completely different from
+  the GENESIS output. There is no spontaneous bursting. The frequency is half
+  that of the GENESIS model.
+  I am disabling all the channels and incrementally comparing the two outputs.
+  Passive compartment - identical output.
+  NaF2 - identical output with fastNa_shift_naf2 = -2.5
+  NaPFSS - identical output with fastNa_shift_napf_spinstell = -2.5
+  With addition of KDR both models fire spontaneously, but the neuron model
+  has far higher frequency than genesis.
+  - It turned out that I had forgotten to set K+ reversal potential in NEURON
+    model. After setting it, the behaviour is identical during current
+    injection, but the pre and post injection spikes in neuron are slightly
+    delayed (~5 ms). 
+  - The passive Em was set -65 in GENESIS and -68 in NEURON model. Correcting
+    that fixed the discrepancy in pre-injection spikes. But the post-injection
+    pulses are still ~1 ms out of sync.
+  - Could not find any error in paramtere translation. Trying kdr alone.
+  - KDR alone produces identical output.
+  - Just NaF2 and KDR causes the same discrepancy.
+  - Adding KA introduces still more discrepancy.
+    
+* <2008-12-27 Sat 00:01> Is there something with the shifts?
+  I suspect that there might be something with the fastNa_shift variable. I
+  could get the spike at the start of simulation in GENESIS by modifying the
+  shift to 0, though there is one additional spike before start of current
+  injection. The outputs are much closer when I set the fastNa_shift in both
+  simulators to 0. I need to have another look into the NEURON mod file.
+* <2009-03-04 Wed 21:50> Another restart of Traub model
+  After a lot of time wasted in reproducing ion channel behaviour Upi
+  suggested that I should chuck the idea and move on to the overall network,
+  using relatively simplified neurons.
+  This was in late January. After coming back from home I was busied with
+  travel arrangements for UK and Japan. Nothing more than a successful
+  implementation of voltage clamp on squid axon happened during this time.
+
+  As I trid re-running the Traub model, the voltage clamp output is
+  horrendous. I am rewriting the circuitry code.
+  
+  Also Dhanya opined that I cannot learn much by voltage
+  clamping. Simulation-wise I think it is too many different clamp voltages to
+  be tried for verifying the ion channels.
+  But I can definitely verify the resting potential of the channel.
+* <2009-03-06 Fri 10:51> Organizing the code
+  Trying to reorganizing the code. Global variables and the include model of
+  GENESIS is a constant source of trouble. If I just move the global
+  assignments around, the code starts breaking (which is expected). Yet to
+  figure out the "best practices" for GENESIS script development.
+
+* <2009-04-06 Mon 15:21> Every restart is practically from scratch
+  I need some dedicated time for finishing this model: without
+  interruption. Avoid distractions, otherwise it is not progressing at all.
+* <2009-04-10 Fri 14:59> Restart cortical network
+** Globals:
+   globals pose a nasty problem as always.
+   simdt, plotdt can remain constant.
+   simtime cannot. many places (especially dumb tables need to be sized
+   according to number of steps) it determines initialization.
+
+   
+** Include:
+   genesis include system is dumb. if you include a file all code in it gets
+   executed. there is not guard from multiple includes other than some
+   variable initialization (like #define in C)
