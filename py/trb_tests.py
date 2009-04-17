@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Dec  2 23:03:52 2008 (+0530)
 # Version: 
-# Last-Updated: Sat Dec 20 11:07:31 2008 (+0530)
+# Last-Updated: Mon Apr 13 16:25:51 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 399
+#     Update #: 402
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -33,6 +33,10 @@ from math import *
 import unittest
 import logging
 import pylab
+
+import sys
+
+sys.path.append("/home/subha/src/moose/pymoose")
 
 import moose
 
