@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:13 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Apr 18 00:00:01 2009 (+0530)
+# Last-Updated: Sun Apr 19 14:03:23 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 3
+#     Update #: 16
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -45,8 +45,10 @@
 
 # Code:
 
-from channel import ChannelBase
 from numpy import where, linspace, exp
+import pylab
+import config
+from channel import ChannelBase
 
 class NaF(ChannelBase):
     def __init__(self, name, parent):
@@ -56,7 +58,7 @@ class NaF(ChannelBase):
         tau_m = where(v < -30e-3, \
                           1.0e-3 * (0.025 + 0.14 * exp((v + 30.0e-3) / 10.0e-3)), \
                           1.0e-3 * (0.02 + 0.145 * exp(( - v - 30.0e-3) / 10.0e-3)))
-        
+
         tau_h = 1.0e-3 * (0.15 + 1.15 / ( 1.0 + exp(( v + 37.0e-3) / 15.0e-3)))
         
         m_inf = 1.0 / (1.0 + exp(( - v - 38e-3) / 10e-3))
@@ -69,6 +71,10 @@ class NaF(ChannelBase):
             self.yGate.B[i] = h_inf[i]
         self.xGate.tweakTau()
         self.yGate.tweakTau()
+        self.xGate.A.dumpFile("naf_xa.plot")
+        self.xGate.B.dumpFile("naf_xb.plot")
+        self.yGate.A.dumpFile("naf_ya.plot")
+        self.yGate.B.dumpFile("naf_yb.plot")
         
 class NaF2(ChannelBase):
     def __init__(self, name, parent):
@@ -123,8 +129,6 @@ class NaP_f(ChannelBase):
             self.xGate.B[i] = m_inf[i]
         self.xGate.tweakTau()
         self.yGate.tweakTau()
-
-
 
 # 
 # nachans.py ends here
