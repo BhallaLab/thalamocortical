@@ -526,3 +526,21 @@
    genesis include system is dumb. if you include a file all code in it gets
    executed. there is not guard from multiple includes other than some
    variable initialization (like #define in C)
+* <2009-04-19 Sun 14:10> Checking channels
+  Starting with python implementation of NaF and K channels. The testing is a
+  pain. Nor behaving properly.  With NaF channle alone I am getting a Gk peak
+  at ~18 ms - which is strange.
+
+  I looked in older data src/cortical and saw that a similar 
+  spike in Gk even before the current injection has started. May be due to ENa
+  and Em and Eleak.
+
+  Separating model set-up, data recording and actual simulation is turning out
+  to be a painful process.
+  
+  These things usually turn out to be monstrous monoliths like a long GENESIS
+  session. Not yet able to figure out the best practices for this kind of work.
+
+  The charging  curve for MOOSE was going higher than NEURON with NaF
+  channel. So to verify, I removed all channels, and simulated.
+  Identical Vm curves for passive compartment.
