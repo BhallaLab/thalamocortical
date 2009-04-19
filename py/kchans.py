@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Apr 18 00:20:03 2009 (+0530)
+# Last-Updated: Sat Apr 18 15:48:36 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 70
+#     Update #: 71
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -68,7 +68,7 @@ class KDR(ChannelBase):
 	ChannelBase.__init__(self, name, parent, 4)
 	self.Ek = -95e-3
 	v = linspace(config.vmin, config.vmax, config.ndivs + 1) 
-	taum_m = where(v < -10e-3, \
+	tau_m = where(v < -10e-3, \
 			   1e-3 * (0.25 + 4.35 * exp((v + 10.0e-3) / 10.0e-3)), \
 			   1e-3 * (0.25 + 4.35 * exp((- v - 10.0e-3) / 10.0e-3)))
 	m_inf = 1.0 / (1.0 + exp((- v - 29.5e-3) / 10e-3))
