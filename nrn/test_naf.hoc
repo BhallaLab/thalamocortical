@@ -15,8 +15,8 @@ soma{
     diam = 15
     L = 20
     
-    insert naf_tcr
-    gbar_naf_tcr = 0.15
+    insert napf_spinstell
+    gbar_napf_spinstell = 0.00015
     ena = 50
     insert kdr
     gbar_kdr = 0.1

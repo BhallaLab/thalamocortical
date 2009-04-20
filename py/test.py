@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 01:08:37 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 20 23:18:41 2009 (+0530)
+# Last-Updated: Mon Apr 20 23:38:39 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 319
+#     Update #: 323
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -60,6 +60,8 @@ conductance = {'NaF': 1500.0,
                'NaF2': 1500.0,
                'NaP': 1.5,
                'NaPF': 1.5,
+               'NaPF_SS': 1.5,
+               'NaPF_TCR': 1.5,
                'KDR': 1000.0,
                'CaT': 1.0,
                'CaL': 5.0,
@@ -221,7 +223,7 @@ class Simulation:
 import pylab
 if __name__ == "__main__":
     sim = Simulation()
-    sim.model, sim.data, = setup_singlecomp(['NaF_TCR', 'KDR'])
+    sim.model, sim.data, = setup_singlecomp(['NaPF_SS', 'KDR'])
     sim.schedule()
     sim.run(50e-3)
     tables = sim.dump_data('data')
