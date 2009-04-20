@@ -1,4 +1,3 @@
-load_file("nrngui.hoc")
 objectvar vecT, vecV, stim1, outfile
 outfile = new File()
 vecV = new Vector()
@@ -16,8 +15,8 @@ soma{
     diam = 15
     L = 20
     
-    insert naf
-    gbar_naf = 0.15
+    insert nap
+    gbar_nap = 0.00015
     ena = 50
     insert kdr
     gbar_kdr = 0.1

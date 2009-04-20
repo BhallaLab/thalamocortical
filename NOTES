@@ -582,3 +582,11 @@
     (test.py) models.
 
   - Now KDR and NaF together working
+
+  - KDR and NAF2 working
+
+  - NaP and KDR not working - when corrected channel density for NaP to
+    realistic value, the curves are more similar - but yet nowhere near
+    matching.
+  - Turned out to be a silly mistake - I was setting gbar for NaP twice in the
+    dictionary, the effective one was differing from NEURON.
