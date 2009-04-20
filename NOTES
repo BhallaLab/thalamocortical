@@ -604,6 +604,6 @@
       NEURON simulation.
 
 
-
+  - NaPF_SS, NAPF_TCR both tested against NEURON - working fine.
 
 
