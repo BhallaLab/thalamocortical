@@ -16,9 +16,9 @@ soma{
     diam = 15
     L = 20
     
-    // insert naf
-    // gbar_naf = 0.15
-    // ena = 50
+    insert naf
+    gbar_naf = 0.15
+    ena = 50
     insert pas
     e_pas = -65
     g_pas = 2e-5

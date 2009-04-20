@@ -568,3 +568,15 @@
   One thing I notice: reset does not really take the simulation state
   back to the beginning. A rerun in the same python process increases
   the membrane potential a lot.
+  -- It turns out that it is a little bug in the code - each time I rerun my
+  simulation , the addmsg code is reexecuted - and this adds one extra message
+  between every src-dest pair. Thus, the injection from pulsegen is doubled on
+  second run. - Is this a bug or a feature?
+
+  I cannot record membrane current - Im table is consistently 0 throughout the
+  simulation - but the Vm value is showing that the compartment is getting the
+  right input.
+
+
+  - Now getting identical Vm plot from NEURON (test_naf.hoc) and PyMOOSE
+    (test.py) models.

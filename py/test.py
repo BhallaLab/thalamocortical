@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 01:08:37 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 20 11:45:44 2009 (+0530)
+# Last-Updated: Mon Apr 20 12:12:56 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 284
+#     Update #: 289
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -129,6 +129,12 @@ class MyCompartment(moose.Compartment):
 
 def setup_singlecomp(channels):
     """channels is the list of channel class names (string)"""
+    if config.context.exists('test'):
+        print "Model is already set up. Returning."
+        container = moose.Neutral("test")
+        data = moose.Neutral("data")
+        return (container, data)
+
     container = moose.Neutral("test")
     data = moose.Neutral("data")
     tables = []
@@ -152,7 +158,7 @@ def setup_singlecomp(channels):
         chan.connect("Gk", table, "inputRequest")
         
     comp.insertRecorder("Vm", data)
-    comp.insertRecorder("inject", data)
+    comp.insertRecorder("Im", data)
     pulsegen = moose.PulseGen("pulsegen", container)
     pulsegen.baseLevel = 0.0
     pulsegen.firstLevel = 1e-10
@@ -207,7 +213,7 @@ class Simulation:
 import pylab
 if __name__ == "__main__":
     sim = Simulation()
-    sim.model, sim.data, = setup_singlecomp([])
+    sim.model, sim.data, = setup_singlecomp(['NaF'])
     sim.schedule()
     sim.run(50e-3)
     tables = sim.dump_data('data')
