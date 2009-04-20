@@ -544,3 +544,27 @@
   The charging  curve for MOOSE was going higher than NEURON with NaF
   channel. So to verify, I removed all channels, and simulated.
   Identical Vm curves for passive compartment.
+
+  Peculiarities of NEURON to remember:
+  time unit: ms
+  voltage unit: mV
+  current unit: nA
+  
+  all resistance/capacitance/conductance are specific, not absolute values. 
+  
+  spcific membrane capacitance: uF/cm^2
+  cytoplasimic resistivity: ohm-cm
+  
+* <2009-04-20 Mon 11:47> Reset is not so safe
+  I subclasses Compartment to allow nicer ways to insert channel conductances
+  and passive properties as specific values (per unit area) as well as
+  recording data. I also created a Simulation class to manage the simulation
+  at a high level - it keeps track of run-time and lets the user dump all the
+  data.
+  The passive properties are matching in PyMOOSE and NEURON and so does
+  the Vm ( which may seem to be trivial, but I needed to test it to
+  ensure that I do not run away too far off due to some silly bug at the
+  start of the road. 
+  One thing I notice: reset does not really take the simulation state
+  back to the beginning. A rerun in the same python process increases
+  the membrane potential a lot.
