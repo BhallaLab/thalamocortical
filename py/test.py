@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 01:08:37 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 20 12:16:35 2009 (+0530)
+# Last-Updated: Mon Apr 20 22:00:35 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 290
+#     Update #: 313
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -55,17 +55,18 @@ from nachans import *
 from kchans import *
 from cachans import *
 
-conductance = {"NaF": 1500.0,
-                     "KDR": 1000.0,
-                     "NaP": 1.5,
-                     "CaT": 1.0,
-                     "CaL": 5.0,
-                     "KA": 300.0,
-                     "KC": 100.0,
-                     "KM": 37.5,
-                     "K2": 1.0,
-                     "KAHP": 1.0,
-                     "AR": 2.5}
+conductance = {'NaF': 1500.0,
+               'NaF2': 1500.0,
+               'KDR': 1000.0,
+               'NaP': 1.5,
+               'CaT': 1.0,
+               'CaL': 5.0,
+               'KA': 300.0,
+               'KC': 100.0,
+               'KM': 37.5,
+               'K2': 1.0,
+               'KAHP': 1.0,
+               'AR': 2.5}
 
 
 class MyCompartment(moose.Compartment):
@@ -158,13 +159,18 @@ def setup_singlecomp(channels):
         chan.connect("Gk", table, "inputRequest")
         
     comp.insertRecorder("Vm", data)
-    comp.insertRecorder("Im", data)
     pulsegen = moose.PulseGen("pulsegen", container)
     pulsegen.baseLevel = 0.0
     pulsegen.firstLevel = 1e-10
     pulsegen.firstWidth = 20e-3
     pulsegen.firstDelay = 20e-3
     pulsegen.connect("outputSrc", comp, "injectMsg")
+    # We cannot read comp.Im using a table because it is always set to
+    # zero at the end of process method. Hence read it from the
+    # pulsegen
+    table = moose.Table("Inject", data)
+    table.stepMode = 3
+    pulsegen.connect('output', table, 'inputRequest')
     return (container, data)
 
 class Simulation:
@@ -213,7 +219,7 @@ class Simulation:
 import pylab
 if __name__ == "__main__":
     sim = Simulation()
-    sim.model, sim.data, = setup_singlecomp(['NaF', 'KDR'])
+    sim.model, sim.data, = setup_singlecomp(['NaP', 'KDR'])
     sim.schedule()
     sim.run(50e-3)
     tables = sim.dump_data('data')
