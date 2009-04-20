@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 01:08:37 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 20 22:44:19 2009 (+0530)
+# Last-Updated: Mon Apr 20 23:18:41 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 317
+#     Update #: 319
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -56,9 +56,10 @@ from kchans import *
 from cachans import *
 
 conductance = {'NaF': 1500.0,
+               'NaF_TCR': 1500.0,
                'NaF2': 1500.0,
                'NaP': 1.5,
-               'NaP_f': 1.5,
+               'NaPF': 1.5,
                'KDR': 1000.0,
                'CaT': 1.0,
                'CaL': 5.0,
@@ -220,7 +221,7 @@ class Simulation:
 import pylab
 if __name__ == "__main__":
     sim = Simulation()
-    sim.model, sim.data, = setup_singlecomp(['NaP_f', 'KDR'])
+    sim.model, sim.data, = setup_singlecomp(['NaF_TCR', 'KDR'])
     sim.schedule()
     sim.run(50e-3)
     tables = sim.dump_data('data')
