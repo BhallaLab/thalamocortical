@@ -591,3 +591,19 @@
   - Turned out to be a silly mistake - I was setting gbar for NaP twice in the
     dictionary, the effective one was differing from NEURON.
   - NaP_f and KDR working fine together.
+
+  - NaF_TCR and KDR are not matching. The NEURON mod file is somewhat
+    confusing. There are two shift_mnaf parameters: shift_mnaf_init=-3.0mV and
+    shift_mnaf_run=-2.5mV. However, the settables procedure has only
+    shift_mnaf. And it calculates shift_naf = shift_naf_init +
+    shift_naf_run. I suspect NEURON does some funny stuff depending on the
+    suffixes _run and _init. The original fortran code has only one shift_mnaf
+    which is -3.0mV.
+
+    - Funny: Once I set shift_mnaf to -5.5mV in PyMOOSE code, it matches
+      NEURON simulation.
+
+
+
+
+
