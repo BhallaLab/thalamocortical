@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 01:08:37 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 20 12:12:56 2009 (+0530)
+# Last-Updated: Mon Apr 20 12:16:35 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 289
+#     Update #: 290
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -213,7 +213,7 @@ class Simulation:
 import pylab
 if __name__ == "__main__":
     sim = Simulation()
-    sim.model, sim.data, = setup_singlecomp(['NaF'])
+    sim.model, sim.data, = setup_singlecomp(['NaF', 'KDR'])
     sim.schedule()
     sim.run(50e-3)
     tables = sim.dump_data('data')

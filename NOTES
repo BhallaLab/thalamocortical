@@ -580,3 +580,5 @@
 
   - Now getting identical Vm plot from NEURON (test_naf.hoc) and PyMOOSE
     (test.py) models.
+
+  - Now KDR and NaF together working
