@@ -15,8 +15,8 @@ soma{
     diam = 15
     L = 20
     
-    insert nap
-    gbar_nap = 0.00015
+    insert napf
+    gbar_napf = 0.00015
     ena = 50
     insert kdr
     gbar_kdr = 0.1
