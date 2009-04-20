@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:13 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 20 16:47:15 2009 (+0530)
+# Last-Updated: Mon Apr 20 22:44:35 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 22
+#     Update #: 23
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -121,7 +121,7 @@ class NaP_f(ChannelBase):
         ChannelBase.__init__(self, name, parent, 3)
         self.Ek = 50e-3
         v = linspace(config.vmin, config.vmax, config.ndivs + 1)
-        taum_m = where(v < -30e-3, \
+        tau_m = where(v < -30e-3, \
                            1.0e-3 * (0.025 + 0.14 * exp((v  + 30.0e-3) / 10.0e-3)), \
                            1.0e-3 * (0.02 + 0.145 * exp((- v - 30.0e-3) / 10.0e-3)))
         m_inf = 1.0 / (1.0 + exp((-v - 38e-3) / 10e-3))
