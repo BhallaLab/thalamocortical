@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:13 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 20 23:25:44 2009 (+0530)
+# Last-Updated: Mon Apr 20 23:37:16 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 56
+#     Update #: 60
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -136,7 +136,8 @@ class NaPF_TCR(ChannelBase):
     def __init__(self, name, parent):
         ChannelBase.__init__(self, name, parent, 1)
         self.Ek = 50e-3
-        v = linspace(config.vmin, config.vmax, config.ndivs + 1)
+        shift = 7e-3
+        v = linspace(config.vmin, config.vmax, config.ndivs + 1) + shift
         tau_m = where(v < -30e-3, \
                            1.0e-3 * (0.025 + 0.14 * exp((v  + 30.0e-3) / 10.0e-3)), \
                            1.0e-3 * (0.02 + 0.145 * exp((- v - 30.0e-3) / 10.0e-3)))
@@ -176,6 +177,20 @@ class NaF_TCR(ChannelBase):
         self.yGate.A.dumpFile("naf_ya.plot")
         self.yGate.B.dumpFile("naf_yb.plot")
         
+class NaPF_SS(ChannelBase):
+    def __init__(self, name, parent):
+        ChannelBase.__init__(self, name, parent, 3)
+        self.Ek = 50e-3
+        shift = -2.5e-3
+        v = linspace(config.vmin, config.vmax, config.ndivs + 1) + shift
+        tau_m = where(v < -30e-3, \
+                           1.0e-3 * (0.025 + 0.14 * exp((v  + 30.0e-3) / 10.0e-3)), \
+                           1.0e-3 * (0.02 + 0.145 * exp((- v - 30.0e-3) / 10.0e-3)))
+        m_inf = 1.0 / (1.0 + exp((- v - 38e-3) / 10e-3))
+        for i in range(config.ndivs + 1):
+            self.xGate.A[i] = tau_m[i]
+            self.xGate.B[i] = m_inf[i]
+        self.xGate.tweakTau()
 
 # 
 # nachans.py ends here
