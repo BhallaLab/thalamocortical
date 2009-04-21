@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Apr 18 15:48:36 2009 (+0530)
+# Last-Updated: Tue Apr 21 15:26:39 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 71
+#     Update #: 83
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -77,7 +77,7 @@ class KDR(ChannelBase):
             self.xGate.B[i] = m_inf[i]
 	self.xGate.tweakTau()
 
-class KDR_fs(ChannelBase):
+class KDR_FS(ChannelBase):
     """KDR for fast spiking neurons"""
     def __init__(self, name, parent):
 	ChannelBase.__init__(self, name, parent, 4)
@@ -98,15 +98,13 @@ class KA(ChannelBase):
 	ChannelBase.__init__(self, name, parent, 4, 1)
 	self.Ek = -95e-3
 	v = linspace(config.vmin, config.vmax, config.ndivs + 1)
-	m_inf = 1.0 / (1.0 + exp((-v - 60e-3) / 8.5e-3))
-	tau_m =  1.0e-3 * (0.185 + \
-			       0.5 /(exp ((v + 35.8e-3) / 19.7e-3) + \
-					 exp((-v - 79.7e-3) / 12.7e-3)))
-	h_inf =  1.0 / (1.0 + exp ( (v + 78e-3) / 6e-3 ) )
-	tau_h = where( v <= -63e-3, \
-			   1e-3 * 0.5 / (exp((v + 46e-3) / 5e-3) + \
-					     exp ( ( -v - 238e-3 )/37.5e-3 ) ), \
-			   9.5e-3)
+	m_inf = 1 / ( 1 + exp( ( - v - 60e-3 ) / 8.5e-3 ) )
+	tau_m =  1e-3 * (0.185 + 0.5 / ( exp( ( v + 35.8e-3 ) / 19.7e-3 ) + exp( ( - v - 79.7e-3 ) / 12.7e-3 ) ))
+	h_inf =   1 / ( 1 + exp( ( v + 78e-3 ) / 6e-3 ) )
+	tau_h = where( v <= -63e-3,\
+                           1e-3 * 0.5 / ( exp( ( v + 46e-3 ) / 5e-3 ) + exp( ( - v - 238e-3 ) / 37.5e-3 ) ), \
+                           9.5e-3)
+
 	for i in range(config.ndivs + 1):
             self.xGate.A[i] = tau_m[i]
             self.xGate.B[i] = m_inf[i]
