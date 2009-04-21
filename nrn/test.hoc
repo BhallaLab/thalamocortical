@@ -1,7 +1,9 @@
-objectvar vecT, vecV, stim1, outfile
+objectvar vecT, vecV, vecKM, stim1, outfile, gkm_file
 outfile = new File()
+gkm_file = new File()
 vecV = new Vector()
 vecT = new Vector()
+vecKM = new Vector() 
 FARADAY=96485
 PI=3.141592
 secondorder=2
@@ -15,13 +17,15 @@ soma{
     diam = 15
     L = 20
     
-    // insert napf_spinstell
-    // gbar_napf_spinstell = 0.00015
+    // insert naf
+    // gbar_naf = 0.15
     // ena = 50
     // insert kdr_fs
     // gbar_kdr_fs = 0.1
-    insert ka
-    gbar_ka = 0.03
+    // insert ka
+    // gbar_ka = 0.03
+    insert km
+    gbar_km = 0.00375
     ek = -95
     insert pas
     e_pas = -65
@@ -37,11 +41,14 @@ soma{
 
 tstop = 50
 vecV.record(&soma.v(0.5))
+vecKM.record(&soma.g_km(0.5))
 vecT.record(&t)
 run()
 outfile.wopen("mydata/Vm.plot")
+gkm_file.wopen("mydata/KM.plot")
 for ii = 0, vecV.size() - 1 {
-	outfile.printf("%g %g\n", vecT.x(ii), vecV.x(ii))
+    outfile.printf("%g %g\n", vecT.x(ii), vecV.x(ii))
+    gkm_file.printf("%g %g\n", vecT.x(ii), vecKM.x(ii))
 }
 outfile.close()
 

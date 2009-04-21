@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Apr 21 15:26:39 2009 (+0530)
+# Last-Updated: Tue Apr 21 19:19:14 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 83
+#     Update #: 93
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -133,13 +133,13 @@ class K2(ChannelBase):
         self.xGate.tweakTau()
 	self.yGate.tweakTau()
 	
-def KM(ChannelBase):
+class KM(ChannelBase):
     def __init__(self, name, parent):
 	ChannelBase.__init__(self, name, parent, 1)
 	self.Ek = -95e-3
 	v = linspace(config.vmin, config.vmax, config.ndivs + 1)
-	a =  0.02 / ( 1 + exp((-v - 20e-3 ) / 5e-3))
-	b = 0.01 * exp((-v - 43e-3) / 18e-3)
+	a =  1e3 * 0.02 / ( 1 + exp((-v - 20e-3 ) / 5e-3))
+	b = 1e3 * 0.01 * exp((-v - 43e-3) / 18e-3)
 	for i in range(config.ndivs + 1):
             self.xGate.A[i] = a[i]
             self.xGate.B[i] = b[i]
