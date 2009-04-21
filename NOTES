@@ -556,7 +556,7 @@
   cytoplasimic resistivity: ohm-cm
   
 * <2009-04-20 Mon 11:47> Reset is not so safe
-  I subclasses Compartment to allow nicer ways to insert channel conductances
+  I subclassed Compartment to allow nicer ways to insert channel conductances
   and passive properties as specific values (per unit area) as well as
   recording data. I also created a Simulation class to manage the simulation
   at a high level - it keeps track of run-time and lets the user dump all the
@@ -600,8 +600,8 @@
     suffixes _run and _init. The original fortran code has only one shift_mnaf
     which is -3.0mV.
 
-    - Funny: Once I set shift_mnaf to -5.5mV in PyMOOSE code, it matches
-      NEURON simulation.
+    - Funny: Once I set shift_mnaf to -5.5mV(=shift_mnaf_init+shift_mnaf_run) in PyMOOSE code, it matches
+      NEURON simulation. Do not know how they came up with this value for NEURON.
 
 
   - NaPF_SS, NAPF_TCR both tested against NEURON - working fine.
