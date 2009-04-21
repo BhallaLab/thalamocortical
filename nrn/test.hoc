@@ -22,8 +22,8 @@ soma{
     // ena = 50
     // insert kdr_fs
     // gbar_kdr_fs = 0.1
-    insert ka
-    gbar_ka = 0.03
+    insert ka_ib
+    gbar_ka_ib = 0.03
     // insert km
     // gbar_km = 0.00375
     ek = -95

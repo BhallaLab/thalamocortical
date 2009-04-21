@@ -602,13 +602,28 @@
 
     - Funny: Once I set shift_mnaf to -5.5mV(=shift_mnaf_init+shift_mnaf_run) in PyMOOSE code, it matches
       NEURON simulation. Do not know how they came up with this value for NEURON.
-
+      
 
   - NaPF_SS, NAPF_TCR both tested against NEURON - working fine.
-
 
 * <2009-04-21 Tue 14:32> Testing K channels
   KDR working as seen yesterday.
   KDR_FS working with NaPF_SS
   KA is not working with NaPF_SS and KDR_FS
-  
+
+* <2009-04-22 Wed 00:27> KA channel fixed
+  It turned out that NEURON version is initializing the m, h state variables
+  to non-standard stuff (in theory they should be functions of voltage, and
+  calculated on the fly). I had to modify HHChannel code to allow for initial
+  values for these state variables.
+
+  Now I am getting mismatch with KA_IB. This is just KA with tau_h multiplied
+  by 2.6 (god knows why, obviously to fit the graphs as best as possible).
+
+  Oops! looks like the initX/Y/Z is not working - the date has changed and I
+  have been trying to match KA(yesterday's output) with KA_IB. 
+  After I realized the blunder, and compared the correct plots, the initial
+  part has a little discrepancy. When I set X for KA_IB after the reset, it
+  works, but when I set initX, it does not.
+
+  Well - now I have fixed PyMOOSE to make it work. KA_IB is matching.
