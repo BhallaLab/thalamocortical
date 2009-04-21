@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 01:08:37 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Apr 22 00:06:20 2009 (+0530)
+# Last-Updated: Wed Apr 22 00:55:20 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 351
+#     Update #: 363
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -67,6 +67,7 @@ conductance = {'NaF': 1500.0,
                'CaT': 1.0,
                'CaL': 5.0,
                'KA': 300.0,
+               'KA_IB': 300.0,
                'KC': 100.0,
                'KM': 37.5,
                'K2': 1.0,
@@ -193,6 +194,10 @@ class Simulation:
 
     def run(self, time):
         config.context.reset()
+        if config.context.exists('/test/comp/KA_IB'):
+            chan = moose.HHChannel('/test/comp/KA_IB')
+            print 'X =', chan.X
+#             chan.X = 0.0
         self.start_t = datetime.now()
         config.context.step(float(time))
         self.end_t = datetime.now()
@@ -224,7 +229,7 @@ class Simulation:
 import pylab
 if __name__ == "__main__":
     sim = Simulation()
-    sim.model, sim.data, = setup_singlecomp(['KA'])
+    sim.model, sim.data, = setup_singlecomp(['KA_IB'])
     sim.schedule()
     sim.run(50e-3)
     tables = sim.dump_data('data')
