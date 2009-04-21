@@ -18,8 +18,8 @@ soma{
     // insert napf_spinstell
     // gbar_napf_spinstell = 0.00015
     // ena = 50
-    // insert kdr
-    // gbar_kdr = 0.1
+    // insert kdr_fs
+    // gbar_kdr_fs = 0.1
     insert ka
     gbar_ka = 0.03
     ek = -95
