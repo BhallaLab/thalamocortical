@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Apr 21 19:19:14 2009 (+0530)
+# Last-Updated: Wed Apr 22 00:06:36 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 93
+#     Update #: 94
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -97,6 +97,7 @@ class KA(ChannelBase):
     def __init__(self, name, parent):
 	ChannelBase.__init__(self, name, parent, 4, 1)
 	self.Ek = -95e-3
+        self.initX = 0.0
 	v = linspace(config.vmin, config.vmax, config.ndivs + 1)
 	m_inf = 1 / ( 1 + exp( ( - v - 60e-3 ) / 8.5e-3 ) )
 	tau_m =  1e-3 * (0.185 + 0.5 / ( exp( ( v + 35.8e-3 ) / 19.7e-3 ) + exp( ( - v - 79.7e-3 ) / 12.7e-3 ) ))
