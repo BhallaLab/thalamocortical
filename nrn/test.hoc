@@ -22,11 +22,14 @@ soma{
     // ena = 50
     // insert kdr_fs
     // gbar_kdr_fs = 0.1
-    insert ka_ib
-    gbar_ka_ib = 0.03
+    // insert ka_ib
+    // gbar_ka_ib = 0.03
     // insert km
     // gbar_km = 0.00375
-    ek = -95
+    // ek = -95
+    insert cat
+    gbar_cat = 1.0
+//    eca = 125e-3
     insert pas
     e_pas = -65
     g_pas = 2e-5
