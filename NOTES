@@ -627,3 +627,11 @@
   works, but when I set initX, it does not.
 
   Well - now I have fixed PyMOOSE to make it work. KA_IB is matching.
+* <2009-04-22 Wed 10:29> Ca channels
+  CaT worked after I corrected unit conversion in the formulae for alpha and
+  beta. CaL was having similar problem, and after fixing unit conversion it is
+  very close.
+
+  Fiddled with beta, changes as drastic as multiplying by 1000 does not make
+  any difference in plot. The little difference with NEURON plot may be at
+  alpha.

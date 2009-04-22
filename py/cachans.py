@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 00:18:24 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Apr 22 10:02:18 2009 (+0530)
+# Last-Updated: Wed Apr 22 23:30:22 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 48
+#     Update #: 108
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -48,24 +48,32 @@
 from channel import ChannelBase
 from numpy import where, linspace, exp
 import config
+class CaChannel(ChannelBase):
+    """This is just a place holder to maintain type information"""
+    def __init__(self, name, parent, xpower=1, ypower=0):
+	ChannelBase.__init__(self, name, parent, xpower, ypower)
+        self.connected_to_pool = False
 
-class CaL(ChannelBase):
+class CaL(CaChannel):
     def __init__(self, name, parent):
-	ChannelBase.__init__(self, name, parent, 2)
+        CaChannel.__init__(self, name, parent, 2)
 	self.Ek = 125e-3
+        self.initX = 0.0
 	v = linspace(config.vmin, config.vmax, config.ndivs + 1)
-	alpha = 1.6e3 / (1.0 + exp(-0.072e3 * (v - 5e-3)))
-	beta = where( v < (1e-6 - 8.9e-3),
-		      100 * exp(-v / 5),
-		      20 * v / (exp(v / 5) - 1))
+	alpha = 1.6e3 / (1.0 + exp(-0.072 * (v * 1e3 - 5)))
+        v = v + 8.9e-3
+	beta = where( abs(v) * 1e3 < 1e-6,
+		      1e3 * 0.1 * exp(-v / 5e-3),
+		      1e3 * 0.02 * v * 1e3 / (exp(v * 1e3 / 5) - 1))
 	for i in range(config.ndivs + 1):
 	    self.xGate.A[i] = alpha[i]
 	    self.xGate.B[i] = beta[i]
-	self.xGate.tweakAlpha()
+        self.xGate.tweakAlpha()
 
-class CaT(ChannelBase):
+
+class CaT(CaChannel):
     def __init__(self, name, parent):
-	ChannelBase.__init__(self, name, parent, 2, 1)
+	CaChannel.__init__(self, name, parent, 2, 1)
 	self.Ek = 125e-3
         self.initX = 0.0
 	v = linspace(config.vmin, config.vmax, config.ndivs + 1)
@@ -83,9 +91,6 @@ class CaT(ChannelBase):
 	    self.yGate.B[i] = h_inf[i]
 	self.xGate.tweakTau()
 	self.yGate.tweakTau()
-		       
-
-
 
 # 
 # cachans.py ends here
