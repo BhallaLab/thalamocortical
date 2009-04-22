@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 01:08:37 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Apr 22 10:08:35 2009 (+0530)
+# Last-Updated: Thu Apr 23 01:45:00 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 368
+#     Update #: 434
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -54,6 +54,7 @@ import config
 from nachans import *
 from kchans import *
 from cachans import *
+from capool import CaPool
 
 conductance = {'NaF': 1500.0,
                'NaF_TCR': 1500.0,
@@ -64,7 +65,7 @@ conductance = {'NaF': 1500.0,
                'NaPF_TCR': 1.5,
                'KDR': 1000.0,
                'KDR_FS': 1000.0,
-               'CaT': 1.0e4,
+               'CaT': 1.0,
                'CaL': 5.0,
                'KA': 300.0,
                'KA_IB': 300.0,
@@ -126,6 +127,27 @@ class MyCompartment(moose.Compartment):
         self.connect("channel", chan, "channel")
         return chan
 
+    def insertCaPool(self, phi, tau):
+        """Insert a Ca+2 pool and connect it to the relevant channels.
+
+        phi is the amount of Ca2+ in unit area. 
+
+        NOTE that this function should be called only after all
+        channels (Ca and Ca dependent K channels) have been
+        initialized. You can call this function multiple times without
+        harm, there is safeguard against multiple connections in
+        CaPool class."""
+        self.ca_pool = CaPool('CaPool', self)
+        self.ca_pool.B = phi / self.sarea()
+        self.ca_pool.tau = tau
+        ca_channels = [ channel for channel in self.channels \
+                            if isinstance(channel, CaChannel) ]
+        print 'no. of ca channels:', len(ca_channels)
+        self.ca_pool.connectCaChannels(ca_channels)
+        kca_channels = [ channel for channel in self.channels \
+                            if isinstance(channel, KCaChannel) ]
+        self.ca_pool.connectDepChannels(kca_channels)
+
     def insertRecorder(self, field_name, data_container):
         """Creates a table for recording a field under data_container"""
         table = moose.Table(field_name, data_container)
@@ -146,6 +168,7 @@ def setup_singlecomp(channels):
     data = moose.Neutral("data")
     tables = []
     comp = MyCompartment("comp", container)
+    container.comp = comp
     comp.length = 20e-6
     comp.diameter = 15e-6
     comp.initVm = -65e-3
@@ -194,10 +217,6 @@ class Simulation:
 
     def run(self, time):
         config.context.reset()
-        if config.context.exists('/test/comp/KA_IB'):
-            chan = moose.HHChannel('/test/comp/KA_IB')
-            print 'X =', chan.X
-#             chan.X = 0.0
         self.start_t = datetime.now()
         config.context.step(float(time))
         self.end_t = datetime.now()
@@ -229,7 +248,11 @@ class Simulation:
 import pylab
 if __name__ == "__main__":
     sim = Simulation()
-    sim.model, sim.data, = setup_singlecomp(['CaT'])
+    sim.model, sim.data, = setup_singlecomp(['CaL', 'CaT'])
+    sim.model.comp.insertCaPool(5.2e-6/2e-10, 0.02e-3) # The fortran code uses 2e-4 um depth
+    ca_table = moose.Table('Ca', sim.data)
+    ca_table.stepMode = 3
+    sim.model.comp.ca_pool.connect('Ca', ca_table, 'inputRequest')
     sim.schedule()
     sim.run(50e-3)
     tables = sim.dump_data('data')

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Apr 22 00:54:35 2009 (+0530)
+# Last-Updated: Wed Apr 22 23:37:43 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 111
+#     Update #: 127
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -49,7 +49,12 @@ from channel import ChannelBase
 from numpy import where, linspace, exp
 import config
 
-class KDR(ChannelBase):
+class KChannel(ChannelBase):
+    """This is a dummy base class to keep type information."""
+    def __init__(self, name, parent, xpower=1, ypower=0):
+        ChannelBase.__init__(self, name, parent, xpower, ypower)
+    
+class KDR(KChannel):
     """Delayed rectifier current
 
     "In hippocampal pyramidal neurons, however, it has been reported have relatively slow activation, with a time to peak of some 50-100 msec and even slower inactivation. Such a slow activation would make it ill suited to participate in the repolarization of the AP.... An equation that can describe IK(DR) in cortical neurons is
@@ -65,7 +70,7 @@ class KDR(ChannelBase):
     """
 
     def __init__(self, name, parent):
-	ChannelBase.__init__(self, name, parent, 4)
+	KChannel.__init__(self, name, parent, 4)
 	self.Ek = -95e-3
 	v = linspace(config.vmin, config.vmax, config.ndivs + 1) 
 	tau_m = where(v < -10e-3, \
@@ -77,10 +82,10 @@ class KDR(ChannelBase):
             self.xGate.B[i] = m_inf[i]
 	self.xGate.tweakTau()
 
-class KDR_FS(ChannelBase):
+class KDR_FS(KChannel):
     """KDR for fast spiking neurons"""
     def __init__(self, name, parent):
-	ChannelBase.__init__(self, name, parent, 4)
+	KChannel.__init__(self, name, parent, 4)
 	self.Ek = -95e-3
 	v = linspace(config.vmin, config.vmax, config.ndivs + 1)
 	m_inf = 1.0 / (1.0 + exp((- v - 27e-3) / 11.5e-3))
@@ -92,10 +97,10 @@ class KDR_FS(ChannelBase):
             self.xGate.B[i] = m_inf[i]
         self.xGate.tweakTau()
 	
-class KA(ChannelBase):
+class KA(KChannel):
     """A type K+ channel"""
     def __init__(self, name, parent):
-	ChannelBase.__init__(self, name, parent, 4, 1)
+	KChannel.__init__(self, name, parent, 4, 1)
 	self.Ek = -95e-3
         self.initX = 0.0
 	v = linspace(config.vmin, config.vmax, config.ndivs + 1)
@@ -118,11 +123,11 @@ class KA(ChannelBase):
         self.yGate.A.dumpFile("ka_ya.plot")
         self.yGate.B.dumpFile("ka_yb.plot")
 
-class KA_IB(ChannelBase):
+class KA_IB(KChannel):
     """A type K+ channel for tufted intrinsically bursting cells -
     multiplies tau_h of KA by 2.6"""
     def __init__(self, name, parent):
-	ChannelBase.__init__(self, name, parent, 4, 1)
+	KChannel.__init__(self, name, parent, 4, 1)
 	self.Ek = -95e-3
         print self.initX
         self.initX = 0.0
@@ -147,9 +152,9 @@ class KA_IB(ChannelBase):
         self.yGate.B.dumpFile("ka_ib_yb.plot")
 
 
-class K2(ChannelBase):
+class K2(KChannel):
     def __init__(self, name, parent):
-	ChannelBase.__init__(self, name, parent, 1, 1)
+	KChannel.__init__(self, name, parent, 1, 1)
 	self.Ek = -95e-3
 	v = linspace(config.vmin, config.vmax, config.ndivs + 1)
 	m_inf = 1.0 / (1 + exp((-v - 10e-3) / 17e-3))
@@ -167,9 +172,9 @@ class K2(ChannelBase):
         self.xGate.tweakTau()
 	self.yGate.tweakTau()
 	
-class KM(ChannelBase):
+class KM(KChannel):
     def __init__(self, name, parent):
-	ChannelBase.__init__(self, name, parent, 1)
+	KChannel.__init__(self, name, parent, 1)
 	self.Ek = -95e-3
 	v = linspace(config.vmin, config.vmax, config.ndivs + 1)
 	a =  1e3 * 0.02 / ( 1 + exp((-v - 20e-3 ) / 5e-3))
@@ -179,7 +184,12 @@ class KM(ChannelBase):
             self.xGate.B[i] = b[i]
 	self.xGate.tweakAlpha()
 
-
+class KCaChannel(KChannel):
+    """[Ca+2] dependent K+ channel base class."""
+    def __init__(self, name, parent, xpower=0, ypower=0, zpower=1):
+        KChannel.__init__(self, name, parent, xpower, ypower)
+        self.connected_to_ca
+    
 	
 
 # 
