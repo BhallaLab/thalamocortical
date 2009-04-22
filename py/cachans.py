@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 00:18:24 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Apr 18 01:04:59 2009 (+0530)
+# Last-Updated: Wed Apr 22 10:02:18 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 46
+#     Update #: 48
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -67,6 +67,7 @@ class CaT(ChannelBase):
     def __init__(self, name, parent):
 	ChannelBase.__init__(self, name, parent, 2, 1)
 	self.Ek = 125e-3
+        self.initX = 0.0
 	v = linspace(config.vmin, config.vmax, config.ndivs + 1)
 	m_inf = 1 / (1 + exp( (- v - 56e-3) / 6.2e-3))
 	tau_m = 1e-3 * (0.204 + 0.333 / ( exp(( v + 15.8e-3) / 18.2e-3 ) + 
@@ -74,7 +75,7 @@ class CaT(ChannelBase):
 	h_inf = 1 / (1 + exp(( v + 80e-3 ) / 4e-3))
 	tau_h = where( v < -81e-3, 
 		       1e-3 * 0.333 * exp( ( v + 466e-3 ) / 66.6e-3 ),
-		       1e-3 * (9.32 + 0.333 * exp( ( -v - 21 ) / 10.5 )))
+		       1e-3 * (9.32 + 0.333 * exp( ( -v - 21e-3 ) / 10.5e-3 )))
 	for i in range(config.ndivs + 1):
 	    self.xGate.A[i] = tau_m[i]
 	    self.xGate.B[i] = m_inf[i]
