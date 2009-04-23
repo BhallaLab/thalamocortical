@@ -21,20 +21,23 @@ soma{
     // ena = 50
     // insert kdr_fs
     // gbar_kdr_fs = 0.1
+    insert ka
+    gbar_ka = 0.03
+    ek = -95
     // insert ka_ib
     // gbar_ka_ib = 0.03
     // insert km
     // gbar_km = 0.00375
     // ek = -95
-    insert cal
-    gbar_cal = 5e-4
-    insert cat
-    gbar_cat = 1e-4
-    insert cad
+    // insert cal
+    // gbar_cal = 5e-4
+    // insert cat
+    // gbar_cat = 1e-4
+    // insert cad
     // *** ca diffusion: beta=1/tau
-    beta_cad  =   0.02
-    // cafor(I) (FORTRAN) converted to phi (NEURON)
-    phi_cad =   260000.
+    // beta_cad  =   0.02
+    // // cafor(I) (FORTRAN) converted to phi (NEURON)
+    // phi_cad =   260000.
 //    eca = 125e-3
     insert pas
     e_pas = -65
@@ -47,15 +50,15 @@ soma{
     stim1.dur = 20
     stim1.del = 20
 }
-ceiling_cad = 1e6
+//ceiling_cad = 1e6
 tstop = 50
 vecV.record(&soma.v(0.5))
 vecT.record(&t)
-vec_cad.record(&soma.cai(0.5))
+// vec_cad.record(&soma.cai(0.5))
 run()
 outfile.wopen("mydata/Vm.plot")
 for ii = 0, vecV.size() - 1 {
-    outfile.printf("%g %g %g\n", vecT.x(ii), vecV.x(ii), vec_cad.x(ii))
+    outfile.printf("%g %g\n", vecT.x(ii), vecV.x(ii))
 
 }
 outfile.close()
