@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:13 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 20 23:37:16 2009 (+0530)
+# Last-Updated: Thu Apr 23 09:39:24 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 60
+#     Update #: 63
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -50,9 +50,14 @@ import pylab
 import config
 from channel import ChannelBase
 
-class NaF(ChannelBase):
+class NaChannel(ChannelBase):
+    """Dummy base class for all Na+ channels"""
+    def __init__(self, name, parent, x, y):
+        ChannelBase.__init__(self, name, parent, x, y)
+
+class NaF(NaChannel):
     def __init__(self, name, parent):
-        ChannelBase.__init__(self, name, parent, 3, 1)
+        NaChannel.__init__(self, name, parent, 3, 1)
         self.Ek = 50e-3
         v = linspace(config.vmin, config.vmax, config.ndivs + 1)
         tau_m = where(v < -30e-3, \
@@ -76,9 +81,9 @@ class NaF(ChannelBase):
         self.yGate.A.dumpFile("naf_ya.plot")
         self.yGate.B.dumpFile("naf_yb.plot")
         
-class NaF2(ChannelBase):
+class NaF2(NaChannel):
     def __init__(self, name, parent):
-        ChannelBase.__init__(self, name, parent, 3, 1)
+        NaChannel.__init__(self, name, parent, 3, 1)
         self.Ek = 50e-3
         v = linspace(config.vmin, config.vmax, config.ndivs + 1)
         tau_m = where(v < -30e-3, \
@@ -98,9 +103,9 @@ class NaF2(ChannelBase):
         self.xGate.tweakTau()
         self.yGate.tweakTau()
 
-class NaP(ChannelBase):
+class NaP(NaChannel):
     def __init__(self, name, parent):
-        ChannelBase.__init__(self, name, parent, 1)
+        NaChannel.__init__(self, name, parent, 1)
         self.Ek = 50e-3
         v = linspace(config.vmin, config.vmax, config.ndivs + 1)
         tau_m = where(v < -40e-3, \
@@ -115,10 +120,10 @@ class NaP(ChannelBase):
         self.xGate.B.dumpFile("nap_xb.plot")
 
 
-class NaPF(ChannelBase):
+class NaPF(NaChannel):
     """Persistent Na+ current, fast"""
     def __init__(self, name, parent):
-        ChannelBase.__init__(self, name, parent, 3)
+        NaChannel.__init__(self, name, parent, 3)
         self.Ek = 50e-3
         v = linspace(config.vmin, config.vmax, config.ndivs + 1)
         tau_m = where(v < -30e-3, \
@@ -130,11 +135,11 @@ class NaPF(ChannelBase):
             self.xGate.B[i] = m_inf[i]
         self.xGate.tweakTau()
 
-class NaPF_TCR(ChannelBase):
+class NaPF_TCR(NaChannel):
     """Persistent Na+ channel specific to TCR cells. Only difference
     with NaPF is power of m is 1 as opposed 3."""
     def __init__(self, name, parent):
-        ChannelBase.__init__(self, name, parent, 1)
+        NaChannel.__init__(self, name, parent, 1)
         self.Ek = 50e-3
         shift = 7e-3
         v = linspace(config.vmin, config.vmax, config.ndivs + 1) + shift
@@ -147,11 +152,11 @@ class NaPF_TCR(ChannelBase):
             self.xGate.B[i] = m_inf[i]
         self.xGate.tweakTau()
 
-class NaF_TCR(ChannelBase):
+class NaF_TCR(NaChannel):
     """Fast Na+ channel for TCR cells. This is almost identical to
     NaF, but there is a nasty voltage shift in the tables."""
     def __init__(self, name, parent):
-        ChannelBase.__init__(self, name, parent, 3, 1)
+        NaChannel.__init__(self, name, parent, 3, 1)
         self.Ek = 50e-3
         shift_mnaf = -5.5e-3
         shift_hnaf = -7e-3
@@ -177,9 +182,9 @@ class NaF_TCR(ChannelBase):
         self.yGate.A.dumpFile("naf_ya.plot")
         self.yGate.B.dumpFile("naf_yb.plot")
         
-class NaPF_SS(ChannelBase):
+class NaPF_SS(NaChannel):
     def __init__(self, name, parent):
-        ChannelBase.__init__(self, name, parent, 3)
+        NaChannel.__init__(self, name, parent, 3)
         self.Ek = 50e-3
         shift = -2.5e-3
         v = linspace(config.vmin, config.vmax, config.ndivs + 1) + shift
