@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Apr 22 22:21:11 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Apr 23 11:26:32 2009 (+0530)
+# Last-Updated: Thu Apr 23 15:28:21 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 43
+#     Update #: 44
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -58,8 +58,8 @@ class CaPool(moose.CaConc):
         """Connects the Ca2+ channels in channel_list as a source of
         Ca2+ to the pool."""
         for channel in channel_list:
-            if not isinstance(channel, CaChannel):
-                print 'WARNING: Ignoring non-CaChannel', channel.path
+            if not isinstance(channel, CaL):
+                print 'WARNING: Ignoring non-CaL', channel.path
             else:
                 if not channel.connected_to_pool:
                     print 'Connecting', channel.path
