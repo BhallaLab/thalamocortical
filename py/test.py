@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 01:08:37 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Apr 23 09:12:50 2009 (+0530)
+# Last-Updated: Thu Apr 23 09:39:52 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 436
+#     Update #: 438
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -248,7 +248,7 @@ class Simulation:
 import pylab
 if __name__ == "__main__":
     sim = Simulation()
-    sim.model, sim.data, = setup_singlecomp(['KA'])
+    sim.model, sim.data, = setup_singlecomp(['CaL', 'CaT', 'NaF'])
     sim.model.comp.insertCaPool(5.2e-6/2e-10, 50e-3) # The fortran code uses 2e-4 um depth
     ca_table = moose.Table('Ca', sim.data)
     ca_table.stepMode = 3
