@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Apr 23 09:12:28 2009 (+0530)
+# Last-Updated: Thu Apr 23 14:39:03 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 129
+#     Update #: 188
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -45,8 +45,9 @@
 
 # Code:
 
+import moose
 from channel import ChannelBase
-from numpy import where, linspace, exp
+from numpy import where, linspace, exp, arange, ones
 import config
 
 class KChannel(ChannelBase):
@@ -187,9 +188,53 @@ class KCaChannel(KChannel):
     """[Ca+2] dependent K+ channel base class."""
     def __init__(self, name, parent, xpower=0, ypower=0, zpower=1):
         KChannel.__init__(self, name, parent, xpower, ypower)
-        self.connected_to_ca
+        self.connected_to_ca = False
+        self.Zpower = zpower
+        self.zGate = moose.HHGate('zGate', self)
+        self.zGate.A.xmin = 0.0
+        self.zGate.A.xmax = 1000.0
+        self.zGate.A.xdivs = 1000
+        self.zGate.B.xmin = 0.0
+        self.zGate.B.xmax = 1000.0
+        self.zGate.B.xdivs = 1000        
     
-	
+class KAHP(KCaChannel):
+    """AHP type K+ current"""
+    def __init__(self, name, parent):
+        KCaChannel.__init__(self, name, parent)
+        self.Z = 0.0
+        self.instant = 4
+        alpha = linspace(0.0, 1000.0, self.zGate.A.xdivs + 1)
+        alpha = where(alpha < 100.0 * 1e3, 0.1 * alpha, 10.0)
+        beta =  ones(len(alpha)) * 10.0 + alpha
+        for i in range(len(alpha)):
+            self.zGate.A[i] = alpha[i]
+            self.zGate.B[i] = beta[i]
+#        self.zGate.tweakAlpha()
+#         self.zGate.A.calcMode = 0
+#         self.zGate.B.calcMode = 0
+#         self.zGate.tabFill(3000, 2)
 
+class KAHP_SLOWER(KCaChannel):
+    def __init__(self, name, parent):
+        KCaChannel.__init__(self, name, parent)
+        alpha = linspace(0.0, 1000.0, 1001)
+        alpha = where(alpha < 500.0, 0.02 * alpha, 10.0)
+        beta =  1.0
+        for i in range(len(alpha)):
+            self.zGate.A[i] = alpha[i]
+            self.zGate.B[i] = beta[i]
+
+class KAHP_DP(KCaChannel):
+    def __init__(self, name, parent):
+        KCaChannel.__init__(self, name, parent)
+        alpha = linspace(0.0, 1000.0, 1001)
+        alpha = where(alpha < 500.0, 0.01 * alpha, 10.0)
+        beta =  1.0
+        for i in range(len(alpha)):
+            self.zGate.A[i] = alpha[i]
+            self.zGate.B[i] = beta[i]
+
+        
 # 
 # kchans.py ends here
