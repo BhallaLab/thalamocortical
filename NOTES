@@ -639,3 +639,11 @@
   CaConc was not matching. After fixing tau, it works after scaled 10^3
   times. Don't know why, because NEURON declares mM as unit - which is
   equivalent to the SI unit used by MOOSE. 
+
+* <2009-04-23 Thu 15:29> Found bug with Ca pool
+  Realized that the cat current does not participate as source in ca
+  pool. It was working because the influx due to CaL was overriding the
+  discrepancy due to CaT.  Lost all commits beyond the working Ca pool version
+  in a confusion with git. 'git checkout version' somehow reverted the commits
+  themselves, or may be something stupid I did with egit in emacs. git does
+  not seem to be as cool as svn.
