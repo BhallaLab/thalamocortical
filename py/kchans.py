@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Apr 23 14:39:03 2009 (+0530)
+# Last-Updated: Sat Apr 25 03:25:52 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 188
+#     Update #: 246
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -54,7 +54,8 @@ class KChannel(ChannelBase):
     """This is a dummy base class to keep type information."""
     def __init__(self, name, parent, xpower=1, ypower=0):
         ChannelBase.__init__(self, name, parent, xpower, ypower)
-    
+        self.Ek = -95e-3
+
 class KDR(KChannel):
     """Delayed rectifier current
 
@@ -192,48 +193,52 @@ class KCaChannel(KChannel):
         self.Zpower = zpower
         self.zGate = moose.HHGate('zGate', self)
         self.zGate.A.xmin = 0.0
-        self.zGate.A.xmax = 1000.0
+        self.zGate.A.xmax = 1e3
         self.zGate.A.xdivs = 1000
         self.zGate.B.xmin = 0.0
-        self.zGate.B.xmax = 1000.0
+        self.zGate.B.xmax = 1e3
         self.zGate.B.xdivs = 1000        
     
 class KAHP(KCaChannel):
     """AHP type K+ current"""
     def __init__(self, name, parent):
         KCaChannel.__init__(self, name, parent)
-        self.Z = 0.0
+#        self.Z = 0.0
         self.instant = 4
-        alpha = linspace(0.0, 1000.0, self.zGate.A.xdivs + 1)
-        alpha = where(alpha < 100.0 * 1e3, 0.1 * alpha, 10.0)
-        beta =  ones(len(alpha)) * 10.0 + alpha
+        ca_conc = linspace(self.zGate.A.xmin, self.zGate.A.xmax, self.zGate.A.xdivs + 1)
+        alpha = where(ca_conc < 100.0 * 1e-3 , 0.1 * ca_conc, 10.0)
+        beta =  ones(self.zGate.B.xdivs + 1) * 10.0
         for i in range(len(alpha)):
             self.zGate.A[i] = alpha[i]
             self.zGate.B[i] = beta[i]
-#        self.zGate.tweakAlpha()
-#         self.zGate.A.calcMode = 0
-#         self.zGate.B.calcMode = 0
-#         self.zGate.tabFill(3000, 2)
+        self.zGate.tweakAlpha()
+        self.zGate.A.calcMode = 1
+        self.zGate.B.calcMode = 1
+
 
 class KAHP_SLOWER(KCaChannel):
     def __init__(self, name, parent):
         KCaChannel.__init__(self, name, parent)
-        alpha = linspace(0.0, 1000.0, 1001)
-        alpha = where(alpha < 500.0, 0.02 * alpha, 10.0)
-        beta =  1.0
+        ca_conc = linspace(self.zGate.A.xmin, self.zGate.A.xmax, self.zGate.A.xdivs + 1)
+        alpha = where(ca_conc < 500.0 * 1e-3 , 1e3 * ca_conc / 50000, 10.0)
+        beta =  ones(self.zGate.B.xdivs + 1) * 1.0
         for i in range(len(alpha)):
             self.zGate.A[i] = alpha[i]
             self.zGate.B[i] = beta[i]
+        self.zGate.tweakAlpha()
 
 class KAHP_DP(KCaChannel):
+    """KAHP for deep pyramidal cell"""
     def __init__(self, name, parent):
         KCaChannel.__init__(self, name, parent)
-        alpha = linspace(0.0, 1000.0, 1001)
-        alpha = where(alpha < 500.0, 0.01 * alpha, 10.0)
-        beta =  1.0
+        ca_conc = linspace(self.zGate.A.xmin, self.zGate.A.xmax, self.zGate.A.xdivs + 1)
+        alpha = where(ca_conc < 100.0 * 1e-3, 1e-4 * ca_conc, 0.01)
+        beta =  0.001
         for i in range(len(alpha)):
             self.zGate.A[i] = alpha[i]
             self.zGate.B[i] = beta[i]
+        self.zGate.tweakAlpha()
+
 
         
 # 

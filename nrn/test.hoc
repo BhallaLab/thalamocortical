@@ -1,8 +1,10 @@
-objectvar vecT, vecV, stim1, outfile, vec_cad
+objectvar vecT, vecV, stim1, outfile, vec_cad, file_cad, vec_mkahp
 outfile = new File()
+file_cad = new File()
 vecV = new Vector()
 vecT = new Vector()
 vec_cad = new Vector()
+vec_mkahp = new Vector()
 FARADAY=96485
 PI=3.141592
 secondorder=2
@@ -25,8 +27,8 @@ soma{
     // gbar_ka_ib = 0.03
     // insert km
     // gbar_km = 0.00375
-    insert kahp
-    gbar_kahp = 1e-4
+    insert kahp_slower
+    gbar_kahp_slower = 1e-4
     ek = -95
     insert cal
     gbar_cal = 5e-4
@@ -34,9 +36,9 @@ soma{
     // gbar_cat = 1e-4
     insert cad
 //    *** ca diffusion: beta=1/tau
-    beta_cad  =   0.02
+    beta_cad = 0.02
     // cafor(I) (FORTRAN) converted to phi (NEURON)
-    phi_cad =   260000.
+    phi_cad = 260000.
 //    eca = 125e-3
     insert pas
     e_pas = -65
@@ -54,11 +56,15 @@ tstop = 50
 vecV.record(&soma.v(0.5))
 vecT.record(&t)
 vec_cad.record(&soma.cai(0.5))
+vec_mkahp.record(&soma.m_kahp_slower(0.5))
 run()
 outfile.wopen("mydata/Vm.plot")
+file_cad.wopen("mydata/Ca.plot")
 for ii = 0, vecV.size() - 1 {
-    outfile.printf("%g %g %g\n", vecT.x(ii), vecV.x(ii), vec_cad.x(ii))
-
+    outfile.printf("%g %g %g\n", vecT.x(ii), vecV.x(ii), vec_mkahp.x(ii))
+    file_cad.printf("%g %g\n", vecT.x(ii), vec_cad.x(ii))
+    
 }
 outfile.close()
+file_cad.close()
 
