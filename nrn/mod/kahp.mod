@@ -29,6 +29,7 @@ PARAMETER {
 ASSIGNED { 
 	ik 		(mA/cm2) 
 	alpha (/ms) beta	(/ms)
+	gk (mS)
 }
  
 STATE {
@@ -38,6 +39,7 @@ STATE {
 BREAKPOINT { 
 	SOLVE states METHOD cnexp
 	ik = gbar * m * ( v - ek ) 
+	gk = gbar * m
 }
  
 INITIAL { 
