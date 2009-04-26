@@ -671,3 +671,12 @@
 * <2009-04-26 Sun 17:03> KAHP still the trouble
   Now I am trying without any current injection. Right at the beginning MOOSE
   [Ca2+] goes up very steeply, while NEURON has a low slope at the beginning. 
+* <2009-04-26 Sun 22:45> KAHP solved - but CaL not exact
+  Found the bug with KAHP - the tables were not fine enough. The conditional
+  evaluation was getting lost in the process. 
+  But still there is a small discrepancy in [Ca2+]. May be something's wrong
+  with CaL. I tried with CaL alone without any input current - and [Ca2+] is
+  deviating right at the start. Later on it stays ~parallel to NEURON.
+
+  Checked X_A and X_B tables with NeuroConstruct's version - identical
+  values.
