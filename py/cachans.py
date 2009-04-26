@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 00:18:24 2009 (+0530)
 # Version: 
-# Last-Updated: Sun Apr 26 22:43:05 2009 (+0530)
+# Last-Updated: Mon Apr 27 00:34:19 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 154
+#     Update #: 158
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -59,7 +59,7 @@ class CaL(CaChannel):
     def __init__(self, name, parent):
         CaChannel.__init__(self, name, parent, 2)
 	self.Ek = 125e-3
-        self.initX = 0.0
+        self.X = 0.0
 	v = linspace(config.vmin, config.vmax, config.ndivs + 1)
 	alpha = 1.6e3 / (1.0 + exp(-0.072 * (v * 1e3 - 5)))
         v = v + 8.9e-3
@@ -77,7 +77,7 @@ class CaT(CaChannel):
     def __init__(self, name, parent):
 	CaChannel.__init__(self, name, parent, 2, 1)
 	self.Ek = 125e-3
-        self.initX = 0.0
+        self.X = 0.0
 	v = linspace(config.vmin, config.vmax, config.ndivs + 1)
 	m_inf = 1 / (1 + exp( (- v - 56e-3) / 6.2e-3))
 	tau_m = 1e-3 * (0.204 + 0.333 / ( exp(( v + 15.8e-3) / 18.2e-3 ) + 
