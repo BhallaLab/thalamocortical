@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Apr 25 03:25:52 2009 (+0530)
+# Last-Updated: Sun Apr 26 18:19:05 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 246
+#     Update #: 256
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -198,6 +198,8 @@ class KCaChannel(KChannel):
         self.zGate.B.xmin = 0.0
         self.zGate.B.xmax = 1e3
         self.zGate.B.xdivs = 1000        
+        self.zGate.A.calcMode = 1
+        self.zGate.B.calcMode = 1
     
 class KAHP(KCaChannel):
     """AHP type K+ current"""
@@ -212,15 +214,13 @@ class KAHP(KCaChannel):
             self.zGate.A[i] = alpha[i]
             self.zGate.B[i] = beta[i]
         self.zGate.tweakAlpha()
-        self.zGate.A.calcMode = 1
-        self.zGate.B.calcMode = 1
 
 
 class KAHP_SLOWER(KCaChannel):
     def __init__(self, name, parent):
         KCaChannel.__init__(self, name, parent)
         ca_conc = linspace(self.zGate.A.xmin, self.zGate.A.xmax, self.zGate.A.xdivs + 1)
-        alpha = where(ca_conc < 500.0 * 1e-3 , 1e3 * ca_conc / 50000, 10.0)
+        alpha = where(ca_conc < 500.0e-3, 1e6 * ca_conc / 50000, 10.0)
         beta =  ones(self.zGate.B.xdivs + 1) * 1.0
         for i in range(len(alpha)):
             self.zGate.A[i] = alpha[i]

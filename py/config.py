@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Sun Apr 19 14:02:20 2009 (+0530)
+# Last-Updated: Sun Apr 26 11:47:06 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 8
+#     Update #: 9
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -49,8 +49,8 @@ import sys
 sys.path.append('/home/src/sim/cortical/py')
 import moose
 context = moose.PyMooseBase.getContext()
-simdt = 1e-5
-plotdt = 1e-5
+simdt = 1e-6
+plotdt = 1e-6
 
 vmin = -120e-3
 vmax = 40e-3
