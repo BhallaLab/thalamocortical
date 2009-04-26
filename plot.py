@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 15:51:57 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Apr 25 03:08:32 2009 (+0530)
+# Last-Updated: Sun Apr 26 11:45:05 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 76
+#     Update #: 146
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -69,26 +69,49 @@ nrn_Vm = nrn_data[:, 1]
 nrn_m = nrn_data[:, 2]
 nrn_t = nrn_data[:, 0]
 pylab.savetxt('nrn_m.txt', pylab.transpose(( indices, nrn_m[nrn_indices])))
-pylab.savetxt('mus_m.txt', pylab.transpose((mus_indices, mus_m)))
-pylab.plot(nrn_m[nrn_indices[3:]] , (mus_m[mus_indices[3:]]/9.42e-10))
+pylab.savetxt('mus_m.txt', pylab.transpose((mus_indices, mus_m/9.42e-6)))
+# pylab.plot(nrn_m[nrn_indices[3:]] , (mus_m[mus_indices[3:]]/9.42e-6))
 # pylab.plot( nrn_t, 1/(nrn_m/nrn_Ca), 'bx', label='nrn')
 # pylab.plot(mus_t, 1/((mus_m/9.42e-10)/mus_Ca), 'r+', label='mus')
 
 # pylab.plot(mus_t, mus_Ca)
 # pylab.plot(nrn_t, nrn_Ca)
 
-pylab.legend()
-pylab.show()
+# pylab.plot(mus_Ca, mus_m/9.42e-6, label='mus')
+# pylab.plot(nrn_Ca, nrn_m, label='nrn')
+# pylab.plot(nrn_Ca, nrn_t, label='t')
+# pylab.plot(mus_t, mus_m/9.42e-6, label='mus')
+# pylab.plot(nrn_t, nrn_m, label='nrn')
+#pylab.plot(mus_indices[3:], pylab.log(nrn_m[nrn_indices[3:]] / mus_m[mus_indices[3:]]))
+#-----
+# pylab.plot(mus_t[mus_indices[10:]], pylab.log(mus_m[mus_indices[10:]]), label='mus')
+# pylab.plot(nrn_t[nrn_indices[10:]], pylab.log(nrn_m[nrn_indices[10:]]), label='nrn')
+#----
+
+from scipy.interpolate import splrep, splev
+smoothness = 3
+order = 2
+# find the knot points
+tckp = splrep( mus_t, mus_Ca, s=3,k=3)
+
+# evaluate spline, including interpolated points
+mus_Ca_new = splev(nrn_t,tckp)
+print len(mus_Ca_new), len(nrn_Ca)
+# pylab.plot(mus_Ca_new - nrn_Ca)
+# pylab.show()
+
+# pylab.legend()
+# pylab.show()
 
 # pylab.subplot(2, 1, 1)
-# pylab.plot(nrn_t, nrn_Vm, label='nrn')
-# pylab.plot(mus_t, mus_Vm, label='mus')
-# pylab.legend()
+pylab.plot(nrn_t, nrn_Vm, label='nrn')
+pylab.plot(mus_t, mus_Vm, label='mus')
+pylab.legend()
 # pylab.subplot(2,1,2)
 # pylab.plot(nrn_t, nrn_Ca, label='nrn')
 # pylab.plot(mus_t, mus_Ca, label='mus')
 # pylab.legend()
-# pylab.show()
+pylab.show()
 
 
 # 

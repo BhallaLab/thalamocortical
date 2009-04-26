@@ -667,3 +667,7 @@
   8. When I plot kahp_m from moose against that from NEURON, the plot has two
      straight lines: one with a slope ~0.5 from (0,0) to (0.018, 0.009) and
      then with slope 1.0 (which is the wanted slope) for the rest.
+
+* <2009-04-26 Sun 17:03> KAHP still the trouble
+  Now I am trying without any current injection. Right at the beginning MOOSE
+  [Ca2+] goes up very steeply, while NEURON has a low slope at the beginning. 

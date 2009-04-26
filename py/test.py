@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 01:08:37 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Apr 25 01:22:29 2009 (+0530)
+# Last-Updated: Sun Apr 26 18:25:12 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 498
+#     Update #: 555
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -114,7 +114,7 @@ def setup_singlecomp(channels):
     comp.insertRecorder("Vm", data)
     pulsegen = moose.PulseGen("pulsegen", container)
     pulsegen.baseLevel = 0.0
-    pulsegen.firstLevel = 1e-10
+    pulsegen.firstLevel = 0.0#1e-10
     pulsegen.firstWidth = 20e-3
     pulsegen.firstDelay = 20e-3
     pulsegen.connect("outputSrc", comp, "injectMsg")
@@ -179,11 +179,40 @@ if __name__ == "__main__":
     sim.model.comp.ca_pool.connect('Ca', ca_table, 'inputRequest')
     m_table = moose.Table('m_kahp', sim.data)
     m_table.stepMode = 3
-    moose.HHChannel('test/comp/KAHP_SLOWER').connect('Gk', m_table, 'inputRequest')
+    moose.HHChannel('test/comp/KAHP_SLOWER').connect('Z', m_table, 'inputRequest')
+    vm_table = moose.Table('data/Vm')
     sim.schedule()
     
     sim.run(50e-3)
     tables = sim.dump_data('data')
+
+    nrn_data = pylab.loadtxt('../nrn/mydata/Vm.plot')
+    nrn_Ca = pylab.loadtxt('../nrn/mydata/Ca.plot')
+    nrn_m = nrn_data[:, 2]
+    nrn_Vm = nrn_data[:, 1]
+    nrn_Ca = nrn_Ca[:, 1]
+    nrn_t = nrn_data[:, 0]
+    mus_t = pylab.array(range(len(m_table)))*1e-3
+    mus_Ca = pylab.array(ca_table)
+    mus_m = pylab.array(m_table)
+    pylab.plot(mus_Ca * 1e3, mus_m)
+    pylab.plot(nrn_Ca, nrn_m)
+# ###############
+#     pylab.subplot(3, 1, 1, title='Vm')
+#     pylab.plot(nrn_t, nrn_Vm, label='nrn')
+#     pylab.plot(mus_t, pylab.array(vm_table)*1e3, label='mus')
+#     pylab.legend()
+#     pylab.subplot(3, 1, 2, title='[Ca2+]')
+#     pylab.plot(nrn_t, nrn_Ca, label='nrn')
+#     pylab.plot(mus_t, pylab.array(ca_table) * 1e3, label='mus')
+#     pylab.legend()
+#     pylab.subplot(3, 1, 3, title='m_kahp')
+#     pylab.plot(nrn_t, nrn_m, label='nrn')
+#     pylab.plot(mus_t, pylab.array(m_table) / 9.42e-6, label='mus')
+#     pylab.legend()
+#     pylab.show()
+
+
 #####################################
 #     tables = test_singlecomp([], 50e-3)
 #     rows = ceil(sqrt(len(tables)))
