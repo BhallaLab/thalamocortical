@@ -47,7 +47,7 @@ soma{
     cm = 0.9
 
     stim1 = new IClamp(0.5)
-    stim1.amp = 0.1
+    stim1.amp = 0.0
     stim1.dur = 20
     stim1.del = 20
 }

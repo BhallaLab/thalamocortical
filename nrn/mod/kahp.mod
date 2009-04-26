@@ -16,7 +16,7 @@ NEURON {
 	SUFFIX kahp
 	USEION k READ ek WRITE ik
 	USEION ca READ cai
-	RANGE gbar, ik, m
+	RANGE gbar, ik, m, gk
 }
 
 PARAMETER { 
