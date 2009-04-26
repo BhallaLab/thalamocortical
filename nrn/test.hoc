@@ -27,19 +27,17 @@ soma{
     // gbar_ka_ib = 0.03
     // insert km
     // gbar_km = 0.00375
-    // insert kahp_slower
-    // gbar_kahp_slower = 1e-4
-    // ek = -95
+    insert kahp_slower
+    gbar_kahp_slower = 1e-4
+    ek = -95
     insert cal
     gbar_cal = 5e-4
     // insert cat
     // gbar_cat = 1e-4
-    insert cad
-//    *** ca diffusion: beta=1/tau
-    beta_cad = 0.02
-    // cafor(I) (FORTRAN) converted to phi (NEURON)
-    phi_cad = 260000.
-//    eca = 125e-3
+   insert cad
+   beta_cad = 0.02
+   phi_cad = 260000.
+
     insert pas
     e_pas = -65
     g_pas = 2e-5
@@ -47,7 +45,7 @@ soma{
     cm = 0.9
 
     stim1 = new IClamp(0.5)
-    stim1.amp = 0.0
+    stim1.amp = 0.1
     stim1.dur = 20
     stim1.del = 20
 }

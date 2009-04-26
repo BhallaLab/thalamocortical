@@ -680,3 +680,18 @@
 
   Checked X_A and X_B tables with NeuroConstruct's version - identical
   values.
+
+  Checked with the commit where I thought the Ca channels were working - no -
+  the out put is very close - I did not recognize the difference as the plot
+  symbols were bigger than the difference. The difference is there during the
+  first few milliseconds.
+
+  Compared [Ca2+] with that from NeuroConstruct-generated  code. That is still
+
+
+  further off from NEURON output.
+
+  Finally FOUND the BUG!
+  I had originally set cal.xGate.initX = 0.0 - but the initX field was removed
+  after Upi suggested a better way of mainitaining initialization info. The
+  old initX = 0 code was not corrected. Once I fixed it, the result is perfect!
