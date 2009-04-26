@@ -694,4 +694,11 @@
   Finally FOUND the BUG!
   I had originally set cal.xGate.initX = 0.0 - but the initX field was removed
   after Upi suggested a better way of mainitaining initialization info. The
-  old initX = 0 code was not corrected. Once I fixed it, the result is perfect!
+  old initX = 0 code was not corrected. Once I fixed it, the result is
+  perfect!
+
+* <2009-04-27 Mon 02:27> KC - the last hurdle
+  Just implemented KC, as with erroneous KAHP, here also the rising phase is
+  more or less identical but the falling phase [Ca2+] goes off, Vm is quite
+  far away.
+  Too sleepy to debug.

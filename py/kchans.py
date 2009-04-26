@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Sun Apr 26 19:58:24 2009 (+0530)
+# Last-Updated: Mon Apr 27 02:25:48 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 265
+#     Update #: 359
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -193,20 +193,24 @@ class KCaChannel(KChannel):
         self.Zpower = zpower
         self.zGate = moose.HHGate('zGate', self)
         self.zGate.A.xmin = 0.0
-        self.zGate.A.xmax = 1.0
         self.zGate.A.xdivs = 1000
         self.zGate.B.xmin = 0.0
-        self.zGate.B.xmax = 1.0
         self.zGate.B.xdivs = 1000        
         self.zGate.A.calcMode = 1
         self.zGate.B.calcMode = 1
-    
-class KAHP(KCaChannel):
-    """AHP type K+ current"""
+        self.useConcentration = True
+
+class KAHPBase(KCaChannel):
     def __init__(self, name, parent):
         KCaChannel.__init__(self, name, parent)
-#        self.Z = 0.0
-#        self.instant = 4
+        self.zGate.A.xmax = 1.0
+        self.zGate.B.xmax = 1.0
+        
+class KAHP(KAHPBase):
+    """AHP type K+ current"""
+    def __init__(self, name, parent):
+        KAHPBase.__init__(self, name, parent)
+
         ca_conc = linspace(self.zGate.A.xmin, self.zGate.A.xmax, self.zGate.A.xdivs + 1)
         alpha = where(ca_conc < 100.0 * 1e-3 , 0.1 * ca_conc, 10.0)
         beta =  ones(self.zGate.B.xdivs + 1) * 10.0
@@ -216,9 +220,9 @@ class KAHP(KCaChannel):
         self.zGate.tweakAlpha()
 
 import pylab
-class KAHP_SLOWER(KCaChannel):
+class KAHP_SLOWER(KAHPBase):
     def __init__(self, name, parent):
-        KCaChannel.__init__(self, name, parent)
+        KAHPBase.__init__(self, name, parent)
         ca_conc = linspace(self.zGate.A.xmin, self.zGate.A.xmax, self.zGate.A.xdivs + 1)
         alpha = where(ca_conc < 500.0e-3, 1e6 * ca_conc / 50000, 10.0)
         beta =  ones(self.zGate.B.xdivs + 1) * 1.0
@@ -227,10 +231,10 @@ class KAHP_SLOWER(KCaChannel):
             self.zGate.B[i] = beta[i]
         self.zGate.tweakAlpha()
 
-class KAHP_DP(KCaChannel):
+class KAHP_DP(KAHPBase):
     """KAHP for deep pyramidal cell"""
     def __init__(self, name, parent):
-        KCaChannel.__init__(self, name, parent)
+        KAHPBase.__init__(self, name, parent)
         ca_conc = linspace(self.zGate.A.xmin, self.zGate.A.xmax, self.zGate.A.xdivs + 1)
         alpha = where(ca_conc < 100.0 * 1e-3, 1e-4 * ca_conc, 0.01)
         beta =  0.001
@@ -239,9 +243,45 @@ class KAHP_DP(KCaChannel):
             self.zGate.B[i] = beta[i]
         self.zGate.tweakAlpha()
 
-
-
+class KC(KCaChannel):
+    """C type K+ channel"""
+    def __init__(self, name, parent):
+        KCaChannel.__init__(self, name, parent, 1, 0, 1)
+        self.zGate.A.xmax = 1.0
+        self.zGate.B.xmax = 1.0
+        ca_conc = linspace(self.zGate.A.xmin, self.zGate.A.xmax, self.zGate.A.xdivs + 1)
+        alpha = ca_conc / 0.250
+        alpha = where(alpha < 1.0, alpha * 1e-3, 1.0e-3)
+        for i in range(len(alpha)):
+            self.zGate.A[i] = alpha[i]
+            self.zGate.B[i] = 1.0
+        self.instant = 4 # Zgate m is instantaneous: m = A/B
+        self.zGate.A.calcMode = 1
+        self.zGate.B.calcMode = 1
+        pylab.plot(ca_conc, self.zGate.A)
+        pylab.show()
+        v = linspace(config.vmin, config.vmax, config.ndivs + 1)
+        alpha = where(v < -10e-3, 
+                      2e3 / 37.95 * ( exp( ( v * 1e3 + 50 ) / 11 - ( v * 1e3 + 53.5 ) / 27 ) ),
+                      2e3 * exp( ( - v * 1e3- 53.5 ) / 27 ))
+        beta = where( v < -10e-3,
+                      2e3 * exp( ( - v * 1e3 - 53.5 ) / 27 ) - alpha, 
+                      0.0)
+        for i in range(len(alpha)):
+            self.xGate.A[i] = alpha[i]
+            self.xGate.B[i] = beta[i]
+        self.xGate.tweakAlpha()
+        self.X = 0.0
+        
+class KC_FAST(KC):
+    """Fast KC channel"""
+    def __init__(self, name, parent):
+        KC.__init__(self, name, parent)
+        for i in range(len(self.xGate.A)):
+            self.xGate.A[i] = 2 * self.xGate.A[i]
+            self.xGate.B[i] = 2 * self.xGate.B[i]
+        
 if __name__ == "__main__":
-    a = KAHP_SLOWER('kahp', moose.Neutral('/'))
+    a = KC_FAST('kc', moose.Neutral('/'))
 # 
 # kchans.py ends here
