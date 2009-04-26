@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 00:18:24 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Apr 22 23:30:22 2009 (+0530)
+# Last-Updated: Sun Apr 26 22:43:05 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 108
+#     Update #: 154
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -46,7 +46,7 @@
 # Code:
 
 from channel import ChannelBase
-from numpy import where, linspace, exp
+from numpy import where, linspace, exp, savetxt
 import config
 class CaChannel(ChannelBase):
     """This is just a place holder to maintain type information"""
@@ -54,6 +54,7 @@ class CaChannel(ChannelBase):
 	ChannelBase.__init__(self, name, parent, xpower, ypower)
         self.connected_to_pool = False
 
+import pylab
 class CaL(CaChannel):
     def __init__(self, name, parent):
         CaChannel.__init__(self, name, parent, 2)
@@ -64,12 +65,13 @@ class CaL(CaChannel):
         v = v + 8.9e-3
 	beta = where( abs(v) * 1e3 < 1e-6,
 		      1e3 * 0.1 * exp(-v / 5e-3),
-		      1e3 * 0.02 * v * 1e3 / (exp(v * 1e3 / 5) - 1))
+		      1e3 * 0.02 * v * 1e3 / (exp(v / 5e-3) - 1))
 	for i in range(config.ndivs + 1):
 	    self.xGate.A[i] = alpha[i]
 	    self.xGate.B[i] = beta[i]
         self.xGate.tweakAlpha()
-
+        self.xGate.A.dumpFile('alpha.txt')
+        self.xGate.B.dumpFile('beta.txt')
 
 class CaT(CaChannel):
     def __init__(self, name, parent):
