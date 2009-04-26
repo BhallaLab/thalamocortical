@@ -6,3 +6,5 @@ plot 'data/2009_04_25/Ca.plot' u ($0*1e-2):($1*1e3) w l, '../nrn/mydata/Ca.plot'
 plot 'data/2009_04_24/Ca.plot' u ($0*1e-2):($1)
 plot 'data/2009_04_25/m_kahp.plot' u ($0*1e-2):($1/9.42e-6), '../nrn/mydata/Vm.plot' u ($1):($3) 
 plot 'data/2009_04_25/m_kahp.plot' u ($0*1e-2):($1)
+plot 'beta.txt' u ($1*1e3):($2), '../nrn/mydata/Vm.plot' u ($2):($3)
+plot  '../nrn/mydata/Vm.plot' u ($2):($3)

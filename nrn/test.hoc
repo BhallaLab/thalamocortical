@@ -27,9 +27,9 @@ soma{
     // gbar_ka_ib = 0.03
     // insert km
     // gbar_km = 0.00375
-    insert kahp_slower
-    gbar_kahp_slower = 1e-4
-    ek = -95
+    // insert kahp_slower
+    // gbar_kahp_slower = 1e-4
+    // ek = -95
     insert cal
     gbar_cal = 5e-4
     // insert cat
@@ -56,7 +56,7 @@ tstop = 50
 vecV.record(&soma.v(0.5))
 vecT.record(&t)
 vec_cad.record(&soma.cai(0.5))
-vec_mkahp.record(&soma.m_kahp_slower(0.5))
+vec_mkahp.record(&soma.beta_cal(0.5))
 run()
 outfile.wopen("mydata/Vm.plot")
 file_cad.wopen("mydata/Ca.plot")

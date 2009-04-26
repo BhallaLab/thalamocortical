@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 01:08:37 2009 (+0530)
 # Version: 
-# Last-Updated: Sun Apr 26 20:17:48 2009 (+0530)
+# Last-Updated: Sun Apr 26 20:23:02 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 565
+#     Update #: 572
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -172,14 +172,14 @@ class Simulation:
 import pylab
 if __name__ == "__main__":
     sim = Simulation()
-    sim.model, sim.data, = setup_singlecomp(['CaL', 'KAHP_SLOWER'])
+    sim.model, sim.data, = setup_singlecomp(['CaL'])
     sim.model.comp.insertCaPool(5.2e-6 / 2e-10, 50e-3) # The fortran code uses 2e-4 um depth
     ca_table = moose.Table('Ca', sim.data)
     ca_table.stepMode = 3
     sim.model.comp.ca_pool.connect('Ca', ca_table, 'inputRequest')
-    m_table = moose.Table('m_kahp', sim.data)
-    m_table.stepMode = 3
-    moose.HHChannel('test/comp/KAHP_SLOWER').connect('Z', m_table, 'inputRequest')
+#     m_table = moose.Table('m_kahp', sim.data)
+#     m_table.stepMode = 3
+#     moose.HHChannel('test/comp/KAHP_SLOWER').connect('Z', m_table, 'inputRequest')
     vm_table = moose.Table('data/Vm')
     sim.schedule()
     
@@ -192,9 +192,9 @@ if __name__ == "__main__":
     nrn_Vm = nrn_data[:, 1]
     nrn_Ca = nrn_Ca[:, 1]
     nrn_t = nrn_data[:, 0]
-    mus_t = pylab.array(range(len(m_table)))*1e-3
+    mus_t = pylab.array(range(len(vm_table)))*1e-3
     mus_Ca = pylab.array(ca_table)
-    mus_m = pylab.array(m_table)
+#     mus_m = pylab.array(m_table)
 #     pylab.plot(mus_Ca * 1e3, mus_m)
 #     pylab.plot(nrn_Ca, nrn_m)
 #     pylab.show()
@@ -207,9 +207,9 @@ if __name__ == "__main__":
     pylab.plot(nrn_t, nrn_Ca, label='nrn')
     pylab.plot(mus_t, pylab.array(ca_table) * 1e3, label='mus')
     pylab.legend()
-    pylab.subplot(3, 1, 3, title='m_kahp')
-    pylab.plot(nrn_t, nrn_m, label='nrn')
-    pylab.plot(mus_t, pylab.array(m_table), label='mus')
+#     pylab.subplot(3, 1, 3, title='m_kahp')
+#     pylab.plot(nrn_t, nrn_m, label='nrn')
+#     pylab.plot(mus_t, pylab.array(m_table), label='mus')
     pylab.legend()
     pylab.show()
 
