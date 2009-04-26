@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Sun Apr 26 18:19:05 2009 (+0530)
+# Last-Updated: Sun Apr 26 19:58:24 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 256
+#     Update #: 265
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -193,10 +193,10 @@ class KCaChannel(KChannel):
         self.Zpower = zpower
         self.zGate = moose.HHGate('zGate', self)
         self.zGate.A.xmin = 0.0
-        self.zGate.A.xmax = 1e3
+        self.zGate.A.xmax = 1.0
         self.zGate.A.xdivs = 1000
         self.zGate.B.xmin = 0.0
-        self.zGate.B.xmax = 1e3
+        self.zGate.B.xmax = 1.0
         self.zGate.B.xdivs = 1000        
         self.zGate.A.calcMode = 1
         self.zGate.B.calcMode = 1
@@ -206,7 +206,7 @@ class KAHP(KCaChannel):
     def __init__(self, name, parent):
         KCaChannel.__init__(self, name, parent)
 #        self.Z = 0.0
-        self.instant = 4
+#        self.instant = 4
         ca_conc = linspace(self.zGate.A.xmin, self.zGate.A.xmax, self.zGate.A.xdivs + 1)
         alpha = where(ca_conc < 100.0 * 1e-3 , 0.1 * ca_conc, 10.0)
         beta =  ones(self.zGate.B.xdivs + 1) * 10.0
@@ -215,7 +215,7 @@ class KAHP(KCaChannel):
             self.zGate.B[i] = beta[i]
         self.zGate.tweakAlpha()
 
-
+import pylab
 class KAHP_SLOWER(KCaChannel):
     def __init__(self, name, parent):
         KCaChannel.__init__(self, name, parent)
@@ -240,6 +240,8 @@ class KAHP_DP(KCaChannel):
         self.zGate.tweakAlpha()
 
 
-        
+
+if __name__ == "__main__":
+    a = KAHP_SLOWER('kahp', moose.Neutral('/'))
 # 
 # kchans.py ends here

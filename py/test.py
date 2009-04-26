@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 01:08:37 2009 (+0530)
 # Version: 
-# Last-Updated: Sun Apr 26 18:25:12 2009 (+0530)
+# Last-Updated: Sun Apr 26 20:09:40 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 555
+#     Update #: 563
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -172,7 +172,7 @@ class Simulation:
 import pylab
 if __name__ == "__main__":
     sim = Simulation()
-    sim.model, sim.data, = setup_singlecomp(['CaL', 'KAHP_SLOWER'])
+    sim.model, sim.data, = setup_singlecomp(['CaL', 'KAHP_SLOWER')
     sim.model.comp.insertCaPool(5.2e-6 / 2e-10, 50e-3) # The fortran code uses 2e-4 um depth
     ca_table = moose.Table('Ca', sim.data)
     ca_table.stepMode = 3
@@ -197,6 +197,7 @@ if __name__ == "__main__":
     mus_m = pylab.array(m_table)
     pylab.plot(mus_Ca * 1e3, mus_m)
     pylab.plot(nrn_Ca, nrn_m)
+    pylab.show()
 # ###############
 #     pylab.subplot(3, 1, 1, title='Vm')
 #     pylab.plot(nrn_t, nrn_Vm, label='nrn')
@@ -208,7 +209,7 @@ if __name__ == "__main__":
 #     pylab.legend()
 #     pylab.subplot(3, 1, 3, title='m_kahp')
 #     pylab.plot(nrn_t, nrn_m, label='nrn')
-#     pylab.plot(mus_t, pylab.array(m_table) / 9.42e-6, label='mus')
+#     pylab.plot(mus_t, pylab.array(m_table), label='mus')
 #     pylab.legend()
 #     pylab.show()
 
