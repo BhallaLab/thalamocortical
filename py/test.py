@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 01:08:37 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 27 21:35:10 2009 (+0530)
+# Last-Updated: Mon Apr 27 21:42:30 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 683
+#     Update #: 684
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -205,6 +205,7 @@ import pylab
 if __name__ == "__main__":
     sim = Simulation()
     comp = createTestCompartment('comp', sim.model, chan_gbar_dict=test_conductances_ss)
+    comp.insertCaPool(5.2e-6/0.02e-10, 20e-3)
     comp.insertPulseGen('pulsegen', sim.model)
     comp.insertRecorder('Vm', sim.data)
 
