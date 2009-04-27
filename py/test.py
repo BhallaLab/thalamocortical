@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 01:08:37 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 27 15:26:54 2009 (+0530)
+# Last-Updated: Mon Apr 27 19:54:20 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 617
+#     Update #: 657
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -54,9 +54,9 @@ import config
 from nachans import *
 from kchans import *
 from cachans import CaL, CaT
-from ar import AR
+from archan import AR
 from capool import CaPool
-from compartment import MyCompartment
+from compartment import *
 
 conductance = {'NaF': 1500.0,
                'NaF_TCR': 1500.0,
@@ -82,7 +82,7 @@ conductance = {'NaF': 1500.0,
 
 
 
-def setup_singlecomp(channels):
+def setup_singlecomp(channels, densities=None):
     """channels is the list of channel class names (string)"""
     if config.context.exists('test'):
         print "Model is already set up. Returning."
@@ -174,17 +174,30 @@ class Simulation:
 import pylab
 if __name__ == "__main__":
     sim = Simulation()
-    sim.model, sim.data, = setup_singlecomp(['AR'])
-#     sim.model.comp.insertCaPool(5.2e-6 / 2e-10, 50e-3) # The fortran code uses 2e-4 um depth
-#     ca_table = moose.Table('Ca', sim.data)
-#     ca_table.stepMode = 3
-#     sim.model.comp.ca_pool.connect('Ca', ca_table, 'inputRequest')
-#     m_table = moose.Table('m_kahp', sim.data)
-#     m_table.stepMode = 3
-#     moose.HHChannel('test/comp/KAHP_SLOWER').connect('Z', m_table, 'inputRequest')
-    vm_table = moose.Table('data/Vm')
-    sim.schedule()
+    model = moose.Neutral('model')
+    sim.model = model
+    comp = createTestCompartment('comp', model, 
+                                 20e-6, 15e-6,
+                                 chan_gbar_dict={
+            # 'NaF2': 750.0,
+#             'NaPF_SS': 0.75,
+#             'KDR_FS': 750.0,
+#             'KC_FAST': 100.0,
+#             'KA': 300.0,
+#             'KM': 37.5,
+#             'K2': 1.0,
+            'KAHP_SLOWER': 1.0,
+            'CaL': 5.0,
+#             'CaT_A': 1.0,
+#             'AR': 2.5
+})
     
+    comp.insertCaPool(5.2e-6/0.02e-10, 20e-3)
+    comp.insertPulseGen('pulsegen', sim.model)
+    data = moose.Neutral('data')
+    sim.data = data
+    vm_table = comp.insertRecorder('Vm', data)
+    sim.schedule()
     sim.run(50e-3)
     tables = sim.dump_data('data')
 
@@ -192,23 +205,10 @@ if __name__ == "__main__":
     nrn_data = pylab.loadtxt('../nrn/mydata/Vm.plot')
     nrn_Vm = nrn_data[:, 1]
     nrn_t = nrn_data[:, 0]
-    mus_t = pylab.array(range(len(vm_table)))*1e-3
-
-##############################
-#     mus_m = pylab.array(m_table)
-#     pylab.plot(mus_Ca * 1e3, mus_m)
-#     pylab.plot(nrn_Ca, nrn_m)
-#     pylab.show()
-# ###############
-    pylab.subplot(2, 1, 1, title='Vm')
+    mus_t = pylab.array(range(len(vm_table))) * 1e-3
     pylab.plot(nrn_t, nrn_Vm, 'r-', label='nrn')
     pylab.plot(mus_t, pylab.array(vm_table)*1e3, 'g-', label='mus')
     pylab.legend()
-#     pylab.subplot(2, 1, 2, title='[Ca2+]')
-#     pylab.plot(nrn_t, nrn_Ca, 'rx', label='nrn')
-#     pylab.plot(mus_t, pylab.array(ca_table) * 1e3, 'g-', label='mus')
-#     pylab.legend()
-#     pylab.legend()
     pylab.show()
 
 
