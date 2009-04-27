@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 01:08:37 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 27 20:21:22 2009 (+0530)
+# Last-Updated: Mon Apr 27 21:35:10 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 682
+#     Update #: 683
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -204,7 +204,7 @@ test_conductances_ss = {
 import pylab
 if __name__ == "__main__":
     sim = Simulation()
-    comp = createTestCompartment('comp', sim.model, chan_gbar_dict={'AR': 2.5})
+    comp = createTestCompartment('comp', sim.model, chan_gbar_dict=test_conductances_ss)
     comp.insertPulseGen('pulsegen', sim.model)
     comp.insertRecorder('Vm', sim.data)
 

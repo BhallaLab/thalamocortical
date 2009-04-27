@@ -710,3 +710,8 @@
   AR remains to be matched.
   <2009-04-27 Mon 15:30> - Got it going - had forgotten to scale tau_m.
   Tested CaT_A OK.
+
+* <2009-04-27 Mon 21:37> All together it is not working :(
+  Inserted all channels corresponding to compartment 2 of spiny stellate cell from
+  NEURON model, not matching. There is a spike at the beginning - which is
+  identical, but the two differ from the end of that spike.
