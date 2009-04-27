@@ -18,35 +18,40 @@ soma{
     diam = 15
     L = 20
     
-    // insert naf
-    // gbar_naf = 0.15
-    // ena = 50
+    // insert naf2
+    // gbar_naf2 =   0.075
+    // insert napf_spinstell
+    // gbar_napf_spinstell =   7.5E-05
     // insert kdr_fs
-    // gbar_kdr_fs = 0.1
-    // insert ka_ib
-    // gbar_ka_ib = 0.03
-    // insert km
-    // gbar_km = 0.00375
-    // insert kahp_slower
-    // gbar_kahp_slower = 1e-4
+    // gbar_kdr_fs =   0.075
     // insert kc_fast
-    // gbar_kc_fast = 100e-4
-    // ek = -95
-    // insert cal
-    // gbar_cal = 5e-4
-    // insert cat
-    // gbar_cat = 1e-4
-   // insert cad
-   // beta_cad = 0.02
-   // phi_cad = 260000.
-   insert ar
-   gbar_ar = 2.5e-4
+    // gbar_kc_fast =   0.01
+    // insert ka
+    // gbar_ka =   0.03
+    // insert km
+    // gbar_km =   0.00375
+    // insert k2
+    // gbar_k2 =   0.0001
+    insert kahp_slower
+    gbar_kahp_slower =   0.0001
+    ek = -95.0
+    insert cal
+    gbar_cal =   0.0005
+    // insert cat_a
+    // gbar_cat_a =   0.0001
+    // insert ar
+    // gbar_ar =   0.00025
+    insert cad
+    // *** ca diffusion: beta=1/tau
+    beta_cad  =   0.05
+    // cafor(I) (FORTRAN) converted to phi (NEURON)
+    phi_cad =   260000.
     insert pas
     e_pas = -65
     g_pas = 2e-5
     Ra = 250
     cm = 0.9
-
+    
     stim1 = new IClamp(0.5)
     stim1.amp = 0.1
     stim1.dur = 20

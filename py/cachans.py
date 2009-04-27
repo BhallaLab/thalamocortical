@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 00:18:24 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 27 00:34:19 2009 (+0530)
+# Last-Updated: Mon Apr 27 17:06:35 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 158
+#     Update #: 168
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -93,6 +93,27 @@ class CaT(CaChannel):
 	    self.yGate.B[i] = h_inf[i]
 	self.xGate.tweakTau()
 	self.yGate.tweakTau()
+
+class CaT_A(CaChannel):
+    def __init__(self, name, parent):
+        CaChannel.__init__(self, name, parent, 2, 1)
+        self.Ek = 125e-3
+        self.X = 0
+	v = linspace(config.vmin, config.vmax, config.ndivs + 1)
+        m_inf  = 1.0 / ( 1 + exp( ( - v * 1e3 - 52 ) / 7.4 ) )
+        tau_m  = 1e-3 * (1 + .33 / ( exp( ( v * 1e3 + 27.0 ) / 10.0 ) + exp( ( - v * 1e3 - 102 ) / 15.0 )))
+
+        h_inf  = 1 / ( 1 + exp( ( v * 1e3 + 80 ) / 5 ) )
+        tau_h = 1e-3 * (28.30 + 0.33 / (exp(( v * 1e3 + 48.0)/ 4.0) + exp( ( -v * 1e3 - 407.0) / 50.0 ) ))
+	for i in range(config.ndivs + 1):
+	    self.xGate.A[i] = tau_m[i]
+	    self.xGate.B[i] = m_inf[i]
+	    self.yGate.A[i] = tau_h[i]
+	    self.yGate.B[i] = h_inf[i]
+
+        self.xGate.tweakTau()
+        self.yGate.tweakTau()
+
 
 # 
 # cachans.py ends here
