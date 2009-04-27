@@ -715,3 +715,10 @@
   Inserted all channels corresponding to compartment 2 of spiny stellate cell from
   NEURON model, not matching. There is a spike at the beginning - which is
   identical, but the two differ from the end of that spike.
+
+* <2009-04-27 Mon 21:43> Final victory (for the time being)
+  I had just missed out the Ca pool. After inserting it, it's quite good
+  match. But the first spike is now deviating more than before.
+
+  Now I should write down some code to test out each channel in the minimal
+  setting. Till now each channel is a different GIT commit.
