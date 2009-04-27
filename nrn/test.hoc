@@ -29,8 +29,8 @@ soma{
     // gbar_km = 0.00375
     // insert kahp_slower
     // gbar_kahp_slower = 1e-4
-    insert kc_fast
-    gbar_kc_fast = 100e-4
+    insert kc
+    gbar_kc = 100e-4
     ek = -95
     insert cal
     gbar_cal = 5e-4
