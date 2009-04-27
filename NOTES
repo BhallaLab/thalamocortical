@@ -705,3 +705,7 @@
 * <2009-04-27 Mon 11:06> Final victory (over ion channels in a single compartment)
   Finally KC also worked. I was not putting the correct scale factor on
   correct term.
+* <2009-04-27 Mon 15:22> Yes, indeed!
+  NO! It's not yet over
+  AR remains to be matched.
+  <2009-04-27 Mon 15:30> - Got it going - had forgotten to scale tau_m.
