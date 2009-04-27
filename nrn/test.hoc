@@ -32,20 +32,20 @@ soma{
     // gbar_km =   0.00375
     // insert k2
     // gbar_k2 =   0.0001
-    insert kahp_slower
-    gbar_kahp_slower =   0.0001
-    ek = -95.0
-    insert cal
-    gbar_cal =   0.0005
+    // insert kahp_slower
+    // gbar_kahp_slower =   0.0001
+    // ek = -95.0
+    // insert cal
+    // gbar_cal =   0.0005
     // insert cat_a
     // gbar_cat_a =   0.0001
-    // insert ar
-    // gbar_ar =   0.00025
-    insert cad
-    // *** ca diffusion: beta=1/tau
-    beta_cad  =   0.05
-    // cafor(I) (FORTRAN) converted to phi (NEURON)
-    phi_cad =   260000.
+    insert ar
+    gbar_ar =   0.00025
+    // insert cad
+    // // *** ca diffusion: beta=1/tau
+    // beta_cad  =   0.05
+    // // cafor(I) (FORTRAN) converted to phi (NEURON)
+    // phi_cad =   260000.
     insert pas
     e_pas = -65
     g_pas = 2e-5
