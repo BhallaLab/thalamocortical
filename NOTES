@@ -702,3 +702,6 @@
   more or less identical but the falling phase [Ca2+] goes off, Vm is quite
   far away.
   Too sleepy to debug.
+* <2009-04-27 Mon 11:06> Final victory (over ion channels in a single compartment)
+  Finally KC also worked. I was not putting the correct scale factor on
+  correct term.

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 01:08:37 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 27 02:26:29 2009 (+0530)
+# Last-Updated: Mon Apr 27 11:04:53 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 593
+#     Update #: 605
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -173,7 +173,7 @@ class Simulation:
 import pylab
 if __name__ == "__main__":
     sim = Simulation()
-    sim.model, sim.data, = setup_singlecomp(['CaL','KC_FAST'])
+    sim.model, sim.data, = setup_singlecomp(['CaL','KC'])
     sim.model.comp.insertCaPool(5.2e-6 / 2e-10, 50e-3) # The fortran code uses 2e-4 um depth
     ca_table = moose.Table('Ca', sim.data)
     ca_table.stepMode = 3
@@ -203,12 +203,12 @@ if __name__ == "__main__":
 #     pylab.show()
 # ###############
     pylab.subplot(2, 1, 1, title='Vm')
-    pylab.plot(nrn_t, nrn_Vm, label='nrn')
-    pylab.plot(mus_t, pylab.array(vm_table)*1e3, label='mus')
+    pylab.plot(nrn_t, nrn_Vm, 'rx', label='nrn')
+    pylab.plot(mus_t, pylab.array(vm_table)*1e3, 'g-', label='mus')
     pylab.legend()
     pylab.subplot(2, 1, 2, title='[Ca2+]')
-    pylab.plot(nrn_t, nrn_Ca, label='nrn')
-    pylab.plot(mus_t, pylab.array(ca_table) * 1e3, label='mus')
+    pylab.plot(nrn_t, nrn_Ca, 'rx', label='nrn')
+    pylab.plot(mus_t, pylab.array(ca_table) * 1e3, 'g-', label='mus')
     pylab.legend()
     pylab.legend()
     pylab.show()
