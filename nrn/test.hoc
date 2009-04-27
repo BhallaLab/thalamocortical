@@ -29,17 +29,18 @@ soma{
     // gbar_km = 0.00375
     // insert kahp_slower
     // gbar_kahp_slower = 1e-4
-    insert kc
-    gbar_kc = 100e-4
-    ek = -95
-    insert cal
-    gbar_cal = 5e-4
+    // insert kc_fast
+    // gbar_kc_fast = 100e-4
+    // ek = -95
+    // insert cal
+    // gbar_cal = 5e-4
     // insert cat
     // gbar_cat = 1e-4
-   insert cad
-   beta_cad = 0.02
-   phi_cad = 260000.
-
+   // insert cad
+   // beta_cad = 0.02
+   // phi_cad = 260000.
+   insert ar
+   gbar_ar = 2.5e-4
     insert pas
     e_pas = -65
     g_pas = 2e-5
@@ -55,14 +56,15 @@ ceiling_cad = 1e6
 tstop = 50
 vecV.record(&soma.v(0.5))
 vecT.record(&t)
-vec_cad.record(&soma.cai(0.5))
-vec_mkahp.record(&soma.beta_cal(0.5))
+// vec_cad.record(&soma.cai(0.5))
+// vec_mkahp.record(&soma.beta_cal(0.5))
 run()
 outfile.wopen("mydata/Vm.plot")
 file_cad.wopen("mydata/Ca.plot")
 for ii = 0, vecV.size() - 1 {
-    outfile.printf("%g %g %g\n", vecT.x(ii), vecV.x(ii), vec_mkahp.x(ii))
-    file_cad.printf("%g %g\n", vecT.x(ii), vec_cad.x(ii))
+    // outfile.printf("%g %g %g\n", vecT.x(ii), vecV.x(ii), vec_mkahp.x(ii))
+    // file_cad.printf("%g %g\n", vecT.x(ii), vec_cad.x(ii))
+    outfile.printf("%g %g\n", vecT.x(ii), vecV.x(ii))
     
 }
 outfile.close()
