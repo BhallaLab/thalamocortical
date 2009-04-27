@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 01:08:37 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 27 19:54:20 2009 (+0530)
+# Last-Updated: Mon Apr 27 20:21:22 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 657
+#     Update #: 682
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -131,8 +131,8 @@ def setup_singlecomp(channels, densities=None):
 class Simulation:
     """This class is a wrapper to control a whole simulation."""
     def __init__(self):
-        self.model = None
-        self.data = None
+        self.model = moose.Neutral('model')
+        self.data = moose.Neutral('data')
         self.start_t = None
         self.end_t = None
 
@@ -170,33 +170,48 @@ class Simulation:
             print 'Dumped data in ', file_path
         return tables
 
+def createTestCompartment(name, parent, 
+                          length=20e-6, diameter=15e-6, 
+                          Em=-65e-3, initVm=-65e-3, CM=9e-3, RM=5.0, RA=2.5, 
+                          chan_gbar_dict={}):
+    comp = MyCompartment(name, parent)
+    comp.length = length
+    comp.diameter = diameter
+    comp.Em = Em
+    comp.initVm = initVm
+    comp.setSpecificCm(CM)
+    comp.setSpecificRm(RM)
+    comp.setSpecificRa(RA)
+    for channel, gbar in chan_gbar_dict.items():
+        channel = comp.insertChannel(channel, gbar)
+        setattr(comp, channel.name, channel)
+    return comp
+
+test_conductances_ss = {
+    'NaF2': 750.0,
+    'NaPF_SS': 0.75,
+    'KDR_FS': 750.0,
+    'KC_FAST': 100.0,
+    'KA': 300.0,
+    'KM': 37.5,
+    'K2': 1.0,
+    'KAHP_SLOWER': 1.0,
+    'CaL': 5.0,
+    'CaT_A': 1.0,
+    'AR': 2.5
+    }
 
 import pylab
 if __name__ == "__main__":
     sim = Simulation()
-    model = moose.Neutral('model')
-    sim.model = model
-    comp = createTestCompartment('comp', model, 
-                                 20e-6, 15e-6,
-                                 chan_gbar_dict={
-            # 'NaF2': 750.0,
-#             'NaPF_SS': 0.75,
-#             'KDR_FS': 750.0,
-#             'KC_FAST': 100.0,
-#             'KA': 300.0,
-#             'KM': 37.5,
-#             'K2': 1.0,
-            'KAHP_SLOWER': 1.0,
-            'CaL': 5.0,
-#             'CaT_A': 1.0,
-#             'AR': 2.5
-})
-    
-    comp.insertCaPool(5.2e-6/0.02e-10, 20e-3)
+    comp = createTestCompartment('comp', sim.model, chan_gbar_dict={'AR': 2.5})
     comp.insertPulseGen('pulsegen', sim.model)
-    data = moose.Neutral('data')
-    sim.data = data
-    vm_table = comp.insertRecorder('Vm', data)
+    comp.insertRecorder('Vm', sim.data)
+
+#     sim.model, sim.data = setup_singlecomp(['AR'])
+    vm_table = moose.Table('data/Vm')
+#     vm_table.stepMode = 3
+#     sim.model.comp.connect('Vm', vm_table, 'inputRequest')
     sim.schedule()
     sim.run(50e-3)
     tables = sim.dump_data('data')
