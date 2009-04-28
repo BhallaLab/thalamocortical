@@ -55,7 +55,7 @@ soma{
     stim1 = new IClamp(0.5)
     stim1.amp = 0.1
     stim1.dur = 20
-    stim1.del = 20e6
+    stim1.del = 20
 }
 ceiling_cad = 1e6
 tstop = 50
