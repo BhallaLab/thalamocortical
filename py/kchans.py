@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Apr 28 15:06:41 2009 (+0530)
+# Last-Updated: Wed Apr 29 02:18:58 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 394
+#     Update #: 391
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -121,10 +121,6 @@ class KA(KChannel):
             self.yGate.B[i] = h_inf[i]
         self.xGate.tweakTau()
 	self.yGate.tweakTau()
-        self.xGate.A.dumpFile("ka_xa.plot")
-        self.xGate.B.dumpFile("ka_xb.plot")
-        self.yGate.A.dumpFile("ka_ya.plot")
-        self.yGate.B.dumpFile("ka_yb.plot")
 
 
 class KA_IB(KChannel):
@@ -148,10 +144,6 @@ class KA_IB(KChannel):
             self.yGate.B[i] = h_inf[i]
         self.xGate.tweakTau()
 	self.yGate.tweakTau()
-        self.xGate.A.dumpFile("ka_ib_xa.plot")
-        self.xGate.B.dumpFile("ka_ib_xb.plot")
-        self.yGate.A.dumpFile("ka_ib_ya.plot")
-        self.yGate.B.dumpFile("ka_ib_yb.plot")
 
 
 class K2(KChannel):
