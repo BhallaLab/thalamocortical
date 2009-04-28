@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:13 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Apr 23 09:39:24 2009 (+0530)
+# Last-Updated: Tue Apr 28 20:53:05 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 63
+#     Update #: 64
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -52,7 +52,7 @@ from channel import ChannelBase
 
 class NaChannel(ChannelBase):
     """Dummy base class for all Na+ channels"""
-    def __init__(self, name, parent, x, y):
+    def __init__(self, name, parent, x, y=0):
         ChannelBase.__init__(self, name, parent, x, y)
 
 class NaF(NaChannel):
