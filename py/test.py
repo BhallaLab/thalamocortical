@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 01:08:37 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 27 15:26:54 2009 (+0530)
+# Last-Updated: Tue Apr 28 21:00:46 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 617
+#     Update #: 651
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -54,7 +54,7 @@ import config
 from nachans import *
 from kchans import *
 from cachans import CaL, CaT
-from ar import AR
+from archan import AR
 from capool import CaPool
 from compartment import MyCompartment
 
@@ -131,8 +131,8 @@ def setup_singlecomp(channels):
 class Simulation:
     """This class is a wrapper to control a whole simulation."""
     def __init__(self):
-        self.model = None
-        self.data = None
+        self.model = moose.Neutral('model')
+        self.data = moose.Neutral('data')
         self.start_t = None
         self.end_t = None
 
@@ -171,18 +171,46 @@ class Simulation:
         return tables
 
 
+
+def create_testcomp(name, parent, length=20e-6, diameter=15e-6, 
+                    Em=-65e-3, initVm=-65e-3, CM=9e-3, RM=5.0, RA=2.5,
+                    conductance_dict={}):
+    comp = MyCompartment(name, parent)
+    comp.length = length
+    comp.diameter = diameter
+    comp.initVm = initVm
+    comp.Em = Em
+    comp.setSpecificCm(CM)
+    comp.setSpecificRm(RM)
+    comp.setSpecificRa(RA)
+    for channel, density in conductance_dict.items():
+        comp.insertChannel(channel, density)
+    return comp
+
+
 import pylab
 if __name__ == "__main__":
     sim = Simulation()
-    sim.model, sim.data, = setup_singlecomp(['AR'])
-#     sim.model.comp.insertCaPool(5.2e-6 / 2e-10, 50e-3) # The fortran code uses 2e-4 um depth
-#     ca_table = moose.Table('Ca', sim.data)
-#     ca_table.stepMode = 3
-#     sim.model.comp.ca_pool.connect('Ca', ca_table, 'inputRequest')
-#     m_table = moose.Table('m_kahp', sim.data)
-#     m_table.stepMode = 3
-#     moose.HHChannel('test/comp/KAHP_SLOWER').connect('Z', m_table, 'inputRequest')
-    vm_table = moose.Table('data/Vm')
+    comp = create_testcomp('comp', sim.model, 
+                           conductance_dict={ 'NaF2': 750.0,
+                                              'NaPF_SS': 0.75,
+                                              'KDR_FS': 750.0,
+                                              'KC_FAST': 100.0,
+                                              'KA': 300.0,
+                                              'KM': 37.5,
+                                              'K2': 1.0,
+                                              'KAHP_SLOWER': 1.0,
+                                              'CaL': 5.0,
+                                              'CaT_A': 1.0,
+                                              'AR': 2.5})
+    
+    comp.insertPulseGen('pulsegen', sim.model)
+    comp.insertCaPool(5.2e-6 / 2e-10, 20e-3) # The fortran code uses 2e-4 um depth
+    ca_table = moose.Table('Ca', sim.data)
+    ca_table.stepMode = 3
+    comp.ca_pool.connect('Ca', ca_table, 'inputRequest')
+    vm_table = comp.insertRecorder('Vm', sim.data)
+    
     sim.schedule()
     
     sim.run(50e-3)
@@ -193,7 +221,7 @@ if __name__ == "__main__":
     nrn_Vm = nrn_data[:, 1]
     nrn_t = nrn_data[:, 0]
     mus_t = pylab.array(range(len(vm_table)))*1e-3
-
+    nrn_Ca = pylab.loadtxt('../nrn/mydata/Ca.plot')[:,1]
 ##############################
 #     mus_m = pylab.array(m_table)
 #     pylab.plot(mus_Ca * 1e3, mus_m)
@@ -201,13 +229,13 @@ if __name__ == "__main__":
 #     pylab.show()
 # ###############
     pylab.subplot(2, 1, 1, title='Vm')
-    pylab.plot(nrn_t, nrn_Vm, 'r-', label='nrn')
+    pylab.plot(nrn_t, nrn_Vm, 'rx', label='nrn')
     pylab.plot(mus_t, pylab.array(vm_table)*1e3, 'g-', label='mus')
     pylab.legend()
-#     pylab.subplot(2, 1, 2, title='[Ca2+]')
-#     pylab.plot(nrn_t, nrn_Ca, 'rx', label='nrn')
-#     pylab.plot(mus_t, pylab.array(ca_table) * 1e3, 'g-', label='mus')
-#     pylab.legend()
+    pylab.subplot(2, 1, 2, title='[Ca2+]')
+    pylab.plot(nrn_t, nrn_Ca, 'rx', label='nrn')
+    pylab.plot(mus_t, pylab.array(ca_table) * 1e3, 'g-', label='mus')
+    pylab.legend()
 #     pylab.legend()
     pylab.show()
 
