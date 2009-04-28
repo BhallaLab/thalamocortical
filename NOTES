@@ -722,3 +722,7 @@
 
   Now I should write down some code to test out each channel in the minimal
   setting. Till now each channel is a different GIT commit.
+* <2009-04-28 Tue 20:03> Not yet 
+  A bug seems to have creeped into the test.py code. [Ca2+], when tested
+  with CaL alone, has suddenly changed scal (10 times larger). Will revert to
+  an older version and redo.
