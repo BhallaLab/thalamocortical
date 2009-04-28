@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Apr 22 22:21:11 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Apr 24 09:59:53 2009 (+0530)
+# Last-Updated: Tue Apr 28 19:26:23 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 48
+#     Update #: 49
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -47,7 +47,7 @@
 
 import moose
 import config
-from cachans import *
+from cachans import CaL
 from kchans import KCaChannel
 
 class CaPool(moose.CaConc):

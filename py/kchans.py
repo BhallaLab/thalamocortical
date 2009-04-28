@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 27 10:59:24 2009 (+0530)
+# Last-Updated: Tue Apr 28 15:06:41 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 387
+#     Update #: 394
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -75,7 +75,6 @@ class KDR(KChannel):
 
     def __init__(self, name, parent):
 	KChannel.__init__(self, name, parent, 4)
-	self.Ek = -95e-3
 	v = linspace(config.vmin, config.vmax, config.ndivs + 1) 
 	tau_m = where(v < -10e-3, \
 			   1e-3 * (0.25 + 4.35 * exp((v + 10.0e-3) / 10.0e-3)), \
@@ -91,7 +90,6 @@ class KDR_FS(KChannel):
     """KDR for fast spiking neurons"""
     def __init__(self, name, parent):
 	KChannel.__init__(self, name, parent, 4)
-	self.Ek = -95e-3
 	v = linspace(config.vmin, config.vmax, config.ndivs + 1)
 	m_inf = 1.0 / (1.0 + exp((- v - 27e-3) / 11.5e-3))
 	tau_m =  where(v < -10e-3, \
@@ -107,7 +105,6 @@ class KA(KChannel):
     """A type K+ channel"""
     def __init__(self, name, parent):
 	KChannel.__init__(self, name, parent, 4, 1)
-	self.Ek = -95e-3
         self.X = 0.0
 	v = linspace(config.vmin, config.vmax, config.ndivs + 1)
 	m_inf = 1 / ( 1 + exp( ( - v - 60e-3 ) / 8.5e-3 ) )
@@ -135,7 +132,6 @@ class KA_IB(KChannel):
     multiplies tau_h of KA by 2.6"""
     def __init__(self, name, parent):
 	KChannel.__init__(self, name, parent, 4, 1)
-	self.Ek = -95e-3
         self.X = 0.0
 	v = linspace(config.vmin, config.vmax, config.ndivs + 1)
 	m_inf = 1 / ( 1 + exp( ( - v - 60e-3 ) / 8.5e-3 ) )
@@ -161,7 +157,6 @@ class KA_IB(KChannel):
 class K2(KChannel):
     def __init__(self, name, parent):
 	KChannel.__init__(self, name, parent, 1, 1)
-	self.Ek = -95e-3
 	v = linspace(config.vmin, config.vmax, config.ndivs + 1)
 	m_inf = 1.0 / (1 + exp((-v - 10e-3) / 17e-3))
 	tau_m = 1e-3 * (4.95 + 0.5 / (exp((v - 81e-3) / 25.6e-3) + \
@@ -182,7 +177,6 @@ class K2(KChannel):
 class KM(KChannel):
     def __init__(self, name, parent):
 	KChannel.__init__(self, name, parent, 1)
-	self.Ek = -95e-3
 	v = linspace(config.vmin, config.vmax, config.ndivs + 1)
 	a =  1e3 * 0.02 / ( 1 + exp((-v - 20e-3 ) / 5e-3))
 	b = 1e3 * 0.01 * exp((-v - 43e-3) / 18e-3)
@@ -227,6 +221,7 @@ class KAHP(KAHPBase):
             self.zGate.A[i] = alpha[i]
             self.zGate.B[i] = beta[i]
         self.zGate.tweakAlpha()
+
 
 
 class KAHP_SLOWER(KAHPBase):
