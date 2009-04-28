@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 01:08:37 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 27 22:00:31 2009 (+0530)
+# Last-Updated: Tue Apr 28 19:37:34 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 694
+#     Update #: 728
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -58,27 +58,6 @@ from archan import AR
 from capool import CaPool
 from compartment import *
 
-conductance = {'NaF': 1500.0,
-               'NaF_TCR': 1500.0,
-               'NaF2': 1500.0,
-               'NaP': 1.5,
-               'NaPF': 1.5,
-               'NaPF_SS': 1.5,
-               'NaPF_TCR': 1.5,
-               'KDR': 1000.0,
-               'KDR_FS': 1000.0,
-               'CaT': 1.0,
-               'CaL': 5.0,
-               'KA': 300.0,
-               'KA_IB': 300.0,
-               'KC': 100.0,
-               'KC_FAST': 100.0,
-               'KM': 37.5,
-               'K2': 1.0,
-               'KAHP': 1.0,
-               'KAHP_SLOWER': 1.0,
-               'AR': 2.5}
-
 class Simulation:
     """This class is a wrapper to control a whole simulation."""
     def __init__(self):
@@ -124,7 +103,7 @@ class Simulation:
 def createTestCompartment(name, parent, 
                           length=20e-6, diameter=15e-6, 
                           Em=-65e-3, initVm=-65e-3, CM=9e-3, RM=5.0, RA=2.5, 
-                          channel_dic={}):
+                          channel_dict={}):
     """Creates a compartment with the given parameters and inserts the
     channels in channel_dict.
 
@@ -139,23 +118,23 @@ def createTestCompartment(name, parent,
     comp.setSpecificCm(CM)
     comp.setSpecificRm(RM)
     comp.setSpecificRa(RA)
-    for channel, gbar in chan_gbar_dict.items():
+    for channel, gbar in channel_dict.items():
         channel = comp.insertChannel(channel, gbar)
         setattr(comp, channel.name, channel)
     return comp
 
 test_conductances_ss = {
-    'NaF2': 750.0,
-    'NaPF_SS': 0.75,
-    'KDR_FS': 750.0,
-    'KC_FAST': 100.0,
-    'KA': 300.0,
-    'KM': 37.5,
-    'K2': 1.0,
-    'KAHP_SLOWER': 1.0,
+#     'NaF2': 750.0,
+#     'NaPF_SS': 0.75,
+#     'KDR_FS': 750.0,
+#     'KC_FAST': 100.0,
+#     'KA': 300.0,
+#     'KM': 37.5,
+#     'K2': 1.0,
+#     'KAHP_SLOWER': 1.0,
     'CaL': 5.0,
-    'CaT_A': 1.0,
-    'AR': 2.5
+#     'CaT_A': 1.0,
+#     'AR': 2.5
     }
 
 import pylab
@@ -163,9 +142,12 @@ if __name__ == "__main__":
     sim = Simulation()
     comp = createTestCompartment('comp', sim.model, channel_dict=test_conductances_ss)
     comp.insertCaPool(5.2e-6/0.02e-10, 20e-3)
-    comp.insertPulseGen('pulsegen', sim.model)
+    comp.insertPulseGen('pulsegen', sim.model, firstDelay=1e10)
     comp.insertRecorder('Vm', sim.data)
     vm_table = moose.Table('data/Vm')
+    ca_table = moose.Table('data/Ca')
+    ca_table.stepMode = 3
+    comp.ca_pool.connect('Ca', ca_table, 'inputRequest')
     sim.schedule()
     sim.run(50e-3)
     tables = sim.dump_data('data')
@@ -178,10 +160,17 @@ if __name__ == "__main__":
     nrn_data = pylab.loadtxt('../nrn/mydata/Vm.plot')
     nrn_Vm = nrn_data[:, 1]
     nrn_t = nrn_data[:, 0]
+    nrn_ca = pylab.loadtxt('../nrn/mydata/Ca.plot')[:, 1]
     mus_t = pylab.array(range(len(vm_table))) * 1e-3
+    pylab.subplot(211, title='Vm')
     pylab.plot(nrn_t, nrn_Vm, 'r-', label='nrn')
     pylab.plot(mus_t, pylab.array(vm_table)*1e3, 'g-', label='mus')
     pylab.legend()
+    pylab.subplot(212, title='[Ca2+]')
+    pylab.plot(nrn_t, nrn_ca, 'r-', label='nrn')
+    pylab.plot(mus_t, pylab.array(ca_table), 'g-', label='mus')
+    pylab.legend()
+    
     pylab.show()
 
 
