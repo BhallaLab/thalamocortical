@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 00:18:24 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Apr 28 20:54:31 2009 (+0530)
+# Last-Updated: Wed Apr 29 00:07:30 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 159
+#     Update #: 160
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -46,7 +46,7 @@
 # Code:
 
 from channel import ChannelBase
-from numpy import where, linspace, exp, savetxt
+from numpy import where, linspace, exp
 import config
 class CaChannel(ChannelBase):
     """This is just a place holder to maintain type information"""
