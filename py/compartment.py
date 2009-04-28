@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 27 20:18:46 2009 (+0530)
+# Last-Updated: Wed Apr 29 02:18:39 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 40
+#     Update #: 42
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -132,7 +132,6 @@ class MyCompartment(moose.Compartment):
         return table
 
     def insertPulseGen(self, name, parent, baseLevel=0.0, firstLevel=1e-10, firstDelay=20e-3, firstWidth=20e-3, secondLevel=0.0, secondDelay=1e10, secondWidth=0.0):
-        print type(parent)
         self.pulsegen = moose.PulseGen(name, parent)
         self.pulsegen.baseLevel = baseLevel
         self.pulsegen.firstLevel = firstLevel

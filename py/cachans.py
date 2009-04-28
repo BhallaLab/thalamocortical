@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 00:18:24 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 27 17:06:35 2009 (+0530)
+# Last-Updated: Wed Apr 29 02:18:15 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 168
+#     Update #: 161
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -46,7 +46,7 @@
 # Code:
 
 from channel import ChannelBase
-from numpy import where, linspace, exp, savetxt
+from numpy import where, linspace, exp
 import config
 class CaChannel(ChannelBase):
     """This is just a place holder to maintain type information"""
@@ -93,6 +93,7 @@ class CaT(CaChannel):
 	    self.yGate.B[i] = h_inf[i]
 	self.xGate.tweakTau()
 	self.yGate.tweakTau()
+
 
 class CaT_A(CaChannel):
     def __init__(self, name, parent):
