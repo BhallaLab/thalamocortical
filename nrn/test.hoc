@@ -18,35 +18,34 @@ soma{
     diam = 15
     L = 20
     
-    // insert naf2
-    // gbar_naf2 =   0.075
-    // insert napf_spinstell
-    // gbar_napf_spinstell =   7.5E-05
-    // ena = 50
-    // insert kdr_fs
-    // gbar_kdr_fs =   0.075
-    // insert kc_fast
-    // gbar_kc_fast =   0.01
-    // insert ka
-    // gbar_ka =   0.03
-    // insert km
-    // gbar_km =   0.00375
-    // insert k2
-    // gbar_k2 =   0.0001
-    // insert kahp_slower
-    // gbar_kahp_slower =   0.0001
-    // ek = -95.0
+    insert naf2
+    gbar_naf2 =   0.075
+    insert napf_spinstell
+    gbar_napf_spinstell =   7.5E-05
+    insert kdr_fs
+    gbar_kdr_fs =   0.075
+    insert kc_fast
+    gbar_kc_fast =   0.01
+    insert ka
+    gbar_ka =   0.03
+    insert km
+    gbar_km =   0.00375
+    insert k2
+    gbar_k2 =   0.0001
+    insert kahp_slower
+    gbar_kahp_slower =   0.0001
+    ek = -95.0
     insert cal
     gbar_cal =   0.0005
-    // insert cat_a
-    // gbar_cat_a =   0.0001
-    // insert ar
-    // gbar_ar =   0.00025
+    insert cat_a
+    gbar_cat_a =   0.0001
+    insert ar
+    gbar_ar =   0.00025
     insert cad
     // *** ca diffusion: beta=1/tau
     beta_cad  =   0.05
     // cafor(I) (FORTRAN) converted to phi (NEURON)
-    phi_cad = 260000.
+    phi_cad =   260000.
     insert pas
     e_pas = -65
     g_pas = 2e-5
