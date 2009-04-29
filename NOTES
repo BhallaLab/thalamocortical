@@ -726,3 +726,10 @@
   A bug seems to have creeped into the test.py code. [Ca2+], when tested
   with CaL alone, has suddenly changed scal (10 times larger). Will revert to
   an older version and redo.
+* <2009-04-30 Thu 03:02> Spiny Stellate cell
+  Spent half of the day writing a pretty-printing utility for MOOSE tree. 
+  
+  Then concentrated on SPiny stellate cell model. Got the geometry correct (I
+  hope). Added all channels ( emacs tricks came very handy to copy these from
+  hoc script). Did the simulation for 50 ms, but the Vm plot does not look
+  convincing. 
