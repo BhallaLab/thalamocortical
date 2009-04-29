@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 01:08:37 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Apr 30 02:25:30 2009 (+0530)
+# Last-Updated: Thu Apr 30 02:57:08 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 653
+#     Update #: 654
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -57,48 +57,7 @@ from cachans import CaL, CaT
 from archan import AR
 from capool import CaPool
 from compartment import *
-
-class Simulation:
-    """This class is a wrapper to control a whole simulation."""
-    def __init__(self):
-        self.model = moose.Neutral('model')
-        self.data = moose.Neutral('data')
-        self.start_t = None
-        self.end_t = None
-
-    def schedule(self):
-        config.context.setClock(0, config.simdt)
-        config.context.setClock(1, config.simdt)
-        config.context.setClock(2, config.plotdt)
-
-    def run(self, time):
-        config.context.reset()
-        self.start_t = datetime.now()
-        config.context.step(float(time))
-        self.end_t = datetime.now()
-
-    def dump_data(self, directory, time_stamp=False):
-        """Save the data in directory. It creates a subdirectory with
-        the date of start_t. The files are prefixed with start time in
-        HH.MM.SS_ format if time_stamp is True."""
-        path = directory
-        tables = []
-        if not os.access(directory, os.W_OK):
-            print 'data directory:', directory, 'is not writable'
-            return
-        else:
-            path = directory + '/' + self.start_t.strftime('%Y_%m_%d') + '/'
-            if not os.access(path, os.F_OK):
-                os.mkdir(path)
-        if time_stamp:
-            path = path + self.start_t.strftime('%H.%M.%S') + '_'
-        for table_id in self.data.children():
-            table = moose.Table(table_id)
-            tables.append(table)
-            file_path = path + table.name + '.plot'
-            table.dumpFile(file_path)
-            print 'Dumped data in ', file_path
-        return tables
+from simulation import Simulation
 
 def createTestCompartment(name, parent, 
                           length=20e-6, diameter=15e-6, 
