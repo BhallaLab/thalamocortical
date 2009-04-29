@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Apr 29 10:24:37 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Apr 30 01:29:20 2009 (+0530)
+# Last-Updated: Thu Apr 30 02:49:54 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 274
+#     Update #: 296
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -138,7 +138,7 @@ class SpinyStellate(moose.Cell):
                            'KAHP_SLOWER': 0.0001 * 1e4,
                            'CaL': 0.0005 * 1e4,
                            'CaT_A': 0.0001 * 1e4,
-                           'AR': 0.00025 * 1e4}
+                           'AR': 0.00025 * 1e4},
                        
                        5: {'NaF2': 0.005 * 1e4,
                            'NaPF_SS': 5.E-06 * 1e4,
@@ -148,7 +148,7 @@ class SpinyStellate(moose.Cell):
                            'KAHP_SLOWER': 0.0001 * 1e4,
                            'CaL': 0.0005 * 1e4,
                            'CaT_A': 0.0001 * 1e4,
-                           'AR': 0.00025 * 1e4}
+                           'AR': 0.00025 * 1e4},
 
                        6: {'NaF2': 0.005 * 1e4,
                            'NaPF_SS': 5.E-06 * 1e4,
@@ -158,7 +158,7 @@ class SpinyStellate(moose.Cell):
                            'KAHP_SLOWER': 0.0001 * 1e4,
                            'CaL': 0.0005 * 1e4,
                            'CaT_A': 0.0001 * 1e4,
-                           'AR': 0.00025 * 1e4}
+                           'AR': 0.00025 * 1e4},
 
                        7: {'NaF2': 0.005 * 1e4, 
                            'NaPF_SS': 5.E-06 * 1e4, 
@@ -168,7 +168,7 @@ class SpinyStellate(moose.Cell):
                            'KAHP_SLOWER': 0.0001 * 1e4, 
                            'CaL': 0.003 * 1e4, 
                            'CaT_A': 0.0001 * 1e4, 
-                           'AR': 0.00025 * 1e4}
+                           'AR': 0.00025 * 1e4},
 
                        8: {'NaF2': 0.005 * 1e4, 
                            'NaPF_SS': 5.E-06 * 1e4, 
@@ -178,7 +178,7 @@ class SpinyStellate(moose.Cell):
                            'KAHP_SLOWER': 0.0001 * 1e4, 
                            'CaL': 0.003 * 1e4, 
                            'CaT_A': 0.0001 * 1e4, 
-                           'AR': 0.00025 * 1e4}
+                           'AR': 0.00025 * 1e4},
 
                        9: {'NaF2': 0.005 * 1e4,
                            'NaPF_SS': 5.E-06 * 1e4,
@@ -189,6 +189,7 @@ class SpinyStellate(moose.Cell):
                            'CaL': 0.003 * 1e4,
                            'CaT_A': 0.0001 * 1e4,
                            'AR': 0.00025 * 1e4}}
+    
     def __init__(self, *args):
 	moose.Cell.__init__(self, *args)
 	self.levels = defaultdict(set) # Python >= 2.5 
@@ -199,6 +200,11 @@ class SpinyStellate(moose.Cell):
         self._set_passiveprops()
         self._connect_axial(self.soma)
         self._insert_channels()
+        self.soma.insertCaPool(5.2e-6 / 2e-10, 50e-3)
+        for i in range(2, 10):
+            for comp in self.levels[i]:
+                comp.insertCaPool(5.2e-6 / 2e-10, 20e-3)
+        
 
     def _create_dtree(self, name_prefix, parent, tree, level, default_length=40e-6, radius_dict=radius):
 	"""Create the dendritic tree structure with compartments.
@@ -267,13 +273,23 @@ class SpinyStellate(moose.Cell):
         for level in range(10):
             comp_set = self.levels[level]
             for comp in comp_set:
-                for channel, density in channel_density[level].items():
-                    comp.insertChannel(channel, denisty)
+                for channel, density in SpinyStellate.channel_density[level].items():
+                    comp.insertChannel(channel, density)
 
+
+import pylab
 import pymoose
+from simulation import Simulation
+
 if __name__ == '__main__':
-    s = SpinyStellate('s')
-    sim = new Simulation()
+    sim = Simulation()
+    s = SpinyStellate('ss', sim.model)
+    vm_table = s.soma.insertRecorder('Vm', sim.data)
+    sim.schedule()
+    sim.run(50e-3)
+    sim.dump_data('data')
+    pylab.plot(vm_table)
+    pylab.show()
     
 # 
 # spinystellate.py ends here
