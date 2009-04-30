@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Apr 29 10:24:37 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Apr 30 02:49:54 2009 (+0530)
+# Last-Updated: Fri May  1 00:14:27 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 296
+#     Update #: 316
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -237,6 +237,7 @@ class SpinyStellate(moose.Cell):
         parent = comp
         for i in range(5, -1, -1):
             comp = MyCompartment('a_' + str(i), parent)
+	    print '$$ ', comp.path, parent.path
             comp.length = 50e-6
             comp.diameter = axon_radius[i] * 2e-6
             self.axon.add(comp)
@@ -257,12 +258,10 @@ class SpinyStellate(moose.Cell):
     def _connect_axial(self, root):
         """Connect parent-child compartments via axial-raxial
         messages."""
-        if hasattr(root, 'axial_connected'):
-           return
         parent = moose.Neutral(root.parent)
-        if parent.className == 'Compartment':
+        if parent.className == 'Compartment' and not hasattr(root, 'axial_connected'):
             root.connect('raxial', parent, 'axial')
-        root.axial_connected = True
+            root.axial_connected = True
         
         for child in root.children():
             obj = moose.Neutral(child)
@@ -277,19 +276,34 @@ class SpinyStellate(moose.Cell):
                     comp.insertChannel(channel, density)
 
 
-import pylab
+#import pylab
 import pymoose
 from simulation import Simulation
 
+#import timeit
+from datetime import datetime
+
 if __name__ == '__main__':
     sim = Simulation()
+    t1 = datetime.now()
     s = SpinyStellate('ss', sim.model)
-    vm_table = s.soma.insertRecorder('Vm', sim.data)
+    t2 = datetime.now()
+    delta_t = t2 - t1
+    print '### TIME SPENT IN CELL CREATION: ', delta_t.seconds + delta_t.microseconds * 1e-6
+    path = s.soma.path + '/a_5/a_4/a_3/a_2'
+    a2 = MyCompartment(path)
+    print a2.path, path
+    vm_table = a2.insertRecorder('Vm', sim.data)
+    s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=0.0, firstWidth=50e-3)
     sim.schedule()
+    t1 = datetime.now()
     sim.run(50e-3)
+    t2 = datetime.now()
+    delta_t = t2 - t1
+    print '#### TIME TO SIMULATE:', delta_t.seconds + delta_t.microseconds * 1e-6
     sim.dump_data('data')
-    pylab.plot(vm_table)
-    pylab.show()
+#    pylab.plot(vm_table)
+#    pylab.show()
     
 # 
 # spinystellate.py ends here
