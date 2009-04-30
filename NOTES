@@ -733,3 +733,20 @@
   hope). Added all channels ( emacs tricks came very handy to copy these from
   hoc script). Did the simulation for 50 ms, but the Vm plot does not look
   convincing. 
+* <2009-05-01 Fri 00:26> Far off 
+  Just tried a single spiny stellate cell. Soma is stimulated with 0.3 nA
+  current and Vm is recorded at fourth axonal compartment from soma, and the
+  frequency is way too high.
+
+  The reasons could be:
+  1. I messed up the injection current. - Just checked - that does not seem to
+     be the case,
+  2. There is something wrong with the connection
+     - From the tree of the cellular connection, it seems the parent child
+       relation is fine.
+
+     - There may be a mistake in connecting raxial. I am not sure if the
+       message is symmetric or not. I assumed it should be (simple ohmic
+       resistance).
+  Need a better look into onecell.hoc - which creates and runs a single cell.
+
