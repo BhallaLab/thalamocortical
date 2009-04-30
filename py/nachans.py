@@ -46,7 +46,7 @@
 # Code:
 
 from numpy import where, linspace, exp
-import pylab
+#import pylab
 import config
 from channel import ChannelBase
 

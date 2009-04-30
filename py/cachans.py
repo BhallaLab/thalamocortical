@@ -54,7 +54,7 @@ class CaChannel(ChannelBase):
 	ChannelBase.__init__(self, name, parent, xpower, ypower)
         self.connected_to_pool = False
 
-import pylab
+#import pylab
 class CaL(CaChannel):
     def __init__(self, name, parent):
         CaChannel.__init__(self, name, parent, 2)
