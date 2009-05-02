@@ -16,7 +16,7 @@ NEURON {
 	SUFFIX kahp
 	USEION k READ ek WRITE ik
 	USEION ca READ cai
-	RANGE gbar, ik, m, gk
+	RANGE gbar, ik, m
 }
 
 PARAMETER { 
@@ -29,7 +29,6 @@ PARAMETER {
 ASSIGNED { 
 	ik 		(mA/cm2) 
 	alpha (/ms) beta	(/ms)
-	gk (mS)
 }
  
 STATE {
@@ -39,7 +38,6 @@ STATE {
 BREAKPOINT { 
 	SOLVE states METHOD cnexp
 	ik = gbar * m * ( v - ek ) 
-	gk = gbar * m
 }
  
 INITIAL { 

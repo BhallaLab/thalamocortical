@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Apr 29 10:24:37 2009 (+0530)
 # Version: 
-# Last-Updated: Fri May  1 00:14:27 2009 (+0530)
+# Last-Updated: Sat May  2 20:20:51 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 316
+#     Update #: 419
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -48,9 +48,18 @@
 # Code:
 from collections import deque, defaultdict
 import moose
+
+from kchans import *
+from nachans import *
+from cachans import *
+from capool import *
+from archan import *
+
 from compartment import MyCompartment
 
+
 class SpinyStellate(moose.Cell):
+    spine_area_mult = 2.0 # accomodates apine area
     #
     #     The dendritic structure is like this:
     #
@@ -87,7 +96,11 @@ class SpinyStellate(moose.Cell):
 	      11: 0.418972332, 
 	      12: 0.418972332, 
 	      13: 0.418972332} 
-    
+    ENa = 50e-3
+    EK = -100e-3
+    ECa = 125e-3
+    Em = -65e-3
+    EAR = -40e-3
     channel_density = {0: {'NaF2':     4000.0,
                            'KDR_FS':   4000.0,
                            'KA':       20.0,
@@ -193,19 +206,42 @@ class SpinyStellate(moose.Cell):
     def __init__(self, *args):
 	moose.Cell.__init__(self, *args)
 	self.levels = defaultdict(set) # Python >= 2.5 
-	self.soma_dendrites = set() # List of compartments that are not
+	self.dendrites = set() # List of compartments that are not
 				 # part of axon
-	self.axon = set()
+	self.axon = []
         self._create_cell()
         self._set_passiveprops()
         self._connect_axial(self.soma)
         self._insert_channels()
         self.soma.insertCaPool(5.2e-6 / 2e-10, 50e-3)
-        for i in range(2, 10):
-            for comp in self.levels[i]:
-                comp.insertCaPool(5.2e-6 / 2e-10, 20e-3)
-        
+        for comp in self.dendrites:
+            comp.insertCaPool(5.2e-6 / 2e-10, 20e-3)
 
+    def _create_axon(self):
+        """Create the axonal structure.
+
+        It is like:       
+                          a_0_0 -- a_0_1
+                         /
+                        /
+        soma -- a_0 -- a_1
+                       \
+                        \
+                         a_1_0 --  a_1_1
+        """
+        self.axon.append(MyCompartment('a_0', self.soma))
+        self.axon[-1].diameter = 0.7 * 2e-6
+        self.axon.append(MyCompartment('a_1', self.axon[0]))
+        self.axon[-1].diameter = 0.6 *  2e-6
+        self.axon.append(MyCompartment('a_0_0', self.axon[1]))
+        self.axon.append(MyCompartment('a_1_0', self.axon[1]))
+        self.axon.append(MyCompartment('a_0_1', self.axon[2]))
+        self.axon.append(MyCompartment('a_1_1', self.axon[3]))
+        for comp in self.axon[2:]: comp.diameter = 0.5 * 2e-6
+        for comp in self.axon: 
+            self.levels[0].add(comp)
+            comp.length = 50e-6
+        
     def _create_dtree(self, name_prefix, parent, tree, level, default_length=40e-6, radius_dict=radius):
 	"""Create the dendritic tree structure with compartments.
 
@@ -216,7 +252,7 @@ class SpinyStellate(moose.Cell):
         comp.length = default_length
         comp.diameter = radius_dict[tree[0]] * 2e-6
         self.levels[level].add(comp)
-        self.soma_dendrites.add(comp)
+        self.dendrites.add(comp)
         for subtree in tree[1:]:
             self._create_dtree(name_prefix, comp, subtree, level+1, default_length, radius_dict)
         
@@ -230,30 +266,29 @@ class SpinyStellate(moose.Cell):
 	comp.diameter = 7.5 * 2e-6
 	self.soma = comp
 	self.levels[1].add(comp)
-        self.soma_dendrites.add(comp)
 	for i in range(4):
 	   self. _create_dtree('d_' + str(i) + '_', comp, SpinyStellate.dendritic_tree, 2)
-        axon_radius = [0.7, 0.6, 0.5, 0.5, 0.5, 0.5]
-        parent = comp
-        for i in range(5, -1, -1):
-            comp = MyCompartment('a_' + str(i), parent)
-	    print '$$ ', comp.path, parent.path
-            comp.length = 50e-6
-            comp.diameter = axon_radius[i] * 2e-6
-            self.axon.add(comp)
-            self.levels[0].add(comp)
-            parent = comp
+        self._create_axon()
 
     def _set_passiveprops(self):
         """Set the passive properties of the cells."""
-        for comp in self.soma_dendrites:
-            comp.setSpecificCm(9e-3)
-            comp.setSpecificRm(5.0)
+        self.soma.setSpecificCm(9e-3)
+        self.soma.setSpecificRm(5.0)
+        self.soma.setSpecificRa(2.5)
+        self.soma.Em = SpinyStellate.Em
+        self.soma.initVm = SpinyStellate.Em
+        for comp in self.dendrites:
+            comp.setSpecificCm(9e-3 * SpinyStellate.spine_area_mult)
+            comp.setSpecificRm(5.0/SpinyStellate.spine_area_mult)
             comp.setSpecificRa(2.5)
+            comp.Em = SpinyStellate.Em
+            comp.initVm = SpinyStellate.Em
         for comp in self.axon:
             comp.setSpecificCm(9e-3)
             comp.setSpecificRm(0.1)
             comp.setSpecificRa(1.0)
+            comp.Em = SpinyStellate.Em
+            comp.initVm = SpinyStellate.Em
 
     def _connect_axial(self, root):
         """Connect parent-child compartments via axial-raxial
@@ -271,9 +306,32 @@ class SpinyStellate(moose.Cell):
     def _insert_channels(self):
         for level in range(10):
             comp_set = self.levels[level]
+            mult = 1.0
+            if level > 1:
+                mult = SpinyStellate.spine_area_mult
+                
             for comp in comp_set:
                 for channel, density in SpinyStellate.channel_density[level].items():
-                    comp.insertChannel(channel, density)
+                    chan = comp.insertChannel(channel, mult * density)
+                    if  isinstance(chan, KChannel):
+                        chan.Ek = SpinyStellate.EK
+                    elif isinstance(chan, NaChannel):
+                        chan.Ek = SpinyStellate.ENa
+                    elif isinstance(chan, CaChannel):
+                        chan.Ek = SpinyStellate.ECa
+                    elif isinstance(chan, AR):
+                        chan.Ek = -SpinyStellate.EAR
+                        chan.X = 0.0
+                    else:
+                        print 'ERROR: Unknown channel type:', channel
+
+
+def dump_cell(cell, filename):
+    file_obj = open(filename, 'w')
+    for lvl in cell.levels:
+        for comp in cell.levels[lvl]:
+            file_obj.write(str(lvl) + ' ' + comp.get_props() + '\n')
+    file_obj.close()
 
 
 #import pylab
@@ -282,7 +340,7 @@ from simulation import Simulation
 
 #import timeit
 from datetime import datetime
-
+import pylab
 if __name__ == '__main__':
     sim = Simulation()
     t1 = datetime.now()
@@ -290,7 +348,8 @@ if __name__ == '__main__':
     t2 = datetime.now()
     delta_t = t2 - t1
     print '### TIME SPENT IN CELL CREATION: ', delta_t.seconds + delta_t.microseconds * 1e-6
-    path = s.soma.path + '/a_5/a_4/a_3/a_2'
+    dump_cell(s, 'spinystellate.p')
+    path = s.soma.path + '/a_0/a_1/a_0_0/a_0_1'
     a2 = MyCompartment(path)
     print a2.path, path
     vm_table = a2.insertRecorder('Vm', sim.data)
@@ -302,8 +361,8 @@ if __name__ == '__main__':
     delta_t = t2 - t1
     print '#### TIME TO SIMULATE:', delta_t.seconds + delta_t.microseconds * 1e-6
     sim.dump_data('data')
-#    pylab.plot(vm_table)
-#    pylab.show()
+    pylab.plot(vm_table)
+    pylab.show()
     
 # 
 # spinystellate.py ends here
