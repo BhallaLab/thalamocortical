@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Apr 22 22:21:11 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Apr 28 19:26:23 2009 (+0530)
+# Last-Updated: Sat May  2 17:03:25 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 49
+#     Update #: 50
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -63,7 +63,6 @@ class CaPool(moose.CaConc):
                 print 'WARNING: Ignoring non-CaL', channel.path
             else:
                 if not channel.connected_to_pool:
-                    print 'Connecting', channel.path
                     channel.connect('IkSrc', self, 'current')
                     channel.connected_to_pool = True
                 else:

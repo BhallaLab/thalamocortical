@@ -749,4 +749,17 @@
        message is symmetric or not. I assumed it should be (simple ohmic
        resistance).
   Need a better look into onecell.hoc - which creates and runs a single cell.
+* <2009-05-01 Fri 11:20> One error found
+  I realized that axonal structure branches into two but I had made it
+  linear. After fixing that, the spiking frequency is much lower. 
 
+  Still it is quite different from NEURON.
+
+  The initial membrane potentials were different (-65 and -60 mV).
+* <2009-05-02 Sat 16:59> Corrected axon
+  Apparently I was inserting channels even in axonal compartments. Noticed
+  just now and corrected to insert channels.
+
+  I forgot to include axons in level 0. So they were not getting any
+  channels. Now it is fixed and the spike shapes look a little better.
+  

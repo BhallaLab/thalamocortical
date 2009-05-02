@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:13 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Apr 29 02:19:19 2009 (+0530)
+# Last-Updated: Fri May  1 18:58:23 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 65
+#     Update #: 66
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -85,7 +85,7 @@ class NaF2(NaChannel):
     def __init__(self, name, parent):
         NaChannel.__init__(self, name, parent, 3, 1)
         self.Ek = 50e-3
-        v = linspace(config.vmin, config.vmax, config.ndivs + 1)
+        v = linspace(config.vmin, config.vmax, config.ndivs + 1) - 2.5e-3
         tau_m = where(v < -30e-3, \
                           1.0e-3 * (0.0125 + 0.1525 * exp ((v + 30e-3) / 10e-3)), \
                           1.0e-3 * (0.02 + 0.145 * exp((-v - 30e-3) / 10e-3)))

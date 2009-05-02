@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Apr 29 02:18:39 2009 (+0530)
+# Last-Updated: Sat May  2 19:58:48 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 42
+#     Update #: 80
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -44,6 +44,8 @@
 # 
 
 # Code:
+
+from cStringIO import StringIO
 import moose
 import config
 from math import pi
@@ -143,6 +145,25 @@ class MyCompartment(moose.Compartment):
         self.pulsegen.connect('outputSrc', self, 'injectMsg')
         return self.pulsegen
 
+    def get_props(self):
+        """Returns information about the compartment as a string
+        similar to a line in genesis .p file"""
+        s = StringIO()
+        s.write(self.name)
+        parent = moose.Neutral(self.parent)
+        s.write(' ' + parent.name)
+        s.write(' ' + str(self.length / 1e-6))
+        s.write(' ' + str(self.diameter / 2e-6))
+        s.write(' Em ' + str(self.Em))
+        s.write(' CM ' + str(self.Cm / self.sarea()))
+        s.write(' GM ' + str(1.0/(self.sarea() * self.Rm)))
+        s.write(' RA ' + str(self.Ra * self.xarea() / self.length))
+        for attr, value in self.__dict__.iteritems():
+            if isinstance(value, ChannelBase):
+                s.write(' ' + attr + ' ' + str(value.Gbar / self.sarea()))
+        if hasattr(self, 'ca_pool'):
+            s.write(' caconc ' + str(self.ca_pool.tau))
+        return s.getvalue()
 
 
 
