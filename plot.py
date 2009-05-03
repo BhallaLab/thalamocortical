@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 15:51:57 2009 (+0530)
 # Version: 
-# Last-Updated: Fri May  1 00:17:34 2009 (+0530)
+# Last-Updated: Sun May  3 15:56:49 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 156
+#     Update #: 158
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -104,9 +104,9 @@ nrn_t = nrn_data[:, 0]
 # # pylab.show()
 
 # # pylab.subplot(2, 1, 1)
-# pylab.plot(nrn_t, nrn_Vm, label='nrn')
-# pylab.plot(mus_t, mus_Vm, label='mus')
-# pylab.legend()
+pylab.plot(nrn_t, nrn_Vm, label='nrn')
+pylab.plot(mus_t, mus_Vm, label='mus')
+pylab.legend()
 # # pylab.subplot(2,1,2)
 # # pylab.plot(nrn_t, nrn_Ca, label='nrn')
 # # pylab.plot(mus_t, mus_Ca, label='mus')
