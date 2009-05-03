@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 01:08:37 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Apr 30 02:57:08 2009 (+0530)
+# Last-Updated: Sun May  3 18:20:55 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 654
+#     Update #: 661
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -109,7 +109,10 @@ def create_testcomp(name, parent, length=20e-6, diameter=15e-6,
     comp.setSpecificRm(RM)
     comp.setSpecificRa(RA)
     for channel, density in conductance_dict.items():
-        comp.insertChannel(channel, density)
+        shift = None
+        if channel == 'NaF2' or channel == 'NaPF_SS':
+            shift = -2.5e-3
+        comp.insertChannel(channel, density, shift)
     return comp
 
 
@@ -117,17 +120,19 @@ import pylab
 if __name__ == "__main__":
     sim = Simulation()
     comp = create_testcomp('comp', sim.model, 
-                           conductance_dict={ 'NaF2': 750.0,
-                                              'NaPF_SS': 0.75,
-                                              'KDR_FS': 750.0,
-                                              'KC_FAST': 100.0,
-                                              'KA': 300.0,
-                                              'KM': 37.5,
-                                              'K2': 1.0,
-                                              'KAHP_SLOWER': 1.0,
-                                              'CaL': 5.0,
-                                              'CaT_A': 1.0,
-                                              'AR': 2.5})
+                           conductance_dict={ 
+            'NaF2': 750.0,
+#             'NaPF_SS': 0.75,
+#             'KDR_FS': 750.0,
+#             'KC_FAST': 100.0,
+#             'KA': 300.0,
+#             'KM': 37.5,
+#             'K2': 1.0,
+#             'KAHP_SLOWER': 1.0,
+#             'CaL': 5.0,
+#             'CaT_A': 1.0,
+#             'AR': 2.5
+            })
     
     comp.insertPulseGen('pulsegen', sim.model)
     comp.insertCaPool(5.2e-6 / 2e-10, 20e-3) # The fortran code uses 2e-4 um depth

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 15:17:35 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Apr 17 23:54:02 2009 (+0530)
+# Last-Updated: Sun May  3 16:45:17 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 17
+#     Update #: 22
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -50,6 +50,7 @@ import config
 import moose
 
 class ChannelBase(moose.HHChannel):
+    v_array = numpy.linspace(config.vmin, config.vmax, config.ndivs + 1)
     def __init__(self, name, parent, xpower=1, ypower=0):
         moose.HHChannel.__init__(self, name, parent)
         if xpower != 0:

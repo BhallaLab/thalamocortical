@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Sat May  2 19:58:48 2009 (+0530)
+# Last-Updated: Sun May  3 18:09:31 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 80
+#     Update #: 97
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -25,30 +25,15 @@
 # 
 # 
 # 
-# 
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as
-# published by the Free Software Foundation; either version 3, or
-# (at your option) any later version.
-# 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License
-# along with this program; see the file COPYING.  If not, write to
-# the Free Software Foundation, Inc., 51 Franklin Street, Fifth
-# Floor, Boston, MA 02110-1301, USA.
-# 
-# 
 
 # Code:
+
+from math import pi
 
 from cStringIO import StringIO
 import moose
 import config
-from math import pi
+from channel import ChannelBase
 from cachans import *
 from kchans import *
 from nachans import *
@@ -81,7 +66,7 @@ class MyCompartment(moose.Compartment):
             self._sarea = pi * self.length * self.diameter
         return self._sarea
 
-    def insertChannel(self, channel, specificGbar=None, Ek=None):
+    def insertChannel(self, channel, specificGbar=None, Ek=None, shift=None):
         """Insert a channel setting its gbar as membrane_area *
         specificGbar and reversal potential to Ek.
         
@@ -93,7 +78,10 @@ class MyCompartment(moose.Compartment):
         if type(channel) is type(''): # if it is a class name, create the channel as a child with the same name as the class name
             
             chan_class = eval(channel)
-            chan = chan_class(channel, self)
+            if shift:
+                chan = chan_class(channel, self, shift=shift)
+            else:
+                chan = chan_class(channel, self)
         elif type(channel) is moose.HHChannel:
             chan = channel
         else:
@@ -133,7 +121,14 @@ class MyCompartment(moose.Compartment):
         self.connect(field_name, table, "inputRequest")
         return table
 
-    def insertPulseGen(self, name, parent, baseLevel=0.0, firstLevel=1e-10, firstDelay=20e-3, firstWidth=20e-3, secondLevel=0.0, secondDelay=1e10, secondWidth=0.0):
+    def insertPulseGen(self, name, parent,      \
+                           baseLevel=0.0,       \
+                           firstLevel=1e-10,    \
+                           firstDelay=20e-3,    \
+                           firstWidth=20e-3,    \
+                           secondLevel=0.0,     \
+                           secondDelay=1e10,    \
+                           secondWidth=0.0):
         self.pulsegen = moose.PulseGen(name, parent)
         self.pulsegen.baseLevel = baseLevel
         self.pulsegen.firstLevel = firstLevel
@@ -158,9 +153,8 @@ class MyCompartment(moose.Compartment):
         s.write(' CM ' + str(self.Cm / self.sarea()))
         s.write(' GM ' + str(1.0/(self.sarea() * self.Rm)))
         s.write(' RA ' + str(self.Ra * self.xarea() / self.length))
-        for attr, value in self.__dict__.iteritems():
-            if isinstance(value, ChannelBase):
-                s.write(' ' + attr + ' ' + str(value.Gbar / self.sarea()))
+        for channel in self.channels:
+            s.write(' ' + channel.name + ' ' + str(channel.Gbar / self.sarea()))
         if hasattr(self, 'ca_pool'):
             s.write(' caconc ' + str(self.ca_pool.tau))
         return s.getvalue()

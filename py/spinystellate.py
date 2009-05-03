@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Apr 29 10:24:37 2009 (+0530)
 # Version: 
-# Last-Updated: Sat May  2 20:20:51 2009 (+0530)
+# Last-Updated: Sun May  3 00:25:04 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 419
+#     Update #: 428
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -266,8 +266,12 @@ class SpinyStellate(moose.Cell):
 	comp.diameter = 7.5 * 2e-6
 	self.soma = comp
 	self.levels[1].add(comp)
+        t1 = datetime.now()
 	for i in range(4):
 	   self. _create_dtree('d_' + str(i) + '_', comp, SpinyStellate.dendritic_tree, 2)
+        t2 = datetime.now()
+        delta = t2 - t1
+        print 'create_dtree took: ', delta.seconds + 1e-6 * delta.microseconds
         self._create_axon()
 
     def _set_passiveprops(self):
@@ -304,6 +308,7 @@ class SpinyStellate(moose.Cell):
                 self._connect_axial(obj)
 
     def _insert_channels(self):
+        t1 = datetime.now()
         for level in range(10):
             comp_set = self.levels[level]
             mult = 1.0
@@ -324,7 +329,9 @@ class SpinyStellate(moose.Cell):
                         chan.X = 0.0
                     else:
                         print 'ERROR: Unknown channel type:', channel
-
+        t2 = datetime.now()
+        delta = t2 - t1
+        print 'insert channels: ', delta.seconds + 1e-6 * delta.microseconds
 
 def dump_cell(cell, filename):
     file_obj = open(filename, 'w')
@@ -348,11 +355,11 @@ if __name__ == '__main__':
     t2 = datetime.now()
     delta_t = t2 - t1
     print '### TIME SPENT IN CELL CREATION: ', delta_t.seconds + delta_t.microseconds * 1e-6
+#    pymoose.printtree(s.soma)
     dump_cell(s, 'spinystellate.p')
     path = s.soma.path + '/a_0/a_1/a_0_0/a_0_1'
     a2 = MyCompartment(path)
-    print a2.path, path
-    vm_table = a2.insertRecorder('Vm', sim.data)
+    vm_table = s.soma.insertRecorder('Vm', sim.data)
     s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=0.0, firstWidth=50e-3)
     sim.schedule()
     t1 = datetime.now()
