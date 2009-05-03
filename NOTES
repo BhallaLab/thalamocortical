@@ -763,3 +763,25 @@
   I forgot to include axons in level 0. So they were not getting any
   channels. Now it is fixed and the spike shapes look a little better.
   
+* <2009-05-03 Sun 16:05> Trying Spiny stellate
+  KDR_FS - identical
+  NaF2 - the spike is delayed - could be something with fastNaf_shoft
+
+  NaPF_SS - does not seem to have any effect
+
+  THE PERFORMANCE BOTTLENECK
+
+  The setup takes terribly long time.
+  The reason for it is that I am calculating the m, h tables for each
+  instantiation of each channel - this causes extreme slowdown. Ideally the
+  tables should be class variables. But the shoft parameter comes in the way. 
+
+  A better workaround will be using copy in MOOSE. But I don't know how to do
+  that. I avoided library, prototype in PyMOOSE. But looks like I need to put
+  them in.
+
+  - NO THE BOTTLENECK is NOT NUMPY ARRAY CREATION - when I move those to class
+    variables, there is only about 3% reduction in time to create all the
+    channels. 
+    - Likely to be in the looping through all tables and assigning
+      values.
