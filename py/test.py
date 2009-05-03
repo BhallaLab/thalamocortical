@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 01:08:37 2009 (+0530)
 # Version: 
-# Last-Updated: Sun May  3 18:20:55 2009 (+0530)
+# Last-Updated: Mon May  4 00:01:25 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 661
+#     Update #: 700
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -83,7 +83,7 @@ def createTestCompartment(name, parent,
     return comp
 
 test_conductances_ss = {
-#     'NaF2': 750.0,
+    'NaF2': 750.0,
 #     'NaPF_SS': 0.75,
 #     'KDR_FS': 750.0,
 #     'KC_FAST': 100.0,
@@ -91,7 +91,7 @@ test_conductances_ss = {
 #     'KM': 37.5,
 #     'K2': 1.0,
 #     'KAHP_SLOWER': 1.0,
-    'CaL': 5.0,
+#     'CaL': 5.0,
 #     'CaT_A': 1.0,
 #     'AR': 2.5
     }
@@ -112,7 +112,9 @@ def create_testcomp(name, parent, length=20e-6, diameter=15e-6,
         shift = None
         if channel == 'NaF2' or channel == 'NaPF_SS':
             shift = -2.5e-3
-        comp.insertChannel(channel, density, shift)
+            print 'Shift set to:', shift
+        print 'now :', shift
+        comp.insertChannel(channel, specificGbar=density, shift=shift)
     return comp
 
 
@@ -122,16 +124,16 @@ if __name__ == "__main__":
     comp = create_testcomp('comp', sim.model, 
                            conductance_dict={ 
             'NaF2': 750.0,
-#             'NaPF_SS': 0.75,
-#             'KDR_FS': 750.0,
-#             'KC_FAST': 100.0,
-#             'KA': 300.0,
-#             'KM': 37.5,
-#             'K2': 1.0,
-#             'KAHP_SLOWER': 1.0,
-#             'CaL': 5.0,
-#             'CaT_A': 1.0,
-#             'AR': 2.5
+            'NaPF_SS': 0.75,
+            'KDR_FS': 750.0,
+            'KC_FAST': 100.0,
+            'KA': 300.0,
+            'KM': 37.5,
+            'K2': 1.0,
+            'KAHP_SLOWER': 1.0,
+            'CaL': 5.0,
+            'CaT_A': 1.0,
+            'AR': 2.5
             })
     
     comp.insertPulseGen('pulsegen', sim.model)
@@ -164,12 +166,12 @@ if __name__ == "__main__":
     pylab.subplot(2, 1, 1, title='Vm')
     pylab.plot(nrn_t, nrn_Vm, 'rx', label='nrn')
     pylab.plot(mus_t, pylab.array(vm_table)*1e3, 'g-', label='mus')
-    pylab.legend()
+#     pylab.legend()
     pylab.subplot(2, 1, 2, title='[Ca2+]')
     pylab.plot(nrn_t, nrn_Ca, 'rx', label='nrn')
     pylab.plot(mus_t, pylab.array(ca_table) * 1e3, 'g-', label='mus')
     pylab.legend()
-#     pylab.legend()
+
     pylab.show()
 
 

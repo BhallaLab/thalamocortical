@@ -785,3 +785,6 @@
     channels. 
     - Likely to be in the looping through all tables and assigning
       values.
+* <2009-05-03 Sun 23:31> KC is making problem
+  Looking through the code again - comparing channels one by one.
+  KC turns out to be the culprit.

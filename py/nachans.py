@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:13 2009 (+0530)
 # Version: 
-# Last-Updated: Sun May  3 18:05:46 2009 (+0530)
+# Last-Updated: Sun May  3 23:14:43 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 103
+#     Update #: 106
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -81,7 +81,7 @@ class NaF(NaChannel):
 class NaF2(NaChannel):
     def __init__(self, name, parent, shift=0.0, Ek=50e-3):
         NaChannel.__init__(self, name, parent, 3, 1, Ek=Ek)
-        self.Ek = 50e-3
+        print 'shift=', shift
         v = linspace(config.vmin, config.vmax, config.ndivs + 1) + shift
         tau_m = where(v < -30e-3, \
                           1.0e-3 * (0.0125 + 0.1525 * exp ((v + 30e-3) / 10e-3)), \
@@ -160,8 +160,7 @@ class NaF_TCR(NaChannel):
     """Fast Na+ channel for TCR cells. This is almost identical to
     NaF, but there is a nasty voltage shift in the tables."""
     def __init__(self, name, parent, Ek=50e-3):
-        NaChannel.__init__(self, name, parent, 3, 1)
-        self.Ek = 50e-3
+        NaChannel.__init__(self, name, parent, 3, 1, Ek=Ek)
         shift_mnaf = -5.5e-3
         shift_hnaf = -7e-3
         v = linspace(config.vmin, config.vmax, config.ndivs + 1) 
