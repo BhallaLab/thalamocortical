@@ -20,40 +20,40 @@ soma{
     
     insert naf2
     gbar_naf2 =   0.075
-    ena = 50
-    // insert napf_spinstell
-    // gbar_napf_spinstell =   7.5E-05
-    // insert kdr_fs
-    // gbar_kdr_fs =   0.075
-    // insert kc_fast
-    // gbar_kc_fast =   0.01
-    // insert ka
-    // gbar_ka =   0.03
-    // insert km
-    // gbar_km =   0.00375
-    // insert k2
-    // gbar_k2 =   0.0001
-    // insert kahp_slower
-    // gbar_kahp_slower =   0.0001
-    // ek = -95.0
-    // insert cal
-    // gbar_cal =   0.0005
-    // insert cat_a
-    // gbar_cat_a =   0.0001
-    // insert ar
-    // gbar_ar =   0.00025
-    // insert cad
-    // // *** ca diffusion: beta=1/tau
-    // beta_cad  =   0.05
-    // // cafor(I) (FORTRAN) converted to phi (NEURON)
-    // phi_cad =   260000.
+    insert napf_spinstell
+    gbar_napf_spinstell =   7.5E-05
+    insert kdr_fs
+    gbar_kdr_fs =   0.075
+    insert kc_fast
+    gbar_kc_fast =   0.01
+    insert ka
+    gbar_ka =   0.03
+    insert km
+    gbar_km =   0.00375
+    insert k2
+    gbar_k2 =   0.0001
+    insert kahp_slower
+    gbar_kahp_slower =   0.0001
+    insert cal
+    gbar_cal =   0.0005
+    insert cat_a
+    gbar_cat_a =   0.0001
+    insert ar
+    gbar_ar =   0.00025
+    insert cad
+    // *** ca diffusion: beta=1/tau
+    beta_cad  =   0.05
+    // cafor(I) (FORTRAN) converted to phi (NEURON)
+    phi_cad =   260000.
     insert pas
     e_pas = -65
     g_pas = 2e-5
     Ra = 250
     cm = 0.9
     fastNa_shift_naf2 = -2.5
-    // fastNa_shift_napf_spinstell = -2.5
+    fastNa_shift_napf_spinstell = -2.5
+    ek = -95.0
+    ena = 50
     
 }
 stim1 = new IClamp(0.5)
@@ -65,17 +65,17 @@ ceiling_cad = 1e6
 tstop = 50
 vecV.record(&soma.v(0.5))
 vecT.record(&t)
-// vec_cad.record(&soma.cai(0.5))
-// vec_mkahp.record(&soma.beta_cal(0.5))
+vec_cad.record(&soma.cai(0.5))
+
 run()
 outfile.wopen("mydata/Vm.plot")
-// file_cad.wopen("mydata/Ca.plot")
+file_cad.wopen("mydata/Ca.plot")
 for ii = 0, vecV.size() - 1 {
     // outfile.printf("%g %g %g\n", vecT.x(ii), vecV.x(ii), vec_mkahp.x(ii))
-    // file_cad.printf("%g %g\n", vecT.x(ii), vec_cad.x(ii))
+    file_cad.printf("%g %g\n", vecT.x(ii), vec_cad.x(ii))
     outfile.printf("%g %g\n", vecT.x(ii), vecV.x(ii))
     
 }
 outfile.close()
-// file_cad.close()
+file_cad.close()
 
