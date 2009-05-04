@@ -788,3 +788,32 @@
 * <2009-05-03 Sun 23:31> KC is making problem
   Looking through the code again - comparing channels one by one.
   KC turns out to be the culprit.
+  
+  After tweaking here and there suddenly the discrepancy in test.hoc and
+  test.py is gone.
+
+  But as I look closely with NaF2 alone in test_ss_soma.py/hoc I see almost
+  invisible difference. - Depolarization due to NaF2 happens slightly faster
+  in MOOSE than in NRN. It is about 0.04 ms ahead. I do not whether this can
+  be attributed to integration errors: integration time step is 1 us = 0.001
+  ms.
+
+  Testing AR alone on test_ss_soma. It is causing major difference in initial
+  depolarization.
+
+  This was due to initial value of m.
+
+
+  Going back to all channels: as soon as I introduce Ca pool, the outputs
+  diverge. Now, moose without Ca pool matches nrn with ca pool. 
+  - I had forgotton to set ceiling_cad in nrn. After setting it, the
+    no-injection outputs match.
+
+  Now with injection they match till the first two spikes after injection
+  start, but the divergence becomes discernible from the third. Also, zooming
+  in reveals very small difference in the earlier part also.
+  Given the perfect match I had obtained on the test compartment, something is
+  slighly wrong. may be the initial values for m of some channel..
+
+* <2009-05-04 Mon 12:13> Back to spinystellate
+
