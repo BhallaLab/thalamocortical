@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 01:08:37 2009 (+0530)
 # Version: 
-# Last-Updated: Mon May  4 00:01:25 2009 (+0530)
+# Last-Updated: Mon May  4 00:57:31 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 700
+#     Update #: 703
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -123,24 +123,24 @@ if __name__ == "__main__":
     sim = Simulation()
     comp = create_testcomp('comp', sim.model, 
                            conductance_dict={ 
-            'NaF2': 750.0,
-            'NaPF_SS': 0.75,
-            'KDR_FS': 750.0,
-            'KC_FAST': 100.0,
-            'KA': 300.0,
-            'KM': 37.5,
-            'K2': 1.0,
-            'KAHP_SLOWER': 1.0,
-            'CaL': 5.0,
-            'CaT_A': 1.0,
+#             'NaF2': 750.0,
+#             'NaPF_SS': 0.75,
+#             'KDR_FS': 750.0,
+#             'KC_FAST': 100.0,
+#             'KA': 300.0,
+#             'KM': 37.5,
+#             'K2': 1.0,
+#             'KAHP_SLOWER': 1.0,
+#             'CaL': 5.0,
+#             'CaT_A': 1.0,
             'AR': 2.5
             })
     
     comp.insertPulseGen('pulsegen', sim.model)
-    comp.insertCaPool(5.2e-6 / 2e-10, 20e-3) # The fortran code uses 2e-4 um depth
-    ca_table = moose.Table('Ca', sim.data)
-    ca_table.stepMode = 3
-    comp.ca_pool.connect('Ca', ca_table, 'inputRequest')
+#     comp.insertCaPool(5.2e-6 / 2e-10, 20e-3) # The fortran code uses 2e-4 um depth
+#     ca_table = moose.Table('Ca', sim.data)
+#     ca_table.stepMode = 3
+#     comp.ca_pool.connect('Ca', ca_table, 'inputRequest')
     vm_table = comp.insertRecorder('Vm', sim.data)
     
     sim.schedule()
@@ -156,7 +156,7 @@ if __name__ == "__main__":
     nrn_Vm = nrn_data[:, 1]
     nrn_t = nrn_data[:, 0]
     mus_t = pylab.array(range(len(vm_table)))*1e-3
-    nrn_Ca = pylab.loadtxt('../nrn/mydata/Ca.plot')[:,1]
+#     nrn_Ca = pylab.loadtxt('../nrn/mydata/Ca.plot')[:,1]
 ##############################
 #     mus_m = pylab.array(m_table)
 #     pylab.plot(mus_Ca * 1e3, mus_m)
@@ -167,9 +167,9 @@ if __name__ == "__main__":
     pylab.plot(nrn_t, nrn_Vm, 'rx', label='nrn')
     pylab.plot(mus_t, pylab.array(vm_table)*1e3, 'g-', label='mus')
 #     pylab.legend()
-    pylab.subplot(2, 1, 2, title='[Ca2+]')
-    pylab.plot(nrn_t, nrn_Ca, 'rx', label='nrn')
-    pylab.plot(mus_t, pylab.array(ca_table) * 1e3, 'g-', label='mus')
+#     pylab.subplot(2, 1, 2, title='[Ca2+]')
+#     pylab.plot(nrn_t, nrn_Ca, 'rx', label='nrn')
+#     pylab.plot(mus_t, pylab.array(ca_table) * 1e3, 'g-', label='mus')
     pylab.legend()
 
     pylab.show()

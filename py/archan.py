@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Apr 27 15:34:07 2009 (+0530)
 # Version: 
-# Last-Updated: Sun May  3 23:30:18 2009 (+0530)
+# Last-Updated: Mon May  4 12:21:10 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 4
+#     Update #: 7
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -63,7 +63,7 @@ class AR(ChannelBase):
 	    self.xGate.A[i] = AR.tau_m[i]
 	    self.xGate.B[i] = AR.m_inf[i]
 	self.xGate.tweakTau()
-	self.X = 0.25
+# 	self.X = 0.25
 	self.Ek = Ek
 
 
