@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Sun May  3 23:17:14 2009 (+0530)
+# Last-Updated: Tue May  5 00:24:06 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 99
+#     Update #: 101
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -78,9 +78,7 @@ class MyCompartment(moose.Compartment):
         if type(channel) is type(''): # if it is a class name, create the channel as a child with the same name as the class name
             
             chan_class = eval(channel)
-            print 'ubsertChannel: shift', shift
             if shift:
-                print 'shift=', shift
                 chan = chan_class(channel, self, shift=shift)
             else:
                 chan = chan_class(channel, self)
