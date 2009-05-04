@@ -1,5 +1,2 @@
-/nrn_m.txt
-/os
-/run_sim.py
-/run_sim.py.~1~
-/splprep_demo.png
+*.pyc
+*~
