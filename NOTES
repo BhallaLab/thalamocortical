@@ -788,3 +788,9 @@
 * <2009-05-03 Sun 23:31> KC is making problem
   Looking through the code again - comparing channels one by one.
   KC turns out to be the culprit.
+* <2009-05-04 Mon 23:11> Todays commits are gone!
+
+  Not that it was a lot of code - but git-emacs did something silly and that
+  screwed up the whole system. I am losing faith in Linus. git is
+  annoying. When branches are cheap, one ends up with many branches and then
+  forget what is what.
