@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Apr 29 10:24:37 2009 (+0530)
 # Version: 
-# Last-Updated: Tue May  5 15:33:48 2009 (+0530)
+# Last-Updated: Tue May  5 18:33:54 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 486
+#     Update #: 496
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -203,7 +203,25 @@ class SpinyStellate(moose.Cell):
                            'CaT_A': 0.0001 * 1e4,
                            'AR': 0.00025 * 1e4}}
     
-    def init_channels(self):
+
+    def __init__(self, *args):
+	moose.Cell.__init__(self, *args)
+        self.channels_inited = False
+        self.channel_lib = {}
+        self._init_channels()
+	self.levels = defaultdict(set) # Python >= 2.5 
+	self.dendrites = set() # List of compartments that are not
+				 # part of axon
+	self.axon = []
+        self._create_cell()
+        self._set_passiveprops()
+        self._connect_axial(self.soma)
+        self._insert_channels()
+        self.soma.insertCaPool(5.2e-6 / 2e-10, 50e-3)
+        for comp in self.dendrites:
+            comp.insertCaPool(5.2e-6 / 2e-10, 20e-3)
+
+    def _init_channels(self):
         if self.channels_inited:
             return
         
@@ -222,23 +240,6 @@ class SpinyStellate(moose.Cell):
                 channel = class_obj(channel_name, lib)
             self.channel_lib[channel_class] = channel
         self.channels_inited = True
-
-    def __init__(self, *args):
-	moose.Cell.__init__(self, *args)
-        self.channels_inited = False
-        self.channel_lib = {}
-        self.init_channels()
-	self.levels = defaultdict(set) # Python >= 2.5 
-	self.dendrites = set() # List of compartments that are not
-				 # part of axon
-	self.axon = []
-        self._create_cell()
-        self._set_passiveprops()
-        self._connect_axial(self.soma)
-        self._insert_channels()
-        self.soma.insertCaPool(5.2e-6 / 2e-10, 50e-3)
-        for comp in self.dendrites:
-            comp.insertCaPool(5.2e-6 / 2e-10, 20e-3)
 
     def _create_axon(self):
         """Create the axonal structure.
@@ -345,6 +346,7 @@ class SpinyStellate(moose.Cell):
                 for channel, density in SpinyStellate.channel_density[level].items():
                     chan = moose.HHChannel(self.channel_lib[channel], channel, comp) # this does a copy
                     comp.insertChannel(chan, specificGbar=mult * density)
+#                     chan = comp.insertChannel(channel, specificGbar=mult * density)
                     if  channel.startswith('K'):
                         chan.Ek = SpinyStellate.EK
                     elif channel.startswith('Na'):
@@ -386,7 +388,7 @@ if __name__ == '__main__':
     dump_cell(s, 'spinystellate.p')
     path = s.soma.path + '/a_0/a_1/a_0_0/a_0_1'
     a2 = MyCompartment(path)
-    vm_table = s.soma.insertRecorder('Vm', sim.data)
+    vm_table = a2.insertRecorder('Vm', sim.data)
     s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=0.0, firstWidth=50e-3)
     sim.schedule()
     t1 = datetime.now()
