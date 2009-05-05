@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Tue May  5 00:24:06 2009 (+0530)
+# Last-Updated: Tue May  5 15:11:12 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 101
+#     Update #: 102
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -82,7 +82,7 @@ class MyCompartment(moose.Compartment):
                 chan = chan_class(channel, self, shift=shift)
             else:
                 chan = chan_class(channel, self)
-        elif type(channel) is moose.HHChannel:
+        elif isinstance(channel, moose.HHChannel):
             chan = channel
         else:
             print "ERROR: unknown object passed as channel: ", channel
