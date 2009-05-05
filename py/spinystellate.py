@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Apr 29 10:24:37 2009 (+0530)
 # Version: 
-# Last-Updated: Sun May  3 00:25:04 2009 (+0530)
+# Last-Updated: Tue May  5 15:33:48 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 428
+#     Update #: 486
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -203,8 +203,31 @@ class SpinyStellate(moose.Cell):
                            'CaT_A': 0.0001 * 1e4,
                            'AR': 0.00025 * 1e4}}
     
+    def init_channels(self):
+        if self.channels_inited:
+            return
+        
+        channels = {'NaF2': 'NaF2_SS', 'NaPF_SS': 'NaPF_SS', 'KDR_FS': 'KDR_FS', \
+                        'KA': 'KA', 'K2': 'K2', 'KM': 'KM', 'KC_FAST': 'KC_FAST', \
+                        'KAHP_SLOWER': 'KAHP_SLOWER', \
+                        'CaL': 'CaL', 'CaT_A': 'CaT_A', 'AR': 'AR'}
+        lib = moose.Neutral('/library')
+        for channel_class, channel_name in channels.items():
+            if config.context.exists('/library/' + channel_name):
+                channel = moose.HHChannel(channel_name, lib)
+            else:
+                class_obj = eval(channel_class)
+                if channel_class == 'NaF2':
+                    channel = class_obj(channel_name, lib, shift=-2.5e-3)
+                channel = class_obj(channel_name, lib)
+            self.channel_lib[channel_class] = channel
+        self.channels_inited = True
+
     def __init__(self, *args):
 	moose.Cell.__init__(self, *args)
+        self.channels_inited = False
+        self.channel_lib = {}
+        self.init_channels()
 	self.levels = defaultdict(set) # Python >= 2.5 
 	self.dendrites = set() # List of compartments that are not
 				 # part of axon
@@ -308,6 +331,9 @@ class SpinyStellate(moose.Cell):
                 self._connect_axial(obj)
 
     def _insert_channels(self):
+        if not self.channels_inited:
+            raise Exception, 'Channels not initialized in library'
+
         t1 = datetime.now()
         for level in range(10):
             comp_set = self.levels[level]
@@ -317,14 +343,15 @@ class SpinyStellate(moose.Cell):
                 
             for comp in comp_set:
                 for channel, density in SpinyStellate.channel_density[level].items():
-                    chan = comp.insertChannel(channel, mult * density)
-                    if  isinstance(chan, KChannel):
+                    chan = moose.HHChannel(self.channel_lib[channel], channel, comp) # this does a copy
+                    comp.insertChannel(chan, specificGbar=mult * density)
+                    if  channel.startswith('K'):
                         chan.Ek = SpinyStellate.EK
-                    elif isinstance(chan, NaChannel):
+                    elif channel.startswith('Na'):
                         chan.Ek = SpinyStellate.ENa
-                    elif isinstance(chan, CaChannel):
+                    elif channel.startswith('Ca'):
                         chan.Ek = SpinyStellate.ECa
-                    elif isinstance(chan, AR):
+                    elif channel.startswith('AR'):
                         chan.Ek = -SpinyStellate.EAR
                         chan.X = 0.0
                     else:

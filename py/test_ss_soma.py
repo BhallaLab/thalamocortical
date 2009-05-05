@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sun May  3 12:52:23 2009 (+0530)
 # Version: 
-# Last-Updated: Mon May  4 12:50:04 2009 (+0530)
+# Last-Updated: Tue May  5 11:43:21 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 76
+#     Update #: 95
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -89,7 +89,7 @@ if __name__ == '__main__':
     for channel, density in channel_density.items():
         shift = None
         if channel == 'NaF2' or channel == 'NaPF_SS':
-            shift=0.0 #-2.5e-3
+            shift=0.0#-2.5e-3
 	chan = soma.insertChannel(channel, density, shift=shift)
 	if isinstance(chan, KChannel):
 	    chan.Ek = EK
