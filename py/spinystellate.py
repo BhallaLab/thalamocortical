@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Apr 29 10:24:37 2009 (+0530)
 # Version: 
-# Last-Updated: Tue May  5 18:33:54 2009 (+0530)
+# Last-Updated: Tue May  5 23:16:36 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 496
+#     Update #: 516
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -225,10 +225,17 @@ class SpinyStellate(moose.Cell):
         if self.channels_inited:
             return
         
-        channels = {'NaF2': 'NaF2_SS', 'NaPF_SS': 'NaPF_SS', 'KDR_FS': 'KDR_FS', \
-                        'KA': 'KA', 'K2': 'K2', 'KM': 'KM', 'KC_FAST': 'KC_FAST', \
-                        'KAHP_SLOWER': 'KAHP_SLOWER', \
-                        'CaL': 'CaL', 'CaT_A': 'CaT_A', 'AR': 'AR'}
+        channels = {'NaF2': 'NaF2_SS', 
+                    'NaPF_SS': 'NaPF_SS',
+                    'KDR_FS': 'KDR_FS',
+                    'KA': 'KA', 
+                    'K2': 'K2', 
+                    'KM': 'KM', 
+                    'KC_FAST': 'KC_FAST', 
+                    'KAHP_SLOWER': 'KAHP_SLOWER',
+                    'CaL': 'CaL', 
+                    'CaT_A': 'CaT_A', 
+                    'AR': 'AR'}
         lib = moose.Neutral('/library')
         for channel_class, channel_name in channels.items():
             if config.context.exists('/library/' + channel_name):
@@ -236,8 +243,10 @@ class SpinyStellate(moose.Cell):
             else:
                 class_obj = eval(channel_class)
                 if channel_class == 'NaF2':
-                    channel = class_obj(channel_name, lib, shift=-2.5e-3)
-                channel = class_obj(channel_name, lib)
+                    print 'NaF2'
+                    channel = class_obj(channel_name, lib, shift=0.0)
+                else:
+                    channel = class_obj(channel_name, lib)
             self.channel_lib[channel_class] = channel
         self.channels_inited = True
 
@@ -346,7 +355,6 @@ class SpinyStellate(moose.Cell):
                 for channel, density in SpinyStellate.channel_density[level].items():
                     chan = moose.HHChannel(self.channel_lib[channel], channel, comp) # this does a copy
                     comp.insertChannel(chan, specificGbar=mult * density)
-#                     chan = comp.insertChannel(channel, specificGbar=mult * density)
                     if  channel.startswith('K'):
                         chan.Ek = SpinyStellate.EK
                     elif channel.startswith('Na'):
@@ -354,7 +362,7 @@ class SpinyStellate(moose.Cell):
                     elif channel.startswith('Ca'):
                         chan.Ek = SpinyStellate.ECa
                     elif channel.startswith('AR'):
-                        chan.Ek = -SpinyStellate.EAR
+                        chan.Ek = SpinyStellate.EAR
                         chan.X = 0.0
                     else:
                         print 'ERROR: Unknown channel type:', channel
@@ -385,11 +393,11 @@ if __name__ == '__main__':
     delta_t = t2 - t1
     print '### TIME SPENT IN CELL CREATION: ', delta_t.seconds + delta_t.microseconds * 1e-6
 #    pymoose.printtree(s.soma)
-    dump_cell(s, 'spinystellate.p')
+#    dump_cell(s, 'spinystellate.p')
     path = s.soma.path + '/a_0/a_1/a_0_0/a_0_1'
     a2 = MyCompartment(path)
     vm_table = a2.insertRecorder('Vm', sim.data)
-    s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=0.0, firstWidth=50e-3)
+    s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=0.0, firstDelay=0.0, firstWidth=50e-3)
     sim.schedule()
     t1 = datetime.now()
     sim.run(50e-3)
