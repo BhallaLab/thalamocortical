@@ -794,3 +794,21 @@
   screwed up the whole system. I am losing faith in Linus. git is
   annoying. When branches are cheap, one ends up with many branches and then
   forget what is what.
+* <2009-05-05 Tue 14:42> Bad design
+  I did not think about the duplication of the gate tables in all the
+  channels. Ideally the channels of the same class should share gates. But
+  although PyMOOSE has provision for copy constructor that just does that, I
+  did not design my channel subclasses for that. As I tried to derive a way
+  to create a copy for all but the first instance, I realized that I shall
+  need to change the signature of all the classes for that (in my python
+  code). Now the way is to explicitly create channel objects in the library
+  and then copy them in compartment code. 
+  Also, the channels varying only by shift will need to be created separately.
+
+
+  I had to set the Ek values based on prefix of the channel names - something
+  I had tried to avoid by creating a whole class hierarchy in python. I feel
+  we are doomed to string based decisions in this kind of system. The kind of
+  friction I am going through in Python is perhaps due to a fundamental
+  difference in the way of thinking. Things might have been smoother if I just
+  wrote genesis script using python syntax.
