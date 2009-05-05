@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Apr 22 22:21:11 2009 (+0530)
 # Version: 
-# Last-Updated: Sat May  2 17:03:25 2009 (+0530)
+# Last-Updated: Tue May  5 17:28:37 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 50
+#     Update #: 57
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -59,10 +59,7 @@ class CaPool(moose.CaConc):
         """Connects the Ca2+ channels in channel_list as a source of
         Ca2+ to the pool."""
         for channel in channel_list:
-            if not isinstance(channel, CaL):
-                print 'WARNING: Ignoring non-CaL', channel.path
-            else:
-                if not channel.connected_to_pool:
+                if not hasattr(channel, 'connected_to_pool') or not channel.connected_to_pool:
                     channel.connect('IkSrc', self, 'current')
                     channel.connected_to_pool = True
                 else:
@@ -73,7 +70,7 @@ class CaPool(moose.CaConc):
         for channel in channel_list:
             if channel.useConcentration == 0:
                 print "WRANING: This channel does not use concentration:", channel.path
-            elif isinstance(channel, KCaChannel) and not channel.connected_to_ca:
+            elif not hasattr(channel, 'connected_to_ca') or not channel.connected_to_ca:
                 self.connect("concSrc", channel, "concen")
                 channel.connected_to_ca = True
             else:

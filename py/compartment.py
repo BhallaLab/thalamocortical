@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Tue May  5 15:11:12 2009 (+0530)
+# Last-Updated: Tue May  5 17:22:41 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 102
+#     Update #: 105
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -108,11 +108,13 @@ class MyCompartment(moose.Compartment):
         self.ca_pool.B = phi / self.sarea()
         self.ca_pool.tau = tau
         ca_channels = [ channel for channel in self.channels \
-                            if isinstance(channel, CaL) ]
+                            if isinstance(channel, CaL) or channel.name.startswith('CaL')]
         self.ca_pool.connectCaChannels(ca_channels)
         kca_channels = [ channel for channel in self.channels \
-                            if isinstance(channel, KCaChannel) ]
+                            if isinstance(channel, KCaChannel) or channel.name.startswith('KC') or channel.name.startswith('KAHP') ]
         self.ca_pool.connectDepChannels(kca_channels)
+        for chn in ca_channels: print chn.name
+        for chn in kca_channels: print chn.name
 
     def insertRecorder(self, field_name, data_container):
         """Creates a table for recording a field under data_container"""
