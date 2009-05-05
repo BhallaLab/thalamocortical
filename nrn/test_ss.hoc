@@ -1,0 +1,18 @@
+objectvar cell, stim1, vvec, tvec, out_file
+load_file("hoc/traubcon.hoc")
+load_file("cell_templates.hoc")
+cell = new spinstell()
+access cell.comp[1]
+define_shape()
+vvec = new Vector()
+tvec = new Vector()
+vvec.record(&cell.comp[1].v(0.5))
+tvec.record(&t)
+tstop = 50
+run()
+out_file = new File()
+out_file.wopen("mydata/Vm.dat")
+for ii = 0, vvec.size() - 1 {
+    out_file.printf("%g %g\n", tvec.x(ii), vvec.x(ii))
+}
+out_file.close()

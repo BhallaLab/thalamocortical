@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Tue May  5 17:22:41 2009 (+0530)
+# Last-Updated: Tue May  5 23:03:21 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 105
+#     Update #: 110
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -75,8 +75,7 @@ class MyCompartment(moose.Compartment):
         set to specificGbar * surface-area of the compartment. If Ek
         is given, the channel's Ek is set to this value.
         """
-        if type(channel) is type(''): # if it is a class name, create the channel as a child with the same name as the class name
-            
+        if type(channel) is type(''): # if it is a class name, create the channel as a child with the same name as the class name            
             chan_class = eval(channel)
             if shift:
                 chan = chan_class(channel, self, shift=shift)
@@ -113,12 +112,10 @@ class MyCompartment(moose.Compartment):
         kca_channels = [ channel for channel in self.channels \
                             if isinstance(channel, KCaChannel) or channel.name.startswith('KC') or channel.name.startswith('KAHP') ]
         self.ca_pool.connectDepChannels(kca_channels)
-        for chn in ca_channels: print chn.name
-        for chn in kca_channels: print chn.name
 
-    def insertRecorder(self, field_name, data_container):
+    def insertRecorder(self, field_name, data_container): 
         """Creates a table for recording a field under data_container"""
-        table = moose.Table(field_name, data_container)
+        table = moose.Table(field_name, data_container)# Possible name conflict for multiple recorders on different compartments
         table.stepMode = 3
         self.connect(field_name, table, "inputRequest")
         return table

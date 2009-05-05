@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:13 2009 (+0530)
 # Version: 
-# Last-Updated: Tue May  5 15:28:53 2009 (+0530)
+# Last-Updated: Tue May  5 20:15:25 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 110
+#     Update #: 112
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -77,6 +77,7 @@ class NaF(NaChannel):
 class NaF2(NaChannel):
     def __init__(self, name, parent, shift=0.0, Ek=50e-3):
         NaChannel.__init__(self, name, parent, 3, 1, Ek=Ek)
+        print 'NaF2: shift =', shift
         v = linspace(config.vmin, config.vmax, config.ndivs + 1) + shift
         tau_m = where(v < -30e-3, \
                           1.0e-3 * (0.0125 + 0.1525 * exp ((v + 30e-3) / 10e-3)), \
@@ -128,6 +129,7 @@ class NaPF_SS(NaChannel):
         NaChannel.__init__(self, name, parent, 3, Ek=Ek)
         if shift is None:
             shift = -2.5e-3
+        print 'NaPF_SS: shift =', shift
         v = linspace(config.vmin, config.vmax, config.ndivs + 1) + shift
         tau_m = where(v < -30e-3, \
                            1.0e-3 * (0.025 + 0.14 * exp((v  + 30.0e-3) / 10.0e-3)), \
