@@ -4,6 +4,11 @@ load_file("cell_templates.hoc")
 cell = new spinstell()
 access cell.comp[1]
 define_shape()
+stim1 = new IClamp(0.5)
+stim1.del = 20
+stim1.amp = 0.3
+stim1.dur = 20
+
 vvec = new Vector()
 tvec = new Vector()
 vvec.record(&cell.comp[1].v(0.5))
