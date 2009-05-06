@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Apr 29 10:24:37 2009 (+0530)
 # Version: 
-# Last-Updated: Wed May  6 17:36:19 2009 (+0530)
+# Last-Updated: Wed May  6 20:17:52 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 542
+#     Update #: 547
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -237,13 +237,14 @@ class SpinyStellate(moose.Cell):
             return
         
         for channel_class, channel_name in SpinyStellate.channels.items():
+            channel = None
             if config.context.exists('/library/' + channel_name):
                 channel = moose.HHChannel(channel_name, config.lib)
             else:
                 class_obj = eval(channel_class)
                 if channel_class == 'NaF2':
                     print 'NaF2'
-                    channel = class_obj(channel_name, config.lib, shift=0.0)
+                    channel = class_obj(channel_name, config.lib, shift=-2.5e-3)
                     channel.X = 0.0
                 else:
                     channel = class_obj(channel_name, config.lib)
@@ -358,6 +359,7 @@ class SpinyStellate(moose.Cell):
                     if  channel.startswith('K'):
                         chan.Ek = SpinyStellate.EK
                     elif channel.startswith('Na'):
+                        chan.X = 0.0
                         chan.Ek = SpinyStellate.ENa
                     elif channel.startswith('Ca'):
                         chan.Ek = SpinyStellate.ECa
@@ -397,7 +399,7 @@ if __name__ == '__main__':
     path = s.soma.path + '/a_0/a_1/a_0_0/a_0_1'
     a2 = MyCompartment(path)
     vm_table = a2.insertRecorder('Vm', sim.data)
-    s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=0.0, firstDelay=1e6, firstWidth=50e-3)
+    s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=20e-3, firstWidth=20e-3)
     sim.schedule()
     t1 = datetime.now()
     sim.run(50e-3)
