@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:13 2009 (+0530)
 # Version: 
-# Last-Updated: Tue May  5 20:15:25 2009 (+0530)
+# Last-Updated: Wed May  6 17:39:09 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 112
+#     Update #: 114
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -78,15 +78,16 @@ class NaF2(NaChannel):
     def __init__(self, name, parent, shift=0.0, Ek=50e-3):
         NaChannel.__init__(self, name, parent, 3, 1, Ek=Ek)
         print 'NaF2: shift =', shift
-        v = linspace(config.vmin, config.vmax, config.ndivs + 1) + shift
+        v = linspace(config.vmin, config.vmax, config.ndivs + 1)
+        tau_h = 1e-3 * (0.225 + 1.125 / ( 1 + exp( (  v + 37e-3 ) / 15e-3 ) ))
+        
+        h_inf = 1.0 / (1.0 + exp((v + 58.3e-3) / 6.7e-3))
+        v = v + shift
         tau_m = where(v < -30e-3, \
                           1.0e-3 * (0.0125 + 0.1525 * exp ((v + 30e-3) / 10e-3)), \
                           1.0e-3 * (0.02 + 0.145 * exp((-v - 30e-3) / 10e-3)))
         
         m_inf = 1.0 / (1.0 + exp(( - v - 38e-3) / 10e-3))
-        tau_h = 1e-3 * (0.225 + 1.125 / ( 1 + exp( (  v - shift + 37e-3 ) / 15e-3 ) ))
-        
-        h_inf = 1.0 / (1.0 + exp((v - shift + 58.3e-3) / 6.7e-3))
 
         for i in range(config.ndivs + 1):
             self.xGate.A[i] = tau_m[i]

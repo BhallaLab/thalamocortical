@@ -812,3 +812,16 @@
   friction I am going through in Python is perhaps due to a fundamental
   difference in the way of thinking. Things might have been smoother if I just
   wrote genesis script using python syntax.
+* <2009-05-06 Wed 17:25> Spiny stellate - more fun
+  In order to track the strange behaviour of ss cells, I tried removing the
+  dendritic arbour level by level. 
+  soma with axon - three spikes at the beginning
+  soma, axon, first level of dendritic compartments - spike count reduced to 2
+  (?)
+  soma, axon, second level of dendritic comp - 1 spike
+  soma axon, third level dendritic comps  - no spike.
+
+  It turns out that the Gk of NaF2 goes 4 orders of magnitude down when
+  shift=-2.5 mV.
+
+  
