@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Apr 29 10:24:37 2009 (+0530)
 # Version: 
-# Last-Updated: Tue May  5 23:16:36 2009 (+0530)
+# Last-Updated: Wed May  6 17:36:19 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 516
+#     Update #: 542
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -202,7 +202,18 @@ class SpinyStellate(moose.Cell):
                            'CaL': 0.003 * 1e4,
                            'CaT_A': 0.0001 * 1e4,
                            'AR': 0.00025 * 1e4}}
-    
+
+    channels = {'NaF2': 'NaF2_SS', 
+                'NaPF_SS': 'NaPF_SS',
+                'KDR_FS': 'KDR_FS',
+                'KA': 'KA', 
+                'K2': 'K2', 
+                'KM': 'KM', 
+                'KC_FAST': 'KC_FAST', 
+                'KAHP_SLOWER': 'KAHP_SLOWER',
+                'CaL': 'CaL', 
+                'CaT_A': 'CaT_A', 
+                'AR': 'AR'}
 
     def __init__(self, *args):
 	moose.Cell.__init__(self, *args)
@@ -225,28 +236,17 @@ class SpinyStellate(moose.Cell):
         if self.channels_inited:
             return
         
-        channels = {'NaF2': 'NaF2_SS', 
-                    'NaPF_SS': 'NaPF_SS',
-                    'KDR_FS': 'KDR_FS',
-                    'KA': 'KA', 
-                    'K2': 'K2', 
-                    'KM': 'KM', 
-                    'KC_FAST': 'KC_FAST', 
-                    'KAHP_SLOWER': 'KAHP_SLOWER',
-                    'CaL': 'CaL', 
-                    'CaT_A': 'CaT_A', 
-                    'AR': 'AR'}
-        lib = moose.Neutral('/library')
-        for channel_class, channel_name in channels.items():
+        for channel_class, channel_name in SpinyStellate.channels.items():
             if config.context.exists('/library/' + channel_name):
-                channel = moose.HHChannel(channel_name, lib)
+                channel = moose.HHChannel(channel_name, config.lib)
             else:
                 class_obj = eval(channel_class)
                 if channel_class == 'NaF2':
                     print 'NaF2'
-                    channel = class_obj(channel_name, lib, shift=0.0)
+                    channel = class_obj(channel_name, config.lib, shift=0.0)
+                    channel.X = 0.0
                 else:
-                    channel = class_obj(channel_name, lib)
+                    channel = class_obj(channel_name, config.lib)
             self.channel_lib[channel_class] = channel
         self.channels_inited = True
 
@@ -393,11 +393,11 @@ if __name__ == '__main__':
     delta_t = t2 - t1
     print '### TIME SPENT IN CELL CREATION: ', delta_t.seconds + delta_t.microseconds * 1e-6
 #    pymoose.printtree(s.soma)
-#    dump_cell(s, 'spinystellate.p')
+    dump_cell(s, 'ss.p')
     path = s.soma.path + '/a_0/a_1/a_0_0/a_0_1'
     a2 = MyCompartment(path)
     vm_table = a2.insertRecorder('Vm', sim.data)
-    s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=0.0, firstDelay=0.0, firstWidth=50e-3)
+    s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=0.0, firstDelay=1e6, firstWidth=50e-3)
     sim.schedule()
     t1 = datetime.now()
     sim.run(50e-3)
