@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sun May  3 12:52:23 2009 (+0530)
 # Version: 
-# Last-Updated: Wed May  6 19:50:58 2009 (+0530)
+# Last-Updated: Wed May  6 19:56:02 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 157
+#     Update #: 158
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -58,16 +58,16 @@ from compartment import MyCompartment
 
 channel_density = {
     'NaF2':     1500.0,
-#     'NaPF_SS':  1.5,
-#     'KDR_FS':   1000.0,
-#     'KC_FAST':  100.0,
-#     'KA':       300.0,
-#     'KM':       37.5,
-#     'K2':       1.0,
-#     'KAHP_SLOWER':      1.0,
-#     'CaL':      5.0,
-#     'CaT_A':    1.0,
-#     'AR':       2.5
+    'NaPF_SS':  1.5,
+    'KDR_FS':   1000.0,
+    'KC_FAST':  100.0,
+    'KA':       300.0,
+    'KM':       37.5,
+    'K2':       1.0,
+    'KAHP_SLOWER':      1.0,
+    'CaL':      5.0,
+    'CaT_A':    1.0,
+    'AR':       2.5
 }
 # channels = {'NaF2': 'NaF2_SS', 'NaPF_SS': 'NaPF_SS', 'KDR_FS': 'KDR_FS', \
 #                 'KA': 'KA', 'K2': 'K2', 'KM': 'KM', 'KC_FAST': 'KC_FAST', \

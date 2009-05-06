@@ -13,43 +13,43 @@ soma{
     L = 40
     insert naf2
     gbar_naf2 =   0.15 * 2
-    // insert napf_spinstell
-    // gbar_napf_spinstell =   0.00015 * 2
-    // insert kdr_fs 
-    // gbar_kdr_fs =   0.1 * 2
-    // insert kc_fast
-    // gbar_kc_fast =   0.01 * 2
-    // insert ka
-    // gbar_ka =   0.03 * 2
-    // insert km
-    // gbar_km =   0.00375 * 2
-    // insert k2
-    // gbar_k2 =   0.0001 * 2
-    // insert kahp_slower
-    // gbar_kahp_slower =   0.0001 * 2
-    // insert cal
-    // gbar_cal =   0.0005 * 2
-    // insert cat_a
-    // gbar_cat_a =   0.0001 * 2
-    // insert ar
-    // gbar_ar =   0.00025 * 2
-    // insert cad
-    // // *** ca diffusion: beta=1/tau
-    // beta_cad  =   0.02
-    // // cafor(I) (FORTRAN) converted to phi (NEURON)
-    // phi_cad =   260000.
+    insert napf_spinstell
+    gbar_napf_spinstell =   0.00015 * 2
+    insert kdr_fs 
+    gbar_kdr_fs =   0.1 * 2
+    insert kc_fast
+    gbar_kc_fast =   0.01 * 2
+    insert ka
+    gbar_ka =   0.03 * 2
+    insert km
+    gbar_km =   0.00375 * 2
+    insert k2
+    gbar_k2 =   0.0001 * 2
+    insert kahp_slower
+    gbar_kahp_slower =   0.0001 * 2
+    insert cal
+    gbar_cal =   0.0005 * 2
+    insert cat_a
+    gbar_cat_a =   0.0001 * 2
+    insert ar
+    gbar_ar =   0.00025 * 2
+    insert cad
+    // *** ca diffusion: beta=1/tau
+    beta_cad  =   0.02
+    // cafor(I) (FORTRAN) converted to phi (NEURON)
+    phi_cad =   260000.
     insert pas
     e_pas = -65 
     g_pas = 2e-5 * 2
     Ra = 100.0
     cm = 0.9 * 2
-    // ek = -100.0
-    // ena = 50.0
-    // vca = 125.0
-    // erev_ar = -40.0
+    ek = -100.0
+    ena = 50.0
+    vca = 125.0
+    erev_ar = -40.0
     
     fastNa_shift_naf2=-2.5
-    // fastNa_shift_napf_spinstell=-2.5
+    fastNa_shift_napf_spinstell=-2.5
 }
 
 stim1 = new IClamp(0.5)
