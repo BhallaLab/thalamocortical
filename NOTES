@@ -825,3 +825,6 @@
   shift=-2.5 mV.
 
   
+* <2009-05-08 Fri 21:33> Added a brute force version 
+  - mostly copy - paste - regex_replace in emacs from spinstell_template.hoc -
+    to minimize typos. No help.
