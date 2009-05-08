@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Apr 29 10:24:37 2009 (+0530)
 # Version: 
-# Last-Updated: Wed May  6 20:17:52 2009 (+0530)
+# Last-Updated: Fri May  8 11:24:14 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 547
+#     Update #: 554
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -243,9 +243,7 @@ class SpinyStellate(moose.Cell):
             else:
                 class_obj = eval(channel_class)
                 if channel_class == 'NaF2':
-                    print 'NaF2'
                     channel = class_obj(channel_name, config.lib, shift=-2.5e-3)
-                    channel.X = 0.0
                 else:
                     channel = class_obj(channel_name, config.lib)
             self.channel_lib[channel_class] = channel
@@ -356,7 +354,7 @@ class SpinyStellate(moose.Cell):
                 for channel, density in SpinyStellate.channel_density[level].items():
                     chan = moose.HHChannel(self.channel_lib[channel], channel, comp) # this does a copy
                     comp.insertChannel(chan, specificGbar=mult * density)
-                    if  channel.startswith('K'):
+                    if channel.startswith('K'):
                         chan.Ek = SpinyStellate.EK
                     elif channel.startswith('Na'):
                         chan.X = 0.0
