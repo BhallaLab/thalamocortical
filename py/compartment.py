@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Tue May  5 23:03:21 2009 (+0530)
+# Last-Updated: Tue May 12 17:46:19 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 110
+#     Update #: 132
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -46,6 +46,12 @@ class MyCompartment(moose.Compartment):
         self.channels = []
         self._xarea = None
         self._sarea = None
+        self.raxial_list = []
+
+    def connect(self, src_field, target, dst_field):
+        if src_field == 'raxial':
+            self.raxial_list.append(target)
+        moose.Compartment.connect(self, src_field, target, dst_field)
 
     def setSpecificRm(self, RM):
         self.Rm = RM / self.sarea()
@@ -138,6 +144,17 @@ class MyCompartment(moose.Compartment):
         self.pulsegen.secondWidth = secondWidth
         self.pulsegen.connect('outputSrc', self, 'injectMsg')
         return self.pulsegen
+
+    def traubConnect(self, child):
+        # Check for common neighbours within a single hop
+        # This is enough to avoid delta connections
+        my_neighbours = self.neighbours('raxial') + self.neighbours('axial')
+        child_neighbours = child.neighbours('raxial') + child.neighbours('axial')
+        for item in my_neighbours:
+            if item in child_neighbours:
+                return
+        self.connect('raxial', child, 'axial')
+            
 
     def get_props(self):
         """Returns information about the compartment as a string

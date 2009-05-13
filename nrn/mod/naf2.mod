@@ -19,7 +19,7 @@ UNITS {
 NEURON { 
 	SUFFIX naf2
 	USEION na READ ena WRITE ina
-	RANGE gbar, ina,m, h, df, fastNa_shift, a, b, c, d, minf, mtau, gk
+	RANGE gbar, ina,m, h, df, fastNa_shift, a, b, c, d, minf, mtau
 }
 PARAMETER { 
 	fastNa_shift = 0 : orig -3.5 (mV)
@@ -35,7 +35,6 @@ ASSIGNED {
 	minf hinf 	   (1)
 	mtau (ms) htau 	   (ms)
 	df	(mV)
-	gk (mho/cm2)
 } 
 STATE {
 	m h
@@ -44,7 +43,6 @@ BREAKPOINT {
 	SOLVE states METHOD cnexp
 	ina = gbar * m * m * m * h * ( v - ena ) 
 	df = v - ena
-	gk = gbar * m * m * m * h
 } 
 INITIAL { 
 	settables( v )

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Apr 29 10:24:37 2009 (+0530)
 # Version: 
-# Last-Updated: Fri May  8 11:24:14 2009 (+0530)
+# Last-Updated: Fri May  8 21:36:23 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 554
+#     Update #: 555
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -397,7 +397,7 @@ if __name__ == '__main__':
     path = s.soma.path + '/a_0/a_1/a_0_0/a_0_1'
     a2 = MyCompartment(path)
     vm_table = a2.insertRecorder('Vm', sim.data)
-    s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=20e-3, firstWidth=20e-3)
+    s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=0.0, firstWidth=20e-3)
     sim.schedule()
     t1 = datetime.now()
     sim.run(50e-3)
