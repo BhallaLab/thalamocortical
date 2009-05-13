@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri May  8 11:24:30 2009 (+0530)
 # Version: 
-# Last-Updated: Fri May  8 21:26:42 2009 (+0530)
+# Last-Updated: Tue May 12 18:53:46 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 125
+#     Update #: 163
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -57,7 +57,7 @@ from archan import *
 
 from compartment import MyCompartment
 
-class SpinyStellate(moose.Neutral):
+class SpinyStellate(moose.Cell):
     ENa = 50e-3
     EK = -100e-3
     ECa = 125e-3
@@ -191,7 +191,7 @@ class SpinyStellate(moose.Neutral):
                 'AR': 'AR'}
 
     def __init__(self, *args):
-	moose.Neutral.__init__(self, *args)
+	moose.Cell.__init__(self, *args)
         self.channel_lib = {}
         for channel_class, channel_name in SpinyStellate.channels.items():
             channel = None
@@ -212,73 +212,76 @@ class SpinyStellate(moose.Neutral):
 	self.presyn = 57
 	for ii in range(60):
 	    comp.append(MyCompartment('comp_' + str(ii), self))
-	comp[1].connect('raxial', comp[ 54], 'axial')
-	comp[1].connect('raxial', comp[ 2], 'axial') 
-	comp[1].connect('raxial', comp[ 15], 'axial')
-	comp[1].connect('raxial', comp[ 28], 'axial')
-	comp[1].connect('raxial', comp[ 41], 'axial')
-	comp[2].connect('raxial', comp[ 3], 'axial') 
-	comp[2].connect('raxial', comp[ 4], 'axial') 
-	comp[3].connect('raxial', comp[ 4], 'axial') 
-	comp[3].connect('raxial', comp[ 5], 'axial') 
-	comp[3].connect('raxial', comp[ 6], 'axial') 
-	comp[4].connect('raxial', comp[ 7], 'axial') 
-	comp[5].connect('raxial', comp[ 6], 'axial') 
-	comp[5].connect('raxial', comp[ 8], 'axial') 
-	comp[6].connect('raxial', comp[ 9], 'axial') 
-	comp[7].connect('raxial', comp[ 10], 'axial')
-	comp[8].connect('raxial', comp[ 11], 'axial')
-	comp[11].connect('raxial', comp[  12], 'axial')
-	comp[12].connect('raxial', comp[  13], 'axial')
-	comp[13].connect('raxial', comp[  14], 'axial')
-	comp[15].connect('raxial', comp[  16], 'axial')
-	comp[15].connect('raxial', comp[  17], 'axial')
-	comp[16].connect('raxial', comp[  17], 'axial')
-	comp[16].connect('raxial', comp[  18], 'axial')
-	comp[16].connect('raxial', comp[  19], 'axial')
-	comp[17].connect('raxial', comp[  20], 'axial')
-	comp[18].connect('raxial', comp[  19], 'axial')
-	comp[18].connect('raxial', comp[  21], 'axial')
-	comp[19].connect('raxial', comp[  22], 'axial')
-	comp[20].connect('raxial', comp[  23], 'axial')
-	comp[21].connect('raxial', comp[  24], 'axial')
-	comp[24].connect('raxial', comp[  25], 'axial')
-	comp[25].connect('raxial', comp[  26], 'axial')
-	comp[26].connect('raxial', comp[  27], 'axial')
-	comp[28].connect('raxial', comp[  29], 'axial')
-	comp[28].connect('raxial', comp[  30], 'axial')
-	comp[29].connect('raxial', comp[  30], 'axial')
-	comp[29].connect('raxial', comp[  31], 'axial')
-	comp[29].connect('raxial', comp[  32], 'axial')
-	comp[30].connect('raxial', comp[  33], 'axial')
-	comp[31].connect('raxial', comp[  32], 'axial')
-	comp[31].connect('raxial', comp[  34], 'axial')
-	comp[32].connect('raxial', comp[  35], 'axial')
-	comp[33].connect('raxial', comp[  36], 'axial')
-	comp[34].connect('raxial', comp[  37], 'axial')
-	comp[37].connect('raxial', comp[  38], 'axial')
-	comp[38].connect('raxial', comp[  39], 'axial')
-	comp[39].connect('raxial', comp[  40], 'axial')
-	comp[41].connect('raxial', comp[  42], 'axial')
-	comp[41].connect('raxial', comp[  43], 'axial')
-	comp[42].connect('raxial', comp[  43], 'axial')
-	comp[42].connect('raxial', comp[  44], 'axial')
-	comp[42].connect('raxial', comp[  45], 'axial')
-	comp[43].connect('raxial', comp[  46], 'axial')
-	comp[44].connect('raxial', comp[  45], 'axial')
-	comp[44].connect('raxial', comp[  47], 'axial')
-	comp[45].connect('raxial', comp[  48], 'axial')
-	comp[46].connect('raxial', comp[  49], 'axial')
-	comp[47].connect('raxial', comp[  50], 'axial')
-	comp[50].connect('raxial', comp[  51], 'axial')
-	comp[51].connect('raxial', comp[  52], 'axial')
-	comp[52].connect('raxial', comp[  53], 'axial')
-	comp[54].connect('raxial', comp[  55], 'axial')
-	comp[55].connect('raxial', comp[  56], 'axial')
-	comp[55].connect('raxial', comp[  58], 'axial')
-	comp[56].connect('raxial', comp[  57], 'axial')
-	comp[56].connect('raxial', comp[  58], 'axial')
-	comp[58].connect('raxial', comp[  59], 'axial')
+    # TODO this is full of cycles - the neuron code is just silly -
+    # they use a check for already connected parent-child relation in
+    # traubconnect function
+	comp[1].traubConnect(comp[ 54])
+	comp[1].traubConnect(comp[ 2]) 
+	comp[1].traubConnect(comp[ 15])
+	comp[1].traubConnect(comp[ 28])
+	comp[1].traubConnect(comp[ 41])
+	comp[2].traubConnect(comp[ 3]) 
+	comp[2].traubConnect(comp[ 4]) 
+	comp[3].traubConnect(comp[ 4]) 
+	comp[3].traubConnect(comp[ 5]) 
+	comp[3].traubConnect(comp[ 6]) 
+	comp[4].traubConnect(comp[ 7]) 
+	comp[5].traubConnect(comp[ 6]) 
+	comp[5].traubConnect(comp[ 8]) 
+	comp[6].traubConnect(comp[ 9]) 
+	comp[7].traubConnect(comp[ 10])
+	comp[8].traubConnect(comp[ 11])
+	comp[11].traubConnect(comp[12])
+	comp[12].traubConnect(comp[13])
+	comp[13].traubConnect(comp[14])
+	comp[15].traubConnect(comp[16])
+	comp[15].traubConnect(comp[17])
+	comp[16].traubConnect(comp[17])
+	comp[16].traubConnect(comp[18])
+	comp[16].traubConnect(comp[19])
+	comp[17].traubConnect(comp[20])
+	comp[18].traubConnect(comp[19])
+	comp[18].traubConnect(comp[21])
+	comp[19].traubConnect(comp[22])
+	comp[20].traubConnect(comp[23])
+	comp[21].traubConnect(comp[24])
+	comp[24].traubConnect(comp[25])
+	comp[25].traubConnect(comp[26])
+	comp[26].traubConnect(comp[27])
+	comp[28].traubConnect(comp[29])
+	comp[28].traubConnect(comp[30])
+	comp[29].traubConnect(comp[30])
+	comp[29].traubConnect(comp[31])
+	comp[29].traubConnect(comp[32])
+	comp[30].traubConnect(comp[33])
+	comp[31].traubConnect(comp[32])
+	comp[31].traubConnect(comp[34])
+	comp[32].traubConnect(comp[35])
+	comp[33].traubConnect(comp[36])
+	comp[34].traubConnect(comp[37])
+	comp[37].traubConnect(comp[38])
+	comp[38].traubConnect(comp[39])
+	comp[39].traubConnect(comp[40])
+	comp[41].traubConnect(comp[42])
+	comp[41].traubConnect(comp[43])
+	comp[42].traubConnect(comp[43])
+	comp[42].traubConnect(comp[44])
+	comp[42].traubConnect(comp[45])
+	comp[43].traubConnect(comp[46])
+	comp[44].traubConnect(comp[45])
+	comp[44].traubConnect(comp[47])
+	comp[45].traubConnect(comp[48])
+	comp[46].traubConnect(comp[49])
+	comp[47].traubConnect(comp[50])
+	comp[50].traubConnect(comp[51])
+	comp[51].traubConnect(comp[52])
+	comp[52].traubConnect(comp[53])
+	comp[54].traubConnect(comp[55])
+	comp[55].traubConnect(comp[56])
+	comp[55].traubConnect(comp[58])
+	comp[56].traubConnect(comp[57])
+	comp[56].traubConnect(comp[58])
+	comp[58].traubConnect(comp[59])
 
 	comp[ 1].diameter = 2 * 7.5 
 	comp[ 2].diameter = 2 * 1.06 
@@ -516,16 +519,31 @@ class SpinyStellate(moose.Neutral):
         print 'insert channels: ', delta.seconds + 1e-6 * delta.microseconds
 		    
 
+def has_cycle(comp):
+    comp._visited = True
+    ret = False
+    for item in comp.raxial_list:
+        if hasattr(item, '_visited') and item._visited:
+            print 'Cycle between: ', comp.path, 'and', item.path
+            return True
+        ret = ret or has_cycle(item)
+    return ret
+    
 import pylab
 from simulation import Simulation
+import pymoose
+
 if __name__ == '__main__':
     sim = Simulation()
     s = SpinyStellate('cell', sim.model)
     vm_table = s.soma.insertRecorder('Vm', sim.data)
-    pulsegen = s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=0.0, firstWidth=50e-3)
+    pulsegen = s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=0.0, firstWidth=100e-3)
     sim.schedule()
+    if has_cycle(s.soma):
+        print "WARNING!! CYCLE PRESENT IN CICRUIT."
+
     t1 = datetime.now()
-    sim.run(50e-3)
+    sim.run(100e-3)
     t2 = datetime.now()
     delta = t2 - t1
     print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
