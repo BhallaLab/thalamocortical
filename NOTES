@@ -828,3 +828,15 @@
 * <2009-05-08 Fri 21:33> Added a brute force version 
   - mostly copy - paste - regex_replace in emacs from spinstell_template.hoc -
     to minimize typos. No help.
+
+* <2009-05-13 Wed 11:28> Switching to TCR
+  As the spiny stellate cell is not working, I am going to move to TCR which
+  is more symmetric. Also neuroConstruct has the cell morphology working.
+
+  This time I should move incrementally - just adding one compartent at a time.
+* <2009-05-15 Fri 15:59> Back to spiny stellate
+  Trying to do it incrementally. Now testing just soma, axon and the dendritic
+  compartments adjacent to soma.
+* <2009-05-18 Mon 02:19> Soma Vm does not match
+  Tested the non-brute spinstell with just soma with neuron - not a perfect
+  match any more. Will start over.

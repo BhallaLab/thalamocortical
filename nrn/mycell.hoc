@@ -23,14 +23,14 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g
     tvec = new Vector()
     vvec = new Vector()
     tvec.record(&t)
-    vvec.record(&cell.comp[cell.presyn_comp].v(0.5))
+    vvec.record(&cell.comp[1].v(0.5))
     stim2 = new IClamp(0.5)
     stim1 = new IClamp(0.5) 
     stim1.amp = 0.3	stim2.amp = 0
     stim1.del = t1	stim2.del = t2
     stim1.dur = $1 - $2	stim2.dur = 1e9
     run()
-    f.wopen("mydata/spinstell.plot")
+    f.wopen("mydata/Vm.plot")
     for ii = 0, vvec.size() - 1{
     	f.printf("%g %g\n", tvec.x(ii), vvec.x(ii))
     }
@@ -42,3 +42,4 @@ proc finit0(){
 }
 
 runcell(100, 20)
+quit()
