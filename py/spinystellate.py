@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Apr 29 10:24:37 2009 (+0530)
 # Version: 
-# Last-Updated: Fri May  8 21:36:23 2009 (+0530)
+# Last-Updated: Mon May 18 02:12:46 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 555
+#     Update #: 569
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -220,6 +220,7 @@ class SpinyStellate(moose.Cell):
         self.channels_inited = False
         self.channel_lib = {}
         self._init_channels()
+        self.comp = [] # Keep a list of compartments for debugging
 	self.levels = defaultdict(set) # Python >= 2.5 
 	self.dendrites = set() # List of compartments that are not
 				 # part of axon
@@ -273,7 +274,8 @@ class SpinyStellate(moose.Cell):
         for comp in self.axon: 
             self.levels[0].add(comp)
             comp.length = 50e-6
-        
+        self.comp += self.axon
+
     def _create_dtree(self, name_prefix, parent, tree, level, default_length=40e-6, radius_dict=radius):
 	"""Create the dendritic tree structure with compartments.
 
@@ -281,6 +283,7 @@ class SpinyStellate(moose.Cell):
         if not tree:
             return
         comp = MyCompartment(name_prefix + str(tree[0]), parent)
+        self.comp.append(comp)
         comp.length = default_length
         comp.diameter = radius_dict[tree[0]] * 2e-6
         self.levels[level].add(comp)
@@ -294,17 +297,18 @@ class SpinyStellate(moose.Cell):
 	if not hasattr(self, 'levels'):
 	    self.levels = defaultdict(set)
 	comp = MyCompartment('soma', self)
+        self.comp.append(comp)
 	comp.length = 20e-6
 	comp.diameter = 7.5 * 2e-6
 	self.soma = comp
 	self.levels[1].add(comp)
         t1 = datetime.now()
-	for i in range(4):
-	   self. _create_dtree('d_' + str(i) + '_', comp, SpinyStellate.dendritic_tree, 2)
+# 	for i in range(4):
+# 	   self. _create_dtree('d_' + str(i) + '_', comp, SpinyStellate.dendritic_tree, 2)
         t2 = datetime.now()
         delta = t2 - t1
         print 'create_dtree took: ', delta.seconds + 1e-6 * delta.microseconds
-        self._create_axon()
+#         self._create_axon()
 
     def _set_passiveprops(self):
         """Set the passive properties of the cells."""
@@ -355,11 +359,13 @@ class SpinyStellate(moose.Cell):
                     chan = moose.HHChannel(self.channel_lib[channel], channel, comp) # this does a copy
                     comp.insertChannel(chan, specificGbar=mult * density)
                     if channel.startswith('K'):
+                        chan.X = 0.0
                         chan.Ek = SpinyStellate.EK
                     elif channel.startswith('Na'):
                         chan.X = 0.0
                         chan.Ek = SpinyStellate.ENa
                     elif channel.startswith('Ca'):
+                        chan.X = 0.0
                         chan.Ek = SpinyStellate.ECa
                     elif channel.startswith('AR'):
                         chan.Ek = SpinyStellate.EAR
@@ -396,11 +402,11 @@ if __name__ == '__main__':
     dump_cell(s, 'ss.p')
     path = s.soma.path + '/a_0/a_1/a_0_0/a_0_1'
     a2 = MyCompartment(path)
-    vm_table = a2.insertRecorder('Vm', sim.data)
-    s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=0.0, firstWidth=20e-3)
+    vm_table = s.soma.insertRecorder('Vm', sim.data)
+    s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=20e-3, firstWidth=100e-3)
     sim.schedule()
     t1 = datetime.now()
-    sim.run(50e-3)
+    sim.run(100e-3)
     t2 = datetime.now()
     delta_t = t2 - t1
     print '#### TIME TO SIMULATE:', delta_t.seconds + delta_t.microseconds * 1e-6

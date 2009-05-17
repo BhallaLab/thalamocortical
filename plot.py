@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 15:51:57 2009 (+0530)
 # Version: 
-# Last-Updated: Wed May  6 18:19:23 2009 (+0530)
+# Last-Updated: Sat May 16 13:53:04 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 182
+#     Update #: 194
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -56,7 +56,7 @@ mus_data_dir = 'py/data/'+datetime.datetime.now().strftime('%Y_%m_%d') + '/'
 mus_Vm = pylab.loadtxt(mus_data_dir + 'Vm.plot') * 1e3
 # mus_Ca = pylab.loadtxt(mus_data_dir + 'Ca.plot') * 1e3
 # mus_m = pylab.loadtxt(mus_data_dir + 'm_kahp.plot')
-mus_t = pylab.linspace(0, 50, len(mus_Vm))
+mus_t = pylab.linspace(0, len(mus_Vm) * 1e-3, len(mus_Vm))
 
 indices = pylab.array(range(len(mus_Vm)), dtype=int)
 mus_indices = indices
@@ -69,8 +69,8 @@ nrn_Vm = nrn_data[:, 1]
 # nrn_m = nrn_data[:, 2]
 nrn_t = nrn_data[:, 0]
 
-mus_gk = pylab.loadtxt(mus_data_dir + 'Gk_NaF2.plot')
-nrn_gk = nrn_data[:, 2]
+# mus_gk = pylab.loadtxt(mus_data_dir + 'Gk_NaF2.plot')
+# nrn_gk = nrn_data[:, 2]
 
 # pylab.savetxt('nrn_m.txt', pylab.transpose(( indices, nrn_m[nrn_indices])))
 # pylab.savetxt('mus_m.txt', pylab.transpose((mus_indices, mus_m/9.42e-6)))
@@ -108,16 +108,16 @@ nrn_gk = nrn_data[:, 2]
 # # pylab.show()
 
 # pylab.subplot(2, 1, 1)
-pylab.plot(nrn_t, nrn_Vm * 1e-2, 'r-', label='nrn_Vm')
-# pylab.plot(mus_t, mus_Vm, 'r+', label='mus')
-# pylab.legend()
+pylab.plot(nrn_t, nrn_Vm, 'r-', label='nrn_Vm')
+pylab.plot(mus_t, mus_Vm, 'g-', label='mus_Vm')
+pylab.legend()
 # pylab.subplot(2,1,2)
 # pylab.plot(nrn_t, nrn_Ca, label='nrn')
 # pylab.plot(mus_t, mus_Ca, label='mus')
 # pylab.legend()
 # pylab.subplot(2,1,2)
-ratio = mus_gk[2:]*1e-4 / nrn_gk[2:]
-pylab.plot(nrn_t[2:], ratio, 'bx', label='Gk_mus / Gk_nrn')
+# ratio = mus_gk[2:]*1e-4 / nrn_gk[2:]
+# pylab.plot(nrn_t[2:], ratio, 'bx', label='Gk_mus / Gk_nrn')
 # pylab.plot(nrn_t, nrn_gk, label='nrn')
 # pylab.plot(mus_t, mus_gk, label='mus')
 # pylab.legend()

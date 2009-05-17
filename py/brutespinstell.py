@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri May  8 11:24:30 2009 (+0530)
 # Version: 
-# Last-Updated: Tue May 12 18:53:46 2009 (+0530)
+# Last-Updated: Mon May 18 02:05:17 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 163
+#     Update #: 193
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -200,7 +200,7 @@ class SpinyStellate(moose.Cell):
             else:
                 class_obj = eval(channel_class)
                 if channel_class == 'NaF2':
-                    channel = class_obj(channel_name, config.lib, shift=0.0)
+                    channel = class_obj(channel_name, config.lib, shift=-2.5e-3)
                 else:
                     channel = class_obj(channel_name, config.lib)
             self.channel_lib[channel_class] = channel
@@ -215,73 +215,73 @@ class SpinyStellate(moose.Cell):
     # TODO this is full of cycles - the neuron code is just silly -
     # they use a check for already connected parent-child relation in
     # traubconnect function
-	comp[1].traubConnect(comp[ 54])
-	comp[1].traubConnect(comp[ 2]) 
-	comp[1].traubConnect(comp[ 15])
-	comp[1].traubConnect(comp[ 28])
-	comp[1].traubConnect(comp[ 41])
-	comp[2].traubConnect(comp[ 3]) 
-	comp[2].traubConnect(comp[ 4]) 
-	comp[3].traubConnect(comp[ 4]) 
-	comp[3].traubConnect(comp[ 5]) 
-	comp[3].traubConnect(comp[ 6]) 
-	comp[4].traubConnect(comp[ 7]) 
-	comp[5].traubConnect(comp[ 6]) 
-	comp[5].traubConnect(comp[ 8]) 
-	comp[6].traubConnect(comp[ 9]) 
-	comp[7].traubConnect(comp[ 10])
-	comp[8].traubConnect(comp[ 11])
-	comp[11].traubConnect(comp[12])
-	comp[12].traubConnect(comp[13])
-	comp[13].traubConnect(comp[14])
-	comp[15].traubConnect(comp[16])
-	comp[15].traubConnect(comp[17])
-	comp[16].traubConnect(comp[17])
-	comp[16].traubConnect(comp[18])
-	comp[16].traubConnect(comp[19])
-	comp[17].traubConnect(comp[20])
-	comp[18].traubConnect(comp[19])
-	comp[18].traubConnect(comp[21])
-	comp[19].traubConnect(comp[22])
-	comp[20].traubConnect(comp[23])
-	comp[21].traubConnect(comp[24])
-	comp[24].traubConnect(comp[25])
-	comp[25].traubConnect(comp[26])
-	comp[26].traubConnect(comp[27])
-	comp[28].traubConnect(comp[29])
-	comp[28].traubConnect(comp[30])
-	comp[29].traubConnect(comp[30])
-	comp[29].traubConnect(comp[31])
-	comp[29].traubConnect(comp[32])
-	comp[30].traubConnect(comp[33])
-	comp[31].traubConnect(comp[32])
-	comp[31].traubConnect(comp[34])
-	comp[32].traubConnect(comp[35])
-	comp[33].traubConnect(comp[36])
-	comp[34].traubConnect(comp[37])
-	comp[37].traubConnect(comp[38])
-	comp[38].traubConnect(comp[39])
-	comp[39].traubConnect(comp[40])
-	comp[41].traubConnect(comp[42])
-	comp[41].traubConnect(comp[43])
-	comp[42].traubConnect(comp[43])
-	comp[42].traubConnect(comp[44])
-	comp[42].traubConnect(comp[45])
-	comp[43].traubConnect(comp[46])
-	comp[44].traubConnect(comp[45])
-	comp[44].traubConnect(comp[47])
-	comp[45].traubConnect(comp[48])
-	comp[46].traubConnect(comp[49])
-	comp[47].traubConnect(comp[50])
-	comp[50].traubConnect(comp[51])
-	comp[51].traubConnect(comp[52])
-	comp[52].traubConnect(comp[53])
-	comp[54].traubConnect(comp[55])
-	comp[55].traubConnect(comp[56])
-	comp[55].traubConnect(comp[58])
-	comp[56].traubConnect(comp[57])
-	comp[56].traubConnect(comp[58])
-	comp[58].traubConnect(comp[59])
+# 	comp[1].traubConnect(comp[ 54])
+# 	comp[1].traubConnect(comp[ 2]) 
+# 	comp[1].traubConnect(comp[ 15])
+# 	comp[1].traubConnect(comp[ 28])
+# 	comp[1].traubConnect(comp[ 41])
+# 	comp[2].traubConnect(comp[ 3]) 
+# 	comp[2].traubConnect(comp[ 4]) 
+# 	comp[3].traubConnect(comp[ 4]) 
+# 	comp[3].traubConnect(comp[ 5]) 
+# 	comp[3].traubConnect(comp[ 6]) 
+# 	comp[4].traubConnect(comp[ 7]) 
+# 	comp[5].traubConnect(comp[ 6]) 
+# 	comp[5].traubConnect(comp[ 8]) 
+# 	comp[6].traubConnect(comp[ 9]) 
+# 	comp[7].traubConnect(comp[ 10])
+# 	comp[8].traubConnect(comp[ 11])
+# 	comp[11].traubConnect(comp[12])
+# 	comp[12].traubConnect(comp[13])
+# 	comp[13].traubConnect(comp[14])
+# 	comp[15].traubConnect(comp[16])
+# 	comp[15].traubConnect(comp[17])
+# 	comp[16].traubConnect(comp[17])
+# 	comp[16].traubConnect(comp[18])
+# 	comp[16].traubConnect(comp[19])
+# 	comp[17].traubConnect(comp[20])
+# 	comp[18].traubConnect(comp[19])
+# 	comp[18].traubConnect(comp[21])
+# 	comp[19].traubConnect(comp[22])
+# 	comp[20].traubConnect(comp[23])
+# 	comp[21].traubConnect(comp[24])
+# 	comp[24].traubConnect(comp[25])
+# 	comp[25].traubConnect(comp[26])
+# 	comp[26].traubConnect(comp[27])
+# 	comp[28].traubConnect(comp[29])
+# 	comp[28].traubConnect(comp[30])
+# 	comp[29].traubConnect(comp[30])
+# 	comp[29].traubConnect(comp[31])
+# 	comp[29].traubConnect(comp[32])
+# 	comp[30].traubConnect(comp[33])
+# 	comp[31].traubConnect(comp[32])
+# 	comp[31].traubConnect(comp[34])
+# 	comp[32].traubConnect(comp[35])
+# 	comp[33].traubConnect(comp[36])
+# 	comp[34].traubConnect(comp[37])
+# 	comp[37].traubConnect(comp[38])
+# 	comp[38].traubConnect(comp[39])
+# 	comp[39].traubConnect(comp[40])
+# 	comp[41].traubConnect(comp[42])
+# 	comp[41].traubConnect(comp[43])
+# 	comp[42].traubConnect(comp[43])
+# 	comp[42].traubConnect(comp[44])
+# 	comp[42].traubConnect(comp[45])
+# 	comp[43].traubConnect(comp[46])
+# 	comp[44].traubConnect(comp[45])
+# 	comp[44].traubConnect(comp[47])
+# 	comp[45].traubConnect(comp[48])
+# 	comp[46].traubConnect(comp[49])
+# 	comp[47].traubConnect(comp[50])
+# 	comp[50].traubConnect(comp[51])
+# 	comp[51].traubConnect(comp[52])
+# 	comp[52].traubConnect(comp[53])
+# 	comp[54].traubConnect(comp[55])
+# 	comp[55].traubConnect(comp[56])
+# 	comp[55].traubConnect(comp[58])
+# 	comp[56].traubConnect(comp[57])
+# 	comp[56].traubConnect(comp[58])
+# 	comp[58].traubConnect(comp[59])
 
 	comp[ 1].diameter = 2 * 7.5 
 	comp[ 2].diameter = 2 * 1.06 
@@ -476,19 +476,24 @@ class SpinyStellate(moose.Cell):
 
         t1 = datetime.now()
 	    
-	for ii in range(0, len(level)):
+#	for ii in range(0, len(level)):
+        for ii in range(2):
 	    comp_set = level[ii]
 	    conductances = SpinyStellate.conductance[ii]
 	    mult = 1e4
 	    if ii > 1:
 		mult *= 2.0
 	    for comp in comp_set:
+                comp.Em = SpinyStellate.Em
+                comp.initVm = SpinyStellate.Em
 		for channel_name, density in conductances.items():
 		    channel = moose.HHChannel(self.channel_lib[channel_name], 
 					  channel_name, comp)
 		    comp.insertChannel(channel, specificGbar=mult *  density)
                     if channel_name.startswith('K'):
                         channel.Ek = SpinyStellate.EK
+                        if channel_name == 'KA' or channel_name == 'K2' or channel_name == 'KAHP_SLOWER' or channel_name == 'KDR_FS' or channel_name == 'KM':
+                            channel.X = 0.0
                     elif channel_name.startswith('Na'):
                         channel.X = 0.0
                         channel.Ek = SpinyStellate.ENa
@@ -500,7 +505,7 @@ class SpinyStellate(moose.Cell):
                     else:
                         print 'ERROR: Unknown channel type:', channel
 	for compartment in self.dendrites:
-	    print compartment.name, compartment.length, compartment.diameter
+# 	    print compartment.name, compartment.length, compartment.diameter
 	    compartment.setSpecificRm(5.0/2)
 	    compartment.setSpecificRa(2.5)
 	    compartment.Cm *= 2.0
@@ -528,6 +533,14 @@ def has_cycle(comp):
             return True
         ret = ret or has_cycle(item)
     return ret
+
+def dump_cell(cell, filename):
+    file_obj = open(filename, 'w')
+    for lvl in cell.level:
+        for comp in cell.level[lvl]:
+            file_obj.write(str(lvl) + ' ' + comp.get_props() + '\n')
+    file_obj.close()
+
     
 import pylab
 from simulation import Simulation
@@ -537,7 +550,7 @@ if __name__ == '__main__':
     sim = Simulation()
     s = SpinyStellate('cell', sim.model)
     vm_table = s.soma.insertRecorder('Vm', sim.data)
-    pulsegen = s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=0.0, firstWidth=100e-3)
+    pulsegen = s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=20e-3, firstWidth=100e-3)
     sim.schedule()
     if has_cycle(s.soma):
         print "WARNING!! CYCLE PRESENT IN CICRUIT."
@@ -548,6 +561,7 @@ if __name__ == '__main__':
     delta = t2 - t1
     print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
     sim.dump_data('data')
+    dump_cell(s, 'brutess.txt')
     pylab.plot(vm_table)
     pylab.show()
 
