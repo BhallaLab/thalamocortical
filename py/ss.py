@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon May 18 02:22:10 2009 (+0530)
 # Version: 
-# Last-Updated: Thu May 21 00:04:48 2009 (+0530)
+# Last-Updated: Thu May 21 02:15:55 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 268
+#     Update #: 306
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -146,8 +146,102 @@ class SpinyStellate(moose.Cell):
 	    'CaL':   0.0005,
 	    'CaT_A':   0.0001,
 	    'AR':   0.00025
+	    },
+	2: {
+	    'NaF2':   0.075,
+	    'NaPF_SS':   7.5E-05,
+	    'KDR_FS':   0.075,
+	    'KC_FAST':   0.01,
+	    'KA':   0.03,
+	    'KM':   0.00375,
+	    'K2':   0.0001,
+	    'KAHP_SLOWER':   0.0001,
+	    'CaL':   0.0005,
+	    'CaT_A':   0.0001,
+	    'AR':   0.00025
+	    },
+	3: {
+	    'NaF2':   0.075,
+	    'NaPF_SS':   7.5E-05,
+	    'KDR_FS':   0.075,
+	    'KC_FAST':   0.01,
+	    'KA':   0.002,
+	    'KM':   0.00375,
+	    'K2':   0.0001,
+	    'KAHP_SLOWER':   0.0001,
+	    'CaL':   0.0005,
+	    'CaT_A':   0.0001,
+	    'AR':   0.00025
+	    },
+	4: {
+	    'NaF2':   0.005,
+	    'NaPF_SS':   5.E-06,
+	    'KC_FAST':   0.01,
+	    'KA':   0.002,
+	    'KM':   0.00375,
+	    'K2':   0.0001,
+	    'KAHP_SLOWER':   0.0001,
+	    'CaL':   0.0005,
+	    'CaT_A':   0.0001,
+	    'AR':   0.00025
+	    },
+	5: {
+	    'NaF2':   0.005,
+	    'NaPF_SS':   5.E-06,
+	    'KA':   0.002,
+	    'KM':   0.00375,
+	    'K2':   0.0001,
+	    'KAHP_SLOWER':   0.0001,
+	    'CaL':   0.0005,
+	    'CaT_A':   0.0001,
+	    'AR':   0.00025
+	    },
+	6: {
+	    'NaF2':   0.005,
+	    'NaPF_SS':   5.E-06,
+	    'KA':   0.002,
+	    'KM':   0.00375,
+	    'K2':   0.0001,
+	    'KAHP_SLOWER':   0.0001,
+	    'CaL':   0.0005,
+	    'CaT_A':   0.0001,
+	    'AR':   0.00025
+	    },
+	7: {
+	    'NaF2':   0.005,
+	    'NaPF_SS':   5.E-06,
+	    'KA':   0.002,
+	    'KM':   0.00375,
+	    'K2':   0.0001,
+	    'KAHP_SLOWER':   0.0001,
+	    'CaL':   0.003,
+	    'CaT_A':   0.0001,
+	    'AR':   0.00025
+	    },
+	8: {
+	    'NaF2':   0.005,
+	    'NaPF_SS':   5.E-06,
+	    'KA':   0.002,
+	    'KM':   0.00375,
+	    'K2':   0.0001,
+	    'KAHP_SLOWER':   0.0001,
+	    'CaL':   0.003,
+	    'CaT_A':   0.0001,
+	    'AR':   0.00025
+	    },
+	9: {
+	    'NaF2':   0.005,
+	    'NaPF_SS':   5.E-06,
+	    'KA':   0.002,
+	    'KM':   0.00375,
+	    'K2':   0.0001,
+	    'KAHP_SLOWER':   0.0001,
+	    'CaL':   0.003,
+	    'CaT_A':   0.0001,
+	    'AR':   0.00025
 	    }
 	}
+
 
     def __init__(self, *args):
 	moose.Cell.__init__(self, *args)
@@ -175,10 +269,25 @@ class SpinyStellate(moose.Cell):
 	t1 = datetime.now()
 	self.soma = self._add_comp(self, 1, dia=SpinyStellate.radius[0] * 2e-6,
                                    length=SpinyStellate.length[1] * 1e-6)
+	for i in range(4):
+	   self._create_dtree(self.soma, SpinyStellate.dendritic_tree, 2)
+
         self._create_axon()
 	t2 = datetime.now()
         delta = t2 - t1
         print '_create_comps took: ', delta.seconds + 1e-6 * delta.microseconds
+
+    def _create_dtree(self, parent, tree, level, radius_dict=radius):
+	"""Create the dendritic tree structure with compartments."""
+        if not tree:
+            return
+        comp = self._add_comp(parent, 
+                              level, 
+                              dia=radius_dict[tree[0]] * 2e-6,
+                              length=SpinyStellate.length[level] * 1e-6)
+        self.dendrites.add(comp)
+        for subtree in tree[1:]:
+            self._create_dtree(comp, subtree, level+1, radius_dict)
 
     def _create_axon(self):
         """Create the axonal structure.
@@ -273,6 +382,7 @@ class SpinyStellate(moose.Cell):
 	    comp.setSpecificRa(2.5)
             comp.Em = SpinyStellate.Em
             comp.initVm = SpinyStellate.Em
+            print comp.get_props()
 
 	for comp in self.axon:
 	    comp.setSpecificCm(9e-3)
@@ -282,7 +392,6 @@ class SpinyStellate(moose.Cell):
             comp.initVm = SpinyStellate.Em
 
     def _insert_channels(self):
-#         return
         if not self.channels_inited:
             raise Exception, 'Channels not initialized in library'
 
@@ -304,15 +413,16 @@ class SpinyStellate(moose.Cell):
         delta = t2 - t1
         print 'insert channels: ', delta.seconds + 1e-6 * delta.microseconds
 
-    
     def _connect_axial(self, root):
         """Connect parent-child compartments via axial-raxial
         messages."""
         parent = moose.Neutral(root.parent)
+        
         if parent.className == 'Compartment' and not hasattr(root, 'axial_connected'):
             root.connect('raxial', parent, 'axial')
             root.axial_connected = True
-        
+            print root.name, parent.name
+
         for child in root.children():
             obj = moose.Neutral(child)
             if obj.className == 'Compartment':

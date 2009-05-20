@@ -33,20 +33,79 @@ proc set_doubler(){
     doubler = 1
 }
 
-proc topol(){
+proc topol() {
+    // create comp[ 60] // note one greater than numcomp due to fortran indicies
+    // last argument, parent locat_aion for connection
+    // is overwritten to 1 for parents with connected children 
+    // in below traub_connect proc calls
     traub_connect(this,  1,  54,   0.0610434081, 0)
     // traub_connect(this,  1,  2,   0.0698996835, 1)
     // traub_connect(this,  1,  15,   0.0698996835, 1)
     // traub_connect(this,  1,  28,   0.0698996835, 1)
     // traub_connect(this,  1,  41,   0.0698996835, 1)
+    // traub_connect(this,  2,  3,   0.0200101501, 1)
+    // traub_connect(this,  2,  4,   0.0200101501, 1)
+    // traub_connect(this,  3,  4,   0.0139626222, 1)
+    // traub_connect(this,  3,  5,   0.00790657526, 1)
+    // traub_connect(this,  3,  6,   0.00790657526, 1)
+    // traub_connect(this,  4,  7,   0.0139626222,  1.)
+    // traub_connect(this,  5,  6,   0.00551467844, 1)
+    // traub_connect(this,  5,  8,   0.00551467844,  1.)
+    // traub_connect(this,  6,  9,   0.00551467844,  1.)
+    // traub_connect(this,  7,  10,   0.0139626222,  1.)
+    // traub_connect(this,  8,  11,   0.00551467844,  1.)
+    // traub_connect(this,  11,  12,   0.00551467844,  1.)
+    // traub_connect(this,  12,  13,   0.00551467844,  1.)
+    // traub_connect(this,  13,  14,   0.00551467844,  1.)
+    // traub_connect(this,  15,  16,   0.0200101501, 1)
+    // traub_connect(this,  15,  17,   0.0200101501, 1)
+    // traub_connect(this,  16,  17,   0.0139626222, 1)
+    // traub_connect(this,  16,  18,   0.00790657526, 1)
+    // traub_connect(this,  16,  19,   0.00790657526, 1)
+    // traub_connect(this,  17,  20,   0.0139626222,  1.)
+    // traub_connect(this,  18,  19,   0.00551467844, 1)
+    // traub_connect(this,  18,  21,   0.00551467844,  1.)
+    // traub_connect(this,  19,  22,   0.00551467844,  1.)
+    // traub_connect(this,  20,  23,   0.0139626222,  1.)
+    // traub_connect(this,  21,  24,   0.00551467844,  1.)
+    // traub_connect(this,  24,  25,   0.00551467844,  1.)
+    // traub_connect(this,  25,  26,   0.00551467844,  1.)
+    // traub_connect(this,  26,  27,   0.00551467844,  1.)
+    // traub_connect(this,  28,  29,   0.0200101501, 1)
+    // traub_connect(this,  28,  30,   0.0200101501, 1)
+    // traub_connect(this,  29,  30,   0.0139626222, 1)
+    // traub_connect(this,  29,  31,   0.00790657526, 1)
+    // traub_connect(this,  29,  32,   0.00790657526, 1)
+    // traub_connect(this,  30,  33,   0.0139626222,  1.)
+    // traub_connect(this,  31,  32,   0.00551467844, 1)
+    // traub_connect(this,  31,  34,   0.00551467844,  1.)
+    // traub_connect(this,  32,  35,   0.00551467844,  1.)
+    // traub_connect(this,  33,  36,   0.0139626222,  1.)
+    // traub_connect(this,  34,  37,   0.00551467844,  1.)
+    // traub_connect(this,  37,  38,   0.00551467844,  1.)
+    // traub_connect(this,  38,  39,   0.00551467844,  1.)
+    // traub_connect(this,  39,  40,   0.00551467844,  1.)
+    // traub_connect(this,  41,  42,   0.0200101501, 1)
+    // traub_connect(this,  41,  43,   0.0200101501, 1)
+    // traub_connect(this,  42,  43,   0.0139626222, 1)
+    // traub_connect(this,  42,  44,   0.00790657526, 1)
+    // traub_connect(this,  42,  45,   0.00790657526, 1)
+    // traub_connect(this,  43,  46,   0.0139626222,  1.)
+    // traub_connect(this,  44,  45,   0.00551467844, 1)
+    // traub_connect(this,  44,  47,   0.00551467844,  1.)
+    // traub_connect(this,  45,  48,   0.00551467844,  1.)
+    // traub_connect(this,  46,  49,   0.0139626222,  1.)
+    // traub_connect(this,  47,  50,   0.00551467844,  1.)
+    // traub_connect(this,  50,  51,   0.00551467844,  1.)
+    // traub_connect(this,  51,  52,   0.00551467844,  1.)
+    // traub_connect(this,  52,  53,   0.00551467844,  1.)
     traub_connect(this,  54,  55,   0.026078893,  1.)
     traub_connect(this,  55,  56,   0.0185405311, 1)
     traub_connect(this,  55,  58,   0.0185405311, 1)
     traub_connect(this,  56,  57,   0.01570795,  1.)
     traub_connect(this,  56,  58,   0.01570795, 1)
     traub_connect(this,  58,  59,   0.01570795,  1.)
-    
-    access comp[1]
+    access comp[1] // handy statement if want to start gui's from nrnmainmenu
 }
 
 proc geom() {

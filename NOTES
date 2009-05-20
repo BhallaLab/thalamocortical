@@ -849,4 +849,16 @@
 * <2009-05-21 Thu 00:07> Compartmentalization problem?
   Just out of frustration I added one extra compartment at the end of the
   axon, and voila, the results are almost identical - looks like there is a
-  compartmentalization problem.
+  compartmentalization problem. - <2009-05-21 Thu 02:18> I tried again now
+  after putting and removing the dendritic tree - that extra spike is missing
+  now. Mat be I am too sleepy.
+
+  With that part working I switched to the full tree - but strangely the Vm 
+  plot remains same - something is not getting updated.
+
+  Found it: the length in the levelno-length map was in microns, but I was not
+  converting it to SI. 
+
+  Now the outputs are quite far apart. When I try only the dendritic
+  compartments adjacent to the soma, the outputs are pretty close, and now the
+  extra axonal compartment is not making much difference.
