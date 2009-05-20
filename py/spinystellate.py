@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Apr 29 10:24:37 2009 (+0530)
 # Version: 
-# Last-Updated: Mon May 18 02:12:46 2009 (+0530)
+# Last-Updated: Thu May 21 01:39:39 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 569
+#     Update #: 571
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -247,6 +247,7 @@ class SpinyStellate(moose.Cell):
                     channel = class_obj(channel_name, config.lib, shift=-2.5e-3)
                 else:
                     channel = class_obj(channel_name, config.lib)
+            channel.X = 0.0
             self.channel_lib[channel_class] = channel
         self.channels_inited = True
 
@@ -303,8 +304,8 @@ class SpinyStellate(moose.Cell):
 	self.soma = comp
 	self.levels[1].add(comp)
         t1 = datetime.now()
-# 	for i in range(4):
-# 	   self. _create_dtree('d_' + str(i) + '_', comp, SpinyStellate.dendritic_tree, 2)
+	for i in range(4):
+	   self. _create_dtree('d_' + str(i) + '_', comp, SpinyStellate.dendritic_tree, 2)
         t2 = datetime.now()
         delta = t2 - t1
         print 'create_dtree took: ', delta.seconds + 1e-6 * delta.microseconds
