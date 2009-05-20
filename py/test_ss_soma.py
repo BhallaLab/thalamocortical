@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sun May  3 12:52:23 2009 (+0530)
 # Version: 
-# Last-Updated: Wed May  6 19:56:02 2009 (+0530)
+# Last-Updated: Mon May 18 14:53:55 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 158
+#     Update #: 172
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -99,6 +99,7 @@ def init_channels():
                 channel = class_obj(channel_class, lib, shift=-2.5e-3)
             else:
                 channel = class_obj(channel_class, lib)
+            channel.X = 0.0
         channel_lib[channel_class] = channel
     channels_inited = True
     return channel_lib
@@ -106,10 +107,10 @@ def init_channels():
 if __name__ == '__main__':
     sim = Simulation()
     soma = MyCompartment('soma', sim.model)
-    soma.length = 40e-6
-    soma.diameter = 2e-6 * 2.0 / 3.0
-    soma.setSpecificCm(9e-3 * 2)
-    soma.setSpecificRm(5.0 / 2)
+    soma.length = 20e-6
+    soma.diameter = 2e-6 * 7.5
+    soma.setSpecificCm(9e-3)
+    soma.setSpecificRm(5.0)
     soma.setSpecificRa(1.0)
     soma.Em = -65e-3
     soma.initVm = -65e-3
@@ -118,9 +119,8 @@ if __name__ == '__main__':
         chan = channel_lib[channel]
         print chan.name, density
         new_chan = moose.HHChannel(chan, chan.name, soma)
-	chan = soma.insertChannel(new_chan, 2 * density)
-        if chan.name == 'NaF2':
-            chan.X = 0.0
+	chan = soma.insertChannel(new_chan, density)
+        chan.X = 0.0
 	if channel.startswith('K'):
 	    chan.Ek = EK
 	elif channel.startswith('Na'):
@@ -129,7 +129,7 @@ if __name__ == '__main__':
 	    chan.Ek = ECa
 	elif channel.startswith('AR'):
 	    chan.Ek = EAR
-  	    chan.X = 0.25
+#   	    chan.X = 0.25
 	else:
 	    print 'Error: unknown channel', channel
 	    

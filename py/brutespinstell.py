@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri May  8 11:24:30 2009 (+0530)
 # Version: 
-# Last-Updated: Mon May 18 02:05:17 2009 (+0530)
+# Last-Updated: Thu May 21 00:06:48 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 193
+#     Update #: 195
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -215,7 +215,7 @@ class SpinyStellate(moose.Cell):
     # TODO this is full of cycles - the neuron code is just silly -
     # they use a check for already connected parent-child relation in
     # traubconnect function
-# 	comp[1].traubConnect(comp[ 54])
+	comp[1].traubConnect(comp[ 54])
 # 	comp[1].traubConnect(comp[ 2]) 
 # 	comp[1].traubConnect(comp[ 15])
 # 	comp[1].traubConnect(comp[ 28])
@@ -276,12 +276,12 @@ class SpinyStellate(moose.Cell):
 # 	comp[50].traubConnect(comp[51])
 # 	comp[51].traubConnect(comp[52])
 # 	comp[52].traubConnect(comp[53])
-# 	comp[54].traubConnect(comp[55])
-# 	comp[55].traubConnect(comp[56])
-# 	comp[55].traubConnect(comp[58])
-# 	comp[56].traubConnect(comp[57])
-# 	comp[56].traubConnect(comp[58])
-# 	comp[58].traubConnect(comp[59])
+	comp[54].traubConnect(comp[55])
+	comp[55].traubConnect(comp[56])
+	comp[55].traubConnect(comp[58])
+	comp[56].traubConnect(comp[57])
+	comp[56].traubConnect(comp[58])
+	comp[58].traubConnect(comp[59])
 
 	comp[ 1].diameter = 2 * 7.5 
 	comp[ 2].diameter = 2 * 1.06 
