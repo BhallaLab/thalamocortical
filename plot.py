@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 15:51:57 2009 (+0530)
 # Version: 
-# Last-Updated: Sat May 16 13:53:04 2009 (+0530)
+# Last-Updated: Mon May 18 15:35:21 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 194
+#     Update #: 195
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -63,7 +63,7 @@ mus_indices = indices
 nrn_indices = indices * 10
 nrn_data_dir = 'nrn/mydata/'
 
-nrn_data = pylab.loadtxt(nrn_data_dir + 'Vm.plot')
+nrn_data = pylab.loadtxt(nrn_data_dir + 'Vm_ss.plot')
 # nrn_Ca = pylab.loadtxt(nrn_data_dir + 'Ca.plot')[:, 1]
 nrn_Vm = nrn_data[:, 1]
 # nrn_m = nrn_data[:, 2]
