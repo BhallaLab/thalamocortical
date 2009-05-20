@@ -840,3 +840,13 @@
 * <2009-05-18 Mon 02:19> Soma Vm does not match
   Tested the non-brute spinstell with just soma with neuron - not a perfect
   match any more. Will start over.
+* <2009-05-18 Mon 03:59> KDR_FS mismatch 
+  I resorted to the painful technique of removing all channels and then adding
+  them back one by one  - NaF2 and NaPF_SS give identical results. KDR_FS
+  causes problem.
+
+  When I put KDR alone, they behave more or less same.
+* <2009-05-21 Thu 00:07> Compartmentalization problem?
+  Just out of frustration I added one extra compartment at the end of the
+  axon, and voila, the results are almost identical - looks like there is a
+  compartmentalization problem.

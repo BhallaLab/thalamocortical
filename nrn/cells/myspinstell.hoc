@@ -34,17 +34,17 @@ proc set_doubler(){
 }
 
 proc topol(){
-    // traub_connect(this,  1,  54,   0.0610434081, 0)
+    traub_connect(this,  1,  54,   0.0610434081, 0)
     // traub_connect(this,  1,  2,   0.0698996835, 1)
     // traub_connect(this,  1,  15,   0.0698996835, 1)
     // traub_connect(this,  1,  28,   0.0698996835, 1)
     // traub_connect(this,  1,  41,   0.0698996835, 1)
-    // traub_connect(this,  54,  55,   0.026078893,  1.)
-    // traub_connect(this,  55,  56,   0.0185405311, 1)
-    // traub_connect(this,  55,  58,   0.0185405311, 1)
-    // traub_connect(this,  56,  57,   0.01570795,  1.)
-    // traub_connect(this,  56,  58,   0.01570795, 1)
-    // traub_connect(this,  58,  59,   0.01570795,  1.)
+    traub_connect(this,  54,  55,   0.026078893,  1.)
+    traub_connect(this,  55,  56,   0.0185405311, 1)
+    traub_connect(this,  55,  58,   0.0185405311, 1)
+    traub_connect(this,  56,  57,   0.01570795,  1.)
+    traub_connect(this,  56,  58,   0.01570795, 1)
+    traub_connect(this,  58,  59,   0.01570795,  1.)
     
     access comp[1]
 }
