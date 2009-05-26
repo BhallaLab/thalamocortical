@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon May 18 02:22:10 2009 (+0530)
 # Version: 
-# Last-Updated: Thu May 21 02:15:55 2009 (+0530)
+# Last-Updated: Tue May 26 11:46:37 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 306
+#     Update #: 322
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -355,7 +355,6 @@ class SpinyStellate(moose.Cell):
 		channel.Z = 0.0
 	    else:
 		channel.X = 0.0
-# 	    channel.X = 0.0
 	    if isinstance(channel, KChannel):
 		channel.Ek = SpinyStellate.EK
 	    elif isinstance(channel, NaChannel):
@@ -451,10 +450,10 @@ if __name__ == '__main__':
 #     path = s.soma.path + '/a_0/a_1/a_0_0/a_0_1'
 #     a2 = MyCompartment(path)
     vm_table = s.soma.insertRecorder('Vm', sim.data)
-    s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=20e-3, firstWidth=50e-3)
+    s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=0.0, firstWidth=50e-3)
     sim.schedule()
     t1 = datetime.now()
-    sim.run(50e-3)
+    sim.run(100e-3)
     t2 = datetime.now()
     delta_t = t2 - t1
     print '#### TIME TO SIMULATE:', delta_t.seconds + delta_t.microseconds * 1e-6

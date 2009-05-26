@@ -38,7 +38,7 @@ proc topol() {
     // last argument, parent locat_aion for connection
     // is overwritten to 1 for parents with connected children 
     // in below traub_connect proc calls
-    traub_connect(this,  1,  54,   0.0610434081, 0)
+    // traub_connect(this,  1,  54,   0.0610434081, 0)
     // traub_connect(this,  1,  2,   0.0698996835, 1)
     // traub_connect(this,  1,  15,   0.0698996835, 1)
     // traub_connect(this,  1,  28,   0.0698996835, 1)
@@ -99,12 +99,12 @@ proc topol() {
     // traub_connect(this,  50,  51,   0.00551467844,  1.)
     // traub_connect(this,  51,  52,   0.00551467844,  1.)
     // traub_connect(this,  52,  53,   0.00551467844,  1.)
-    traub_connect(this,  54,  55,   0.026078893,  1.)
-    traub_connect(this,  55,  56,   0.0185405311, 1)
-    traub_connect(this,  55,  58,   0.0185405311, 1)
-    traub_connect(this,  56,  57,   0.01570795,  1.)
-    traub_connect(this,  56,  58,   0.01570795, 1)
-    traub_connect(this,  58,  59,   0.01570795,  1.)
+    // traub_connect(this,  54,  55,   0.026078893,  1.)
+    // traub_connect(this,  55,  56,   0.0185405311, 1)
+    // traub_connect(this,  55,  58,   0.0185405311, 1)
+    // traub_connect(this,  56,  57,   0.01570795,  1.)
+    // traub_connect(this,  56,  58,   0.01570795, 1)
+    // traub_connect(this,  58,  59,   0.01570795,  1.)
     access comp[1] // handy statement if want to start gui's from nrnmainmenu
 }
 
@@ -506,7 +506,7 @@ objref all
 	 e_pas =  -65.
 	 ena =   50.
 	 vca =   125.
-	 forsec all if (ismembrane("ar")) erev_ar =  -40.
+	 if (ismembrane("ar")) erev_ar =  -40.
 	 e_gaba_a =  -75.
      }
      // from outside the FORTRAN initialization section:

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Apr 29 10:24:37 2009 (+0530)
 # Version: 
-# Last-Updated: Thu May 21 01:39:39 2009 (+0530)
+# Last-Updated: Thu May 21 12:39:21 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 571
+#     Update #: 572
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -309,7 +309,7 @@ class SpinyStellate(moose.Cell):
         t2 = datetime.now()
         delta = t2 - t1
         print 'create_dtree took: ', delta.seconds + 1e-6 * delta.microseconds
-#         self._create_axon()
+        self._create_axon()
 
     def _set_passiveprops(self):
         """Set the passive properties of the cells."""

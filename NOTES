@@ -862,3 +862,15 @@
   Now the outputs are quite far apart. When I try only the dendritic
   compartments adjacent to the soma, the outputs are pretty close, and now the
   extra axonal compartment is not making much difference.
+* <2009-05-23 Sat 15:25> Upi's suggestion
+  Upi suggested I should change the axial resistance of the extra branch to
+  very high (so that it becomes practically disconnected) and see if the
+  solver is handling it correctly.
+* <2009-05-25 Mon 23:13> Checked connectivity
+  I printed out the connectivity in python and neuron models - and they are
+  identical (brutespinstell.py and mycell.hoc). So the error is happening
+  somewhere else.
+* <2009-05-26 Tue 15:53> Compared brutespinstell
+  I did a comparison of all single compartments in neuron and python - the
+  compartments are isolated and injection and recording happen on the same
+  compartment. The plots are identical.

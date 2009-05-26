@@ -133,6 +133,7 @@ proc finit0() { local ix
 	if (cell != nil) {
 		ix = cell.type()
 		forsec cell.all { v = type_vinit.x[ix] }
+		printf("initVm = %f\n", type_vinit.x[ix])
 		if (ix == TCRtype) {
 			forsec cell.all { v = -85 }
 		}
