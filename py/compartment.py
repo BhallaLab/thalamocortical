@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Tue May 12 17:46:19 2009 (+0530)
+# Last-Updated: Tue May 26 15:36:55 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 132
+#     Update #: 137
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -119,9 +119,9 @@ class MyCompartment(moose.Compartment):
                             if isinstance(channel, KCaChannel) or channel.name.startswith('KC') or channel.name.startswith('KAHP') ]
         self.ca_pool.connectDepChannels(kca_channels)
 
-    def insertRecorder(self, field_name, data_container): 
+    def insertRecorder(self, object_name, field_name, data_container): 
         """Creates a table for recording a field under data_container"""
-        table = moose.Table(field_name, data_container)# Possible name conflict for multiple recorders on different compartments
+        table = moose.Table(object_name, data_container)# Possible name conflict for multiple recorders on different compartments
         table.stepMode = 3
         self.connect(field_name, table, "inputRequest")
         return table
@@ -154,6 +154,7 @@ class MyCompartment(moose.Compartment):
             if item in child_neighbours:
                 return
         self.connect('raxial', child, 'axial')
+        print 'Connecting', self.name, 'to', child.name
             
 
     def get_props(self):
