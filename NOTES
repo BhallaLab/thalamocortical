@@ -874,3 +874,29 @@
   I did a comparison of all single compartments in neuron and python - the
   compartments are isolated and injection and recording happen on the same
   compartment. The plots are identical.
+* <2009-05-26 Tue 23:58> Axial-Raxial problem
+  I just switched the direction of connection [soma.raxial->axon.axial to
+  soma.axial->axon.raxial] and that did the trick.
+  
+  Silly me!
+
+  But but but ... after this correction, brutespinstell encounters the same
+  problem - one extra spike before current injection as I add all the axonal
+  compartments.
+
+  MOOSE is badly affected by dt - 1e-4 gives quite different results from
+  1e-6. 1e-5 is reasonable. 1e-4 is problematic because each ms of simulation
+  is done with only 10 time points, but comparatively neuron simulation is
+  much faster. Adaptive time steps??
+
+  Problem with spontaneous second spike: the branching does not really
+  matter - even if I add the extra axonal comp at the end or as a branch the
+  output matches. But if I increase the Ra for compartments upstream, the
+  firing does not happen.
+* <2009-06-01 Mon 22:22> Shameful mistake
+  I realized that I was using diameter as radious for calculating cross
+  section of compartments - after correcting for that the outputs are decent. 
+
+  But there is some problem with KDR_FS and NaF2 - if I try these two channels
+  only on the soma, the outputs don't match. Given that I was getting perfect
+  match in singlecompartment test, this should not happen.

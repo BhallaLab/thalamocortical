@@ -99,12 +99,12 @@ proc topol() {
     // traub_connect(this,  50,  51,   0.00551467844,  1.)
     // traub_connect(this,  51,  52,   0.00551467844,  1.)
     // traub_connect(this,  52,  53,   0.00551467844,  1.)
-    // traub_connect(this,  54,  55,   0.026078893,  1.)
-    // traub_connect(this,  55,  56,   0.0185405311, 1)
-    // traub_connect(this,  55,  58,   0.0185405311, 1)
-    // traub_connect(this,  56,  57,   0.01570795,  1.)
-    // traub_connect(this,  56,  58,   0.01570795, 1)
-    // traub_connect(this,  58,  59,   0.01570795,  1.)
+    traub_connect(this,  54,  55,   0.026078893,  1.)
+    traub_connect(this,  55,  56,   0.0185405311, 1)
+    traub_connect(this,  55,  58,   0.0185405311, 1)
+    traub_connect(this,  56,  57,   0.01570795,  1.)
+    traub_connect(this,  56,  58,   0.01570795, 1)
+    traub_connect(this,  58,  59,   0.01570795,  1.)
     access comp[1] // handy statement if want to start gui's from nrnmainmenu
 }
 
@@ -203,46 +203,48 @@ objref all
      //       insert the mechanisms and assign max conductances
      // 
      forsec all { insert pas }   // g_pas has two values; soma-dend,axon
+    
      forsec level[ 0] {
-	 insert naf2
-	 gbar_naf2 =   0.4
-	 insert kdr_fs
-	 gbar_kdr_fs =   0.4
-	 insert ka
-	 gbar_ka =   0.002
-	 insert k2
-	 gbar_k2 =   0.0001
+	 // insert naf2
+	 // gbar_naf2 =   0.4
+	 // insert kdr_fs
+	 // gbar_kdr_fs =   0.4
+	 // insert ka
+	 // gbar_ka =   0.002
+	 // insert k2
+	 // gbar_k2 =   0.0001
+	 
      }
      forsec level[ 1] {
 	 insert naf2
 	 gbar_naf2 =   0.15
-	 insert napf_spinstell
-	 gbar_napf_spinstell =   0.00015
+	 // insert napf_spinstell
+	 // gbar_napf_spinstell =   0.00015
 	 insert kdr_fs
 	 gbar_kdr_fs =   0.1
-	 insert kc_fast
-	 gbar_kc_fast =   0.01
-	 insert ka
-	 gbar_ka =   0.03
-	 insert km
-	 gbar_km =   0.00375
-	 insert k2
-	 gbar_k2 =   0.0001
-	 insert kahp_slower
-	 gbar_kahp_slower =   0.0001
-	 insert cal
-	 gbar_cal =   0.0005
-	 insert cat_a
-	 gbar_cat_a =   0.0001
-	 insert ar
-	 gbar_ar =   0.00025
-	 insert cad
-	 // *** ca diffusion: beta=1/tau
-	 beta_cad  =   0.02
-	 // cafor(I) (FORTRAN) converted to phi (NEURON)
-	 phi_cad =   260000.
+	 // insert kc_fast
+	 // gbar_kc_fast =   0.01
+	 // insert ka
+	 // gbar_ka =   0.03
+	 // insert km
+	 // gbar_km =   0.00375
+	 // insert k2
+	 // gbar_k2 =   0.0001
+	 // insert kahp_slower
+	 // gbar_kahp_slower =   0.0001
+	 // insert cal
+	 // gbar_cal =   0.0005
+	 // insert cat_a
+	 // gbar_cat_a =   0.0001
+	 // insert ar
+	 // gbar_ar =   0.00025
+	 // insert cad
+	 // // *** ca diffusion: beta=1/tau
+	 // beta_cad  =   0.02
+	 // // cafor(I) (FORTRAN) converted to phi (NEURON)
+	 // phi_cad =   260000.
      }
-     forsec level[ 2] {
+    forsec level[ 2] {
 	 insert naf2
 	 gbar_naf2 =   0.075
 	 insert napf_spinstell
@@ -502,10 +504,10 @@ objref all
      forsec all {
          if (ismembrane("naf2")) {fastNa_shift_naf2=-2.5}
 	 // global reversal potentials
-	 ek =  -100.
+	 if (ismembrane("kdr_fs")){ ek =  -100.}
 	 e_pas =  -65.
-	 ena =   50.
-	 vca =   125.
+	 if (ismembrane("naf2")){ena =   50.}
+	 if(ismembrane("cal")){vca =   125.}
 	 if (ismembrane("ar")) erev_ar =  -40.
 	 e_gaba_a =  -75.
      }
