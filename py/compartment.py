@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Tue May 26 15:36:55 2009 (+0530)
+# Last-Updated: Mon Jun  1 16:29:30 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 137
+#     Update #: 143
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -58,13 +58,14 @@ class MyCompartment(moose.Compartment):
 
     def setSpecificRa(self, RA):
         self.Ra = RA * self.length / self.xarea()
+        print self.name, self.Ra, self.length, self.xarea()
 
     def setSpecificCm(self, CM):
         self.Cm = CM * self.sarea()
 
     def xarea(self):
         if self._xarea is None:
-            self._xarea = pi * self.diameter * self.diameter
+            self._xarea = pi * self.diameter * self.diameter / 4.0
         return self._xarea
 
     def sarea(self):
@@ -153,7 +154,7 @@ class MyCompartment(moose.Compartment):
         for item in my_neighbours:
             if item in child_neighbours:
                 return
-        self.connect('raxial', child, 'axial')
+        self.connect('axial', child, 'raxial')
         print 'Connecting', self.name, 'to', child.name
             
 

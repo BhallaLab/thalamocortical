@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri May  8 11:24:30 2009 (+0530)
 # Version: 
-# Last-Updated: Tue May 26 21:51:53 2009 (+0530)
+# Last-Updated: Mon Jun  1 22:18:46 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 348
+#     Update #: 423
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -49,23 +49,23 @@ class SpinyStellate(moose.Cell):
     EAR = -40e-3
     conductance = {
 	0: {
-	    'NaF2':   0.4,
-	    'KDR_FS':   0.4,
-	    'KA':   0.002,
-	    'K2':   0.0001
+# 	    'NaF2':   0.4,
+# 	    'KDR_FS':   0.4,
+# 	    'KA':   0.002,
+# 	    'K2':   0.0001
 	    },
 	1: {
 	    'NaF2':   0.15,
-	    'NaPF_SS':   0.00015,
+# 	    'NaPF_SS':   0.00015,
 	    'KDR_FS':   0.1,
-	    'KC_FAST':   0.01,
-	    'KA':   0.03,
-	    'KM':   0.00375,
-	    'K2':   0.0001,
-	    'KAHP_SLOWER':   0.0001,
-	    'CaL':   0.0005,
-	    'CaT_A':   0.0001,
-	    'AR':   0.00025
+# 	    'KC_FAST':   0.01,
+# 	    'KA':   0.03,
+# 	    'KM':   0.00375,
+# 	    'K2':   0.0001,
+# 	    'KAHP_SLOWER':   0.0001,
+# 	    'CaL':   0.0005,
+# 	    'CaT_A':   0.0001,
+# 	    'AR':   0.00025
 	    },
 	2: {
 	    'NaF2':   0.075,
@@ -256,7 +256,7 @@ class SpinyStellate(moose.Cell):
 	level[ 0].add( comp[ 57])
 	level[ 0].add( comp[ 58])
 	level[ 0].add( comp[ 59])
-
+        level[ 0].add( comp[ 0])
 	for ii in range(2, len(level)):
 	    dendrites |= level[ii]
         
@@ -266,9 +266,8 @@ class SpinyStellate(moose.Cell):
 	self.soma = comp[1]
         self.axon = [c for c in self.level[0]]
 
-    # TODO this is full of cycles - the neuron code is just silly -
-    # they use a check for already connected parent-child relation in
-    # traubconnect function
+    # this is full of cycles - the traubConnect function is intended
+    # to avoid the cycles
 # 	comp[1].traubConnect(comp[ 54])
 # 	comp[1].traubConnect(comp[ 2]) 
 # 	comp[1].traubConnect(comp[ 15])
@@ -330,12 +329,12 @@ class SpinyStellate(moose.Cell):
 # 	comp[50].traubConnect(comp[51])
 # 	comp[51].traubConnect(comp[52])
 # 	comp[52].traubConnect(comp[53])
-# 	comp[54].traubConnect(comp[55])
-# 	comp[55].traubConnect(comp[56])
-# 	comp[55].traubConnect(comp[58])
-# 	comp[56].traubConnect(comp[57])
-# 	comp[56].traubConnect(comp[58])
-# 	comp[58].traubConnect(comp[59])
+	comp[54].traubConnect(comp[55])
+	comp[55].traubConnect(comp[56])
+	comp[55].traubConnect(comp[58])
+	comp[56].traubConnect(comp[57])
+	comp[56].traubConnect(comp[58])
+	comp[58].traubConnect(comp[59])
 
 	comp[ 1].diameter = 2e-6 * 7.5 
 	comp[ 2].diameter = 2e-6 * 1.06 
@@ -427,8 +426,10 @@ class SpinyStellate(moose.Cell):
                         channel.Ek = SpinyStellate.EAR
                     else:
                         print 'ERROR: unknown channel type.'
-                    channel.X = 0.0
-                    channel.Z = 0.0
+                    if isinstance(proto, KC_FAST):
+                        channel.Z = 0.0
+                    else:
+                        channel.X = 0.0
 		    compartment.insertChannel(channel, specificGbar=density * 1e4) # convert density to SI
 
 	for compartment in self.dendrites:
@@ -479,11 +480,8 @@ import pymoose
 if __name__ == '__main__':
     sim = Simulation()
     s = SpinyStellate('cell', sim.model)
-#     vm_table = s.soma.insertRecorder('Vm', sim.data)
-#     pulsegen = s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=20e-3, firstWidth=100e-3)
-    for comp in s.comp:
-        comp.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=20e-3, firstWidth=100e-3)
-        vm_table = comp.insertRecorder('Vm_' + comp.name, 'Vm', sim.data)
+    vm_table = s.soma.insertRecorder('Vm_ss', 'Vm', sim.data)
+    pulsegen = s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=20e-3, firstWidth=100e-3)
     sim.schedule()
     if has_cycle(s.soma):
         print "WARNING!! CYCLE PRESENT IN CICRUIT."
@@ -495,7 +493,9 @@ if __name__ == '__main__':
     print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
     sim.dump_data('data')
     dump_cell(s, 'brutess.txt')
-
+    for comp in s.comp:
+        for chan in comp.channels:
+            print chan.path, chan.Gbar/comp.sarea(), chan.Ek
 #     nrn_data = pylab.loadtxt('../nrn/mydata/Vm_ss.plot')
 #     nrn_vm = nrn_data[:, 1]
 #     nrn_t = nrn_data[:, 0]

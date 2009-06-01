@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 15:51:57 2009 (+0530)
 # Version: 
-# Last-Updated: Tue May 26 15:52:55 2009 (+0530)
+# Last-Updated: Mon Jun  1 20:44:09 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 219
+#     Update #: 236
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -18,7 +18,7 @@
 
 # Commentary: 
 # 
-# 
+#  The scaling of MOOSE time must be done with reference to simdt in config.py
 # 
 # 
 
@@ -54,21 +54,23 @@ os.chdir(working_dir)
 mus_data_dir = 'py/data/'+datetime.datetime.now().strftime('%Y_%m_%d') + '/'
 nrn_data_dir = 'nrn/mydata/'
 
-# nrn_data = pylab.loadtxt(nrn_data_dir + 'Vm_ss.plot')
-# nrn_Vm = nrn_data[:, 1]
-# nrn_t = nrn_data[:, 0]
+nrn_data = pylab.loadtxt(nrn_data_dir + 'Vm_ss.plot')
+nrn_Vm = nrn_data[:, 1]
+nrn_t = nrn_data[:, 0]
+mus_Vm = pylab.loadtxt(mus_data_dir + "Vm_ss.plot") * 1e3
+mus_t = pylab.linspace(0, len(mus_Vm) * 1e-2, len(mus_Vm))
 
-for ii in range(1,60):    
-    mus_Vm = pylab.loadtxt(mus_data_dir + "/Vm_comp_" + str(ii) + ".plot") * 1e3
-    mus_t = pylab.linspace(0, len(mus_Vm) * 1e-3, len(mus_Vm))
-    nrn_data = pylab.loadtxt(nrn_data_dir + "/Vm_comp_" + str(ii) + ".plot")
-    nrn_t = nrn_data[:, 0]
-    nrn_Vm = nrn_data[:, 1]
-    pylab.title("Vm_comp_" + str(ii))
-    pylab.plot(nrn_t, nrn_Vm, 'r-', label='nrn_Vm')
-    pylab.plot(mus_t, mus_Vm, 'g-', label='mus_Vm')
-    pylab.legend()
-    pylab.show()
+# for ii in range(1,60):    
+#     mus_Vm = pylab.loadtxt(mus_data_dir + "/Vm_comp_" + str(ii) + ".plot") * 1e3
+#     mus_t = pylab.linspace(0, len(mus_Vm) * 1e-3, len(mus_Vm))
+#     nrn_data = pylab.loadtxt(nrn_data_dir + "/Vm_comp_" + str(ii) + ".plot")
+#     nrn_t = nrn_data[:, 0]
+#     nrn_Vm = nrn_data[:, 1]
+#     pylab.title("Vm_comp_" + str(ii))
+#     pylab.plot(nrn_t, nrn_Vm, 'r-', label='nrn_Vm')
+#     pylab.plot(mus_t, mus_Vm, 'g-', label='mus_Vm')
+#     pylab.legend()
+#     pylab.show()
 
 # from scipy.interpolate import splrep, splev
 # smoothness = 3
@@ -86,9 +88,9 @@ for ii in range(1,60):
 # # pylab.show()
 
 # pylab.subplot(2, 1, 1)
-# pylab.plot(nrn_t, nrn_Vm, 'r-', label='nrn_Vm')
-# pylab.plot(mus_t, mus_Vm, 'g-', label='mus_Vm')
-# pylab.legend()
+pylab.plot(nrn_t, nrn_Vm, 'r-', label='nrn_Vm')
+pylab.plot(mus_t, mus_Vm, 'g-', label='mus_Vm')
+pylab.legend()
 # pylab.subplot(2,1,2)
 # pylab.plot(nrn_t, nrn_Ca, label='nrn')
 # pylab.plot(mus_t, mus_Ca, label='mus')
@@ -99,7 +101,7 @@ for ii in range(1,60):
 # pylab.plot(nrn_t, nrn_gk, label='nrn')
 # pylab.plot(mus_t, mus_gk, label='mus')
 # pylab.legend()
-# pylab.show()
+pylab.show()
 
 
 # 
