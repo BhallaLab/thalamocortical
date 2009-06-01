@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:13 2009 (+0530)
 # Version: 
-# Last-Updated: Fri May  8 11:19:31 2009 (+0530)
+# Last-Updated: Mon Jun  1 22:06:55 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 115
+#     Update #: 118
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -96,6 +96,10 @@ class NaF2(NaChannel):
             self.yGate.B[i] = h_inf[i]
         self.xGate.tweakTau()
         self.yGate.tweakTau()
+        self.xGate.A.dumpFile('naf2_xa.plot')
+        self.xGate.B.dumpFile('naf2_xb.plot')
+        self.yGate.A.dumpFile('naf2_ya.plot')
+        self.yGate.B.dumpFile('naf2_yb.plot')
 
 class NaP(NaChannel):
     def __init__(self, name, parent, Ek=50e-3):
