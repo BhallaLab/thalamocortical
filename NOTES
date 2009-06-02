@@ -436,10 +436,11 @@
   conc. I don't see how to incorporate this in MOOSE Ca_conc object.
 
 * <2008-12-13 Sat 12:37> Looking at channel behaviour
-  After almost completing the single compartment model with GENESIS Ca_concen object from my old implementation I see that
-  the frequency has increased drastically. Actually there is no structure in
-  the spikes. To understand the contribution of each channel I am commenting
-  out most of them and incrementally enabling a few channels.
+  After almost completing the single compartment model with GENESIS Ca_concen
+  object from my old implementation I see that the frequency has increased
+  drastically. Actually there is no structure in the spikes. To understand the
+  contribution of each channel I am commenting out most of them and
+  incrementally enabling a few channels.
 
   NaF2 on SS gives a typical spike at the start of simulation due to the
   difference between the cell's resting Vm and Ek of the channel, which slowly
@@ -765,7 +766,7 @@
   
 * <2009-05-03 Sun 16:05> Trying Spiny stellate
   KDR_FS - identical
-  NaF2 - the spike is delayed - could be something with fastNaf_shoft
+  NaF2 - the spike is delayed - could be something with fastNaf_shift
 
   NaPF_SS - does not seem to have any effect
 
@@ -900,3 +901,39 @@
   But there is some problem with KDR_FS and NaF2 - if I try these two channels
   only on the soma, the outputs don't match. Given that I was getting perfect
   match in singlecompartment test, this should not happen.
+
+  The problem is KDR_FS alone is giving identical results in the
+  compartment. So is NaF2 alone.
+* <2009-06-02 Tue 14:35> Single compartment match
+  The problem factors were dt and secondorder statements in NEURON.
+  once I added:
+  secondorder=2
+  dt=1e-3
+  
+  single compartment soma outputs were matching nicely.
+  
+  But as I restored the connectivity to all the compartments, the outputs are
+  differing as before. ALso, when I removed the injection current the outputs
+  seem to be highly different. Need to check once I come back from animal house.
+
+* <2009-06-02 Tue 19:46> Dendritic compartments cause problem
+  As I add a dendritic compartment the outputs start differing. Just soma and
+  one denritic compartment also differs.
+  When I switch the direction of axial-raxial connection - the output of MOOSE
+  goes haywire.
+  But single compartment test works on the dendritic compartment.
+  Things to check: 
+   spine area multiplication is correct.    
+   Ra is correct
+   Dimensions are correct
+
+ I tested the passive soma - d1 pair - and they are differing : something is
+ wrong with Raxial
+
+ No! there is a problem with passive properties. I switched the 
+  
+* <2009-06-02 Tue 23:32> Problem in passive properties
+  brutespinstell.py has some problem with passive properties: because when I
+  create a separate two compartment passive model with soma and first
+  dendritic compartment settings, it matches with the neuron Vm.
+

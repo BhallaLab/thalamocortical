@@ -6,10 +6,10 @@ strdef tstr
 objref vm_vecs[60], stim[60], files[60]
 PI=3.141592
 FARADAY=96485
-// secondorder=2
-// // dt = 1e-3
-// // celsius=30
-// //till the shift bug in the mod files are fixed (table depends on range variable)
+secondorder=2
+dt = 1e-3
+celsius=30
+//till the shift bug in the mod files are fixed (table depends on range variable)
 // usetable_naf2 = 0
 // usetable_naf = 0
 // usetable_napf_spinstell = 0
@@ -34,12 +34,12 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g
     // 	vm_vecs[ii] = new Vector()
     // 	vm_vecs[ii].record(&cell.comp[ii].v(0.5))
     // 	}
-    access cell.comp[1]
+    access cell.comp[2]
     f = new File()
     tvec = new Vector()
     vvec = new Vector()
     tvec.record(&t)
-    vvec.record(&cell.comp[1].v(0.5))
+    vvec.record(&cell.comp[2].v(0.5))
     
     stim1 = new IClamp(0.5) 
     stim1.amp = 0.3
