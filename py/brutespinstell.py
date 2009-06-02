@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri May  8 11:24:30 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Jun  1 22:18:46 2009 (+0530)
+# Last-Updated: Tue Jun  2 22:19:18 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 423
+#     Update #: 476
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -49,15 +49,15 @@ class SpinyStellate(moose.Cell):
     EAR = -40e-3
     conductance = {
 	0: {
-# 	    'NaF2':   0.4,
-# 	    'KDR_FS':   0.4,
-# 	    'KA':   0.002,
-# 	    'K2':   0.0001
+	    'NaF2':   0.4,
+	    'KDR_FS':   0.4,
+	    'KA':   0.002,
+	    'K2':   0.0001
 	    },
 	1: {
-	    'NaF2':   0.15,
+# 	    'NaF2':   0.15,
 # 	    'NaPF_SS':   0.00015,
-	    'KDR_FS':   0.1,
+# 	    'KDR_FS':   0.1,
 # 	    'KC_FAST':   0.01,
 # 	    'KA':   0.03,
 # 	    'KM':   0.00375,
@@ -68,17 +68,17 @@ class SpinyStellate(moose.Cell):
 # 	    'AR':   0.00025
 	    },
 	2: {
-	    'NaF2':   0.075,
-	    'NaPF_SS':   7.5E-05,
-	    'KDR_FS':   0.075,
-	    'KC_FAST':   0.01,
-	    'KA':   0.03,
-	    'KM':   0.00375,
-	    'K2':   0.0001,
-	    'KAHP_SLOWER':   0.0001,
-	    'CaL':   0.0005,
-	    'CaT_A':   0.0001,
-	    'AR':   0.00025
+# 	    'NaF2':   0.075,
+# 	    'NaPF_SS':   7.5E-05,
+# 	    'KDR_FS':   0.075,
+# 	    'KC_FAST':   0.01,
+# 	    'KA':   0.03,
+# 	    'KM':   0.00375,
+# 	    'K2':   0.0001,
+# 	    'KAHP_SLOWER':   0.0001,
+# 	    'CaL':   0.0005,
+# 	    'CaT_A':   0.0001,
+# 	    'AR':   0.00025
 	    },
 	3: {
 	    'NaF2':   0.075,
@@ -269,7 +269,7 @@ class SpinyStellate(moose.Cell):
     # this is full of cycles - the traubConnect function is intended
     # to avoid the cycles
 # 	comp[1].traubConnect(comp[ 54])
-# 	comp[1].traubConnect(comp[ 2]) 
+	comp[1].traubConnect(comp[ 2]) 
 # 	comp[1].traubConnect(comp[ 15])
 # 	comp[1].traubConnect(comp[ 28])
 # 	comp[1].traubConnect(comp[ 41])
@@ -329,12 +329,12 @@ class SpinyStellate(moose.Cell):
 # 	comp[50].traubConnect(comp[51])
 # 	comp[51].traubConnect(comp[52])
 # 	comp[52].traubConnect(comp[53])
-	comp[54].traubConnect(comp[55])
-	comp[55].traubConnect(comp[56])
-	comp[55].traubConnect(comp[58])
-	comp[56].traubConnect(comp[57])
-	comp[56].traubConnect(comp[58])
-	comp[58].traubConnect(comp[59])
+# 	comp[54].traubConnect(comp[55])
+# 	comp[55].traubConnect(comp[56])
+# 	comp[55].traubConnect(comp[58])
+# 	comp[56].traubConnect(comp[57])
+# 	comp[56].traubConnect(comp[58])
+# 	comp[58].traubConnect(comp[59])
 
 	comp[ 1].diameter = 2e-6 * 7.5 
 	comp[ 2].diameter = 2e-6 * 1.06 
@@ -431,17 +431,17 @@ class SpinyStellate(moose.Cell):
                     else:
                         channel.X = 0.0
 		    compartment.insertChannel(channel, specificGbar=density * 1e4) # convert density to SI
-
+        spine_area_mult = 1.0
 	for compartment in self.dendrites:
-	    compartment.setSpecificRm(5.0/2)
+	    compartment.setSpecificRm(5.0/spine_area_mult)
 	    compartment.setSpecificRa(2.5)
-	    compartment.setSpecificCm(2 * 9e-3)
+	    compartment.setSpecificCm(spine_area_mult * 9e-3)
 	    compartment.insertCaPool(5.2e-6 / 2e-10, 20e-3)
             for channel in compartment.channels:
-                channel.Gbar *= 2
+                channel.Gbar *= spine_area_mult
 
 	self.soma.setSpecificRm(5.0)
-	self.soma.setSpecificRa(2.5)
+	self.soma.setSpecificRa(25)
         self.soma.setSpecificCm(9e-3)
         self.soma.insertCaPool(5.2e-6 / 2e-10, 50e-3)
 
@@ -480,12 +480,14 @@ import pymoose
 if __name__ == '__main__':
     sim = Simulation()
     s = SpinyStellate('cell', sim.model)
-    vm_table = s.soma.insertRecorder('Vm_ss', 'Vm', sim.data)
-    pulsegen = s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=20e-3, firstWidth=100e-3)
+    vm_table = s.comp[2].insertRecorder('Vm_ss', 'Vm', sim.data)
+    
+    pulsegen = s.comp[2].insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=20e-3, firstWidth=100e-3)
     sim.schedule()
     if has_cycle(s.soma):
         print "WARNING!! CYCLE PRESENT IN CICRUIT."
-
+    for chan in s.soma.channels:
+        print chan.name, 'Ek = ', chan.Ek, 'Gbar = ', chan.Gbar / s.soma.sarea()
     t1 = datetime.now()
     sim.run(100e-3)
     t2 = datetime.now()
