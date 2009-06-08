@@ -937,3 +937,35 @@
   create a separate two compartment passive model with soma and first
   dendritic compartment settings, it matches with the neuron Vm.
 
+  Just checked the passive properties of brutespinstell compartments (soma and
+  comp[2]) and test_twocomp - identical. 
+
+* <2009-06-05 Fri 10:47> HSolve not present
+  I realized by showmsg() that the brutespinstell is not getting a
+  solver. This is strange - the class is derived from moose.Cell and all the
+  compartments are under this object.
+* <2009-06-06 Sat 12:28> HSolve present but hub not connected
+  pymoose.showmsg(moose.Neutral('/model/cell/solve/hub'))
+Info: PyMooseBase::PyMooseBase(Neutral, /model/cell/solve/hub) - Returning already existing object.
+INCOMING:
+[/model/cell/solve/hub].child <- [/model/cell/solve].childSrc
+[/model/cell/solve/hub].integ-hub <- [/model/cell/solve/integ].integ-hub
+[/model/cell/solve/hub].child <- [/model/cell/solve].childSrc
+OUTGOING:
+[/model/cell/solve/hub].compartmentSolve -> [/model/cell/comp_59].process
+>>> 
+
+So solver is getting created but only compartment 59 is connected to the
+hub. Why?
+
+- Niraj told me that the solver starts with the last created compartment and
+  traces the whole cell by tracing connectivity between compartments. Thus a
+  forest of compartments is not handled correctly by the solver.
+
+  So I have to remove all other compartments and do the simulation. So I guess
+  my full cell model is the best I can get with the solver ( because all the
+  compartments are connected).
+* <2009-06-09 Tue 02:37> Three compartments 
+  Soma, comp[2], comp[3] where comp[3] does not have any ion channels works
+  fine. But when I add ion channels, it deviates slightly. I am going to
+  accept it and move on with the other cells.
