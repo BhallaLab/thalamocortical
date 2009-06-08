@@ -43,7 +43,7 @@ proc topol() {
     // traub_connect(this,  1,  15,   0.0698996835, 1)
     // traub_connect(this,  1,  28,   0.0698996835, 1)
     // traub_connect(this,  1,  41,   0.0698996835, 1)
-    // traub_connect(this,  2,  3,   0.0200101501, 1)
+    traub_connect(this,  2,  3,   0.0200101501, 1)
     // traub_connect(this,  2,  4,   0.0200101501, 1)
     // traub_connect(this,  3,  4,   0.0139626222, 1)
     // traub_connect(this,  3,  5,   0.00790657526, 1)
@@ -214,7 +214,7 @@ objref all
 	 insert k2
 	 gbar_k2 =   0.0001
      }
-/*     forsec level[ 1] {
+    forsec level[ 1] {
 	 insert naf2
 	 gbar_naf2 =   0.15
 	 insert napf_spinstell
@@ -242,8 +242,8 @@ objref all
 	 beta_cad  =   0.02
 	 // cafor(I) (FORTRAN) converted to phi (NEURON)
 	 phi_cad =   260000.
-     }*/
-/*    forsec level[ 2] {
+     }
+     forsec level[ 2] {
 	 insert naf2
 	 gbar_naf2 =   0.075
 	 insert napf_spinstell
@@ -271,7 +271,7 @@ objref all
 	 beta_cad  =   0.05
 	 // cafor(I) (FORTRAN) converted to phi (NEURON)
 	 phi_cad =   260000.
-     } */
+     } 
      forsec level[ 3] {
 	 insert naf2
 	 gbar_naf2 =   0.075
@@ -472,7 +472,7 @@ objref all
  }  // end of biophys
  
  proc double_dend_cond() {
-     spine_area_multiplier = 1
+     spine_area_multiplier = 2.0
      forsec dendrites {
          if (ismembrane("napf_spinstell")) { gbar_napf_spinstell *= spine_area_multiplier }
          if (ismembrane("napf_spinstellf")) { gbar_napf_spinstellf *= spine_area_multiplier }

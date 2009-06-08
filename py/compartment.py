@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Jun  2 23:30:06 2009 (+0530)
+# Last-Updated: Fri Jun  5 14:29:05 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 147
+#     Update #: 157
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -178,7 +178,98 @@ class MyCompartment(moose.Compartment):
         return s.getvalue()
 
 
+def compare_compartment(left, right):
+    """Compare if two compartments have same field values"""
+#     return almost_equal(left.Em, right.Em) and \
+#         almost_equal(left.Rm, right.Rm) and \
+#         almost_equal(left.Cm, right.Cm) and \
+#         almost_equal(left.Ra, right.Ra) and \
+#         almost_equal(left.initVm, right.initVm)
+    result = almost_equal(left.Em, right.Em)
+    if not result:
+        print left.path + ".Em = " + str(left.Em) + " <> " + right.path + ".Em = " + str(right.Em)
+        return result
+    result = almost_equal(left.Rm, right.Rm)
+    if not result:
+        print(left.path + ".Rm = " + str(left.Rm) + " <> " + right.path + ".Rm = " + str(right.Rm))
+        return result
 
+    result = almost_equal(left.Cm, right.Cm)
+    if not result:
+        print(left.path + ".Cm = " + str(left.Cm) + " <> " + right.path + ".Cm = " + str(right.Cm))
+        return result
+    result = almost_equal(left.Ra, right.Ra)
+    if not result:
+        print(left.path + ".Ra = " + str(left.Ra) + " <> " + right.path + ".Ra = " + str(right.Ra))
+        return result
+
+    result = almost_equal(left.initVm, right.initVm)
+    if not result:
+        print(left.path + ".initVm = " + str(left.initVm) + " <> " + right.path + ".initVm = " + str(right.initVm))
+        return result
+
+    result = almost_equal(left.Vm, right.Vm)
+    if not result:
+        print(left.path + ".Vm = " + str(left.Vm) + " <> " + right.path + ".Vm = " + str(right.Vm))
+        return result
+
+    return True
+# ! compare_compartments
+
+from trbutil import almost_equal
+def compare_channel(left, right):
+    """Compare two channels on same field values"""
+#     result = almost_equal(left.Ek, right.Ek) and \
+#         almost_equal(left.Gbar, right.Gbar) and \
+#         almost_equal(left.Xpower, right.Xpower) and \
+#         almost_equal(left.Ypower, right.Ypower) and \
+#         almost_equal(left.Zpower, right.Zpower) and \
+#         almost_equal(left.instant, right.instant) and \
+#         almost_equal(left.Gk, right.Gk) and \
+#         almost_equal(left.Ik, right.Ik)
+    result = almost_equal(left.Ek, right.Ek)
+    if not result:
+        print(left.path + ".Ek = " + str(left.Ek) + " <> " + right.path + ".Ek = " + str(right.Ek))
+        return result
+    
+    result = almost_equal(left.Gbar, right.Gbar)
+    if not result:
+        print(left.path + ".Gbar = " + str(left.Gbar) + " <> " + right.path + ".Gbar = " + str(right.Gbar))
+        return result
+
+    result = almost_equal(left.Xpower, right.Xpower)
+
+    if not result:
+        print(left.path + ".Xpower = " + str(left.Xpower) + " <> " + right.path + ".Xpower = " + str(right.Xpower))
+        return result
+
+    result = almost_equal(left.Ypower, right.Ypower)
+    if not result:
+        print(left.path + ".Ypower = " + str(left.Ypower) + " <> " + right.path + ".Ypower = " + str(right.Ypower))
+        return result
+
+    result = almost_equal(left.Zpower, right.Zpower)
+    if not result:
+        print(left.path + ".Zpower = " + str(left.Zpower) + " <> " + right.path + ".Zpower = " + str(right.Zpower))
+        return result
+
+    result = almost_equal(left.instant, right.instant)
+    if not result:
+        print(left.path + ".instant = " + str(left.instant) + " <> " + right.path + ".instant = " + str(right.instant))
+        return result
+
+    result = almost_equal(left.Gk, right.Gk)
+    if not result:
+        print(left.path + ".Gk = " + str(left.Gk) + " <> " + right.path + ".Gk = " + str(right.Gk))
+        return result
+
+    result = almost_equal(left.Ik, right.Ik)
+    if not result:
+        print(left.path + ".Ik = " + str(left.Ik) + " <> " + right.path + ".Ik = " + str(right.Ik))
+        return result
+
+
+    return True
 
         
 # 
