@@ -969,3 +969,41 @@ hub. Why?
   Soma, comp[2], comp[3] where comp[3] does not have any ion channels works
   fine. But when I add ion channels, it deviates slightly. I am going to
   accept it and move on with the other cells.
+* <2009-06-09 Tue 23:30> Regular expression 
+  Some useful regular expressions for this particular case:
+
+  To replace all occurrences like:
+
+  comp[ 1] { level[ 1].append() L=  20. diam = 2*  7.5 }
+
+  by the corresponding python statements:
+
+	level[1].append(comp[1])
+	comp[1].length = 20.
+	comp[1].diameter = 2 * 7.5
+
+  use following regexp search:
+
+  comp\[ *\([0-9]+\)\] *{ level\[ *\([0-9]+\)].append() L= *\([0-9]*.[0-9]*\) *diam = 2\* *\([0-9]*.[0-9]*\) *}
+
+  and replace by:
+
+  level[\2].add(comp[\1])
+  comp[\1].length = \3
+  comp[\1].diameter = \4
+
+  Another alternative that reduces typing in the replacement string is:
+
+
+\(comp\[ *[0-9]+\]\) *{ *\(level\[ *[0-9]+\]\)\.append() *L *= *\([0-9]*.[0-9]*\) *diam *= *\(2\* *[0-9]*.[0-9]*\) *}
+  replaced by:
+
+  \2.add(\1)
+  \1.length = \3
+  \1.diameter = \4
+
+  Then select the whole region, replace ]. with ]. (to make the
+  length/diameter/add/ as 3rd field) and select area again use C-u 3 M-x
+  sort-fields. It will separate out the level.add(), comp.length = xyz and
+  comp.diameter = uvw into three separate blocks. Then kill rectangle and yank
+  rectangle will do the trick.
