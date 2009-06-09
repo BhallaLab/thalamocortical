@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # brutespinstell.py --- 
 # 
 # Filename: brutespinstell.py
@@ -6,9 +7,9 @@
 # Maintainer: 
 # Created: Fri May  8 11:24:30 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Jun  9 02:37:36 2009 (+0530)
+# Last-Updated: Tue Jun  9 02:45:41 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 533
+#     Update #: 541
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -191,74 +192,73 @@ class SpinyStellate(moose.Cell):
     def __init__(self, *args):
 	moose.Cell.__init__(self, *args)        
 	comp = []
-        self.num_comp = 3
+        self.num_comp = 59
 	dendrites = set()
 	level = defaultdict(set)
 	self.presyn = 57
-        comp.append(None)        
+        comp.append(None) # First position is kept for matching index with FORTRAN       
 	for ii in range(1, self.num_comp + 1):
 	    comp.append(MyCompartment('comp_' + str(ii), self))
         # Assign levels to the compartments
 	level[ 1].add( comp[ 1]) 
 	level[ 2].add( comp[ 2]) 
 	level[ 3].add( comp[ 3]) 
-# 	level[ 3].add( comp[ 4]) 
-# 	level[ 4].add( comp[ 5]) 
-# 	level[ 4].add( comp[ 6]) 
-# 	level[ 4].add( comp[ 7]) 
-# 	level[ 5].add( comp[ 8]) 
-# 	level[ 5].add( comp[ 9]) 
-# 	level[ 5].add( comp[ 10])
-# 	level[ 6].add( comp[ 11])
-# 	level[ 7].add( comp[ 12])
-# 	level[ 8].add( comp[ 13])
-# 	level[ 9].add( comp[ 14])
-# 	level[ 2].add( comp[ 15])
-# 	level[ 3].add( comp[ 16])
-# 	level[ 3].add( comp[ 17])
-# 	level[ 4].add( comp[ 18])
-# 	level[ 4].add( comp[ 19])
-# 	level[ 4].add( comp[ 20])
-# 	level[ 5].add( comp[ 21])
-# 	level[ 5].add( comp[ 22])
-# 	level[ 5].add( comp[ 23])
-# 	level[ 6].add( comp[ 24])
-# 	level[ 7].add( comp[ 25])
-# 	level[ 8].add( comp[ 26])
-# 	level[ 9].add( comp[ 27])
-# 	level[ 2].add( comp[ 28])
-# 	level[ 3].add( comp[ 29])
-# 	level[ 3].add( comp[ 30])
-# 	level[ 4].add( comp[ 31])
-# 	level[ 4].add( comp[ 32])
-# 	level[ 4].add( comp[ 33])
-# 	level[ 5].add( comp[ 34])
-# 	level[ 5].add( comp[ 35])
-# 	level[ 5].add( comp[ 36])
-# 	level[ 6].add( comp[ 37])
-# 	level[ 7].add( comp[ 38])
-# 	level[ 8].add( comp[ 39])
-# 	level[ 9].add( comp[ 40])
-# 	level[ 2].add( comp[ 41])
-# 	level[ 3].add( comp[ 42])
-# 	level[ 3].add( comp[ 43])
-# 	level[ 4].add( comp[ 44])
-# 	level[ 4].add( comp[ 45])
-# 	level[ 4].add( comp[ 46])
-# 	level[ 5].add( comp[ 47])
-# 	level[ 5].add( comp[ 48])
-# 	level[ 5].add( comp[ 49])
-# 	level[ 6].add( comp[ 50])
-# 	level[ 7].add( comp[ 51])
-# 	level[ 8].add( comp[ 52])
-# 	level[ 9].add( comp[ 53])
-# 	level[ 0].add( comp[ 54])
-# 	level[ 0].add( comp[ 55])
-# 	level[ 0].add( comp[ 56])
-# 	level[ 0].add( comp[ 57])
-# 	level[ 0].add( comp[ 58])
-# 	level[ 0].add( comp[ 59])
-#         level[ 0].add( comp[ 0])
+	level[ 3].add( comp[ 4]) 
+	level[ 4].add( comp[ 5]) 
+	level[ 4].add( comp[ 6]) 
+	level[ 4].add( comp[ 7]) 
+	level[ 5].add( comp[ 8]) 
+	level[ 5].add( comp[ 9]) 
+	level[ 5].add( comp[ 10])
+	level[ 6].add( comp[ 11])
+	level[ 7].add( comp[ 12])
+	level[ 8].add( comp[ 13])
+	level[ 9].add( comp[ 14])
+	level[ 2].add( comp[ 15])
+	level[ 3].add( comp[ 16])
+	level[ 3].add( comp[ 17])
+	level[ 4].add( comp[ 18])
+	level[ 4].add( comp[ 19])
+	level[ 4].add( comp[ 20])
+	level[ 5].add( comp[ 21])
+	level[ 5].add( comp[ 22])
+	level[ 5].add( comp[ 23])
+	level[ 6].add( comp[ 24])
+	level[ 7].add( comp[ 25])
+	level[ 8].add( comp[ 26])
+	level[ 9].add( comp[ 27])
+	level[ 2].add( comp[ 28])
+	level[ 3].add( comp[ 29])
+	level[ 3].add( comp[ 30])
+	level[ 4].add( comp[ 31])
+	level[ 4].add( comp[ 32])
+	level[ 4].add( comp[ 33])
+	level[ 5].add( comp[ 34])
+	level[ 5].add( comp[ 35])
+	level[ 5].add( comp[ 36])
+	level[ 6].add( comp[ 37])
+	level[ 7].add( comp[ 38])
+	level[ 8].add( comp[ 39])
+	level[ 9].add( comp[ 40])
+	level[ 2].add( comp[ 41])
+	level[ 3].add( comp[ 42])
+	level[ 3].add( comp[ 43])
+	level[ 4].add( comp[ 44])
+	level[ 4].add( comp[ 45])
+	level[ 4].add( comp[ 46])
+	level[ 5].add( comp[ 47])
+	level[ 5].add( comp[ 48])
+	level[ 5].add( comp[ 49])
+	level[ 6].add( comp[ 50])
+	level[ 7].add( comp[ 51])
+	level[ 8].add( comp[ 52])
+	level[ 9].add( comp[ 53])
+	level[ 0].add( comp[ 54])
+	level[ 0].add( comp[ 55])
+	level[ 0].add( comp[ 56])
+	level[ 0].add( comp[ 57])
+	level[ 0].add( comp[ 58])
+	level[ 0].add( comp[ 59])
 
 	for key, comp_set in level.items():
             if (key >= 2):
@@ -272,133 +272,133 @@ class SpinyStellate(moose.Cell):
 
     # this is full of cycles - the traubConnect function is intended
     # to avoid the cycles
-# 	comp[1].traubConnect(comp[ 54])
+	comp[1].traubConnect(comp[ 54])
 	comp[1].traubConnect(comp[ 2]) 
-# 	comp[1].traubConnect(comp[ 15])
-# 	comp[1].traubConnect(comp[ 28])
-# 	comp[1].traubConnect(comp[ 41])
+	comp[1].traubConnect(comp[ 15])
+	comp[1].traubConnect(comp[ 28])
+	comp[1].traubConnect(comp[ 41])
 	comp[2].traubConnect(comp[ 3]) 
-# 	comp[2].traubConnect(comp[ 4]) 
-# 	comp[3].traubConnect(comp[ 4]) 
-# 	comp[3].traubConnect(comp[ 5]) 
-# 	comp[3].traubConnect(comp[ 6]) 
-# 	comp[4].traubConnect(comp[ 7]) 
-# 	comp[5].traubConnect(comp[ 6]) 
-# 	comp[5].traubConnect(comp[ 8]) 
-# 	comp[6].traubConnect(comp[ 9]) 
-# 	comp[7].traubConnect(comp[ 10])
-# 	comp[8].traubConnect(comp[ 11])
-# 	comp[11].traubConnect(comp[12])
-# 	comp[12].traubConnect(comp[13])
-# 	comp[13].traubConnect(comp[14])
-# 	comp[15].traubConnect(comp[16])
-# 	comp[15].traubConnect(comp[17])
-# 	comp[16].traubConnect(comp[17])
-# 	comp[16].traubConnect(comp[18])
-# 	comp[16].traubConnect(comp[19])
-# 	comp[17].traubConnect(comp[20])
-# 	comp[18].traubConnect(comp[19])
-# 	comp[18].traubConnect(comp[21])
-# 	comp[19].traubConnect(comp[22])
-# 	comp[20].traubConnect(comp[23])
-# 	comp[21].traubConnect(comp[24])
-# 	comp[24].traubConnect(comp[25])
-# 	comp[25].traubConnect(comp[26])
-# 	comp[26].traubConnect(comp[27])
-# 	comp[28].traubConnect(comp[29])
-# 	comp[28].traubConnect(comp[30])
-# 	comp[29].traubConnect(comp[30])
-# 	comp[29].traubConnect(comp[31])
-# 	comp[29].traubConnect(comp[32])
-# 	comp[30].traubConnect(comp[33])
-# 	comp[31].traubConnect(comp[32])
-# 	comp[31].traubConnect(comp[34])
-# 	comp[32].traubConnect(comp[35])
-# 	comp[33].traubConnect(comp[36])
-# 	comp[34].traubConnect(comp[37])
-# 	comp[37].traubConnect(comp[38])
-# 	comp[38].traubConnect(comp[39])
-# 	comp[39].traubConnect(comp[40])
-# 	comp[41].traubConnect(comp[42])
-# 	comp[41].traubConnect(comp[43])
-# 	comp[42].traubConnect(comp[43])
-# 	comp[42].traubConnect(comp[44])
-# 	comp[42].traubConnect(comp[45])
-# 	comp[43].traubConnect(comp[46])
-# 	comp[44].traubConnect(comp[45])
-# 	comp[44].traubConnect(comp[47])
-# 	comp[45].traubConnect(comp[48])
-# 	comp[46].traubConnect(comp[49])
-# 	comp[47].traubConnect(comp[50])
-# 	comp[50].traubConnect(comp[51])
-# 	comp[51].traubConnect(comp[52])
-# 	comp[52].traubConnect(comp[53])
-# 	comp[54].traubConnect(comp[55])
-# 	comp[55].traubConnect(comp[56])
-# 	comp[55].traubConnect(comp[58])
-# 	comp[56].traubConnect(comp[57])
-# 	comp[56].traubConnect(comp[58])
-# 	comp[58].traubConnect(comp[59])
+	comp[2].traubConnect(comp[ 4]) 
+	comp[3].traubConnect(comp[ 4]) 
+	comp[3].traubConnect(comp[ 5]) 
+	comp[3].traubConnect(comp[ 6]) 
+	comp[4].traubConnect(comp[ 7]) 
+	comp[5].traubConnect(comp[ 6]) 
+	comp[5].traubConnect(comp[ 8]) 
+	comp[6].traubConnect(comp[ 9]) 
+	comp[7].traubConnect(comp[ 10])
+	comp[8].traubConnect(comp[ 11])
+	comp[11].traubConnect(comp[12])
+	comp[12].traubConnect(comp[13])
+	comp[13].traubConnect(comp[14])
+	comp[15].traubConnect(comp[16])
+	comp[15].traubConnect(comp[17])
+	comp[16].traubConnect(comp[17])
+	comp[16].traubConnect(comp[18])
+	comp[16].traubConnect(comp[19])
+	comp[17].traubConnect(comp[20])
+	comp[18].traubConnect(comp[19])
+	comp[18].traubConnect(comp[21])
+	comp[19].traubConnect(comp[22])
+	comp[20].traubConnect(comp[23])
+	comp[21].traubConnect(comp[24])
+	comp[24].traubConnect(comp[25])
+	comp[25].traubConnect(comp[26])
+	comp[26].traubConnect(comp[27])
+	comp[28].traubConnect(comp[29])
+	comp[28].traubConnect(comp[30])
+	comp[29].traubConnect(comp[30])
+	comp[29].traubConnect(comp[31])
+	comp[29].traubConnect(comp[32])
+	comp[30].traubConnect(comp[33])
+	comp[31].traubConnect(comp[32])
+	comp[31].traubConnect(comp[34])
+	comp[32].traubConnect(comp[35])
+	comp[33].traubConnect(comp[36])
+	comp[34].traubConnect(comp[37])
+	comp[37].traubConnect(comp[38])
+	comp[38].traubConnect(comp[39])
+	comp[39].traubConnect(comp[40])
+	comp[41].traubConnect(comp[42])
+	comp[41].traubConnect(comp[43])
+	comp[42].traubConnect(comp[43])
+	comp[42].traubConnect(comp[44])
+	comp[42].traubConnect(comp[45])
+	comp[43].traubConnect(comp[46])
+	comp[44].traubConnect(comp[45])
+	comp[44].traubConnect(comp[47])
+	comp[45].traubConnect(comp[48])
+	comp[46].traubConnect(comp[49])
+	comp[47].traubConnect(comp[50])
+	comp[50].traubConnect(comp[51])
+	comp[51].traubConnect(comp[52])
+	comp[52].traubConnect(comp[53])
+	comp[54].traubConnect(comp[55])
+	comp[55].traubConnect(comp[56])
+	comp[55].traubConnect(comp[58])
+	comp[56].traubConnect(comp[57])
+	comp[56].traubConnect(comp[58])
+	comp[58].traubConnect(comp[59])
 
 	comp[ 1].diameter = 2e-6 * 7.5 
 	comp[ 2].diameter = 2e-6 * 1.06 
 	comp[ 3].diameter = 2e-6 * 0.666666667 
-# 	comp[ 4].diameter = 2e-6 * 0.666666667 
-# 	comp[ 5].diameter = 2e-6 * 0.418972332 
-# 	comp[ 6].diameter = 2e-6 * 0.418972332 
-# 	comp[ 7].diameter = 2e-6 * 0.666666667 
-# 	comp[ 8].diameter = 2e-6 * 0.418972332 
-# 	comp[ 9].diameter = 2e-6 * 0.418972332 
-# 	comp[ 10].diameter = 2e-6 * 0.666666667 
-# 	comp[ 11].diameter = 2e-6 * 0.418972332 
-# 	comp[ 12].diameter = 2e-6 * 0.418972332 
-# 	comp[ 13].diameter = 2e-6 * 0.418972332 
-# 	comp[ 14].diameter = 2e-6 * 0.418972332 
-# 	comp[ 15].diameter = 2e-6 * 1.06 
-# 	comp[ 16].diameter = 2e-6 * 0.666666667 
-# 	comp[ 17].diameter = 2e-6 * 0.666666667 
-# 	comp[ 18].diameter = 2e-6 * 0.418972332 
-# 	comp[ 19].diameter = 2e-6 * 0.418972332 
-# 	comp[ 20].diameter = 2e-6 * 0.666666667 
-# 	comp[ 21].diameter = 2e-6 * 0.418972332 
-# 	comp[ 22].diameter = 2e-6 * 0.418972332 
-# 	comp[ 23].diameter = 2e-6 * 0.666666667 
-# 	comp[ 24].diameter = 2e-6 * 0.418972332 
-# 	comp[ 25].diameter = 2e-6 * 0.418972332 
-# 	comp[ 26].diameter = 2e-6 * 0.418972332 
-# 	comp[ 27].diameter = 2e-6 * 0.418972332 
-# 	comp[ 28].diameter = 2e-6 * 1.06 
-# 	comp[ 29].diameter = 2e-6 * 0.666666667 
-# 	comp[ 30].diameter = 2e-6 * 0.666666667 
-# 	comp[ 31].diameter = 2e-6 * 0.418972332 
-# 	comp[ 32].diameter = 2e-6 * 0.418972332 
-# 	comp[ 33].diameter = 2e-6 * 0.666666667 
-# 	comp[ 34].diameter = 2e-6 * 0.418972332 
-# 	comp[ 35].diameter = 2e-6 * 0.418972332 
-# 	comp[ 36].diameter = 2e-6 * 0.666666667 
-# 	comp[ 37].diameter = 2e-6 * 0.418972332 
-# 	comp[ 38].diameter = 2e-6 * 0.418972332 
-# 	comp[ 39].diameter = 2e-6 * 0.418972332 
-# 	comp[ 40].diameter = 2e-6 * 0.418972332 
-# 	comp[ 41].diameter = 2e-6 * 1.06 
-# 	comp[ 42].diameter = 2e-6 * 0.666666667 
-# 	comp[ 43].diameter = 2e-6 * 0.666666667 
-# 	comp[ 44].diameter = 2e-6 * 0.418972332 
-# 	comp[ 45].diameter = 2e-6 * 0.418972332 
-# 	comp[ 46].diameter = 2e-6 * 0.666666667 
-# 	comp[ 47].diameter = 2e-6 * 0.418972332 
-# 	comp[ 48].diameter = 2e-6 * 0.418972332 
-# 	comp[ 49].diameter = 2e-6 * 0.666666667 
-# 	comp[ 50].diameter = 2e-6 * 0.418972332 
-# 	comp[ 51].diameter = 2e-6 * 0.418972332 
-# 	comp[ 52].diameter = 2e-6 * 0.418972332 
-# 	comp[ 53].diameter = 2e-6 * 0.418972332 
-# 	comp[ 54].diameter = 2e-6 * 0.7 
-# 	comp[ 55].diameter = 2e-6 * 0.6 
-# 	comp[ 56].diameter = 2e-6 * 0.5 
-# 	comp[ 57].diameter = 2e-6 * 0.5 
-# 	comp[ 58].diameter = 2e-6 * 0.5 
-# 	comp[ 59].diameter = 2e-6 * 0.5 
+	comp[ 4].diameter = 2e-6 * 0.666666667 
+	comp[ 5].diameter = 2e-6 * 0.418972332 
+	comp[ 6].diameter = 2e-6 * 0.418972332 
+	comp[ 7].diameter = 2e-6 * 0.666666667 
+	comp[ 8].diameter = 2e-6 * 0.418972332 
+	comp[ 9].diameter = 2e-6 * 0.418972332 
+	comp[ 10].diameter = 2e-6 * 0.666666667 
+	comp[ 11].diameter = 2e-6 * 0.418972332 
+	comp[ 12].diameter = 2e-6 * 0.418972332 
+	comp[ 13].diameter = 2e-6 * 0.418972332 
+	comp[ 14].diameter = 2e-6 * 0.418972332 
+	comp[ 15].diameter = 2e-6 * 1.06 
+	comp[ 16].diameter = 2e-6 * 0.666666667 
+	comp[ 17].diameter = 2e-6 * 0.666666667 
+	comp[ 18].diameter = 2e-6 * 0.418972332 
+	comp[ 19].diameter = 2e-6 * 0.418972332 
+	comp[ 20].diameter = 2e-6 * 0.666666667 
+	comp[ 21].diameter = 2e-6 * 0.418972332 
+	comp[ 22].diameter = 2e-6 * 0.418972332 
+	comp[ 23].diameter = 2e-6 * 0.666666667 
+	comp[ 24].diameter = 2e-6 * 0.418972332 
+	comp[ 25].diameter = 2e-6 * 0.418972332 
+	comp[ 26].diameter = 2e-6 * 0.418972332 
+	comp[ 27].diameter = 2e-6 * 0.418972332 
+	comp[ 28].diameter = 2e-6 * 1.06 
+	comp[ 29].diameter = 2e-6 * 0.666666667 
+	comp[ 30].diameter = 2e-6 * 0.666666667 
+	comp[ 31].diameter = 2e-6 * 0.418972332 
+	comp[ 32].diameter = 2e-6 * 0.418972332 
+	comp[ 33].diameter = 2e-6 * 0.666666667 
+	comp[ 34].diameter = 2e-6 * 0.418972332 
+	comp[ 35].diameter = 2e-6 * 0.418972332 
+	comp[ 36].diameter = 2e-6 * 0.666666667 
+	comp[ 37].diameter = 2e-6 * 0.418972332 
+	comp[ 38].diameter = 2e-6 * 0.418972332 
+	comp[ 39].diameter = 2e-6 * 0.418972332 
+	comp[ 40].diameter = 2e-6 * 0.418972332 
+	comp[ 41].diameter = 2e-6 * 1.06 
+	comp[ 42].diameter = 2e-6 * 0.666666667 
+	comp[ 43].diameter = 2e-6 * 0.666666667 
+	comp[ 44].diameter = 2e-6 * 0.418972332 
+	comp[ 45].diameter = 2e-6 * 0.418972332 
+	comp[ 46].diameter = 2e-6 * 0.666666667 
+	comp[ 47].diameter = 2e-6 * 0.418972332 
+	comp[ 48].diameter = 2e-6 * 0.418972332 
+	comp[ 49].diameter = 2e-6 * 0.666666667 
+	comp[ 50].diameter = 2e-6 * 0.418972332 
+	comp[ 51].diameter = 2e-6 * 0.418972332 
+	comp[ 52].diameter = 2e-6 * 0.418972332 
+	comp[ 53].diameter = 2e-6 * 0.418972332 
+	comp[ 54].diameter = 2e-6 * 0.7 
+	comp[ 55].diameter = 2e-6 * 0.6 
+	comp[ 56].diameter = 2e-6 * 0.5 
+	comp[ 57].diameter = 2e-6 * 0.5 
+	comp[ 58].diameter = 2e-6 * 0.5 
+	comp[ 59].diameter = 2e-6 * 0.5 
 
         # Set the compartment length
 	self.soma.length = 20e-6 
@@ -406,7 +406,7 @@ class SpinyStellate(moose.Cell):
             cc.length = 40e-6
         for cc in self.axon:
             cc.length = 50e-6
-#         comp[0].length = 50e-6
+
 	
 
 	
