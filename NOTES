@@ -1007,3 +1007,7 @@ hub. Why?
   sort-fields. It will separate out the level.add(), comp.length = xyz and
   comp.diameter = uvw into three separate blocks. Then kill rectangle and yank
   rectangle will do the trick.
+* <2009-06-29 Mon 16:12> Restarting 
+  - there was a break of a couple of weeks since TCM (15 June
+    2009). Restarting this work.
+
