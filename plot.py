@@ -67,8 +67,8 @@ mus_t = pylab.linspace(0, len(mus_Vm) * 1e-2, len(mus_Vm))
 #     nrn_t = nrn_data[:, 0]
 #     nrn_Vm = nrn_data[:, 1]
 #     pylab.title("Vm_comp_" + str(ii))
-#     pylab.plot(nrn_t, nrn_Vm, 'r-', label='nrn_Vm')
-#     pylab.plot(mus_t, mus_Vm, 'g-', label='mus_Vm')
+#     pylab.plot(nrn_t, nrn_Vm, 'r_', label='nrn_Vm')
+#     pylab.plot(mus_t, mus_Vm, 'g.-', label='mus_Vm')
 #     pylab.legend()
 #     pylab.show()
 
@@ -89,7 +89,7 @@ mus_t = pylab.linspace(0, len(mus_Vm) * 1e-2, len(mus_Vm))
 
 # pylab.subplot(2, 1, 1)
 pylab.plot(nrn_t, nrn_Vm, 'r-', label='nrn_Vm')
-pylab.plot(mus_t, mus_Vm, 'g-', label='mus_Vm')
+pylab.plot(mus_t, mus_Vm, 'g--', label='mus_Vm')
 pylab.legend()
 # pylab.subplot(2,1,2)
 # pylab.plot(nrn_t, nrn_Ca, label='nrn')
