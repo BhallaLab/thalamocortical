@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed May 13 11:28:02 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Jun 10 00:34:29 2009 (+0530)
+# Last-Updated: Mon Jun 29 16:24:35 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 44
+#     Update #: 70
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -41,8 +41,8 @@ class TCR(moose.Cell):
     conductance = {
         0: {
             'NaF_TCR':   0.4,
-            'KDR':   0.4,
-            'KA':   0.001,
+            'KDR':   0.4 * 0.45,
+            'KA':   0.001 * 0.2,
             'K2':   0.0005,
             },
         1: {
@@ -50,10 +50,10 @@ class TCR(moose.Cell):
             'NaPF_TCR':   0.0002,
             'KDR':   0.075,
             'KC':   0.012,
-            'KA':   0.03,
+            'KA':   0.03 * 0.2,
             'KM':   0.0005,
             'K2':   0.002,
-            'KAHP_SLOWER':   5.'E'-05,
+            'KAHP_SLOWER':   5E-05,
             'CaL':   0.0005,
             'CaT':   0.0005,
             'AR':   0.00025,
@@ -61,66 +61,67 @@ class TCR(moose.Cell):
         2: {
             'NaF_TCR':   0.1,
             'NaPF_TCR':   0.0002,
-            'KDR':   0.05,
+            'KDR':   0.05 * 0.45,
             'KC':   0.012,
-            'KA':   0.03,
+            'KA':   0.03 * 0.2,
             'KM':   0.0005,
             'K2':   0.002,
-            'KAHP_SLOWER':   5.'E'-05,
+            'KAHP_SLOWER':   5E-05,
             'CaL':   0.0005,
             'CaT':   0.005,
             'AR':   0.0005,
             },
         3: {
             'NaF_TCR':   0.005,
-            'NaPF_TCR':   1.'E'-05,
+            'NaPF_TCR':   1e-05,
             'KC':   0.02,
-            'KA':   0.001,
+            'KA':   0.001 * 0.2,
             'KM':   0.0005,
             'K2':   0.002,
-            'KAHP_SLOWER':   5.'E'-05,
+            'KAHP_SLOWER':   5E-05,
             'CaL':   0.00025,
             'CaT':   0.003,
             'AR':   0.0003,
             },
         4: {
             'NaF_TCR':   0.005,
-            'NaPF_TCR':   1.'E'-05,
+            'NaPF_TCR':   1e-05,
             'KC':   0.02,
-            'KA':   0.001,
+            'KA':   0.001 * 0.2,
             'KM':   0.0005,
             'K2':   0.002,
-            'KAHP_SLOWER':   5.'E'-05,
-            'CaLm':   0.00025,
+            'KAHP_SLOWER':   5E-05,
+            'CaL':   0.00025,
             'CaT':   0.0005,
             'AR':   0.0003,
             }
         }
 
-       channels = ['AR',
-                   'CaL',
-                   'CaT',
-                   'K2',
-                   'KA',
-                   'KAHP_SLOWER',
-                   'KC',
-                   'KDR',
-                   'KM',
-                   'NaF_TCR',
-                   'NaPF_TCR']
-
-       channel_lib = {}
-       channel_lib['AR'
-       channel_lib['CaL'
-       channel_lib['CaT'
-       channel_lib['K2'
-       channel_lib['KA'
-       channel_lib['KAHP_SLOWER'
-       channel_lib['KC'
-       channel_lib['KDR'
-       channel_lib['KM'
-       channel_lib['NaF_TCR'
-       channel_lib['NaPF_TCR'        
+    channels = ['AR',
+                'CaL',
+                'CaT',
+                'K2',
+                'KA',
+                'KAHP_SLOWER',
+                'KC',
+                'KDR',
+                'KM',
+                'NaF_TCR',
+                'NaPF_TCR']
+    
+    channel_lib = {}
+    channel_lib['AR'] = AR('AR', config.lib)
+    channel_lib['CaL'] = CaL('CaL', config.lib)
+    channel_lib['CaT'] = CaT('CaT', config.lib)
+    channel_lib['K2'] = K2('K2', config.lib)
+    channel_lib['KA'] = KA('KA', config.lib)
+    channel_lib['KAHP_SLOWER'] = KAHP_SLOWER('KAHP_SLOWER', config.lib)
+    channel_lib['KC'] = KC('KC', config.lib)
+    channel_lib['KDR'] = KDR('KDR', config.lib)
+    channel_lib['KM'] = KM('KM', config.lib)
+    channel_lib['NaF_TCR'] = NaF_TCR('NaF_TCR', config.lib)
+    channel_lib['NaPF_TCR'] = NaPF_TCR('NaPF_TCR', config.lib)
+    
     def __init__(self, *args):
 	moose.Cell.__init__(self, *args)
 	self.comp = [None]
@@ -769,6 +770,41 @@ class TCR(moose.Cell):
 	comp[ 135].length = 50. * 1e-6
 	comp[ 136].length = 50. * 1e-6
 	comp[ 137].length = 50. * 1e-6
+
+        t1 = datetime.now()
+	    
+	for ii, comp_set in level.items():
+	    conductances = TCR.conductance[ii]
+	    for compartment in comp_set:
+                compartment.Em = TCR.Em
+                compartment.initVm = TCR.Em
+                compartment.setSpecificCm(9e-3)
+		for channel_name, density in conductances.items():
+                    proto = self.channel_lib[channel_name]
+       		    channel = moose.HHChannel(proto, channel_name, compartment)
+                    if isinstance(proto, NaChannel):
+                        channel.Ek = TCR.ENa
+                    elif isinstance(proto, KChannel):
+                        channel.Ek = TCR.EK
+                    elif isinstance(proto, CaChannel):
+                        channel.Ek = TCR.ECa
+                    elif isinstance(proto, AR):
+                        channel.Ek = TCR.EAR
+                    else:
+                        print 'ERROR: unknown channel type.'
+                    if isinstance(proto, KC):
+                        channel.Z = 0.0
+                    else:
+                        channel.X = 0.0
+		    compartment.insertChannel(channel, specificGbar=density * 1e4) # convert density to SI
+        for tmp_cmp in self.dendrites:
+            tmp_cmp.setSpecificRm() # TODO:
+            tmp_cmp.setSpecificRa() # TODO:
+        # TODO : spineareamultiplier
+        t2 = datetime.now()
+        delta = t2 - t1
+        print 'insert channels: ', delta.seconds + 1e-6 * delta.microseconds
+
 
 
 # 

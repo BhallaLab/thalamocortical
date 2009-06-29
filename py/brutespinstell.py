@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri May  8 11:24:30 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Jun  9 02:45:41 2009 (+0530)
+# Last-Updated: Mon Jun 15 02:35:54 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 541
+#     Update #: 543
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -488,7 +488,7 @@ if __name__ == '__main__':
     s = SpinyStellate('cell', sim.model)
     vm_table = s.comp[2].insertRecorder('Vm_ss', 'Vm', sim.data)
     
-    pulsegen = s.comp[2].insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=20e-3, firstWidth=100e-3)
+    pulsegen = s.comp[2].insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=0.0, firstWidth=100e-3)
     twocomp_cell = test_twocomp(sim)
     soma1 = moose.Compartment(twocomp_cell.path + '/soma')
     dend1 = moose.Compartment(twocomp_cell.path + '/dend')
