@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Jun  5 14:29:05 2009 (+0530)
+# Last-Updated: Mon Jun 29 18:10:42 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 157
+#     Update #: 158
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -271,6 +271,16 @@ def compare_channel(left, right):
 
     return True
 
+
+def has_cycle(comp):
+    comp._visited = True
+    ret = False
+    for item in comp.raxial_list:
+        if hasattr(item, '_visited') and item._visited:
+            print 'Cycle between: ', comp.path, 'and', item.path
+            return True
+        ret = ret or has_cycle(item)
+    return ret
         
 # 
 # compartment.py ends here

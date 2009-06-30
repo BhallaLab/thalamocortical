@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed May 13 11:28:02 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Jun 29 16:24:35 2009 (+0530)
+# Last-Updated: Tue Jun 30 13:48:16 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 70
+#     Update #: 126
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -27,8 +27,15 @@
 # 
 
 # Code:
-
+from collections import deque, defaultdict
+from datetime import datetime
 import moose
+
+from kchans import *
+from nachans import *
+from cachans import *
+from capool import *
+from archan import *
 
 from compartment import *
 
@@ -41,14 +48,14 @@ class TCR(moose.Cell):
     conductance = {
         0: {
             'NaF_TCR':   0.4,
-            'KDR':   0.4 * 0.45,
+            'KDR':   0.4 * 0.45, # Axon g_KDR is modified this way in NEURON code
             'KA':   0.001 * 0.2,
             'K2':   0.0005,
             },
         1: {
             'NaF_TCR':   0.1,
             'NaPF_TCR':   0.0002,
-            'KDR':   0.075,
+            'KDR':   0.075 * 0.45, # Soma g_KDR is modified this way in NEURON code
             'KC':   0.012,
             'KA':   0.03 * 0.2,
             'KM':   0.0005,
@@ -61,7 +68,7 @@ class TCR(moose.Cell):
         2: {
             'NaF_TCR':   0.1,
             'NaPF_TCR':   0.0002,
-            'KDR':   0.05 * 0.45,
+            'KDR':   0.05 * 0.45, # Level2 (primary dendrites) alaso has modified KDR
             'KC':   0.012,
             'KA':   0.03 * 0.2,
             'KM':   0.0005,
@@ -128,8 +135,13 @@ class TCR(moose.Cell):
 	self.num_comp = 137
         level = defaultdict(set)
         self.level = level
+        dendrites = set()
+        self.dendrites = dendrites
 	for ii in range(1, self.num_comp + 1):
 	    self.comp.append(MyCompartment('comp_' + str(ii), self))
+        self.presyn = 135
+        comp = self.comp
+        self.soma = comp[1]
 	self.comp[1].traubConnect(self.comp[132])
 	self.comp[1].traubConnect(self.comp[2])
 	self.comp[1].traubConnect(self.comp[15])
@@ -770,15 +782,22 @@ class TCR(moose.Cell):
 	comp[ 135].length = 50. * 1e-6
 	comp[ 136].length = 50. * 1e-6
 	comp[ 137].length = 50. * 1e-6
+        
+        for i in range(2, len(level)):
+            dendrites |= level[i]
 
+        self.axon = []
+        for tmp_cmp in level[0]:
+            self.axon.append(tmp_cmp)
+        
         t1 = datetime.now()
-	    
+
+        spine_area_mult = 2.0    
 	for ii, comp_set in level.items():
 	    conductances = TCR.conductance[ii]
 	    for compartment in comp_set:
                 compartment.Em = TCR.Em
                 compartment.initVm = TCR.Em
-                compartment.setSpecificCm(9e-3)
 		for channel_name, density in conductances.items():
                     proto = self.channel_lib[channel_name]
        		    channel = moose.HHChannel(proto, channel_name, compartment)
@@ -798,14 +817,58 @@ class TCR(moose.Cell):
                         channel.X = 0.0
 		    compartment.insertChannel(channel, specificGbar=density * 1e4) # convert density to SI
         for tmp_cmp in self.dendrites:
-            tmp_cmp.setSpecificRm() # TODO:
-            tmp_cmp.setSpecificRa() # TODO:
-        # TODO : spineareamultiplier
+            tmp_cmp.setSpecificRm(1/(3.78787879 * spine_area_mult))
+            tmp_cmp.setSpecificRa(1.75)
+            tmp_cmp.setSpecificCm(9e-3 * spine_area_mult)
+            tmp_cmp.insertCaPool(5.2e4, 20e-3)
+            for channel in tmp_cmp.channels:
+                channel.Gbar *= spine_area_mult
+
+        comp[1].setSpecificRm(1/3.78787879)
+        comp[1].setSpecificRa(1.75)
+        comp[1].setSpecificCm(9e-3)
+        comp[1].insertCaPool(5.2e4 * 2, 50e-3)
+
+	for compartment in self.axon:
+	    compartment.setSpecificRm(0.1)
+	    compartment.setSpecificRa(1.0)
+            compartment.setSpecificCm(9e-3)
+
         t2 = datetime.now()
         delta = t2 - t1
         print 'insert channels: ', delta.seconds + 1e-6 * delta.microseconds
 
 
+
+import pylab
+from simulation import Simulation
+import pymoose
+
+if __name__ == '__main__':
+    sim = Simulation()
+    s = TCR('cell', sim.model)
+    vm_table = s.comp[s.presyn].insertRecorder('Vm_tcr', 'Vm', sim.data)
+    
+    pulsegen = s.comp[1].insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=0.0, firstWidth=100e-3)
+    sim.schedule()
+    if has_cycle(s.soma):
+        print "WARNING!! CYCLE PRESENT IN CICRUIT."
+    t1 = datetime.now()
+    sim.run(100e-3)
+    t2 = datetime.now()
+    delta = t2 - t1
+    print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
+    sim.dump_data('data')
+#     dump_cell(s, 'brutess.txt')
+    nrn_data = pylab.loadtxt('../nrn/mydata/Vm_tcr.plot')
+    nrn_vm = nrn_data[:, 1]
+    nrn_t = nrn_data[:, 0]
+    mus_vm = pylab.array(vm_table) * 1e3 # convert Neuron unit - mV
+    mus_t = pylab.linspace(0, sim.simtime * 1e3, len(vm_table)) # convert simtime to neuron unit - ms
+    pylab.plot(mus_t, mus_vm, 'r-', label='mus')
+    pylab.plot(nrn_t, nrn_vm, 'g-', label='nrn')
+    pylab.legend()
+    pylab.show()
 
 # 
 # tcr.py ends here

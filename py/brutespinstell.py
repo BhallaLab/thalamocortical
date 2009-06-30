@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri May  8 11:24:30 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Jun 15 02:35:54 2009 (+0530)
+# Last-Updated: Tue Jun 30 14:36:50 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 543
+#     Update #: 547
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -481,7 +481,6 @@ def dump_cell(cell, filename):
 import pylab
 from simulation import Simulation
 import pymoose
-from test_twocomp import test_twocomp
 
 if __name__ == '__main__':
     sim = Simulation()
@@ -489,11 +488,7 @@ if __name__ == '__main__':
     vm_table = s.comp[2].insertRecorder('Vm_ss', 'Vm', sim.data)
     
     pulsegen = s.comp[2].insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=0.0, firstWidth=100e-3)
-    twocomp_cell = test_twocomp(sim)
-    soma1 = moose.Compartment(twocomp_cell.path + '/soma')
-    dend1 = moose.Compartment(twocomp_cell.path + '/dend')
-    print 'somas are equal:', compare_compartment(s.soma, soma1)
-    print 'dends are equal:', compare_compartment(s.comp[2], dend1)
+    
     sim.schedule()
     if has_cycle(s.soma):
         print "WARNING!! CYCLE PRESENT IN CICRUIT."
@@ -514,12 +509,12 @@ if __name__ == '__main__':
 #     nrn_data = pylab.loadtxt('../nrn/mydata/Vm_ss.plot')
 #     nrn_vm = nrn_data[:, 1]
 #     nrn_t = nrn_data[:, 0]
-#     mus_vm = pylab.array(vm_table) * 1e3 # convert Neuron unit - mV
-#     mus_t = pylab.linspace(0, sim.simtime * 1e3, len(vm_table)) # convert simtime to neuron unit - ms
-#     pylab.plot(mus_t, mus_vm, 'r-', label='mus')
+    mus_vm = pylab.array(vm_table) * 1e3 # convert Neuron unit - mV
+    mus_t = pylab.linspace(0, sim.simtime * 1e3, len(vm_table)) # convert simtime to neuron unit - ms
+    pylab.plot(mus_t, mus_vm, 'r-', label='mus')
 #     pylab.plot(nrn_t, nrn_vm, 'g-', label='nrn')
-#     pylab.legend()
-#     pylab.show()
+    pylab.legend()
+    pylab.show()
 
 # 
 # brutespinstell.py ends here
