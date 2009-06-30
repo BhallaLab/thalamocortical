@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri May  8 11:24:30 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Jun 30 14:36:50 2009 (+0530)
+# Last-Updated: Tue Jun 30 14:42:35 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 547
+#     Update #: 549
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -485,9 +485,9 @@ import pymoose
 if __name__ == '__main__':
     sim = Simulation()
     s = SpinyStellate('cell', sim.model)
-    vm_table = s.comp[2].insertRecorder('Vm_ss', 'Vm', sim.data)
+    vm_table = s.comp[s.presyn].insertRecorder('Vm_ss', 'Vm', sim.data)
     
-    pulsegen = s.comp[2].insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=0.0, firstWidth=100e-3)
+    pulsegen = s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=0.0, firstWidth=100e-3)
     
     sim.schedule()
     if has_cycle(s.soma):
