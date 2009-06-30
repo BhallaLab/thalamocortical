@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:13 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Jun  1 22:06:55 2009 (+0530)
+# Last-Updated: Tue Jun 30 13:41:59 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 118
+#     Update #: 120
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -169,9 +169,8 @@ class NaF_TCR(NaChannel):
         shift_hnaf = -7e-3
         v = linspace(config.vmin, config.vmax, config.ndivs + 1) 
         tau_h = 1.0e-3 * (0.15 + 1.15 / ( 1.0 + exp(( v + 37.0e-3) / 15.0e-3)))        
-        v = v + shift_hnaf
-        h_inf = 1.0 / (1.0 + exp((v + 62.9e-3) / 10.7e-3))
-        v = v - shift_hnaf + shift_mnaf
+        h_inf = 1.0 / (1.0 + exp((v + shift_hnaf + 62.9e-3) / 10.7e-3))
+        v = v + shift_mnaf
         tau_m = where(v < -30e-3, \
                           1.0e-3 * (0.025 + 0.14 * exp((v + 30.0e-3) / 10.0e-3)), \
                           1.0e-3 * (0.02 + 0.145 * exp(( - v - 30.0e-3) / 10.0e-3)))

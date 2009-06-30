@@ -6,13 +6,13 @@
 # Maintainer: 
 # Created: Wed Apr 29 10:24:37 2009 (+0530)
 # Version: 
-# Last-Updated: Thu May 21 12:39:21 2009 (+0530)
+# Last-Updated: Tue Jun 30 14:35:38 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 572
+#     Update #: 573
 # URL: 
 # Keywords: 
 # Compatibility: 
-# 
+# **************** THIS IS DEPRECATED BY brutespinstell.py *******************
 # 
 
 # Commentary: 
