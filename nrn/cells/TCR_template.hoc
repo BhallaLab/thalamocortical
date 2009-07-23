@@ -1030,6 +1030,7 @@ func type() {return       12 }
  forsec Axon {
     g_pas =   0.001
     Ra =   100.
+//    print "Rm =", 1 / (g_pas * L * diam * PI * 1e-8), "diam =", diam*1e-6, "len =", L*1e-6
  }
  ceiling_cad = 1e6 //  nearly unlimited Ca concentration
  // print "made it to end of initialization from SCORTMAJ_FRB()"
@@ -1040,6 +1041,7 @@ func type() {return       12 }
  // only multiplying all dend. max conductances by two
  // (the area is doubled but the volume is const.)
  proc double_dend_cond() {
+     print "double_dend_cond() ..."
    spine_area_multiplier = 2
    forsec Dendrites {
         if (ismembrane("napf_tcr")) { gbar_napf_tcr *= spine_area_multiplier }
@@ -1064,6 +1066,7 @@ func type() {return       12 }
         if (ismembrane("ar")) { gbar_ar *= spine_area_multiplier }
         if (ismembrane("pas")) { g_pas *= spine_area_multiplier }
         cm = cm * spine_area_multiplier
+	printf("cm = %g", cm)
    }
  }
  // double_dend_cond()  // run for cells w/ spines
@@ -1233,10 +1236,11 @@ func type() {return       12 }
  
  // is not an artificial cell:
       func is_art() { return 0 }
- 
- 
- 
-         proc more_adjustments() {
+      
+      
+      
+      proc more_adjustments() {
+	  print "more_adjustments() ..."
  forsec all {
     // global reversal potentials
     ek =  -95.

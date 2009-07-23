@@ -37,7 +37,7 @@ proc traub_connect() {local x, ip, ic  localobj child
 	}
 	// standard NEURON connection only if child not already connected
 	if (!child.has_parent) {
-	    printf("Connecting %d to %d at %f\n", ip, ic, x)
+	    // printf("Connecting %d to %d at %f\n", ip, ic, x)
 		$o1.comp[ip] connect child.sec(0), x
 		traub_parent.x[ic] = ip
 	}
