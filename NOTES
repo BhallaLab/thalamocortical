@@ -1013,3 +1013,11 @@ hub. Why?
 * <2009-07-16 Thu 23:57> Another restart
   Drifted away by MOOSE release and optogenetics course - another trial .. now
   I seriously doubt the fate of this project.
+* <2009-07-23 Thu 23:46> TCR - automate comparison
+  Now I finally managed to put together some code for automatically dumping
+  the cell parameters and comparing them. Code for dumping teh parameters in
+  neuron is in hoc/utility.hoc and that for TCR cell in pymoose is in tcr.py
+  (dump_cell). The comparison program is compare.py. Parameterwise I am
+  getting an exact match to 1e-3 error, but plots are very diffrent. Could be
+  due to stimulation difference. Also, I should check the same code against
+  spinystellate to verify that the code indeed works.
