@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed May 13 11:28:02 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Jul 23 23:05:49 2009 (+0530)
+# Last-Updated: Thu Jul 23 23:35:04 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 229
+#     Update #: 230
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -901,6 +901,7 @@ class TCR(moose.Cell):
                     dump_file.write(',0.0,0.0')
                 else:
                     dump_file.write(',%g,%g' % (channel.Ek, channel.Gbar))
+            dump_file.write('\n')
 
 import pylab
 from simulation import Simulation
