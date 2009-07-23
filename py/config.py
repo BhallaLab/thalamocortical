@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Jun  1 20:43:49 2009 (+0530)
+# Last-Updated: Thu Jul 23 22:40:57 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 20
+#     Update #: 22
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -58,7 +58,7 @@ vmin = -120e-3
 vmax = 40e-3
 ndivs = 640
 dv = (vmax - vmin) / ndivs
-
+channel_name_list = ['AR','CaPool','CaL','CaT','CaT_A','K2','KA','KA_IB','KAHP','KAHP_DEEPPYR','KAHP_SLOWER','KC','KC_FAST','KDR','KDR_FS','KM','NaF','NaF2','NaF_TCR','NaP','NaPF','NaPF_SS','NaPF_TCR']
 
 # 
 # config.py ends here
