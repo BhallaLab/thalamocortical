@@ -1021,3 +1021,11 @@ hub. Why?
   getting an exact match to 1e-3 error, but plots are very diffrent. Could be
   due to stimulation difference. Also, I should check the same code against
   spinystellate to verify that the code indeed works.
+* <2009-07-24 Fri 14:29> TCR - some match finally
+  My comparison code yesterday had epsilon=1e3 instead of 1e-3 - hence
+  everything was matching. After correcting that today, I took spinystellate
+  as the model and scaled all parameters so that spinystellate cells
+  match. Then comparison code showed that I was making a mistake of one
+  decimal place for Ca2+ B. After correcting this, the two are pretty
+  close. But funny thing is that the neuron gui shows several spikes whereas
+  my version shows only two spikes.

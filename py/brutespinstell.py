@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri May  8 11:24:30 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Jun 30 14:42:35 2009 (+0530)
+# Last-Updated: Fri Jul 24 10:48:36 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 549
+#     Update #: 554
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -32,8 +32,7 @@
 
 from collections import deque, defaultdict
 from datetime import datetime
-import moose
-
+import cell
 from kchans import *
 from nachans import *
 from cachans import *
@@ -42,7 +41,7 @@ from archan import *
 
 from compartment import *
 
-class SpinyStellate(moose.Cell):
+class SpinyStellate(cell.TraubCell):
     ENa = 50e-3
     EK = -100e-3
     ECa = 125e-3
@@ -500,7 +499,7 @@ if __name__ == '__main__':
     delta = t2 - t1
     print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
     sim.dump_data('data')
-    dump_cell(s, 'brutess.txt')
+    s.dump_cell('spinstell.txt')
     print 'soma:', 'Ra =', s.soma.Ra, 'Rm =', s.soma.Rm, 'Cm =', s.soma.Cm, 'Em =', s.soma.Em, 'initVm =', s.soma.initVm
     print 'dend:', 'Ra =', s.comp[2].Ra, 'Rm =', s.comp[2].Rm, 'Cm =', s.comp[2].Cm, 'Em =', s.comp[2].Em, 'initVm =', s.comp[2].initVm
 #     for comp in s.comp:
