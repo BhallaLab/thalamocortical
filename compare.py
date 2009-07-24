@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 17 18:01:06 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Jul 23 23:38:46 2009 (+0530)
+# Last-Updated: Fri Jul 24 11:27:17 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 116
+#     Update #: 152
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -57,29 +57,49 @@ def almost_equal(left, right, epsilon=1e-6):
         return ( 1 - left / right) < epsilon
 #!almost_equal
 
-def comparecsv(left, right, epsilon=1e3, row_header=True, col_header=True):
+def comparecsv(left, right, epsilon=1e-3, row_header=True, col_header=True):
     ret = True
     left_file = open(left, 'rb')
     right_file = open(right, 'rb')
     left_reader = csv.reader(left_file, delimiter=',')
     right_reader = csv.reader(right_file, delimiter=',')
     index = 0
+    left_end = False
+    right_end = False
+    try:
+        left_row = left_reader.next()
+    except StopIteration:
+        left_end = True
+    try:
+        right_row = right_reader.next()
+    except StopIteration:
+        right_end = True
+    if left_end and right_end:
+        print 'Both file are empty.'
+        return True
+
     if col_header:
-        left_header = left_reader.next()
-        right_header = right_reader.next()
+        left_header = left_row
+        right_header = right_row
         index = 1
 
     while True:
-        left_row = left_reader.next()
-        right_row = right_reader.next()
-        if left_row is None and not (right_row is None):
+        try:
+            left_row = left_reader.next()
+        except StopIteration:
+            left_end = True
+        try:
+            right_row = right_reader.next()
+        except StopIteration:
+            right_end = True
+        if left_end and not right_end:
             print left, 'run out of line after', index, 'rows'
-            ret = False
-            break
-        if right_row is None and not (left_row is None):
+            return False
+        if right_end and not left_end:
             print right, 'run out of line after', index, 'rows'
-            ret = False
-            break
+            return False
+        if left_end and right_end:
+            return ret
         if len(left_row) != len(right_row):
             print 'No. of columns differ: left - ', len(left_row), 'right -', len(right_row)
             ret = False
@@ -98,9 +118,12 @@ def comparecsv(left, right, epsilon=1e3, row_header=True, col_header=True):
                     col = str(col_no)
                 else:
                     col = str(left_header[col_no])
-                print 'Mismatch in row:%s, column:%s. Values: %f <> %f' % (row, col, left_col, right_col)
+                print 'Mismatch in row:%s, column:%s. Values: %g <> %g' % (row, col, float(left_col), float(right_col))
                 ret = False
-        return ret
+            col_no += 1
+#         print 'compared ', index, 'lines'
+        index = index + 1
+    return ret
 
 
 def compare_tcr():
@@ -120,7 +143,11 @@ def compare_tcr():
                 all_matching = False
     if all_matching: print 'All matching ...'
 
+def compare_spinstell():
+    print 'spinystellate matching?', comparecsv('py/spinstell.txt', 'nrn/spinstell')
+    
 if __name__ == "__main__":
-    print comparecsv('py/tcr.txt', 'nrn/TCR')
+    print 'tcr cells matching?', comparecsv('py/tcr.txt', 'nrn/TCR')
+    compare_spinstell()
 # 
 # compare.py ends here
