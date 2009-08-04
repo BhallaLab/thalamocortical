@@ -1029,3 +1029,22 @@ hub. Why?
   decimal place for Ca2+ B. After correcting this, the two are pretty
   close. But funny thing is that the neuron gui shows several spikes whereas
   my version shows only two spikes.
+* <2009-07-27 Mon 00:30> NeuroConstruct generated code
+  While trying to load NeuroConstruct genenrated GENESIS code for TCR in
+  MOOSE, there were errors on tab2Dchannel - it turned out to be due to some
+  constant not defined in MOOSE:VOLT_C1_INDEX - I am not sure why this is
+  being used. Another thing I noted was that the kahp_slower channel is only
+  [Ca2+] dependent, not voltage dependent - so there is no real need for
+  tab2Dchannel.
+* <2009-08-04 Tue 04:00> NeuroConstruct generated code - can mostly read now
+  I fixed the Interpol2D class and str2val for getting indices. This solved
+  the problem of loading a HHChannel2D using GENESIS script. And added the
+  Leakage channel type.
+
+  Also added more code to dump neuron info in NEURON - so should be easier
+  now - but it is getting uglier at the same time - equivalent to doing a
+  readcell.
+
+* <2009-08-04 Tue 22:20> Readcell
+  Finally I switch to printing the NEURON parameters in readcell format and
+  then using readcell to read it in.

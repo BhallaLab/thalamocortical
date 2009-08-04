@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Jun  1 22:07:33 2009 (+0530)
+# Last-Updated: Tue Aug  4 22:10:51 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 499
+#     Update #: 500
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -219,7 +219,7 @@ class KAHP(KAHPBase):
 
     def __init__(self, name, parent, Ek=-95e-3):
         KAHPBase.__init__(self, name, parent, Ek=Ek)
-        for i in range(len(alpha)):
+        for i in range(len(KAHP.alpha)):
             self.zGate.A[i] = KAHP.alpha[i]
             self.zGate.B[i] = KAHP.beta[i]
         self.zGate.tweakAlpha()
