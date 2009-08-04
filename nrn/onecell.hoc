@@ -109,6 +109,7 @@ proc runcell() {local i, t1,a1,t2,a2  localobj vvec, tvec, f, g
 	if (exact_) { traubexact(cell, tci) }
 	print tstr1
 	print_cell(cell, tstr1)
+	print_readcell(cell, tstr1)
 }
 
 runcell(0)

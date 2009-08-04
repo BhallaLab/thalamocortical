@@ -1,5 +1,6 @@
-strdef tstr
-proc print_cell(){ localobj cell,dump_file, strfn
+strdef tstr, parent_str, compname, comp_index
+
+proc print_cell(){ localobj cell,dump_file, strfn, secref
     print "###### Printcell"
     if (numarg() < 2){
 	print "Must pass a cell object and a file name"
@@ -40,9 +41,11 @@ proc print_cell(){ localobj cell,dump_file, strfn
     dump_file.printf(",e_napf_tcr,gbar_napf_tcr")
     dump_file.printf("\n")
     print "###### about to start traversing"
+    
     forsec cell.all  {
 	    sarea = PI * L * diam * 1e-8 // um^2 to cm^2
 	    xarea = PI * diam * diam * 1e-8 / 4.0
+	    secref = new SectionRef()
 	    dump_file.printf("%s,%g,%g,%g,%g,%g,%g,%g,%g", secname(), L * 1e-6, diam * 1e-6, sarea * 1e-4, xarea*1e-4, v*1e-3, cm  * 1e-6 * sarea, 1.0/(g_pas * sarea), Ra * L * 1e-4 / xarea) // all multipliers for unit conversion
 	    if (ismembrane("ar")) dump_file.printf(",%g,%g", 1e-3 * erev_ar, gbar_ar * sarea) else dump_file.printf(",0.0,0.0")
 	    if (ismembrane("cad")) dump_file.printf(",%g,%g", 1e-3 / beta_cad, phi_cad/10) else dump_file.printf(",0.0,0.0")
@@ -67,6 +70,76 @@ proc print_cell(){ localobj cell,dump_file, strfn
 	    if (ismembrane("napf")) dump_file.printf(",%g,%g", 1e-3 * ena, gbar_napf * sarea) else dump_file.printf(",0.0,0.0")
 	    if (ismembrane("napf_spinstell")) dump_file.printf(",%g,%g", 1e-3 * ena, gbar_napf_spinstell * sarea) else dump_file.printf(",0.0,0.0")
 	    if (ismembrane("napf_tcr")) dump_file.printf(",%g,%g", 1e-3 * ena, gbar_napf_tcr * sarea) else dump_file.printf(",0.0,0.0")
+	    dump_file.printf("\n")		
+	}
+	dump_file.close()
+    }
+    
+    
+proc print_readcell(){ localobj cell,dump_file, strfn, secref
+    print "###### Print Readcell"
+    if (numarg() < 2){
+	print "Must pass a cell object and a file name"
+	return
+    }
+    strfn = new StringFunctions()
+    print "Refering to cell"
+    cell = $o1
+    dump_file = new File()
+    print "Dump file created"
+    print "arg ", numarg()
+    strfn.head(secname(), "\\[", tstr)
+    sprint(tstr, "%s.p", tstr)
+    dump_file.wopen(tstr)
+    print "Opened dump file :", tstr
+
+    print "###### about to start traversing"
+    forsec cell.all  {
+	    sarea = PI * L * diam * 1e-8 // um^2 to cm^2
+	    xarea = PI * diam * diam * 1e-8 / 4.0
+	    secref = new SectionRef()
+	    if (!secref.has_parent){
+		sprint(parent_str, "none")
+	    } else {
+		secref.parent {		    
+		    strfn.tail(secname(), "\\.", parent_str)
+		    strfn.head(parent_str, "\\]", comp_index)
+		    strfn.tail(comp_index, "\\[", comp_index)
+		    strfn.head(parent_str, "\\[", parent_str)
+		    sprint(parent_str, "%s_%s", parent_str, comp_index)
+		}
+	    }
+	    sprint(compname, "%s", secname())
+	    strfn.tail(secname(), "\\.", compname)
+	    strfn.head(compname, "\\]", comp_index)
+	    strfn.tail(comp_index, "\\[", comp_index)
+	    strfn.head(compname, "\\[", compname)
+	    sprint(compname, "%s_%s", compname, comp_index)
+//	    print "secname: ", compname, " index: ", comp_index, " parent: ", parent_str
+	    dump_file.printf("%s	%s	%g	%g	%g	%g", compname, parent_str, L, 0.0, 0.0, diam)
+	    if (ismembrane("ar")) dump_file.printf("	AR	%g", gbar_ar * 1e4)
+	    if (ismembrane("cad")) dump_file.printf("	Ca	%g", phi_cad / 10)
+	    if (ismembrane("cal")) dump_file.printf("	CaL	%g", gbar_cal * 1e4)
+	    if (ismembrane("cat")) dump_file.printf("	CaT	%g", gbar_cat * 1e4)
+	    if (ismembrane("cat_a")) dump_file.printf("	CaT_A	%g", gbar_cat_a * 1e4)
+	    if (ismembrane("k2")) dump_file.printf("	K2	%g", gbar_k2 * 1e4)
+	    if (ismembrane("ka")) dump_file.printf("	KA	%g", gbar_ka * 1e4)
+	    if (ismembrane("ka_ib")) dump_file.printf("	KA_IB	%g", gbar_ka_ib )
+	    if (ismembrane("kahp")) dump_file.printf("	KAHP	%g", gbar_kahp ) 
+	    if (ismembrane("kahp_deeppyr")) dump_file.printf("	KAHP_DP	%g", gbar_kahp_deeppyr * 1e4) 
+	    if (ismembrane("kahp_slower")) dump_file.printf("	KAHP_SLOWER	%g", gbar_kahp_slower * 1e4 ) 
+	    if (ismembrane("kc")) dump_file.printf("	KC	%g", gbar_kc * 1e4) 
+	    if (ismembrane("kc_fast")) dump_file.printf("	KC_FAST	%g", gbar_kc_fast * 1e4) 
+	    if (ismembrane("kdr")) dump_file.printf("	KDR	%g", gbar_kdr * 1e4) 
+	    if (ismembrane("kdr_fs")) dump_file.printf("	KDR_FS	%g", gbar_kdr_fs * 1e4) 
+	    if (ismembrane("km")) dump_file.printf("	KM	%g", gbar_km * 1e4) 
+	    if (ismembrane("naf")) dump_file.printf("	NaF	%g", gbar_naf * 1e4) 
+	    if (ismembrane("naf2")) dump_file.printf("	NaF2	%g", gbar_naf2 * 1e4) 
+	    if (ismembrane("naf_tcr")) dump_file.printf("	NaF_TCR	%g", gbar_naf_tcr * 1e4) 
+	    if (ismembrane("nap")) dump_file.printf("	NaP	%g", gbar_nap * 1e4) 
+	    if (ismembrane("napf")) dump_file.printf("	NaPF	%g", gbar_napf * 1e4) 
+	    if (ismembrane("napf_spinstell")) dump_file.printf("	NaPF_SS	%g", gbar_napf_spinstell * 1e4) 
+	    if (ismembrane("napf_tcr")) dump_file.printf("	NaPF_TCR	%g", gbar_napf_tcr * 1e4) 
 	    dump_file.printf("\n")		
 	}
 	dump_file.close()
