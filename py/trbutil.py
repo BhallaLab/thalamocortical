@@ -1,14 +1,14 @@
-# config.py --- 
+# trbutil.py --- 
 # 
-# Filename: config.py
+# Filename: trbutil.py
 # Description: 
 # Author: subhasis ray
 # Maintainer: 
-# Created: Fri Apr 17 14:36:30 2009 (+0530)
+# Created: Fri Jun  5 13:59:40 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Aug  4 22:11:50 2009 (+0530)
+# Last-Updated: Fri Jun  5 14:25:54 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 38
+#     Update #: 2
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -17,7 +17,7 @@
 
 # Commentary: 
 # 
-# This contains global variables used in other modules.
+# 
 # 
 # 
 
@@ -45,22 +45,17 @@
 
 # Code:
 
-import sys
-sys.path.append('/home/src/sim/cortical/py')
-import moose
+def almost_equal(left, right, epsilon=1e-6):
+    """check if two floats are almost equal"""
+    if left == right:
+        return True
+    if abs(left) > abs(right):
+        return (1 - right / left) < epsilon
+    else:
+        return ( 1 - left / right) < epsilon
+#!almost_equal
 
-context = moose.PyMooseBase.getContext()
-lib = moose.Neutral('/library')
-root = moose.Neutral("/")
-
-simdt = 1e-5
-plotdt = 1e-5
-vmin = -120e-3
-vmax = 40e-3
-ndivs = 640
-dv = (vmax - vmin) / ndivs
-channel_name_list = ['AR','CaPool','CaL','CaT','CaT_A','K2','KA','KA_IB','KAHP','KAHP_DP','KAHP_SLOWER','KC','KC_FAST','KDR','KDR_FS','KM','NaF','NaF2','NaF_TCR','NaP','NaPF','NaPF_SS','NaPF_TCR']
 
 
 # 
-# config.py ends here
+# trbutil.py ends here
