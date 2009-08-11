@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Aug  4 22:11:50 2009 (+0530)
+# Last-Updated: Fri Aug  7 15:04:10 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 38
+#     Update #: 43
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -61,6 +61,7 @@ ndivs = 640
 dv = (vmax - vmin) / ndivs
 channel_name_list = ['AR','CaPool','CaL','CaT','CaT_A','K2','KA','KA_IB','KAHP','KAHP_DP','KAHP_SLOWER','KC','KC_FAST','KDR','KDR_FS','KM','NaF','NaF2','NaF_TCR','NaP','NaPF','NaPF_SS','NaPF_TCR']
 
+channel_lib = {}
 
 # 
 # config.py ends here
