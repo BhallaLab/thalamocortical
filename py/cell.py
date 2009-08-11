@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 24 10:04:47 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Aug 11 23:27:17 2009 (+0530)
+# Last-Updated: Wed Aug 12 00:38:15 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 195
+#     Update #: 204
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -171,18 +171,21 @@ class TraubCell(moose.Cell):
         for comp in self.comp[1:]:
             dump_file.write('%s,%g,%g,%g,%g,%g,%g,%g,%g' % (comp.name, comp.length, comp.diameter, comp.sarea(), comp.xarea(), comp.Em, comp.Cm, comp.Rm, comp.Ra))
             for channel_name in config.channel_name_list:
+                path = comp.path + '/' + channel_name
                 if channel_name == 'CaPool':
-                    if hasattr(comp, 'ca_pool'):
-                        dump_file.write(',%g,%g' % (comp.ca_pool.tau, comp.ca_pool.B * comp.sarea()))
+                    if config.context.exists(path):
+                        ca_pool = CaPool(path)
+                        dump_file.write(',%g,%g' % (ca_pool.tau, ca_pool.B * comp.sarea()))
                     else:
                         dump_file.write(',0.0,0.0')
                     continue
                 channel = None
-                for channel in (ch for ch in comp.channels if ch.name == channel_name):
+                for channel in (ch for ch in comp.children() if ch.path().endswith(channel_name)):
                     break
                 if channel is None:
                     dump_file.write(',0.0,0.0')
                 else:
+                    channel = moose.HHChannel(channel)
                     dump_file.write(',%g,%g' % (channel.Ek, channel.Gbar))
             dump_file.write('\n')
 
