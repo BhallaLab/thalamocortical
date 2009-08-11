@@ -1048,3 +1048,15 @@ hub. Why?
 * <2009-08-04 Tue 22:20> Readcell
   Finally I switch to printing the NEURON parameters in readcell format and
   then using readcell to read it in.
+* <2009-08-06 Thu 15:14> Readcell - todo
+  Some parameters are not accounted for in readcell format: tau for
+  CaPool. Erev for channels - which varies from cell type to cell type. 
+* <2009-08-12 Wed 00:24> Further changes using readcell
+  Refined the TraubCell class to set the channel reversal potentials.
+  Also added something to set Rm and Ra, but then realized that they can be
+  put in .p file.
+  Switched call to readcell_scrambled in TraubCell to PyMooseContext.readCell
+  as readcell scrambled cannot preserve the position of compartment specific
+  parameters. So using readcell_scrambled to sort out the sequence of
+  compartments. Then inserting the compartment parameter statements at correct
+  place manually.

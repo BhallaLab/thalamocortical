@@ -118,7 +118,7 @@ proc print_readcell(){ localobj cell,dump_file, strfn, secref
 //	    print "secname: ", compname, " index: ", comp_index, " parent: ", parent_str
 	    dump_file.printf("%s	%s	%g	%g	%g	%g", compname, parent_str, L, 0.0, 0.0, diam)
 	    if (ismembrane("ar")) dump_file.printf("	AR	%g", gbar_ar * 1e4)
-	    if (ismembrane("cad")) dump_file.printf("	Ca	%g", phi_cad / 10)
+	    if (ismembrane("cad")) dump_file.printf("	CaPool	%g", phi_cad / 10)
 	    if (ismembrane("cal")) dump_file.printf("	CaL	%g", gbar_cal * 1e4)
 	    if (ismembrane("cat")) dump_file.printf("	CaT	%g", gbar_cat * 1e4)
 	    if (ismembrane("cat_a")) dump_file.printf("	CaT_A	%g", gbar_cat_a * 1e4)

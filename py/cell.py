@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 24 10:04:47 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Jul 24 14:07:02 2009 (+0530)
+# Last-Updated: Tue Aug 11 23:27:17 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 16
+#     Update #: 195
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -44,10 +44,41 @@
 # 
 
 # Code:
+from collections import defaultdict
+
 import config
-import moose
+import pymoose
+
+from nachans import *
+from kchans import *
+from cachans import *
+from archan import *
+from capool import *
+from compartment import MyCompartment
+
+def init_channel_lib():
+    """Initialize the prototype channels in library"""
+    if not config.channel_lib:
+        for channel_name in config.channel_name_list:
+            channel_class = eval(channel_name)
+            channel = channel_class(channel_name, config.lib)
+            config.channel_lib[channel_name] = channel
+    return config.channel_lib
+
+def nameindex(comp):
+    """Utility function to sort by index in the compartment name"""
+    if comp is None:
+        return -1
+    pos = comp.name.rfind('_')
+    if pos >= 0:
+        index = int(comp.name[pos+1:])
+        return index
+    else:
+        return -1
 
 class TraubCell(moose.Cell):
+    channel_lib = init_channel_lib()
+                     
     def __init__(self, *args):
 	moose.Cell.__init__(self, *args)
 	self.comp = [None]
@@ -55,6 +86,60 @@ class TraubCell(moose.Cell):
         self.level = defaultdict(set)
 	self.dendrites = set()
         self.presyn = 0
+        for child in self.children():
+            comp = MyCompartment(child)
+            if comp.className == "Compartment": # Ensure it is a compartment
+                self.comp.append(comp)
+        if len(self.comp) > 1:
+            self.comp.sort(key=nameindex)
+            self.soma = self.comp[1]
+            self._topology()
+            self._setup_passive()
+            self._setup_channels()
+        else:
+            raise Exception("No compartment in the cell.")
+        
+    def pfile_name(self):
+        """Each cell type subclass should implement this"""
+        return None
+
+    @classmethod
+    def read_proto(cls, filename, cellname):
+        """Read a prototype cell from .p file into library.  Each cell
+        type class should initialize its prototype with a call to this
+        function. with something like this within the class declaration:
+
+        prototype = TraubCell.read_proto("MyCellType.p", "MyClassName")
+        """
+        ret = None
+        cellpath = config.lib.path + '/' + cellname
+        if not config.context.exists(cellpath):
+            config.context.readCell(filename, cellpath)
+        return moose.Cell(cellpath)
+
+    def _ca_tau(self):
+        raise NotImplementedError("You must set tau for [Ca2+] decay in the method _ca_tau() in subclass.")
+
+    def _setup_passive(self):
+        raise NotImplementedError("You must define _setup_passive to set the passive membrane properties and other post-readcell tweakings.")
+
+    def _setup_channels(self):
+        raise NotImplementedError("You must define setup_channels to set the channel reversal potential and other post-readcell tweakings.")
+
+    def _topology(self):
+        raise NotImplementedError("You must define cell topology in the method _topology() in subclass.")
+
+    def has_cycle(self, comp=None):
+        if comp is None:
+            comp = self.soma
+        comp._visited = True
+        ret = False
+        for item in comp.raxial_list:
+            if hasattr(item, '_visited') and item._visited:
+                print 'Cycle between: ', comp.path, 'and', item.path
+                return True
+            ret = ret or has_cycle(item)
+        return ret
 
     def dump_cell(self, file_path):
         dump_file = open(file_path, "w")

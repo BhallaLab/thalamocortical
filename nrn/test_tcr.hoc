@@ -65,4 +65,4 @@ proc finit0(){
     forsec cell.all { v = -70 }
 }
 runcell(100, 0.0)
-quit()
+//quit()
