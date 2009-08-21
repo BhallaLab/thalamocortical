@@ -1060,3 +1060,9 @@ hub. Why?
   parameters. So using readcell_scrambled to sort out the sequence of
   compartments. Then inserting the compartment parameter statements at correct
   place manually.
+* <2009-08-12 Wed 13:50> A better way to debug Python module _moose.so
+  http://book.opensourceproject.org.cn/lamp/python/pythoncook2/opensource/0596007973/pythoncook2-chp-17-sect-9.html
+  Break on _PyImport_LoadDynamicModule
+
+  This will stop at every module being loaded, after which we can put a
+  breakpoint on any symbol in _moose.so.
