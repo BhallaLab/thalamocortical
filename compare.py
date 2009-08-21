@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 17 18:01:06 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Jul 24 11:27:17 2009 (+0530)
+# Last-Updated: Wed Aug 12 14:08:27 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 152
+#     Update #: 158
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -58,6 +58,7 @@ def almost_equal(left, right, epsilon=1e-6):
 #!almost_equal
 
 def comparecsv(left, right, epsilon=1e-3, row_header=True, col_header=True):
+    print left, "<>", right
     ret = True
     left_file = open(left, 'rb')
     right_file = open(right, 'rb')
@@ -147,7 +148,11 @@ def compare_spinstell():
     print 'spinystellate matching?', comparecsv('py/spinstell.txt', 'nrn/spinstell')
     
 if __name__ == "__main__":
-    print 'tcr cells matching?', comparecsv('py/tcr.txt', 'nrn/TCR')
-    compare_spinstell()
+#     print 'tcr cells matching?', comparecsv('py/tcr.txt', 'nrn/TCR')
+#     compare_spinstell()
+    print "SupPyrRS matching?"
+    comparecsv('py/suppyrrs.txt', 'nrn/suppyrRS')
+    
+
 # 
 # compare.py ends here
