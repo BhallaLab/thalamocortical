@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 24 10:04:47 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Aug 12 00:38:15 2009 (+0530)
+# Last-Updated: Fri Aug 28 17:20:11 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 204
+#     Update #: 208
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -175,7 +175,7 @@ class TraubCell(moose.Cell):
                 if channel_name == 'CaPool':
                     if config.context.exists(path):
                         ca_pool = CaPool(path)
-                        dump_file.write(',%g,%g' % (ca_pool.tau, ca_pool.B * comp.sarea()))
+                        dump_file.write(',%g,%g' % (ca_pool.tau, ca_pool.B))
                     else:
                         dump_file.write(',0.0,0.0')
                     continue
