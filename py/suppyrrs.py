@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Aug 12 00:08:21 2009 (+0530)
+# Last-Updated: Fri Aug 28 11:18:38 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 189
+#     Update #: 199
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -74,7 +74,7 @@ class SupPyrRS(TraubCell):
 	self.level[9].add(self.comp[44])
 	for ii in range(45, 53):
 	    self.level[10].add(self.comp[ii])
-	for ii in range(54, 61):
+	for ii in range(53, 61):
 	    self.level[11].add(self.comp[ii])
 	for ii in range(61, 69):
 	    self.level[12].add(self.comp[ii])
@@ -92,6 +92,7 @@ class SupPyrRS(TraubCell):
                     if obj.name == 'CaPool':
                         obj = moose.CaConc(child)
                         obj.tau = 1e-3/0.05
+                        print obj.path, 'set tau to', obj.tau
                     else:
                         obj_class = obj.className
                         if obj_class == "HHChannel":
@@ -105,6 +106,9 @@ class SupPyrRS(TraubCell):
                                 obj.Ek = 125e-3
                             elif issubclass(pyclass, AR):
                                 obj.Ek = -35e-3
+        obj = moose.CaConc(self.soma.path + '/CaPool')
+        obj.tau = 1e-3 / 0.01
+        print obj.path, 'set tau to', obj.tau
 
     @classmethod
     def test_single_cell(cls):

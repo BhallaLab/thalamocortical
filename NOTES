@@ -1066,3 +1066,11 @@ hub. Why?
 
   This will stop at every module being loaded, after which we can put a
   breakpoint on any symbol in _moose.so.
+* <2009-08-28 Fri 12:40> Ca concentration issues
+  The B parameter for Ca pool in .p file I generate is half that in the
+  neuroconstruct generated stuff. 
+  I found that the reason is that NeuroConstruct makes compartments half the
+  size of those in the model. As B is calculated as phi/A, my version gives a
+  different result.
+
+  Still the results are far off from NEURON.

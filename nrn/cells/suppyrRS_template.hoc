@@ -783,6 +783,7 @@ func type() {return  0 }
  // only multiplying all dend. max conductances by two
  // (the area is doubled but the volume is const.)
  proc double_dend_cond() {
+     print "suppyrRS - doubling dendritic coordinates"
    spine_area_multiplier = 2
    forsec Dendrites {
         if (ismembrane("nap")) { gbar_nap *= spine_area_multiplier }

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Jun 29 18:10:42 2009 (+0530)
+# Last-Updated: Fri Aug 21 13:57:51 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 158
+#     Update #: 162
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -56,12 +56,21 @@ class MyCompartment(moose.Compartment):
     def setSpecificRm(self, RM):
         self.Rm = RM / self.sarea()
 
+    def getSpecificRm(self):
+        return self.Rm * self.sarea()
+
     def setSpecificRa(self, RA):
         self.Ra = RA * self.length / self.xarea()
         print self.name, self.Ra, self.length, self.xarea()
 
+    def getSpecificRa(self):
+        return self.Ra * self.xarea() / self.length
+
     def setSpecificCm(self, CM):
         self.Cm = CM * self.sarea()
+
+    def getSpecificCm(self):
+        return self.Cm / self.sarea()
 
     def xarea(self):
         if self._xarea is None:
