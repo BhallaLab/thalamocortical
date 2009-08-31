@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 17 18:01:06 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Aug 12 14:08:27 2009 (+0530)
+# Last-Updated: Mon Aug 31 09:45:11 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 158
+#     Update #: 159
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -151,7 +151,7 @@ if __name__ == "__main__":
 #     print 'tcr cells matching?', comparecsv('py/tcr.txt', 'nrn/TCR')
 #     compare_spinstell()
     print "SupPyrRS matching?"
-    comparecsv('py/suppyrrs.txt', 'nrn/suppyrRS')
+    print comparecsv('py/suppyrrs.txt', 'nrn/suppyrRS')
     
 
 # 

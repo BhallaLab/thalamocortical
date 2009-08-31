@@ -1074,3 +1074,6 @@ hub. Why?
   different result.
 
   Still the results are far off from NEURON.
+* <2009-08-31 Mon 21:49> Far higher frequency 
+  I am getting far higher frequency than NEURON model and my model spikes
+  spontaneously whereas the NEURON model spikes only at current injection.
