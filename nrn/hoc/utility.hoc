@@ -46,9 +46,9 @@ proc print_cell(){ localobj cell,dump_file, strfn, secref
 	    sarea = PI * L * diam * 1e-8 // um^2 to cm^2
 	    xarea = PI * diam * diam * 1e-8 / 4.0
 	    secref = new SectionRef()
-	    dump_file.printf("%s,%g,%g,%g,%g,%g,%g,%g,%g", secname(), L * 1e-6, diam * 1e-6, sarea * 1e-4, xarea*1e-4, v*1e-3, cm  * 1e-6 * sarea, 1.0 /(g_pas * xarea), Ra * L * 1e-4 / xarea ) // all multipliers for unit conversion
+	    dump_file.printf("%s,%g,%g,%g,%g,%g,%g,%g,%g", secname(), L * 1e-6, diam * 1e-6, sarea * 1e-4, xarea*1e-4, v*1e-3, cm  * 1e-6 * sarea, 1.0 /(g_pas * sarea), Ra * L * 1e-4 / xarea ) // all multipliers for unit conversion
 	    if (ismembrane("ar")) dump_file.printf(",%g,%g", 1e-3 * erev_ar, gbar_ar * sarea) else dump_file.printf(",0.0,0.0")
-	    if (ismembrane("cad")) dump_file.printf(",%g,%g", 1e-3 / beta_cad, 1e3 * phi_cad/sarea) else dump_file.printf(",0.0,0.0")
+	    if (ismembrane("cad")) dump_file.printf(",%g,%g", 1e-3 / beta_cad, 1e6 * phi_cad/sarea) else dump_file.printf(",0.0,0.0")
 	    if (ismembrane("cal")) dump_file.printf(",%g,%g", 1e-3 * 125, gbar_cal * sarea) else dump_file.printf(",0.0,0.0")
 	    if (ismembrane("cat")) dump_file.printf(",%g,%g", 1e-3 * 125, gbar_cat * sarea) else dump_file.printf(",0.0,0.0")
 	    if (ismembrane("cat_a")) dump_file.printf(",%g,%g", 1e-3 * 125, gbar_cat_a * sarea) else dump_file.printf(",0.0,0.0")
@@ -118,7 +118,7 @@ proc print_readcell(){ localobj cell,dump_file, strfn, secref
 //	    print "secname: ", compname, " index: ", comp_index, " parent: ", parent_str
 	    dump_file.printf("%s	%s	%g	%g	%g	%g", compname, parent_str, L, 0.0, 0.0, diam)
 	    if (ismembrane("ar")) dump_file.printf("	AR	%g", gbar_ar * 1e4)
-	    if (ismembrane("cad")) dump_file.printf("	CaPool	%g", -phi_cad /( diam * L * PI * 1e-14 ))
+	    if (ismembrane("cad")) dump_file.printf("	CaPool	%g", -phi_cad * 1e6 / sarea)
 	    if (ismembrane("cal")) dump_file.printf("	CaL	%g", gbar_cal * 1e4)
 	    if (ismembrane("cat")) dump_file.printf("	CaT	%g", gbar_cat * 1e4)
 	    if (ismembrane("cat_a")) dump_file.printf("	CaT_A	%g", gbar_cat_a * 1e4)
