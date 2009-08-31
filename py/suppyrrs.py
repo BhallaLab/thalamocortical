@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Aug 28 11:18:38 2009 (+0530)
+# Last-Updated: Mon Aug 31 21:43:28 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 199
+#     Update #: 201
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -117,13 +117,13 @@ class SupPyrRS(TraubCell):
         print 'Created cell:', mycell.path
         vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_suppyrrs', 'Vm', sim.data)
 
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=0.0, firstWidth=100e-3)
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=5e-3, firstWidth=100e-3)
 
         sim.schedule()
         if mycell.has_cycle():
             print "WARNING!! CYCLE PRESENT IN CICRUIT."
         t1 = datetime.now()
-        sim.run(100e-3)
+        sim.run(10e-3)
         t2 = datetime.now()
         delta = t2 - t1
         print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
