@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Sep  7 21:49:40 2009 (+0530)
+# Last-Updated: Mon Sep  7 21:56:06 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 278
+#     Update #: 284
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -164,8 +164,9 @@ class SupPyrRS(TraubCell):
         print 'soma:', 'Ra =', mycell.soma.Ra, 'Rm =', mycell.soma.Rm, 'Cm =', mycell.soma.Cm, 'Em =', mycell.soma.Em, 'initVm =', mycell.soma.initVm
         print 'dend:', 'Ra =', mycell.comp[2].Ra, 'Rm =', mycell.comp[2].Rm, 'Cm =', mycell.comp[2].Cm, 'Em =', mycell.comp[2].Em, 'initVm =', mycell.comp[2].initVm
         mus_vm = pylab.array(vm_table) * 1e3
-        pylab.plot(mus_vm, 'r-', label='mus')
-        pylab.plot(ca_table, 'b-', label='ca')
+        pylab.plot(mus_vm, 'r-', label='Vm (V)')
+        ca_array = pylab.array(ca_table)
+        pylab.plot(ca_array * 1e2, 'b-', label='[Ca2+] x 1e2')
         print pylab.amax(ca_table)
         pylab.legend()
         pylab.show()
