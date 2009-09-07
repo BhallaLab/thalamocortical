@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Aug 31 21:43:28 2009 (+0530)
+# Last-Updated: Mon Sep  7 21:49:40 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 201
+#     Update #: 278
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -53,6 +53,7 @@ from capool import CaPool
 
 class SupPyrRS(TraubCell):
     prototype = TraubCell.read_proto("SupPyrRS.p", "SupPyrRS")
+    ca_dep_chans = ['KAHP','KAHP_SLOWER', 'KAHP_DP', 'KC', 'KC_FAST']
     def __init__(self, *args):
 	TraubCell.__init__(self, *args)
 	
@@ -87,12 +88,16 @@ class SupPyrRS(TraubCell):
     def _setup_channels(self):
         for i in range(len(self.level)):
             for comp in self.level[i]:
+                ca_pool = None
+                ca_dep_chans = []
+                ca_chans = []
                 for child in comp.children():
                     obj = moose.Neutral(child)
                     if obj.name == 'CaPool':
-                        obj = moose.CaConc(child)
-                        obj.tau = 1e-3/0.05
-                        print obj.path, 'set tau to', obj.tau
+                        ca_pool = moose.CaConc(child)
+                        ca_pool.B = ca_pool.B / 1e3 # TEST - spinstells are matching in Vm plot but not in parameter comparison - Beta_Cad is 1000 times less in MOOSE.
+                        ca_pool.tau = 1e-3/0.05
+                        print '??', comp.name, ca_pool.B * comp.length * comp.diameter * pylab.pi, ca_pool.tau
                     else:
                         obj_class = obj.className
                         if obj_class == "HHChannel":
@@ -100,12 +105,27 @@ class SupPyrRS(TraubCell):
                             pyclass = eval(obj.name)
                             if issubclass(pyclass, KChannel):
                                 obj.Ek = -95e-3
+                                if issubclass(pyclass, KCaChannel):
+                                    ca_dep_chans.append(obj)
                             elif issubclass(pyclass, NaChannel):
                                 obj.Ek = 50e-3
                             elif issubclass(pyclass, CaChannel):
                                 obj.Ek = 125e-3
+                                if issubclass(pyclass, CaL):
+                                    print 'CaL channel in', comp.path
+                                    ca_chans.append(obj)
                             elif issubclass(pyclass, AR):
                                 obj.Ek = -35e-3
+                if ca_pool: # Setup connections for CaPool : from CaL, to KAHP and KC
+                    for channel in ca_chans:
+                        channel.connect('IkSrc', ca_pool, 'current')
+                        print comp.name, ':', channel.name, 'connected to', ca_pool.name
+                    for channel in ca_dep_chans:
+                        channel.useConcentration = 1
+                        ca_pool.connect("concSrc", channel, "concen")
+                        print comp.name, ':', ca_pool.name, 'connected to', channel.name
+
+
         obj = moose.CaConc(self.soma.path + '/CaPool')
         obj.tau = 1e-3 / 0.01
         print obj.path, 'set tau to', obj.tau
@@ -116,8 +136,20 @@ class SupPyrRS(TraubCell):
         mycell = SupPyrRS(SupPyrRS.prototype, sim.model.path + "/SupPyrRS")
         print 'Created cell:', mycell.path
         vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_suppyrrs', 'Vm', sim.data)
+        ca_conc = moose.CaConc(mycell.soma.path + '/CaPool')
+        print 'tau =', ca_conc.tau, 'B =', ca_conc.B
+        ca_table = moose.Table('cad', sim.data)
+        ca_table.stepMode = 3
+        for i in range(len(mycell.level)):
+            for comp in mycell.level[i]:
+                if config.context.exists(comp.path + '/CaPool'):
+                    ca_pool = moose.CaConc(comp.path + '/CaPool')
+                    print '##?', comp.name, ca_pool.B, ca_pool.tau
 
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=5e-3, firstWidth=100e-3)
+        print '######## Connecting'
+        ca_conc.connect('Ca', ca_table, 'inputRequest')
+        pymoose.showmsg(ca_conc)
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=5e3, firstWidth=100e-3)
 
         sim.schedule()
         if mycell.has_cycle():
@@ -133,6 +165,8 @@ class SupPyrRS(TraubCell):
         print 'dend:', 'Ra =', mycell.comp[2].Ra, 'Rm =', mycell.comp[2].Rm, 'Cm =', mycell.comp[2].Cm, 'Em =', mycell.comp[2].Em, 'initVm =', mycell.comp[2].initVm
         mus_vm = pylab.array(vm_table) * 1e3
         pylab.plot(mus_vm, 'r-', label='mus')
+        pylab.plot(ca_table, 'b-', label='ca')
+        print pylab.amax(ca_table)
         pylab.legend()
         pylab.show()
         

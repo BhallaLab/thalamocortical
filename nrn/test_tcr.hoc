@@ -1,5 +1,6 @@
 load_file("nrngui.hoc")
 load_file("hoc/traubcon.hoc")
+load_file("hoc/utility.hoc")
 load_file("cells/TCR_template.hoc")
 objref vm_vec, stim, dump_file
 PI=3.141592
@@ -48,7 +49,7 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g
     vvec = new Vector()
     tvec.record(&t)
     vvec.record(&cell.comp[cell.presyn_comp].v(0.5))
-    
+    print_cell(cell, "tcr")
     stim1 = new IClamp(0.5) 
     stim1.amp = 0.3
     stim1.del = t1
