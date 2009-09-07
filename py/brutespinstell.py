@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri May  8 11:24:30 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Jul 24 10:48:36 2009 (+0530)
+# Last-Updated: Mon Sep  7 19:13:27 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 554
+#     Update #: 566
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -487,7 +487,13 @@ if __name__ == '__main__':
     vm_table = s.comp[s.presyn].insertRecorder('Vm_ss', 'Vm', sim.data)
     
     pulsegen = s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=0.0, firstWidth=100e-3)
-    
+    ca_pool = moose.CaConc(s.soma.path + '/CaPool')
+    ca_table = moose.Table('ca_conc', sim.data)
+    ca_table.stepMode = 3
+    ca_pool.connect('Ca', ca_table, 'inputRequest')
+    for c in s.comp[1:]:
+        if hasattr(c, 'ca_pool'):
+            print '##?', c.name, c.ca_pool.B, c.ca_pool.tau
     sim.schedule()
     if has_cycle(s.soma):
         print "WARNING!! CYCLE PRESENT IN CICRUIT."
@@ -511,6 +517,7 @@ if __name__ == '__main__':
     mus_vm = pylab.array(vm_table) * 1e3 # convert Neuron unit - mV
     mus_t = pylab.linspace(0, sim.simtime * 1e3, len(vm_table)) # convert simtime to neuron unit - ms
     pylab.plot(mus_t, mus_vm, 'r-', label='mus')
+    pylab.plot(mus_t, ca_table, 'b-', label='ca')
 #     pylab.plot(nrn_t, nrn_vm, 'g-', label='nrn')
     pylab.legend()
     pylab.show()
