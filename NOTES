@@ -1077,3 +1077,10 @@ hub. Why?
 * <2009-08-31 Mon 21:49> Far higher frequency 
   I am getting far higher frequency than NEURON model and my model spikes
   spontaneously whereas the NEURON model spikes only at current injection.
+* <2009-09-07 Mon 18:49> Ca was the culprit
+  Not yet solved - but as I started recording [Ca2+] it was all 0. Then I
+  figured that the readcell was not able to tell Ca dependent channels from
+  others. So I put code to explicitly connect the CaPool to the CaL channel
+  for Ca2+ source and to KCa channels as source of concentration - and this
+  changed the firing behaviour drastically. Now it fires 3 times in first 4
+  milliseconds (too high) and stops after that - not sure why.
