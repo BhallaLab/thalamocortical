@@ -1084,3 +1084,8 @@ hub. Why?
   for Ca2+ source and to KCa channels as source of concentration - and this
   changed the firing behaviour drastically. Now it fires 3 times in first 4
   milliseconds (too high) and stops after that - not sure why.
+* <2009-09-08 Tue 11:00> Passive properties - OK
+  Only difference was Em - which was set to -65 mV in my code and -70 in
+  neuron - after changing passive cell behaves OK.
+** Blocked Ca channels and Ca dependent channels - differ
+** Only Na channels - the high happens early in moose - likely culprit
