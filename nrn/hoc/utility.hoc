@@ -118,7 +118,7 @@ proc print_readcell(){ localobj cell,dump_file, strfn, secref
 //	    print "secname: ", compname, " index: ", comp_index, " parent: ", parent_str
 	    dump_file.printf("%s	%s	%g	%g	%g	%g", compname, parent_str, L, 0.0, 0.0, diam)
 	    if (ismembrane("ar")) dump_file.printf("	AR	%g", gbar_ar * 1e4)
-	    if (ismembrane("cad")) dump_file.printf("	CaPool	%g", -phi_cad * 1e6 / sarea)
+	    if (ismembrane("cad")) dump_file.printf("	CaPool	%g", -phi_cad * 1e3 / sarea) // Not sure why - but multiply by 1e3 instead of 1e6 to get it to work
 	    if (ismembrane("cal")) dump_file.printf("	CaL	%g", gbar_cal * 1e4)
 	    if (ismembrane("cat")) dump_file.printf("	CaT	%g", gbar_cat * 1e4)
 	    if (ismembrane("cat_a")) dump_file.printf("	CaT_A	%g", gbar_cat_a * 1e4)
@@ -133,7 +133,10 @@ proc print_readcell(){ localobj cell,dump_file, strfn, secref
 	    if (ismembrane("kdr")) dump_file.printf("	KDR	%g", gbar_kdr * 1e4) 
 	    if (ismembrane("kdr_fs")) dump_file.printf("	KDR_FS	%g", gbar_kdr_fs * 1e4) 
 	    if (ismembrane("km")) dump_file.printf("	KM	%g", gbar_km * 1e4) 
-	    if (ismembrane("naf")) dump_file.printf("	NaF	%g", gbar_naf * 1e4) 
+	    if (ismembrane("naf")){
+		dump_file.printf("	NaF	%g", gbar_naf * 1e4) 
+		printf("!! NaF: %s %g\n", compname, gbar_naf)
+	    }	    
 	    if (ismembrane("naf2")) dump_file.printf("	NaF2	%g", gbar_naf2 * 1e4) 
 	    if (ismembrane("naf_tcr")) dump_file.printf("	NaF_TCR	%g", gbar_naf_tcr * 1e4) 
 	    if (ismembrane("nap")) dump_file.printf("	NaP	%g", gbar_nap * 1e4) 

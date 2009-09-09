@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 24 10:04:47 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Aug 28 17:20:11 2009 (+0530)
+# Last-Updated: Tue Sep  8 10:58:18 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 208
+#     Update #: 210
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -101,7 +101,7 @@ class TraubCell(moose.Cell):
         
     def pfile_name(self):
         """Each cell type subclass should implement this"""
-        return None
+        raise NotImplementedError, "function pfile_name not implemented"
 
     @classmethod
     def read_proto(cls, filename, cellname):
