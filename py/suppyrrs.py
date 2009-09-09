@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Sep  7 21:56:06 2009 (+0530)
+# Last-Updated: Wed Sep  9 17:17:49 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 284
+#     Update #: 341
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -83,7 +83,8 @@ class SupPyrRS(TraubCell):
 	    self.level[0].add(self.comp[ii])
     
     def _setup_passive(self):
-        pass
+        for comp in self.comp[1:]:
+            comp.Em = -70e-3
 
     def _setup_channels(self):
         for i in range(len(self.level)):
@@ -95,7 +96,7 @@ class SupPyrRS(TraubCell):
                     obj = moose.Neutral(child)
                     if obj.name == 'CaPool':
                         ca_pool = moose.CaConc(child)
-                        ca_pool.B = ca_pool.B / 1e3 # TEST - spinstells are matching in Vm plot but not in parameter comparison - Beta_Cad is 1000 times less in MOOSE.
+                        ca_pool.B = ca_pool.B /1e3 # TEST - spinstells are matching in Vm plot but not in parameter comparison - Beta_Cad is 1000 times less in MOOSE.
                         ca_pool.tau = 1e-3/0.05
                         print '??', comp.name, ca_pool.B * comp.length * comp.diameter * pylab.pi, ca_pool.tau
                     else:
@@ -112,7 +113,6 @@ class SupPyrRS(TraubCell):
                             elif issubclass(pyclass, CaChannel):
                                 obj.Ek = 125e-3
                                 if issubclass(pyclass, CaL):
-                                    print 'CaL channel in', comp.path
                                     ca_chans.append(obj)
                             elif issubclass(pyclass, AR):
                                 obj.Ek = -35e-3
@@ -149,13 +149,13 @@ class SupPyrRS(TraubCell):
         print '######## Connecting'
         ca_conc.connect('Ca', ca_table, 'inputRequest')
         pymoose.showmsg(ca_conc)
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=5e3, firstWidth=100e-3)
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=1e6, firstWidth=100e-3)
 
         sim.schedule()
         if mycell.has_cycle():
             print "WARNING!! CYCLE PRESENT IN CICRUIT."
         t1 = datetime.now()
-        sim.run(10e-3)
+        sim.run(100e-3)
         t2 = datetime.now()
         delta = t2 - t1
         print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds

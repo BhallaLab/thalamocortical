@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:13 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Jun 30 13:41:59 2009 (+0530)
+# Last-Updated: Wed Sep  9 15:11:15 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 120
+#     Update #: 122
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -57,13 +57,14 @@ class NaChannel(ChannelBase):
         self.Ek = Ek
 
 class NaF(NaChannel):
-    def __init__(self, name, parent, shift=0.0, Ek=50e-3):
+    def __init__(self, name, parent, shift=-3.5e-3, Ek=50e-3):
         NaChannel.__init__(self, name, parent, 3, 1, Ek)
         v = linspace(config.vmin, config.vmax, config.ndivs + 1) + shift
         tau_m = where(v < -30e-3, \
                           1.0e-3 * (0.025 + 0.14 * exp((v + 30.0e-3) / 10.0e-3)), \
                           1.0e-3 * (0.02 + 0.145 * exp(( - v - 30.0e-3) / 10.0e-3)))
         m_inf = 1.0 / (1.0 + exp(( - v - 38e-3) / 10e-3))
+        v = v - shift
         tau_h = 1.0e-3 * (0.15 + 1.15 / ( 1.0 + exp(( v + 37.0e-3) / 15.0e-3)))
         h_inf = 1.0 / (1.0 + exp((v + 62.9e-3) / 10.7e-3))
         for i in range(config.ndivs + 1):
