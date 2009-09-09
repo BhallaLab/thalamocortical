@@ -1089,3 +1089,6 @@ hub. Why?
   neuron - after changing passive cell behaves OK.
 ** Blocked Ca channels and Ca dependent channels - differ
 ** Only Na channels - the high happens early in moose - likely culprit
+* <2009-09-09 Wed 18:08> Fixed SupPyrRS  - almost
+  Now within 10 ms window behaviour is identical - earlier problem was because
+  NaF shift was missing. Change utility.hoc to write scaled value of B for [Ca2+].

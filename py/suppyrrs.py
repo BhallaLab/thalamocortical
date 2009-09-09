@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Sep  9 17:17:49 2009 (+0530)
+# Last-Updated: Wed Sep  9 18:03:05 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 341
+#     Update #: 342
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -96,7 +96,7 @@ class SupPyrRS(TraubCell):
                     obj = moose.Neutral(child)
                     if obj.name == 'CaPool':
                         ca_pool = moose.CaConc(child)
-                        ca_pool.B = ca_pool.B /1e3 # TEST - spinstells are matching in Vm plot but not in parameter comparison - Beta_Cad is 1000 times less in MOOSE.
+                        ca_pool.B = ca_pool.B
                         ca_pool.tau = 1e-3/0.05
                         print '??', comp.name, ca_pool.B * comp.length * comp.diameter * pylab.pi, ca_pool.tau
                     else:
