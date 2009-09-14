@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Aug  7 15:04:10 2009 (+0530)
+# Last-Updated: Mon Sep 14 09:57:59 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 43
+#     Update #: 46
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -53,8 +53,8 @@ context = moose.PyMooseBase.getContext()
 lib = moose.Neutral('/library')
 root = moose.Neutral("/")
 
-simdt = 1e-5
-plotdt = 1e-5
+simdt = 1e-6
+plotdt = 1e-6
 vmin = -120e-3
 vmax = 40e-3
 ndivs = 640
