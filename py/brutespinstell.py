@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri May  8 11:24:30 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Sep  7 19:13:27 2009 (+0530)
+# Last-Updated: Fri Sep 11 02:46:05 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 566
+#     Update #: 568
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -511,14 +511,14 @@ if __name__ == '__main__':
 #     for comp in s.comp:
 #         for chan in comp.channels:
 #             print chan.path, chan.Gbar/comp.sarea(), chan.Ek
-#     nrn_data = pylab.loadtxt('../nrn/mydata/Vm_ss.plot')
-#     nrn_vm = nrn_data[:, 1]
-#     nrn_t = nrn_data[:, 0]
+    nrn_data = pylab.loadtxt('../nrn/mydata/Vm_ss.plot')
+    nrn_vm = nrn_data[:, 1]
+    nrn_t = nrn_data[:, 0]
     mus_vm = pylab.array(vm_table) * 1e3 # convert Neuron unit - mV
     mus_t = pylab.linspace(0, sim.simtime * 1e3, len(vm_table)) # convert simtime to neuron unit - ms
     pylab.plot(mus_t, mus_vm, 'r-', label='mus')
     pylab.plot(mus_t, ca_table, 'b-', label='ca')
-#     pylab.plot(nrn_t, nrn_vm, 'g-', label='nrn')
+    pylab.plot(nrn_t, nrn_vm, 'g-', label='nrn')
     pylab.legend()
     pylab.show()
 

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Sep  9 18:03:05 2009 (+0530)
+# Last-Updated: Mon Sep 14 00:31:17 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 342
+#     Update #: 411
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -87,6 +87,18 @@ class SupPyrRS(TraubCell):
             comp.Em = -70e-3
 
     def _setup_channels(self):
+        unblocklist = [
+#             'NaF', 
+#             'NaP', 
+#             'KDR', 
+#             'K2',
+            'CaL',
+#             'CaT',
+#             'KA',
+#             'AR',
+#             'KM',
+            'KC'
+            ]
         for i in range(len(self.level)):
             for comp in self.level[i]:
                 ca_pool = None
@@ -96,14 +108,16 @@ class SupPyrRS(TraubCell):
                     obj = moose.Neutral(child)
                     if obj.name == 'CaPool':
                         ca_pool = moose.CaConc(child)
-                        ca_pool.B = ca_pool.B
+#                         ca_pool.B = ca_pool.B * 1e3
                         ca_pool.tau = 1e-3/0.05
-                        print '??', comp.name, ca_pool.B * comp.length * comp.diameter * pylab.pi, ca_pool.tau
                     else:
                         obj_class = obj.className
                         if obj_class == "HHChannel":
                             obj = moose.HHChannel(child)
-                            pyclass = eval(obj.name)
+                            if not obj.name in unblocklist:
+                                obj.Gbar = 0.0
+                            pyclass = eval(obj.name)                            
+                            
                             if issubclass(pyclass, KChannel):
                                 obj.Ek = -95e-3
                                 if issubclass(pyclass, KCaChannel):
@@ -140,16 +154,14 @@ class SupPyrRS(TraubCell):
         print 'tau =', ca_conc.tau, 'B =', ca_conc.B
         ca_table = moose.Table('cad', sim.data)
         ca_table.stepMode = 3
-        for i in range(len(mycell.level)):
-            for comp in mycell.level[i]:
-                if config.context.exists(comp.path + '/CaPool'):
-                    ca_pool = moose.CaConc(comp.path + '/CaPool')
-                    print '##?', comp.name, ca_pool.B, ca_pool.tau
-
         print '######## Connecting'
         ca_conc.connect('Ca', ca_table, 'inputRequest')
+        gk_table = moose.Table('gkc', sim.data)
+        gk_table.stepMode = 3
+        kc = moose.HHChannel(mycell.soma.path + '/KC')
+        kc.connect('Gk', gk_table, 'inputRequest')
         pymoose.showmsg(ca_conc)
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=1e6, firstWidth=100e-3)
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=5e-3, firstWidth=100e-3)
 
         sim.schedule()
         if mycell.has_cycle():

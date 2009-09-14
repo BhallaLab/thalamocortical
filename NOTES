@@ -1092,3 +1092,56 @@ hub. Why?
 * <2009-09-09 Wed 18:08> Fixed SupPyrRS  - almost
   Now within 10 ms window behaviour is identical - earlier problem was because
   NaF shift was missing. Change utility.hoc to write scaled value of B for [Ca2+].
+* <2009-09-11 Fri 01:31> Checking for 100ms run time
+  There was significant discrepenacy in time for the second spike when I ran the
+  simulation - now I am trying the channels one by one again.
+** Na channels - passed
+** Na + KDR - hyperpolarization of neuron model is more than mus - Ek of K channels?
+   I had forgotten to uncomment ek for neuron model.
+   After correction - first spike matches exactly - but then they start going
+   out of sync...
+** KDR Alone - after 30 ms mus and nrn plots start diverging
+** KA Alone - good match - now I have serious doubt about KDR
+** KDR, KC and KAHP blocked - slight variation
+** KC enabled, KDR and KAHP blocked - significant variation
+** KAHP enabled, KDR and KC blocked - significant variation after the first spike..
+* <2009-09-11 Fri 14:18> Now KDR works!
+  As I retried to compare KDR only models - voila - the plots are
+  identical. Looks like I was missing some compartments when
+  enabling/disabling channels. Effect of wee-hour programming!!
+** NaF, NaP and KDR work together
+** KC - causes serious discrepancy from second spike
+** checked [Ca2+] :: moose * 1e3 = neuron
+   It is getting built up according to the formula:
+   [Ca2+]' = B * I - [Ca2+]/tau   
+   Now I is in mA in neuron and A in moose - so B * I will be scaled up by
+   1000. Also tau is ms in neuron and s in moose - so this too, ... no the
+   dimensions are messed up! So let us assume everything else is fine except
+   the scale factor for [Ca2+] - as shown bu the plots - so how to rescale KC
+   Zgate tables to behave properly?
+
+   
+* <2009-09-12 Sat 22:13> KC and KAHP only hardles
+  Now all other channels are behaving properly - only KC and KAHP - the Ca
+  dependent channels have to be fixed. Now I will try brute force approach -
+  plot Gk (or Ik) / (v - ek) against [Ca2+] and reverse calculate the
+  appropriate function for MOOSE.
+* <2009-09-14 Mon 09:43> KC ....
+  The neuron formula for ik_kc is:
+  if 0.004 * cai < 1
+	ik_kc = gbar * m * 0.004 * cai * (v - ek)
+  else
+	ik_kc = gbar * m * (v - ek)
+
+
+  So, since moose cai is 10^-3 times that in neuron, the formula should be
+  
+  if 4 * cai < 1:
+	ik_kc = gbar * m * 4 * cai
+  else
+	ik_kc = gbar * m * (v - ek)
+
+  But this does not help.
+  I tried plotting g_kc for neuron against moose - initial part is
+  non-linear. Now removed the Ca dependency from both versions and checking if
+  m parameter is ok.
