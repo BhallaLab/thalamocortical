@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Aug  4 22:10:51 2009 (+0530)
+# Last-Updated: Mon Sep 14 10:49:02 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 500
+#     Update #: 575
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -47,7 +47,7 @@
 
 import moose
 from channel import ChannelBase
-from numpy import where, linspace, exp, arange, ones, zeros
+from numpy import where, linspace, exp, arange, ones, zeros, savetxt
 import config
 
 
@@ -79,11 +79,14 @@ class KDR(KChannel):
     m_inf = 1.0 / (1.0 + exp((- v - 29.5e-3) / 10e-3))
     
     def __init__(self, name, parent, Ek=-95e-3):
-	KChannel.__init__(self, name, parent, 4, Ek=Ek)
+	KChannel.__init__(self, name, parent, xpower=4.0, Ek=Ek)
 	for i in range(config.ndivs + 1):
             self.xGate.A[i] = KDR.tau_m[i]
             self.xGate.B[i] = KDR.m_inf[i]
 	self.xGate.tweakTau()
+        self.X = 0.0
+	self.xGate.A.dumpFile('kdr_xa.plot')
+        self.xGate.B.dumpFile('kdr_xb.plot')
 
 
 class KDR_FS(KChannel):
@@ -160,7 +163,7 @@ class K2(KChannel):
 					exp((-v - 130e-3) / 7.1e-3)))
 
     def __init__(self, name, parent, Ek=-95e-3):
-	KChannel.__init__(self, name, parent, 1, 1, Ek=Ek)
+	KChannel.__init__(self, name, parent, xpower=1.0, ypower=1.0, Ek=Ek)
 	for i in range(config.ndivs + 1):
             self.xGate.A[i] = K2.tau_m[i]
             self.xGate.B[i] = K2.m_inf[i]
@@ -168,13 +171,19 @@ class K2(KChannel):
             self.yGate.B[i] = K2.h_inf[i]
         self.xGate.tweakTau()
 	self.yGate.tweakTau()
+        self.X = 0.0
+	self.xGate.A.dumpFile('k2_xa.plot')
+        self.xGate.B.dumpFile('k2_xb.plot')
+	self.yGate.A.dumpFile('k2_ya.plot')
+        self.yGate.B.dumpFile('k2_yb.plot')
 	
 
 class KM(KChannel):
     v = ChannelBase.v_array
     a =  1e3 * 0.02 / ( 1 + exp((-v - 20e-3 ) / 5e-3))
     b = 1e3 * 0.01 * exp((-v - 43e-3) / 18e-3)
-
+    minf = a / (a + b)
+    mtau = 1 / (a + b)
     def __init__(self, name, parent, Ek=-95e-3):
 	KChannel.__init__(self, name, parent, 1, Ek=Ek)
 	for i in range(config.ndivs + 1):
@@ -185,22 +194,22 @@ class KM(KChannel):
 
 class KCaChannel(KChannel):
     """[Ca+2] dependent K+ channel base class."""
-    xmin = 0.0
-    xmax = 1.0
-    xdivs = 1000
-    ca_conc = linspace(xmin, xmax, xdivs + 1)
+    ca_min = 0.0
+    ca_max = 1.0
+    ca_divs = 1000
+    ca_conc = linspace(ca_min, ca_max, ca_divs + 1)
 
     def __init__(self, name, parent, xpower=0, ypower=0, zpower=1, Ek=-95e-3):
         KChannel.__init__(self, name, parent, xpower, ypower, Ek=Ek)
         self.connected_to_ca = False
         self.Zpower = zpower
         self.zGate = moose.HHGate('zGate', self)
-        self.zGate.A.xmin = KCaChannel.xmin
-        self.zGate.A.xdivs = KCaChannel.xdivs
-        self.zGate.A.xmax = KCaChannel.xmax
-        self.zGate.B.xmin = KCaChannel.xmin
-        self.zGate.B.xdivs = KCaChannel.xdivs        
-        self.zGate.B.xmax = KCaChannel.xmax
+        self.zGate.A.xmin = KCaChannel.ca_min
+        self.zGate.A.xdivs = KCaChannel.ca_divs
+        self.zGate.A.xmax = KCaChannel.ca_max
+        self.zGate.B.xmin = KCaChannel.ca_min
+        self.zGate.B.xdivs = KCaChannel.ca_divs        
+        self.zGate.B.xmax = KCaChannel.ca_max
         self.zGate.A.calcMode = 1
         self.zGate.B.calcMode = 1
         self.useConcentration = True
@@ -215,7 +224,7 @@ class KAHP(KAHPBase):
     """AHP type K+ current"""
 
     alpha = where(KCaChannel.ca_conc < 100.0 * 1e-3 , 0.1 * KCaChannel.ca_conc, 10.0)
-    beta =  ones(KCaChannel.xdivs + 1) * 10.0
+    beta =  ones(KCaChannel.ca_divs + 1) * 10.0
 
     def __init__(self, name, parent, Ek=-95e-3):
         KAHPBase.__init__(self, name, parent, Ek=Ek)
@@ -229,11 +238,11 @@ class KAHP(KAHPBase):
 class KAHP_SLOWER(KAHPBase):
 
     alpha = where(KCaChannel.ca_conc < 500.0e-3, 1e6 * KCaChannel.ca_conc / 50000, 10.0)
-    beta =  ones(KCaChannel.xdivs + 1) * 1.0
+    beta =  ones(KCaChannel.ca_divs + 1) * 1.0
 
     def __init__(self, name, parent, Ek=-95e-3):
         KAHPBase.__init__(self, name, parent, Ek=Ek)
-        for i in range(KCaChannel.xdivs + 1):
+        for i in range(KCaChannel.ca_divs + 1):
             self.zGate.A[i] = KAHP_SLOWER.alpha[i]
             self.zGate.B[i] = KAHP_SLOWER.beta[i]
         self.zGate.tweakAlpha()
@@ -242,17 +251,17 @@ class KAHP_SLOWER(KAHPBase):
 class KAHP_DP(KAHPBase):
     """KAHP for deep pyramidal cell"""
     alpha = where(KCaChannel.ca_conc < 100.0 * 1e-3, 1e-4 * KCaChannel.ca_conc, 0.01)
-    beta =  ones(KCaChannel.xdivs + 1) * 0.001 
+    beta =  ones(KCaChannel.ca_divs + 1) * 0.001 
     def __init__(self, name, parent, Ek=-95e-3):
         KAHPBase.__init__(self, name, parent, Ek=Ek)
-        for i in range(KCaChannel.xdivs + 1):
+        for i in range(KCaChannel.ca_divs + 1):
             self.zGate.A[i] = KAHP_DP.alpha[i]
             self.zGate.B[i] = KAHP_DP.beta[i]
         self.zGate.tweakAlpha()
 
 class KC(KCaChannel):
     """C type K+ channel"""
-    alpha_ca = where(KCaChannel.ca_conc < 250e-3, KCaChannel.ca_conc / 250e-3, 1.0)
+    alpha_ca = where(KCaChannel.ca_conc < 0.25, KCaChannel.ca_conc / 0.25, 1.0)
     v = ChannelBase.v_array
     alpha = where(v < -10e-3, 
                       2e3 / 37.95 * ( exp( ( v * 1e3 + 50 ) / 11 - ( v * 1e3 + 53.5 ) / 27 ) ),
@@ -262,17 +271,19 @@ class KC(KCaChannel):
                   0.0)
 
     def __init__(self, name, parent, Ek=-95e-3):
-        KCaChannel.__init__(self, name, parent, 1, 0, 1, Ek=Ek)
-        for i in range(KCaChannel.xdivs + 1):
-            self.zGate.A[i] = KC.alpha_ca[i]
+        KCaChannel.__init__(self, name, parent, xpower=1.0, ypower=0.0, zpower=1.0, Ek=Ek)
+        for i in range(KCaChannel.ca_divs + 1):
+            self.zGate.A[i] = 1.0 #KC.alpha_ca[i]
             self.zGate.B[i] = 1.0
         self.instant = 4 # Zgate m is instantaneous: m = A/B
-        self.X = 0.0
+        self.zGate.A.calcMode = 1
+        self.zGate.B.calcMode = 1
         for i in range(config.ndivs + 1):
             self.xGate.A[i] = KC.alpha[i]
             self.xGate.B[i] = KC.beta[i]
         self.xGate.tweakAlpha()
-        self.X = 0.0
+        self.xGate.A.calcMode = 1
+        self.xGate.B.calcMode = 1
 
         
 class KC_FAST(KC):
@@ -284,6 +295,9 @@ class KC_FAST(KC):
             self.xGate.B[i] = 2 * self.xGate.B[i]
         
 if __name__ == "__main__":
-    a = KC_FAST('kc', moose.Neutral('/'))
+#    a = KC_FAST('kc', moose.Neutral('/'))
+#     b = KDR('KDR', moose.Neutral('/'))
+    c = K2('K2', moose.Neutral('/'))
+
 # 
 # kchans.py ends here
