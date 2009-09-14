@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Sep 14 00:31:17 2009 (+0530)
+# Last-Updated: Mon Sep 14 12:01:54 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 411
+#     Update #: 412
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -151,7 +151,7 @@ class SupPyrRS(TraubCell):
         print 'Created cell:', mycell.path
         vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_suppyrrs', 'Vm', sim.data)
         ca_conc = moose.CaConc(mycell.soma.path + '/CaPool')
-        print 'tau =', ca_conc.tau, 'B =', ca_conc.B
+#         print 'tau =', ca_conc.tau, 'B =', ca_conc.B
         ca_table = moose.Table('cad', sim.data)
         ca_table.stepMode = 3
         print '######## Connecting'

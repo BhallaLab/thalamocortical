@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Sep 14 10:49:02 2009 (+0530)
+# Last-Updated: Mon Sep 14 12:02:40 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 575
+#     Update #: 598
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -212,7 +212,7 @@ class KCaChannel(KChannel):
         self.zGate.B.xmax = KCaChannel.ca_max
         self.zGate.A.calcMode = 1
         self.zGate.B.calcMode = 1
-        self.useConcentration = True
+#         self.useConcentration = True # TODO - uncomment after test
 
 
 class KAHPBase(KCaChannel):
@@ -279,12 +279,11 @@ class KC(KCaChannel):
         self.zGate.A.calcMode = 1
         self.zGate.B.calcMode = 1
         for i in range(config.ndivs + 1):
-            self.xGate.A[i] = KC.alpha[i]
-            self.xGate.B[i] = KC.beta[i]
-        self.xGate.tweakAlpha()
+            self.xGate.A[i] = KC.alpha[i] 
+            self.xGate.B[i] = (KC.alpha[i] + KC.beta[i])
         self.xGate.A.calcMode = 1
         self.xGate.B.calcMode = 1
-
+        self.X = 0.0
         
 class KC_FAST(KC):
     """Fast KC channel"""
