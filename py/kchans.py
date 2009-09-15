@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Sep 14 12:02:40 2009 (+0530)
+# Last-Updated: Tue Sep 15 13:02:12 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 598
+#     Update #: 607
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -195,7 +195,7 @@ class KM(KChannel):
 class KCaChannel(KChannel):
     """[Ca+2] dependent K+ channel base class."""
     ca_min = 0.0
-    ca_max = 1.0
+    ca_max = 1000.0
     ca_divs = 1000
     ca_conc = linspace(ca_min, ca_max, ca_divs + 1)
 
@@ -261,7 +261,7 @@ class KAHP_DP(KAHPBase):
 
 class KC(KCaChannel):
     """C type K+ channel"""
-    alpha_ca = where(KCaChannel.ca_conc < 0.25, KCaChannel.ca_conc / 0.25, 1.0)
+    alpha_ca = where(KCaChannel.ca_conc < 250.0, KCaChannel.ca_conc / 250.0, 1.0)
     v = ChannelBase.v_array
     alpha = where(v < -10e-3, 
                       2e3 / 37.95 * ( exp( ( v * 1e3 + 50 ) / 11 - ( v * 1e3 + 53.5 ) / 27 ) ),
@@ -273,16 +273,17 @@ class KC(KCaChannel):
     def __init__(self, name, parent, Ek=-95e-3):
         KCaChannel.__init__(self, name, parent, xpower=1.0, ypower=0.0, zpower=1.0, Ek=Ek)
         for i in range(KCaChannel.ca_divs + 1):
-            self.zGate.A[i] = 1.0 #KC.alpha_ca[i]
+            self.zGate.A[i] = KC.alpha_ca[i]
             self.zGate.B[i] = 1.0
         self.instant = 4 # Zgate m is instantaneous: m = A/B
         self.zGate.A.calcMode = 1
         self.zGate.B.calcMode = 1
         for i in range(config.ndivs + 1):
-            self.xGate.A[i] = KC.alpha[i] 
-            self.xGate.B[i] = (KC.alpha[i] + KC.beta[i])
+            self.xGate.A[i] = 1.0 #KC.alpha[i] 
+            self.xGate.B[i] = 1.0 #(KC.alpha[i] + KC.beta[i])
         self.xGate.A.calcMode = 1
         self.xGate.B.calcMode = 1
+        self.instant = 1 + 4
         self.X = 0.0
         
 class KC_FAST(KC):

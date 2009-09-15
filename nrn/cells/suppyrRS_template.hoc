@@ -404,38 +404,38 @@ proc biophys() {
     forsec all { insert pas }   // g_pas has two values; soma-dend,axon
     
     forsec level[ 0] {
-	// insert naf
-	// gbar_naf =   0.4
-	// insert kdr
-	// gbar_kdr =   0.4
-        // insert ka
-	// gbar_ka =   0.002
-        // insert k2
-	// gbar_k2 =   0.0001
+	insert naf
+	gbar_naf =   0.4
+	insert kdr
+	gbar_kdr =   0.4
+        insert ka
+	gbar_ka =   0.002
+        insert k2
+	gbar_k2 =   0.0001
     }
     forsec level[ 1] {
-	// insert naf
-	// gbar_naf =   0.15
-	// insert nap
-	// gbar_nap =   0.0006
-	// insert kdr
-	// gbar_kdr =   0.1
+	insert naf
+	gbar_naf =   0.15
+	insert nap
+	gbar_nap =   0.0006
+	insert kdr
+	gbar_kdr =   0.1
 	insert kc
 	gbar_kc =   0.0075
-	// insert ka
-	// gbar_ka =   0.03
-	// insert km
-	// gbar_km =   0.00375
-	// insert k2
-	// gbar_k2 =   0.0001
-	// insert kahp
-	// gbar_kahp =   0.0001
+	insert ka
+	gbar_ka =   0.03
+	insert km
+	gbar_km =   0.00375
+	insert k2
+	gbar_k2 =   0.0001
+	insert kahp
+	gbar_kahp =   0.0001
 	insert cal
 	gbar_cal =   0.001
-	// insert cat
-	// gbar_cat =   0.0001
-	// insert ar
-	// gbar_ar =   0.00025
+	insert cat
+	gbar_cat =   0.0001
+	insert ar
+	gbar_ar =   0.00025
 	insert cad
 	////       *** ca diffusion: beta=1/tau
         beta_cad  =   0.01
@@ -443,28 +443,28 @@ proc biophys() {
         phi_cad =   26000.
     }
     forsec level[ 2] {
-	// insert naf
-	// gbar_naf =   0.075
-	// insert nap
-	// gbar_nap =   0.0003
-        // insert kdr
-	// gbar_kdr =   0.075
+	insert naf
+	gbar_naf =   0.075
+	insert nap
+	gbar_nap =   0.0003
+        insert kdr
+	gbar_kdr =   0.075
 	insert kc
 	gbar_kc =   0.0075
-        // insert ka
-	// gbar_ka =   0.002
-        // insert km
-	// gbar_km =   0.00375
-        // insert k2
-	// gbar_k2 =   0.0001
-        // insert kahp
-	// gbar_kahp =   0.0001
+        insert ka
+	gbar_ka =   0.002
+        insert km
+	gbar_km =   0.00375
+        insert k2
+	gbar_k2 =   0.0001
+        insert kahp
+	gbar_kahp =   0.0001
         insert cal
 	gbar_cal =   0.001
-        // insert cat
-	// gbar_cat =   0.0001
-        // insert ar
-	// gbar_ar =   0.00025
+        insert cat
+	gbar_cat =   0.0001
+        insert ar
+	gbar_ar =   0.00025
         insert cad
 	//        // *** ca diffusion: beta=1/tau
         beta_cad  =   0.05
@@ -472,28 +472,28 @@ proc biophys() {
         phi_cad =   52000.
     }
     forsec level[ 3] {
-	// insert naf
-	// gbar_naf =   0.01
-	// insert nap
-	// gbar_nap =   4.E-05
-        // insert kdr
-	// gbar_kdr =   0.005
+	insert naf
+	gbar_naf =   0.01
+	insert nap
+	gbar_nap =   4.E-05
+        insert kdr
+	gbar_kdr =   0.005
 	insert kc
 	gbar_kc =   0.0075
-        // insert ka
-	// gbar_ka =   0.002
-        // insert km
-	// gbar_km =   0.00375
-        // insert k2
-	// gbar_k2 =   0.0001
-	//        insert kahp
-	//	gbar_kahp =   0.0001
+        insert ka
+	gbar_ka =   0.002
+        insert km
+	gbar_km =   0.00375
+        insert k2
+	gbar_k2 =   0.0001
+	insert kahp
+	gbar_kahp =   0.0001
         insert cal
 	gbar_cal =   0.001
-        // insert cat
-	// gbar_cat =   0.0001
-        // insert ar
-	// gbar_ar =   0.00025
+        insert cat
+	gbar_cat =   0.0001
+        insert ar
+	gbar_ar =   0.00025
         insert cad
 	//        // *** ca diffusion: beta=1/tau
         beta_cad  =   0.05
@@ -501,28 +501,28 @@ proc biophys() {
         phi_cad =   52000.
     }
     forsec level[ 4] {
-	// insert naf
-	// gbar_naf =   0.01
-	// insert nap
-	// gbar_nap =   4.E-05
-        // insert kdr
-	// gbar_kdr =   0.005
+	insert naf
+	gbar_naf =   0.01
+	insert nap
+	gbar_nap =   4.E-05
+        insert kdr
+	gbar_kdr =   0.005
 	insert kc
 	gbar_kc =   0.0075
-        // insert ka
-	// gbar_ka =   0.002
-        // insert km
-	// gbar_km =   0.00375
-        // insert k2
-	// gbar_k2 =   0.0001
-	//        insert kahp
-	//	gbar_kahp =   0.0001
+        insert ka
+	gbar_ka =   0.002
+        insert km
+	gbar_km =   0.00375
+        insert k2
+	gbar_k2 =   0.0001
+	insert kahp
+	gbar_kahp =   0.0001
         insert cal
 	gbar_cal =   0.001
-        // insert cat
-	// gbar_cat =   0.0001
-        // insert ar
-	// gbar_ar =   0.00025
+        insert cat
+	gbar_cat =   0.0001
+        insert ar
+	gbar_ar =   0.00025
         insert cad
 	//        // *** ca diffusion: beta=1/tau
         beta_cad  =   0.05
@@ -530,28 +530,28 @@ proc biophys() {
         phi_cad =   52000.
     }
     forsec level[ 5] {
-	// insert naf
-	// gbar_naf =   0.1
-	// insert nap
-	// gbar_nap =   0.0004
-        // insert kdr
-	// gbar_kdr =   0.1
+	insert naf
+	gbar_naf =   0.1
+	insert nap
+	gbar_nap =   0.0004
+        insert kdr
+	gbar_kdr =   0.1
 	insert kc
 	gbar_kc =   0.0075
-        // insert ka
-	// gbar_ka =   0.03
-        // insert km
-	// gbar_km =   0.00375
-        // insert k2
-	// gbar_k2 =   0.0001
-	//        insert kahp
-	//	gbar_kahp =   0.0001
+        insert ka
+	gbar_ka =   0.03
+        insert km
+	gbar_km =   0.00375
+        insert k2
+	gbar_k2 =   0.0001
+	insert kahp
+	gbar_kahp =   0.0001
         insert cal
 	gbar_cal =   0.001
-        // insert cat
-	// gbar_cat =   0.0001
-        // insert ar
-	// gbar_ar =   0.00025
+        insert cat
+	gbar_cat =   0.0001
+        insert ar
+	gbar_ar =   0.00025
         insert cad
 	//        // *** ca diffusion: beta=1/tau
         beta_cad  =   0.05
@@ -559,28 +559,28 @@ proc biophys() {
         phi_cad =   52000.
     }
     forsec level[ 6] {
-	// insert naf
-	// gbar_naf =   0.075
-	// insert nap
-	// gbar_nap =   0.0003
-	// insert kdr
-	// gbar_kdr =   0.075
+	insert naf
+	gbar_naf =   0.075
+	insert nap
+	gbar_nap =   0.0003
+	insert kdr
+	gbar_kdr =   0.075
 	insert kc
 	gbar_kc =   0.0075
-        // insert ka
-	// gbar_ka =   0.002
-        // insert km
-	// gbar_km =   0.00375
-        // insert k2
-	// gbar_k2 =   0.0001
-	//        insert kahp
-	//	gbar_kahp =   0.0001
+        insert ka
+	gbar_ka =   0.002
+        insert km
+	gbar_km =   0.00375
+        insert k2
+	gbar_k2 =   0.0001
+	insert kahp
+	gbar_kahp =   0.0001
         insert cal
 	gbar_cal =   0.001
-        // insert cat
-	// gbar_cat =   0.0001
-        // insert ar
-	// gbar_ar =   0.00025
+        insert cat
+	gbar_cat =   0.0001
+        insert ar
+	gbar_ar =   0.00025
         insert cad
 	//        // *** ca diffusion: beta=1/tau
         beta_cad  =   0.05
@@ -588,28 +588,28 @@ proc biophys() {
         phi_cad =   52000.
     }
     forsec level[ 7] {
-	// insert naf
-	// gbar_naf =   0.01
-	// insert nap
-	// gbar_nap =   4.E-05
-        // insert kdr
-	// gbar_kdr =   0.005
+	insert naf
+	gbar_naf =   0.01
+	insert nap
+	gbar_nap =   4.E-05
+        insert kdr
+	gbar_kdr =   0.005
 	insert kc
 	gbar_kc =   0.0075
-        // insert ka
-	// gbar_ka =   0.002
-        // insert km
-	// gbar_km =   0.00375
-        // insert k2
-	// gbar_k2 =   0.0001
-	//        insert kahp
-	//	gbar_kahp =   0.0001
+        insert ka
+	gbar_ka =   0.002
+        insert km
+	gbar_km =   0.00375
+        insert k2
+	gbar_k2 =   0.0001
+	insert kahp
+	gbar_kahp =   0.0001
         insert cal
 	gbar_cal =   0.001
-        // insert cat
-	// gbar_cat =   0.0001
-        // insert ar
-	// gbar_ar =   0.00025
+        insert cat
+	gbar_cat =   0.0001
+        insert ar
+	gbar_ar =   0.00025
         insert cad
 	//        // *** ca diffusion: beta=1/tau
         beta_cad  =   0.05
@@ -617,28 +617,28 @@ proc biophys() {
         phi_cad =   52000.
     }
     forsec level[ 8] {
-	// insert naf
-	// gbar_naf =   0.01
-	// insert nap
-	// gbar_nap =   4.E-05
-        // insert kdr
-	// gbar_kdr =   0.005
+	insert naf
+	gbar_naf =   0.01
+	insert nap
+	gbar_nap =   4.E-05
+        insert kdr
+	gbar_kdr =   0.005
 	insert kc
 	gbar_kc =   0.0075
-        // insert ka
-	// gbar_ka =   0.002
-        // insert km
-	// gbar_km =   0.00375
-        // insert k2
-	// gbar_k2 =   0.0001
-	//        insert kahp
-	//	gbar_kahp =   0.0001
+        insert ka
+	gbar_ka =   0.002
+        insert km
+	gbar_km =   0.00375
+        insert k2
+	gbar_k2 =   0.0001
+	insert kahp
+	gbar_kahp =   0.0001
         insert cal
 	gbar_cal =   0.001
-        // insert cat
-	// gbar_cat =   0.0001
-        // insert ar
-	// gbar_ar =   0.00025
+        insert cat
+	gbar_cat =   0.0001
+        insert ar
+	gbar_ar =   0.00025
         insert cad
 	//        // *** ca diffusion: beta=1/tau
         beta_cad  =   0.05
@@ -646,28 +646,28 @@ proc biophys() {
         phi_cad =   52000.
     }
     forsec level[ 9] {
-	// insert naf
-	// gbar_naf =   0.01
-	// insert nap
-	// gbar_nap =   4.E-05
-        // insert kdr
-	// gbar_kdr =   0.005
+	insert naf
+	gbar_naf =   0.01
+	insert nap
+	gbar_nap =   4.E-05
+        insert kdr
+	gbar_kdr =   0.005
 	insert kc
 	gbar_kc =   0.0075
-        // insert ka
-	// gbar_ka =   0.002
-        // insert km
-	// gbar_km =   0.00375
-        // insert k2
-	// gbar_k2 =   0.0001
-	//        insert kahp
-	//	gbar_kahp =   0.0001
+        insert ka
+	gbar_ka =   0.002
+        insert km
+	gbar_km =   0.00375
+        insert k2
+	gbar_k2 =   0.0001
+	insert kahp
+	gbar_kahp =   0.0001
         insert cal
 	gbar_cal =   0.001
-        // insert cat
-	// gbar_cat =   0.0001
-        // insert ar
-	// gbar_ar =   0.00025
+        insert cat
+	gbar_cat =   0.0001
+        insert ar
+	gbar_ar =   0.00025
         insert cad
 	//        // *** ca diffusion: beta=1/tau
         beta_cad  =   0.05
@@ -675,28 +675,28 @@ proc biophys() {
         phi_cad =   52000.
     }
     forsec level[ 10] {
-	// insert naf
-	// gbar_naf =   0.01
-	// insert nap
-	// gbar_nap =   4.E-05
-        // insert kdr
-	// gbar_kdr =   0.005
+	insert naf
+	gbar_naf =   0.01
+	insert nap
+	gbar_nap =   4.E-05
+        insert kdr
+	gbar_kdr =   0.005
 	insert kc
 	gbar_kc =   0.0075
-        // insert ka
-	// gbar_ka =   0.002
-        // insert km
-	// gbar_km =   0.00375
-        // insert k2
-	// gbar_k2 =   0.0001
-	//        insert kahp
-	//	gbar_kahp =   0.0001
+        insert ka
+	gbar_ka =   0.002
+        insert km
+	gbar_km =   0.00375
+        insert k2
+	gbar_k2 =   0.0001
+	insert kahp
+	gbar_kahp =   0.0001
         insert cal
 	gbar_cal =   0.001
-        // insert cat
-	// gbar_cat =   0.0001
-        // insert ar
-	// gbar_ar =   0.00025
+        insert cat
+	gbar_cat =   0.0001
+        insert ar
+	gbar_ar =   0.00025
         insert cad
 	//        // *** ca diffusion: beta=1/tau
         beta_cad  =   0.05
@@ -704,28 +704,28 @@ proc biophys() {
         phi_cad =   52000.
     }
     forsec level[ 11] {
-	// insert naf
-	// gbar_naf =   0.01
-	// insert nap
-	// gbar_nap =   4.E-05
-        // insert kdr
-	// gbar_kdr =   0.005
+	insert naf
+	gbar_naf =   0.01
+	insert nap
+	gbar_nap =   4.E-05
+        insert kdr
+	gbar_kdr =   0.005
 	insert kc
 	gbar_kc =   0.0075
-        // insert ka
-	// gbar_ka =   0.002
-        // insert km
-	// gbar_km =   0.00375
-        // insert k2
-	// gbar_k2 =   0.0001
-	//        insert kahp
-	//	gbar_kahp =   0.0001
+        insert ka
+	gbar_ka =   0.002
+        insert km
+	gbar_km =   0.00375
+        insert k2
+	gbar_k2 =   0.0001
+	insert kahp
+	gbar_kahp =   0.0001
         insert cal
 	gbar_cal =   0.001
-        // insert cat
-	// gbar_cat =   0.0001
-        // insert ar
-	// gbar_ar =   0.00025
+        insert cat
+	gbar_cat =   0.0001
+        insert ar
+	gbar_ar =   0.00025
         insert cad
 	//        // *** ca diffusion: beta=1/tau
         beta_cad  =   0.05
@@ -733,28 +733,28 @@ proc biophys() {
         phi_cad =   52000.
     }
     forsec level[ 12] {
-	// insert naf
-	// gbar_naf =   0.01
-	// insert nap
-	// gbar_nap =   4.E-05
-        // insert kdr
-	// gbar_kdr =   0.005
+	insert naf
+	gbar_naf =   0.01
+	insert nap
+	gbar_nap =   4.E-05
+        insert kdr
+	gbar_kdr =   0.005
 	insert kc
 	gbar_kc =   0.0075
-        // insert ka
-	// gbar_ka =   0.002
-	// insert km
-	// gbar_km =   0.00375
-        // insert k2
-	// gbar_k2 =   0.0001
-	//        insert kahp
-	//	gbar_kahp =   0.0001
+        insert ka
+	gbar_ka =   0.002
+	insert km
+	gbar_km =   0.00375
+        insert k2
+	gbar_k2 =   0.0001
+	insert kahp
+	gbar_kahp =   0.0001
         insert cal
 	gbar_cal =   0.001
-        // insert cat
-	// gbar_cat =   0.0001
-        // insert ar
-	// gbar_ar =   0.00025
+        insert cat
+	gbar_cat =   0.0001
+        insert ar
+	gbar_ar =   0.00025
         insert cad
 	//        // *** ca diffusion: beta=1/tau
 	beta_cad  =   0.05
@@ -920,18 +920,18 @@ func is_art() { return 0 }
 proc more_adjustments() {
     forsec all {
 	// global reversal potentials
-	if (ismembrane("kc")) {ek =  -95.}
+	ek =  -95.
 	e_pas =  -70.
-	// ena = 50.
-	if (ismembrane("cal")) {vca =   125.}
+	ena = 50.
+	vca =   125.
 	forsec all if (ismembrane("ar")) erev_ar =  -35.
 	e_gaba_a =  -81.
     }
     forsec all if (ismembrane("naf")) {fastNa_shift_naf=-3.5} // extended initializations from integrate_suppyrFRB()
     forsec all { if (ismembrane("km")) {gbar_km = 2*gbar_km}}
     forsec Soma_Dendrites {
-	// gbar_naf = 1.25*gbar_naf
-	// gbar_kdr = 1.25*gbar_kdr
+	gbar_naf = 1.25*gbar_naf
+	gbar_kdr = 1.25*gbar_kdr
     }
     forsec all if (ismembrane("nap")) { gbar_nap *=   0.2 }
     forsec all if (ismembrane("kc")) { gbar_kc *=   1.6 }
