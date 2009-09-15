@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Sep 14 12:01:54 2009 (+0530)
+# Last-Updated: Tue Sep 15 19:52:02 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 412
+#     Update #: 429
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -88,16 +88,16 @@ class SupPyrRS(TraubCell):
 
     def _setup_channels(self):
         unblocklist = [
-#             'NaF', 
-#             'NaP', 
-#             'KDR', 
+            'NaF', 
+            'NaP', 
+            'KDR', 
 #             'K2',
             'CaL',
-#             'CaT',
+            'CaT',
 #             'KA',
 #             'AR',
 #             'KM',
-            'KC'
+#             'KC'
             ]
         for i in range(len(self.level)):
             for comp in self.level[i]:
@@ -115,6 +115,7 @@ class SupPyrRS(TraubCell):
                         if obj_class == "HHChannel":
                             obj = moose.HHChannel(child)
                             if not obj.name in unblocklist:
+                                print '?? blocked', obj.name
                                 obj.Gbar = 0.0
                             pyclass = eval(obj.name)                            
                             
@@ -161,13 +162,13 @@ class SupPyrRS(TraubCell):
         kc = moose.HHChannel(mycell.soma.path + '/KC')
         kc.connect('Gk', gk_table, 'inputRequest')
         pymoose.showmsg(ca_conc)
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=5e-3, firstWidth=100e-3)
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=5e-3, firstWidth=10e-3)
 
         sim.schedule()
         if mycell.has_cycle():
             print "WARNING!! CYCLE PRESENT IN CICRUIT."
         t1 = datetime.now()
-        sim.run(100e-3)
+        sim.run(200e-3)
         t2 = datetime.now()
         delta = t2 - t1
         print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds

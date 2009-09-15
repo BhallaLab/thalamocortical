@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 15:51:57 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Sep 14 10:45:39 2009 (+0530)
+# Last-Updated: Tue Sep 15 10:04:06 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 298
+#     Update #: 299
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -51,7 +51,7 @@ import datetime
 
 working_dir = '/home/subha/src/sim/cortical/'
 os.chdir(working_dir)
-mus_data_dir = 'py/data/'+datetime.datetime.now().strftime('%Y_%m_%d') + '/'
+mus_data_dir = 'py/data/'#+datetime.datetime.now().strftime('%Y_%m_%d') + '/'
 nrn_data_dir = 'nrn/mydata/'
 
 nrn_data = pylab.loadtxt(nrn_data_dir + 'Vm_suppyrrs.plot')

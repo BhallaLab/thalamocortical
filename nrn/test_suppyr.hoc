@@ -46,30 +46,37 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     tvec.record(&t)
     vvec.record(&cell.comp[cell.presyn_comp].v(0.5))
     caconc.record(&cell.comp[1].cai(0.5))
-    ikvec.record(&cell.comp[1].ik_kc(0.5))
+    // ikvec.record(&cell.comp[1].ik_kc(0.5))
     stim1 = new IClamp(0.5) 
     stim1.amp = 0.3
     stim1.del = t1
-    stim1.dur = $1 - $2
+    stim1.dur = 10// $1 - $2
     print_cell(cell, "suppyrRS")
-//    print_readcell(cell, "suppyrRS.p")
-
+    //    print_readcell(cell, "suppyrRS.p")
+    forsec cell.all{
+	// if (ismembrane("nap")) { gbar_nap *= spine_area_multiplier }
+        // if (ismembrane("napf")) { gbar_napf *= spine_area_multiplier }
+        // if (ismembrane("napf_tcr")) { gbar_napf_tcr *= spine_area_multiplier }
+        // if (ismembrane("naf")) { gbar_naf *= spine_area_multiplier }
+        // if (ismembrane("naf_tcr")) { gbar_naf_tcr *= spine_area_multiplier }
+        // if (ismembrane("naf2")) { gbar_naf2 *= spine_area_multiplier }
+        if (ismembrane("kc")) { gbar_kc = 0.0 }
+        if (ismembrane("kc_fast")) { gbar_kc_fast = 0.0 }
+	
+        if (ismembrane("kahp")) { gbar_kahp = 0.0}
+        if (ismembrane("km")) { gbar_km = 0.0 }
+        // if (ismembrane("kdr")) { gbar_kdr = 0.0}
+        if (ismembrane("kdr_fs")) { gbar_kdr_fs = 0.0 }
+        if (ismembrane("ka")) { gbar_ka = 0.0 }
+        if (ismembrane("ka_ib")) { gbar_ka_ib = 0.0 }
+        if (ismembrane("k2")) { gbar_k2 = 0.0 }
+        // if (ismembrane("cal")) { gbar_cal = 0.0 }
+        // if (ismembrane("cat")) { gbar_cat = 0.0 }
+        if (ismembrane("cat_a")) { gbar_cat_a = 0.0 }
+        if (ismembrane("ar")) { gbar_ar = 0.0 }
+    }
+    
     run()
-    // forsec cell.all{
-    // 	printf("EK = %g\tENa = %g\t", ena, ek)
-    // 	if (ismembrane("ar")){printf("%g\t", erev_ar)}
-    // 	printf("\n")
-    // }
-    /* for testing the comprtments individually */
-    // for ii = 1, 59 {
-    // 	files[ii] = new File()
-    // 	sprint(tstr, "mydata/Vm_comp_%d.plot", ii) 
-    // 	files[ii].wopen(tstr)
-    // 	for jj = 0, tvec.size() - 1{
-    // 	    files[ii].printf("%g %g\n", tvec.x(jj), vm_vecs[ii].x(jj))
-    // 	}
-    // 	files[ii].close()	    
-    // }
     f.wopen("mydata/Vm_suppyrrs.plot")
     for ii = 0, tvec.size() - 1{
     	f.printf("%g %g\n", tvec.x(ii), vvec.x(ii))
@@ -80,10 +87,10 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     	f.printf("%g %g\n", tvec.x(ii), caconc.x(ii))
     }
     f.close()
-    f.wopen("mydata/ikc_suppyrrs.plot")
-    for ii = 0, tvec.size() - 1{
-    	f.printf("%g %g\n", tvec.x(ii), ikvec.x(ii))
-    }
+    // f.wopen("mydata/ikc_suppyrrs.plot")
+    // for ii = 0, tvec.size() - 1{
+    // 	f.printf("%g %g\n", tvec.x(ii), ikvec.x(ii))
+    // }
     f.close()
 }
 
@@ -92,5 +99,5 @@ proc finit0(){
     forsec cell.all { v = -65 }
 }
 
-runcell(100, 5.0)
+runcell(200, 5.0)
 quit()
