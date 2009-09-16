@@ -54,26 +54,18 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     print_cell(cell, "suppyrRS")
     //    print_readcell(cell, "suppyrRS.p")
     forsec cell.all{
-	// if (ismembrane("nap")) { gbar_nap *= spine_area_multiplier }
-        // if (ismembrane("napf")) { gbar_napf *= spine_area_multiplier }
-        // if (ismembrane("napf_tcr")) { gbar_napf_tcr *= spine_area_multiplier }
-        // if (ismembrane("naf")) { gbar_naf *= spine_area_multiplier }
-        // if (ismembrane("naf_tcr")) { gbar_naf_tcr *= spine_area_multiplier }
-        // if (ismembrane("naf2")) { gbar_naf2 *= spine_area_multiplier }
+	// if (ismembrane("nap")) { gbar_nap = 0.0 }
+        // if (ismembrane("naf")) { gbar_naf = 0.0 }
         if (ismembrane("kc")) { gbar_kc = 0.0 }
-        if (ismembrane("kc_fast")) { gbar_kc_fast = 0.0 }
 	
         if (ismembrane("kahp")) { gbar_kahp = 0.0}
-        if (ismembrane("km")) { gbar_km = 0.0 }
+        // if (ismembrane("km")) { gbar_km = 0.0 }
         // if (ismembrane("kdr")) { gbar_kdr = 0.0}
-        if (ismembrane("kdr_fs")) { gbar_kdr_fs = 0.0 }
         if (ismembrane("ka")) { gbar_ka = 0.0 }
-        if (ismembrane("ka_ib")) { gbar_ka_ib = 0.0 }
-        if (ismembrane("k2")) { gbar_k2 = 0.0 }
+        // if (ismembrane("k2")) { gbar_k2 = 0.0 }
         // if (ismembrane("cal")) { gbar_cal = 0.0 }
         // if (ismembrane("cat")) { gbar_cat = 0.0 }
-        if (ismembrane("cat_a")) { gbar_cat_a = 0.0 }
-        if (ismembrane("ar")) { gbar_ar = 0.0 }
+        // if (ismembrane("ar")) { gbar_ar = 0.0 }
     }
     
     run()
@@ -91,7 +83,7 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     // for ii = 0, tvec.size() - 1{
     // 	f.printf("%g %g\n", tvec.x(ii), ikvec.x(ii))
     // }
-    f.close()
+    // f.close()
 }
 
 proc finit0(){

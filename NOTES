@@ -1145,3 +1145,10 @@ hub. Why?
   I tried plotting g_kc for neuron against moose - initial part is
   non-linear. Now removed the Ca dependency from both versions and checking if
   m parameter is ok.
+* <2009-09-16 Wed 00:41> Some crazy behaviour explained?
+  Fortunately I had backed up 12 Sept. code in magaj home. After copying the
+  older code I am getting good match. It seems that the gbar_xyz = 0.0 was not
+  equivalent to commenting out 'insert xyz' statement.
+* <2009-09-16 Wed 10:22> Now OK it seems 
+  The current version is kind of working ... for the enabled
+  channels. committing to git for back up.

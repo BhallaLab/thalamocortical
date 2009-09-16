@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Sep 15 19:52:02 2009 (+0530)
+# Last-Updated: Wed Sep 16 10:18:49 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 429
+#     Update #: 452
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -91,12 +91,12 @@ class SupPyrRS(TraubCell):
             'NaF', 
             'NaP', 
             'KDR', 
-#             'K2',
+            'K2',
             'CaL',
             'CaT',
 #             'KA',
-#             'AR',
-#             'KM',
+            'AR',
+            'KM',
 #             'KC'
             ]
         for i in range(len(self.level)):
@@ -151,17 +151,21 @@ class SupPyrRS(TraubCell):
         mycell = SupPyrRS(SupPyrRS.prototype, sim.model.path + "/SupPyrRS")
         print 'Created cell:', mycell.path
         vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_suppyrrs', 'Vm', sim.data)
-        ca_conc = moose.CaConc(mycell.soma.path + '/CaPool')
-#         print 'tau =', ca_conc.tau, 'B =', ca_conc.B
-        ca_table = moose.Table('cad', sim.data)
-        ca_table.stepMode = 3
-        print '######## Connecting'
-        ca_conc.connect('Ca', ca_table, 'inputRequest')
-        gk_table = moose.Table('gkc', sim.data)
-        gk_table.stepMode = 3
-        kc = moose.HHChannel(mycell.soma.path + '/KC')
-        kc.connect('Gk', gk_table, 'inputRequest')
-        pymoose.showmsg(ca_conc)
+        ca_conc_path = mycell.soma.path + '/CaPool'
+        ca_table = None
+        if config.context.exists(ca_conc_path):
+            ca_conc = moose.CaConc(ca_conc_path)
+            ca_table = moose.Table('cad', sim.data)
+            ca_table.stepMode = 3
+            ca_conc.connect('Ca', ca_table, 'inputRequest')
+        kc_path = mycell.soma.path + '/KC'
+        gk_table = None
+        if config.context.exists(kc_path):
+            gk_table = moose.Table('gkc', sim.data)
+            gk_table.stepMode = 3
+            kc = moose.HHChannel(kc_path)
+            kc.connect('Gk', gk_table, 'inputRequest')
+            pymoose.showmsg(ca_conc)
         pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=5e-3, firstWidth=10e-3)
 
         sim.schedule()
@@ -178,9 +182,10 @@ class SupPyrRS(TraubCell):
         print 'dend:', 'Ra =', mycell.comp[2].Ra, 'Rm =', mycell.comp[2].Rm, 'Cm =', mycell.comp[2].Cm, 'Em =', mycell.comp[2].Em, 'initVm =', mycell.comp[2].initVm
         mus_vm = pylab.array(vm_table) * 1e3
         pylab.plot(mus_vm, 'r-', label='Vm (V)')
-        ca_array = pylab.array(ca_table)
-        pylab.plot(ca_array * 1e2, 'b-', label='[Ca2+] x 1e2')
-        print pylab.amax(ca_table)
+        if ca_table:
+            ca_array = pylab.array(ca_table)
+            pylab.plot(ca_array * 1e2, 'b-', label='[Ca2+] x 1e2')
+            print pylab.amax(ca_table)
         pylab.legend()
         pylab.show()
         
