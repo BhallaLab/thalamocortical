@@ -54,9 +54,9 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     forsec cell.all{
 	if (ismembrane("nap")) { gbar_nap = 0.0 }
         if (ismembrane("naf")) { gbar_naf = 0.0 }
-        // if (ismembrane("kc")) { gbar_kc = 0.0 }
+        if (ismembrane("kc")) { gbar_kc = 0.0 }
 	
-        if (ismembrane("kahp")) { gbar_kahp = 0.0}
+        // if (ismembrane("kahp")) { gbar_kahp = 0.0}
         if (ismembrane("km")) { gbar_km = 0.0 }
         if (ismembrane("kdr")) { gbar_kdr = 0.0}
         if (ismembrane("ka")) { gbar_ka = 0.0 }

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Sep 17 00:27:47 2009 (+0530)
+# Last-Updated: Thu Sep 17 00:44:12 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 530
+#     Update #: 532
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -97,8 +97,8 @@ class SupPyrRS(TraubCell):
 #             'KA',
 #             'AR',
 #             'KM',
-            'KC',
-#             'KAHP'
+#             'KC',
+            'KAHP'
             ]
         for i in range(len(self.level)):
             for comp in self.level[i]:

@@ -1196,3 +1196,9 @@ hub. Why?
   and calcMode = 1 for each as well as making them instantaneous. After
   putting beta in B and doing a tweakAlpha and unsetting the instant property
   of xGate, it is working with KC and CaL.
+
+
+  Now I added KAHP and there was little difference. Then to verify that KAHP
+  was really working I disabled KC. It showed a small difference at the
+  peak of Vm as well as a slow deviation of [Ca2+]. I don't know when it is
+  going to bite.
