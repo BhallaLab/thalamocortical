@@ -784,7 +784,7 @@ gbar_k2 =   0.0001
  // only multiplying all dend. max conductances by two
  // (the area is doubled but the volume is const.)
  proc double_dend_cond() {
-     print "suppyrRS - doubling dendritic coordinates"
+     // print "suppyrRS - doubling dendritic coordinates"
    spine_area_multiplier = 2
    forsec Dendrites {
         if (ismembrane("nap")) { gbar_nap *= spine_area_multiplier }
@@ -809,7 +809,7 @@ gbar_k2 =   0.0001
         if (ismembrane("ar")) { gbar_ar *= spine_area_multiplier }
         if (ismembrane("pas")) { g_pas *= spine_area_multiplier }
         cm = cm * spine_area_multiplier
-	printf("%s cm=%g\n", secname(), cm * L * 1e-4 * diam * 1e-4 * PI)
+	// printf("%s cm=%g\n", secname(), cm * L * 1e-4 * diam * 1e-4 * PI)
    }
  }
  // double_dend_cond()  // run for cells w/ spines

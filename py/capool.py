@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Apr 22 22:21:11 2009 (+0530)
 # Version: 
-# Last-Updated: Tue May  5 17:28:37 2009 (+0530)
+# Last-Updated: Wed Sep 16 18:10:50 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 57
+#     Update #: 58
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -54,6 +54,8 @@ class CaPool(moose.CaConc):
     def __init__(self, *args):
 	moose.CaConc.__init__(self, *args)
         self.CaBasal = 0.0        
+        config.context.runG('setfield ' + self.path + ' ceiling 1e6')
+        config.context.runG('setfield ' + self.path + ' floor 0.0')
         
     def connectCaChannels(self, channel_list):
         """Connects the Ca2+ channels in channel_list as a source of
