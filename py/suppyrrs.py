@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Sep 16 12:07:59 2009 (+0530)
+# Last-Updated: Wed Sep 16 14:04:40 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 459
+#     Update #: 482
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -88,17 +88,17 @@ class SupPyrRS(TraubCell):
 
     def _setup_channels(self):
         unblocklist = [
-#             'NaF', 
-#             'NaP', 
+            'NaF', 
+            'NaP', 
 #             'KDR', 
 #             'K2',
             'CaL',
-#             'CaT',
+            'CaT',
 #             'KA',
 #             'AR',
 #             'KM',
-#             'KC',
-            'KAHP'
+            'KC',
+#             'KAHP'
             ]
         for i in range(len(self.level)):
             for comp in self.level[i]:
@@ -185,7 +185,7 @@ class SupPyrRS(TraubCell):
         pylab.plot(mus_vm, 'r-', label='Vm (V)')
         if ca_table:
             ca_array = pylab.array(ca_table)
-            pylab.plot(ca_array * 1e2, 'b-', label='[Ca2+] x 1e2')
+            pylab.plot(ca_array* 1e-3, 'b-', label='[Ca2+]x1e-3')
             print pylab.amax(ca_table)
         pylab.legend()
         pylab.show()

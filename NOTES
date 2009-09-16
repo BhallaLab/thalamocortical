@@ -1160,3 +1160,16 @@ hub. Why?
 
   Even KAHP and CaL together are matching after the scaling.
   Now I am going to put back all the channels. Good luck!!
+
+  kc, kahp, cal, cat - OK
+
+  kc, kahp, cal, cat, naf - NO
+
+  naf - OK
+
+  cal, cat, naf - OK
+
+  cal, cat, naf, nap - OK
+
+  
+  cal, cat, naf, nap, kc - 
