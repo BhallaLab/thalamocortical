@@ -54,18 +54,18 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     print_cell(cell, "suppyrRS")
     //    print_readcell(cell, "suppyrRS.p")
     forsec cell.all{
-	// if (ismembrane("nap")) { gbar_nap = 0.0 }
-        // if (ismembrane("naf")) { gbar_naf = 0.0 }
-        if (ismembrane("kc")) { gbar_kc = 0.0 }
+	if (ismembrane("nap")) { gbar_nap = 0.0 }
+        if (ismembrane("naf")) { gbar_naf = 0.0 }
+        // if (ismembrane("kc")) { gbar_kc = 0.0 }
 	
         if (ismembrane("kahp")) { gbar_kahp = 0.0}
-        // if (ismembrane("km")) { gbar_km = 0.0 }
-        // if (ismembrane("kdr")) { gbar_kdr = 0.0}
+        if (ismembrane("km")) { gbar_km = 0.0 }
+        if (ismembrane("kdr")) { gbar_kdr = 0.0}
         if (ismembrane("ka")) { gbar_ka = 0.0 }
-        // if (ismembrane("k2")) { gbar_k2 = 0.0 }
+        if (ismembrane("k2")) { gbar_k2 = 0.0 }
         // if (ismembrane("cal")) { gbar_cal = 0.0 }
-        // if (ismembrane("cat")) { gbar_cat = 0.0 }
-        // if (ismembrane("ar")) { gbar_ar = 0.0 }
+        if (ismembrane("cat")) { gbar_cat = 0.0 }
+        if (ismembrane("ar")) { gbar_ar = 0.0 }
     }
     
     run()

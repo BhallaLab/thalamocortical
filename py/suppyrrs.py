@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Sep 16 10:18:49 2009 (+0530)
+# Last-Updated: Wed Sep 16 11:10:44 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 452
+#     Update #: 458
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -88,16 +88,16 @@ class SupPyrRS(TraubCell):
 
     def _setup_channels(self):
         unblocklist = [
-            'NaF', 
-            'NaP', 
-            'KDR', 
-            'K2',
+#             'NaF', 
+#             'NaP', 
+#             'KDR', 
+#             'K2',
             'CaL',
-            'CaT',
+#             'CaT',
 #             'KA',
-            'AR',
-            'KM',
-#             'KC'
+#             'AR',
+#             'KM',
+            'KC'
             ]
         for i in range(len(self.level)):
             for comp in self.level[i]:
@@ -108,7 +108,7 @@ class SupPyrRS(TraubCell):
                     obj = moose.Neutral(child)
                     if obj.name == 'CaPool':
                         ca_pool = moose.CaConc(child)
-#                         ca_pool.B = ca_pool.B * 1e3
+                        ca_pool.B = ca_pool.B * 1e3
                         ca_pool.tau = 1e-3/0.05
                     else:
                         obj_class = obj.className
