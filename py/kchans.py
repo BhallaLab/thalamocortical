@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Sep 17 00:38:16 2009 (+0530)
+# Last-Updated: Thu Sep 17 01:03:41 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 622
+#     Update #: 634
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -199,7 +199,7 @@ class KCaChannel(KChannel):
     ca_divs = 1000
     ca_conc = linspace(ca_min, ca_max, ca_divs + 1)
 
-    def __init__(self, name, parent, xpower=0, ypower=0, zpower=1, Ek=-95e-3):
+    def __init__(self, name, parent, xpower=0.0, ypower=0.0, zpower=1.0, Ek=-95e-3):
         KChannel.__init__(self, name, parent, xpower, ypower, Ek=Ek)
         self.connected_to_ca = False
         self.Zpower = zpower
@@ -210,14 +210,15 @@ class KCaChannel(KChannel):
         self.zGate.B.xmin = KCaChannel.ca_min
         self.zGate.B.xdivs = KCaChannel.ca_divs        
         self.zGate.B.xmax = KCaChannel.ca_max
-        self.zGate.A.calcMode = 1
-        self.zGate.B.calcMode = 1
-#         self.useConcentration = True # TODO - uncomment after test
+#         self.zGate.A.calcMode = 1
+#         self.zGate.B.calcMode = 1
+        self.useConcentration = True # TODO - uncomment after test
 
 
 class KAHPBase(KCaChannel):
     def __init__(self, name, parent, Ek=-95e-3):
         KCaChannel.__init__(self, name, parent)
+        self.Z = 0.0
         
 
 class KAHP(KAHPBase):
@@ -232,13 +233,12 @@ class KAHP(KAHPBase):
             self.zGate.A[i] = KAHP.alpha[i]
             self.zGate.B[i] = KAHP.beta[i]
         self.zGate.tweakAlpha()
-        self.Z = 0.0
 
 
 
 class KAHP_SLOWER(KAHPBase):
 
-    alpha = where(KCaChannel.ca_conc < 500.0e-3, 1e6 * KCaChannel.ca_conc / 50000, 10.0)
+    alpha = where(KCaChannel.ca_conc < 500.0, 1e3 * KCaChannel.ca_conc / 50000, 10.0)
     beta =  ones(KCaChannel.ca_divs + 1) * 1.0
 
     def __init__(self, name, parent, Ek=-95e-3):
@@ -251,8 +251,8 @@ class KAHP_SLOWER(KAHPBase):
 
 class KAHP_DP(KAHPBase):
     """KAHP for deep pyramidal cell"""
-    alpha = where(KCaChannel.ca_conc < 100.0, 1e-4 * KCaChannel.ca_conc, 0.01)
-    beta =  ones(KCaChannel.ca_divs + 1) * 0.001 
+    alpha = where(KCaChannel.ca_conc < 100.0, 1e-1 * KCaChannel.ca_conc, 10.0)
+    beta =  ones(KCaChannel.ca_divs + 1)
     def __init__(self, name, parent, Ek=-95e-3):
         KAHPBase.__init__(self, name, parent, Ek=Ek)
         for i in range(KCaChannel.ca_divs + 1):
