@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Sep 16 11:55:45 2009 (+0530)
+# Last-Updated: Wed Sep 16 12:07:27 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 612
+#     Update #: 618
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -223,15 +223,16 @@ class KAHPBase(KCaChannel):
 class KAHP(KAHPBase):
     """AHP type K+ current"""
 
-    alpha = where(KCaChannel.ca_conc < 100.0 * 1e-3 , 0.1 * KCaChannel.ca_conc, 10.0)
+    alpha = where(KCaChannel.ca_conc < 100.0, 0.1 * KCaChannel.ca_conc, 10.0)
     beta =  ones(KCaChannel.ca_divs + 1) * 10.0
 
-    def __init__(self, name, parent, Ek=-95e-3):
+    def __init__(self, name, parent, xpower=0.0, ypower=0.0, Ek=-95e-3):
         KAHPBase.__init__(self, name, parent, Ek=Ek)
         for i in range(len(KAHP.alpha)):
             self.zGate.A[i] = KAHP.alpha[i]
             self.zGate.B[i] = KAHP.beta[i]
         self.zGate.tweakAlpha()
+        self.Z = 0.0
 
 
 
@@ -250,7 +251,7 @@ class KAHP_SLOWER(KAHPBase):
 
 class KAHP_DP(KAHPBase):
     """KAHP for deep pyramidal cell"""
-    alpha = where(KCaChannel.ca_conc < 100.0 * 1e-3, 1e-4 * KCaChannel.ca_conc, 0.01)
+    alpha = where(KCaChannel.ca_conc < 100.0, 1e-4 * KCaChannel.ca_conc, 0.01)
     beta =  ones(KCaChannel.ca_divs + 1) * 0.001 
     def __init__(self, name, parent, Ek=-95e-3):
         KAHPBase.__init__(self, name, parent, Ek=Ek)
@@ -275,7 +276,6 @@ class KC(KCaChannel):
         for i in range(KCaChannel.ca_divs + 1):
             self.zGate.A[i] = KC.alpha_ca[i]
             self.zGate.B[i] = 1.0
-#         self.instant = 4 # Zgate m is instantaneous: m = A/B
         self.zGate.A.calcMode = 1
         self.zGate.B.calcMode = 1
         for i in range(config.ndivs + 1):
