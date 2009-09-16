@@ -408,8 +408,8 @@ func type() {return  0 }
        gbar_naf =   0.4
        insert kdr
        gbar_kdr =   0.4
-//       insert ka
-//       gbar_ka =   0.002
+       insert ka
+       gbar_ka =   0.002
        insert k2
        gbar_k2 =   0.0001
  }
@@ -420,10 +420,10 @@ func type() {return  0 }
        gbar_nap =   0.0006
        insert kdr
        gbar_kdr =   0.1
-//        insert kc
-//        gbar_kc =   0.0075
-//       insert ka
-//       gbar_ka =   0.03
+        insert kc
+        gbar_kc =   0.0075
+       insert ka
+       gbar_ka =   0.03
         insert km
         gbar_km =   0.00375
        insert k2
@@ -449,10 +449,10 @@ func type() {return  0 }
      gbar_nap =   0.0003
      insert kdr
      gbar_kdr =   0.075
-//             insert kc
-//      gbar_kc =   0.0075
-//     insert ka
-//     gbar_ka =   0.002
+             insert kc
+      gbar_kc =   0.0075
+     insert ka
+     gbar_ka =   0.002
              insert km
       gbar_km =   0.00375
      insert k2
@@ -478,10 +478,10 @@ func type() {return  0 }
 gbar_nap =   4.E-05
         insert kdr
  gbar_kdr =   0.005
-//        insert kc
-// gbar_kc =   0.0075
-//        insert ka
-// gbar_ka =   0.002
+        insert kc
+ gbar_kc =   0.0075
+        insert ka
+ gbar_ka =   0.002
         insert km
  gbar_km =   0.00375
         insert k2
@@ -507,10 +507,10 @@ gbar_k2 =   0.0001
 gbar_nap =   4.E-05
         insert kdr
  gbar_kdr =   0.005
-//        insert kc
-// gbar_kc =   0.0075
-//        insert ka
-// gbar_ka =   0.002
+        insert kc
+ gbar_kc =   0.0075
+        insert ka
+ gbar_ka =   0.002
         insert km
  gbar_km =   0.00375
         insert k2
@@ -536,10 +536,10 @@ gbar_k2 =   0.0001
 gbar_nap =   0.0004
         insert kdr
  gbar_kdr =   0.1
-//        insert kc
-// gbar_kc =   0.0075
-//        insert ka
-// gbar_ka =   0.03
+        insert kc
+ gbar_kc =   0.0075
+        insert ka
+ gbar_ka =   0.03
         insert km
  gbar_km =   0.00375
         insert k2
@@ -565,10 +565,10 @@ gbar_k2 =   0.0001
 gbar_nap =   0.0003
        insert kdr
 gbar_kdr =   0.075
-//        insert kc
-// gbar_kc =   0.0075
-//        insert ka
-// gbar_ka =   0.002
+        insert kc
+ gbar_kc =   0.0075
+        insert ka
+ gbar_ka =   0.002
         insert km
  gbar_km =   0.00375
         insert k2
@@ -594,10 +594,10 @@ gbar_k2 =   0.0001
 gbar_nap =   4.E-05
         insert kdr
  gbar_kdr =   0.005
-//        insert kc
-// gbar_kc =   0.0075
-//        insert ka
-// gbar_ka =   0.002
+        insert kc
+ gbar_kc =   0.0075
+        insert ka
+ gbar_ka =   0.002
         insert km
  gbar_km =   0.00375
         insert k2
@@ -623,10 +623,10 @@ gbar_k2 =   0.0001
 gbar_nap =   4.E-05
         insert kdr
  gbar_kdr =   0.005
-//        insert kc
-// gbar_kc =   0.0075
-//        insert ka
-// gbar_ka =   0.002
+        insert kc
+ gbar_kc =   0.0075
+        insert ka
+ gbar_ka =   0.002
         insert km
  gbar_km =   0.00375
         insert k2
@@ -652,10 +652,10 @@ gbar_k2 =   0.0001
 gbar_nap =   4.E-05
         insert kdr
  gbar_kdr =   0.005
-//        insert kc
-// gbar_kc =   0.0075
-//        insert ka
-// gbar_ka =   0.002
+        insert kc
+ gbar_kc =   0.0075
+        insert ka
+ gbar_ka =   0.002
         insert km
  gbar_km =   0.00375
         insert k2
@@ -681,10 +681,10 @@ gbar_k2 =   0.0001
 gbar_nap =   4.E-05
         insert kdr
  gbar_kdr =   0.005
-//        insert kc
-// gbar_kc =   0.0075
-//        insert ka
-// gbar_ka =   0.002
+        insert kc
+ gbar_kc =   0.0075
+        insert ka
+ gbar_ka =   0.002
         insert km
  gbar_km =   0.00375
         insert k2
@@ -710,10 +710,10 @@ gbar_k2 =   0.0001
 gbar_nap =   4.E-05
         insert kdr
  gbar_kdr =   0.005
-//        insert kc
-// gbar_kc =   0.0075
-//        insert ka
-// gbar_ka =   0.002
+        insert kc
+ gbar_kc =   0.0075
+        insert ka
+ gbar_ka =   0.002
         insert km
  gbar_km =   0.00375
         insert k2
@@ -739,10 +739,10 @@ gbar_naf =   0.01
 gbar_nap =   4.E-05
         insert kdr
  gbar_kdr =   0.005
-//        insert kc
-// gbar_kc =   0.0075
-//        insert ka
-// gbar_ka =   0.002
+        insert kc
+ gbar_kc =   0.0075
+       insert ka
+gbar_ka =   0.002
         insert km
  gbar_km =   0.00375
         insert k2
@@ -925,7 +925,7 @@ gbar_k2 =   0.0001
    ek =  -95.
    e_pas =  -70.
    ena = 50.
-   // vca =   125.
+   vca =   125.
     forsec all if (ismembrane("ar")) erev_ar =  -35.
     e_gaba_a =  -81.
  }
