@@ -42,12 +42,10 @@ STATE {
 BREAKPOINT { 
 	SOLVE states METHOD cnexp
 	if( 0.004(1/mM) * cai < 1 ) {
-		iktmp =  1 * 0.004(1/mM) * cai * ( v - ek ) 
-: 		iktmp =  m * 0.004(1/mM) * cai * ( v - ek ) 
+		iktmp =  m * 0.004(1/mM) * cai * ( v - ek ) 
 		gamma = 0.004 * cai
 	    }else{
-		iktmp = 1 * (v - ek)
-: 		iktmp =  m * ( v - ek )
+		iktmp =  m * ( v - ek )
 	        gamma = 1.0
 	}
 	df = v-ek
