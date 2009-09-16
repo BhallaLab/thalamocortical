@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Sep 16 14:04:40 2009 (+0530)
+# Last-Updated: Thu Sep 17 00:27:47 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 482
+#     Update #: 530
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -88,12 +88,12 @@ class SupPyrRS(TraubCell):
 
     def _setup_channels(self):
         unblocklist = [
-            'NaF', 
-            'NaP', 
+#             'NaF', 
+#             'NaP', 
 #             'KDR', 
 #             'K2',
             'CaL',
-            'CaT',
+#             'CaT',
 #             'KA',
 #             'AR',
 #             'KM',
@@ -167,7 +167,7 @@ class SupPyrRS(TraubCell):
             kc = moose.HHChannel(kc_path)
             kc.connect('Gk', gk_table, 'inputRequest')
             pymoose.showmsg(ca_conc)
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=5e-3, firstWidth=10e-3)
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-7, firstDelay=50e-3, firstWidth=5e-3)
 
         sim.schedule()
         if mycell.has_cycle():
@@ -179,13 +179,20 @@ class SupPyrRS(TraubCell):
         print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
         sim.dump_data('data')
         mycell.dump_cell('suppyrrs.txt')
-        print 'soma:', 'Ra =', mycell.soma.Ra, 'Rm =', mycell.soma.Rm, 'Cm =', mycell.soma.Cm, 'Em =', mycell.soma.Em, 'initVm =', mycell.soma.initVm
-        print 'dend:', 'Ra =', mycell.comp[2].Ra, 'Rm =', mycell.comp[2].Rm, 'Cm =', mycell.comp[2].Cm, 'Em =', mycell.comp[2].Em, 'initVm =', mycell.comp[2].initVm
+        
         mus_vm = pylab.array(vm_table) * 1e3
-        pylab.plot(mus_vm, 'r-', label='Vm (V)')
+        nrn_vm = pylab.loadtxt('../nrn/mydata/Vm_suppyrrs.plot')
+        nrn_t = nrn_vm[:, 0]
+        mus_t = linspace(0, nrn_t[-1], len(mus_vm))
+        nrn_vm = nrn_vm[:, 1]
+        nrn_ca = pylab.loadtxt('../nrn/mydata/Ca_suppyrrs.plot')
+        nrn_ca = nrn_ca[:,1]
+        pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
+        pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
         if ca_table:
             ca_array = pylab.array(ca_table)
-            pylab.plot(ca_array* 1e-3, 'b-', label='[Ca2+]x1e-3')
+            pylab.plot(nrn_t, -nrn_ca, 'r-', label='nrn (-)ca')
+            pylab.plot(mus_t, -ca_array, 'b-.', label='mus (-)ca')
             print pylab.amax(ca_table)
         pylab.legend()
         pylab.show()

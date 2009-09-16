@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 00:18:24 2009 (+0530)
 # Version: 
-# Last-Updated: Sun May  3 17:09:19 2009 (+0530)
+# Last-Updated: Wed Sep 16 16:51:56 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 173
+#     Update #: 179
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -50,7 +50,7 @@ from numpy import where, linspace, exp, array
 import config
 class CaChannel(ChannelBase):
     """This is just a place holder to maintain type information"""
-    def __init__(self, name, parent, xpower=1, ypower=0):
+    def __init__(self, name, parent, xpower=1.0, ypower=0.0):
 	ChannelBase.__init__(self, name, parent, xpower, ypower)
         self.connected_to_pool = False
 
@@ -64,13 +64,13 @@ class CaL(CaChannel):
                   1e3 * 0.02 * v * 1e3 / (exp(v / 5e-3) - 1))
 
     def __init__(self, name, parent):
-        CaChannel.__init__(self, name, parent, 2)
+        CaChannel.__init__(self, name, parent, xpower=2.0)
 	self.Ek = 125e-3
-        self.X = 0.0
 	for i in range(config.ndivs + 1):
 	    self.xGate.A[i] = CaL.alpha[i]
 	    self.xGate.B[i] = CaL.beta[i]
         self.xGate.tweakAlpha()
+        self.X = 0.0
 
 class CaT(CaChannel):
     v = ChannelBase.v_array
@@ -83,7 +83,7 @@ class CaT(CaChannel):
                    1e-3 * (9.32 + 0.333 * exp( ( -v - 21e-3 ) / 10.5e-3 )))
 
     def __init__(self, name, parent):
-	CaChannel.__init__(self, name, parent, 2, 1)
+	CaChannel.__init__(self, name, parent, xpower=2.0, ypower=1.0)
 	self.Ek = 125e-3
         self.X = 0.0
 	for i in range(config.ndivs + 1):
@@ -106,7 +106,6 @@ class CaT_A(CaChannel):
     def __init__(self, name, parent):
         CaChannel.__init__(self, name, parent, 2, 1)
         self.Ek = 125e-3
-        self.X = 0
 	for i in range(config.ndivs + 1):
 	    self.xGate.A[i] = CaT.tau_m[i]
 	    self.xGate.B[i] = CaT.m_inf[i]
@@ -115,6 +114,7 @@ class CaT_A(CaChannel):
 
         self.xGate.tweakTau()
         self.yGate.tweakTau()
+        self.X = 0
 
 
 # 

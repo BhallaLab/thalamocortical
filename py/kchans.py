@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Sep 16 12:07:27 2009 (+0530)
+# Last-Updated: Thu Sep 17 00:38:16 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 618
+#     Update #: 622
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -276,14 +276,11 @@ class KC(KCaChannel):
         for i in range(KCaChannel.ca_divs + 1):
             self.zGate.A[i] = KC.alpha_ca[i]
             self.zGate.B[i] = 1.0
-        self.zGate.A.calcMode = 1
-        self.zGate.B.calcMode = 1
         for i in range(config.ndivs + 1):
             self.xGate.A[i] = KC.alpha[i] 
-            self.xGate.B[i] = KC.alpha[i] + KC.beta[i]
-        self.xGate.A.calcMode = 1
-        self.xGate.B.calcMode = 1
-        self.instant = 1 + 4
+            self.xGate.B[i] = KC.beta[i]
+        self.xGate.tweakAlpha()
+        self.instant = 4
         self.X = 0.0
         
 class KC_FAST(KC):
