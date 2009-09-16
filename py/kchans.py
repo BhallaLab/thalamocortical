@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Sep 15 13:02:12 2009 (+0530)
+# Last-Updated: Wed Sep 16 10:15:27 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 607
+#     Update #: 609
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -118,7 +118,6 @@ class KA(KChannel):
 
     def __init__(self, name, parent, Ek=-95e-3):
 	KChannel.__init__(self, name, parent, 4, 1)
-        self.X = 0.0
 	for i in range(config.ndivs + 1):
             self.xGate.A[i] = KA.tau_m[i]
             self.xGate.B[i] = KA.m_inf[i]
@@ -126,6 +125,7 @@ class KA(KChannel):
             self.yGate.B[i] = KA.h_inf[i]
         self.xGate.tweakTau()
 	self.yGate.tweakTau()
+        self.X = 0.0
 
 
 class KA_IB(KChannel):
@@ -190,8 +190,8 @@ class KM(KChannel):
             self.xGate.A[i] = KM.a[i]
             self.xGate.B[i] = KM.b[i]
 	self.xGate.tweakAlpha()
-
-
+        self.X = 0.0
+        
 class KCaChannel(KChannel):
     """[Ca+2] dependent K+ channel base class."""
     ca_min = 0.0
