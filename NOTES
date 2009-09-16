@@ -1172,4 +1172,27 @@ hub. Why?
   cal, cat, naf, nap - OK
 
   
-  cal, cat, naf, nap, kc - 
+  cal, cat, naf, nap, kc - NO
+
+  - looks like naf and kc together messes up
+
+    naf, cal, cat - slight difference in [Ca2+] - which worries me.
+* <2009-09-17 Thu 00:22> CaConc is the trouble
+  I spent the most part of this evening trying to find the source of the
+  problem. And with KC and CaConc enabled and with a high depolarizing current
+  injection it became obvious that the [Ca2+] is the culprit. The neuron model
+  sets floor and ceiling values on [Ca2+] and the floor(0.0) is reached - in
+  MOOSE it goes negative.
+
+  I added floor and ceiling sttings in MOOSE and that made the plots much more
+  similar. Yet, with KM present the MOOSE [Ca2+] goes up from 0 earlier than
+  the NEURON model.
+
+  Without KC the discrepancy is much smaller and comes very slowly.
+
+  Finally - this small discrepancy turned out to be due to KC - I was putting 
+  xGate.A = alpha
+  xGate.B = alpha + beta
+  and calcMode = 1 for each as well as making them instantaneous. After
+  putting beta in B and doing a tweakAlpha and unsetting the instant property
+  of xGate, it is working with KC and CaL.
