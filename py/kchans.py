@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Sep 17 01:03:41 2009 (+0530)
+# Last-Updated: Thu Sep 17 11:04:14 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 634
+#     Update #: 642
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -227,13 +227,14 @@ class KAHP(KAHPBase):
     alpha = where(KCaChannel.ca_conc < 100.0, 0.1 * KCaChannel.ca_conc, 10.0)
     beta =  ones(KCaChannel.ca_divs + 1) * 10.0
 
-    def __init__(self, name, parent, xpower=0.0, ypower=0.0, Ek=-95e-3):
+    def __init__(self, name, parent, xpower=0.0, ypower=0.0, zpower=1.0, Ek=-95e-3):
         KAHPBase.__init__(self, name, parent, Ek=Ek)
         for i in range(len(KAHP.alpha)):
             self.zGate.A[i] = KAHP.alpha[i]
             self.zGate.B[i] = KAHP.beta[i]
         self.zGate.tweakAlpha()
-
+#         self.zGate.A.calcMode = 1
+#         self.zGate.B.calcMode = 1
 
 
 class KAHP_SLOWER(KAHPBase):
