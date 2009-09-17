@@ -1184,21 +1184,74 @@ hub. Why?
   sets floor and ceiling values on [Ca2+] and the floor(0.0) is reached - in
   MOOSE it goes negative.
 
-  I added floor and ceiling sttings in MOOSE and that made the plots much more
-  similar. Yet, with KM present the MOOSE [Ca2+] goes up from 0 earlier than
-  the NEURON model.
+** MOOSE code change
+   I added floor and ceiling sttings in MOOSE and that made the plots much more
+   similar. Yet, with KM present the MOOSE [Ca2+] goes up from 0 earlier than
+   the NEURON model.
 
-  Without KC the discrepancy is much smaller and comes very slowly.
+   Without KC the discrepancy is much smaller and comes very slowly.
 
-  Finally - this small discrepancy turned out to be due to KC - I was putting 
-  xGate.A = alpha
-  xGate.B = alpha + beta
-  and calcMode = 1 for each as well as making them instantaneous. After
-  putting beta in B and doing a tweakAlpha and unsetting the instant property
-  of xGate, it is working with KC and CaL.
+** Finally - this small discrepancy turned out to be due to KC - I was putting 
+   xGate.A = alpha
+   xGate.B = alpha + beta
+   and calcMode = 1 for each as well as making them instantaneous. After
+   putting beta in B and doing a tweakAlpha and unsetting the instant property
+   of xGate, it is working with KC and CaL.
 
 
-  Now I added KAHP and there was little difference. Then to verify that KAHP
-  was really working I disabled KC. It showed a small difference at the
-  peak of Vm as well as a slow deviation of [Ca2+]. I don't know when it is
-  going to bite.
+** KAHP - 
+   Now I added KAHP and there was little difference. Then to verify that KAHP
+   was really working I disabled KC. It showed a small difference at the
+   peak of Vm as well as a slow deviation of [Ca2+]. I don't know when it is
+   going to bite.
+
+** All channels
+   for 200 ms the Vm plots match nicely. But the [Ca2+] plots deviate from the
+   Ca2+ peak onwards - much like the earlier issue with KC.
+   
+** KAHP blocked
+   Still the deviation in [Ca2+] is present.
+
+* <2009-09-17 Thu 09:52> More shock
+  Now that [Ca2+] is matching for high injection current, when I put KC and
+  CaL together it does not work anymore. There must be something in the
+  scripts themselves - because even after reverting back to older version of
+  pymoose library, it remains the same.
+** KAHP solved 
+   The KAHP issue came because I had made the instantaneous calculation
+   on. AFter correcting that I got exact match for KAHP.
+   -- Now the protocol is:
+   50 ms - start 0.3nA injection
+   100 ms - stop injection
+   150 ms - start 0.3mA injection
+   160 ms - stop injection
+   200 ms - end simulation
+** KAHP + KC - working
+   but the mus peak at 0.3mA injection is slightly (mus: 1370mV, nrn: 1385mV)
+   for lower.
+** KAHP + KC + CaL + NaF 
+   glitches - towards 150 ms
+* <2009-09-17 Thu 16:28> All channels
+  Almost good match with all channels enabled : only glitch is the last spike
+  in moose repoloalizes to a lower Vm than nrn.
+
+  
+** Disable KDR - more discrepancy 
+   - so KDR was actually balancing the discrepancy.
+** Disabled KDR, CaL, CaT, KC, KAHP
+   - I have checked the last four to some extent and expect the culprit to be
+     some other channel.
+   - not much good - the moose plot is very slightly delayed ~0.22 ms
+** Naf & ka enabled
+   Much less difference: 0.05 ms
+** NaF, KC, CaL
+   Bad .. after the first bunch of spikes there is silence ~20ms. Then another
+   bunch of spikes .. the discrepancy going higher and higher.  Last peaks are
+   almost 2 ms apart.
+** NaF, KC - CaL blocked
+   Not much difference, yet moose has a very slight lag.
+** NaF, CaL
+   Back to the same stage as exp. 6 yesterday. [Ca2+] does not match. Now I am
+   going to check the analytical expressions for these two and compare
+   successive [Ca2+] values based on Vm. Using difference formulae I should be
+   able to tease out the problem source.
