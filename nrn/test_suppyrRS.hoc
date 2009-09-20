@@ -19,6 +19,7 @@ define_shape()
 //objref runinfo_, choice_, cell, nil, stim1, stim2, mchoice_
 objref cell, stim1, stim2
 /* runcell(runtime, delay) */
+
 proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     tstop = $1
     t1 = $2
@@ -70,7 +71,7 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
         if (ismembrane("ar")) { gbar_ar = 0.0 }
     }
     print_cell(cell, "suppyrRS")
-    //    print_readcell(cell, "suppyrRS.p")
+    print_readcell(cell, "suppyrRS.p")
     
     run()
     f.wopen("mydata/Vm_suppyrrs.plot")

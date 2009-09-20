@@ -167,7 +167,9 @@ proc finit1() { local ix
 		forsec cell2.all { v = type_vinit.x[ix] }
 		if (ix == TCRtype) {
 			forsec cell2.all { v = type_vinit.x[ix] }
+		    }
 		}
-	}
+		printf("initVm = %f\n", type_vinit.x[ix])
+
 }
 
