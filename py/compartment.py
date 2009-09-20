@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Aug 21 13:57:51 2009 (+0530)
+# Last-Updated: Fri Sep 18 16:51:57 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 162
+#     Update #: 164
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -120,7 +120,10 @@ class MyCompartment(moose.Compartment):
         harm, there is safeguard against multiple connections in
         CaPool class."""
         self.ca_pool = CaPool('CaPool', self)
-        self.ca_pool.B = phi / self.sarea()
+        if phi > 0.0:
+            self.ca_pool.B = phi / self.sarea()
+        else:
+            self.ca_pool.B = -phi
         self.ca_pool.tau = tau
         ca_channels = [ channel for channel in self.channels \
                             if isinstance(channel, CaL) or channel.name.startswith('CaL')]

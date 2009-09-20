@@ -20,7 +20,7 @@
 
 *set_compt_param	RA	2.5
 
-*set_compt_param	ELEAK	-65e-3
+*set_compt_param	ELEAK	-70e-3
 
 comp_1	none	15	0	0	16	AR	2.5	CaPool	-3.44836e+12	CaL	10	CaT	1	K2	1	KA	300	KAHP	0.4	KC	120	KDR	1250	KM	75	NaF	1875	NaP	1.2
 *set_compt_param	RM	2.5
