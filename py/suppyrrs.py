@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Sep 17 19:02:07 2009 (+0530)
+# Last-Updated: Mon Sep 21 16:14:27 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 568
+#     Update #: 579
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -87,19 +87,7 @@ class SupPyrRS(TraubCell):
             comp.Em = -70e-3
 
     def _setup_channels(self):
-        unblocklist = [
-            'NaF', 
-#             'NaP', 
-#             'KDR', 
-#             'K2',
-            'CaL',
-#             'CaT',
-#             'KA',
-#             'AR',
-#             'KM',
-#             'KC',
-#             'KAHP'
-            ]
+        """Set up connections between """
         for i in range(len(self.level)):
             for comp in self.level[i]:
                 ca_pool = None
@@ -115,9 +103,6 @@ class SupPyrRS(TraubCell):
                         obj_class = obj.className
                         if obj_class == "HHChannel":
                             obj = moose.HHChannel(child)
-                            if not obj.name in unblocklist:
-                                print '?? blocked', obj.name
-                                obj.Gbar = 0.0
                             pyclass = eval(obj.name)                            
                             
                             if issubclass(pyclass, KChannel):
@@ -156,7 +141,7 @@ class SupPyrRS(TraubCell):
         ca_table = None
         if config.context.exists(ca_conc_path):
             ca_conc = moose.CaConc(ca_conc_path)
-            ca_table = moose.Table('cad', sim.data)
+            ca_table = moose.Table('Ca_suppyrrs', sim.data)
             ca_table.stepMode = 3
             ca_conc.connect('Ca', ca_table, 'inputRequest')
         kc_path = mycell.soma.path + '/KC'
@@ -167,7 +152,7 @@ class SupPyrRS(TraubCell):
             kc = moose.HHChannel(kc_path)
             kc.connect('Gk', gk_table, 'inputRequest')
             pymoose.showmsg(ca_conc)
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=50e3, firstWidth=50e-3)
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=50e-3, firstWidth=50e-3)
 #         pulsegen1 = mycell.soma.insertPulseGen('pulsegen1', sim.model, firstLevel=3e-7, firstDelay=150e-3, firstWidth=10e-3)
 
         sim.schedule()
@@ -190,11 +175,11 @@ class SupPyrRS(TraubCell):
         nrn_ca = nrn_ca[:,1]
         pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
         pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
-        if ca_table:
-            ca_array = pylab.array(ca_table)
-            pylab.plot(nrn_t, -nrn_ca, 'r-', label='nrn (-)ca')
-            pylab.plot(mus_t, -ca_array, 'b-.', label='mus (-)ca')
-            print pylab.amax(ca_table)
+#         if ca_table:
+#             ca_array = pylab.array(ca_table)
+#             pylab.plot(nrn_t, -nrn_ca, 'r-', label='nrn (-)ca')
+#             pylab.plot(mus_t, -ca_array, 'b-.', label='mus (-)ca')
+#             print pylab.amax(ca_table)
         pylab.legend()
         pylab.show()
         
@@ -202,8 +187,9 @@ class SupPyrRS(TraubCell):
 # test main --
 from simulation import Simulation
 import pylab
-
+from subprocess import call
 if __name__ == "__main__":
+    call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_suppyrRS.hoc'], cwd='../nrn')
     SupPyrRS.test_single_cell()
     
 
