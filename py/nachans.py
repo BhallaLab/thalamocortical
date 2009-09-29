@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:13 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Sep 16 16:33:59 2009 (+0530)
+# Last-Updated: Wed Sep 23 08:04:34 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 133
+#     Update #: 136
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -77,7 +77,7 @@ class NaF(NaChannel):
         self.X = 0.0
         
 class NaF2(NaChannel):
-    def __init__(self, name, parent, shift=0.0, Ek=50e-3):
+    def __init__(self, name, parent, shift=-2.5e-3, Ek=50e-3):
         NaChannel.__init__(self, name, parent, xpower=3.0, ypower=1.0, Ek=Ek)
         print 'NaF2: shift =', shift
         v = linspace(config.vmin, config.vmax, config.ndivs + 1)
@@ -115,6 +115,7 @@ class NaP(NaChannel):
             self.xGate.A[i] = tau_m[i]
             self.xGate.B[i] = m_inf[i]
         self.xGate.tweakTau()
+        self.X = 0.0
 
 
 class NaPF(NaChannel):

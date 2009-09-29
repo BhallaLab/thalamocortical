@@ -1,14 +1,14 @@
-# suppyrFRB.py --- 
+# supLTS.py --- 
 # 
-# Filename: suppyrFRB.py
+# Filename: supLTS.py
 # Description: 
 # Author: subhasis ray
 # Maintainer: 
-# Created: Mon Sep 21 01:45:00 2009 (+0530)
+# Created: Mon Sep 23 00:18:00 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Sep 23 10:05:30 2009 (+0530)
+# Last-Updated: Mon Sep 28 14:16:28 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 104
+#     Update #: 49
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -26,22 +26,6 @@
 # 
 # 
 # 
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as
-# published by the Free Software Foundation; either version 3, or
-# (at your option) any later version.
-# 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License
-# along with this program; see the file COPYING.  If not, write to
-# the Free Software Foundation, Inc., 51 Franklin Street, Fifth
-# Floor, Boston, MA 02110-1301, USA.
-# 
-# 
 
 # Code:
 import string
@@ -51,20 +35,18 @@ import config
 from cell import *
 from capool import CaPool
 
-class SupPyrFRB(TraubCell):
-    prototype = TraubCell.read_proto("SupPyrFRB.p", "SupPyrFRB")
+class SupLTS(TraubCell):
+    prototype = TraubCell.read_proto("SupLTS.p", "SupLTS")
     def __init__(self, *args):
         self.chan_list = ['all channels']
-#         self.chan_list = ['NaF', 'NaP', 'KC', 'KAHP', 'KDR', 'KA', 'K2', 'KM', 'CaL', 'CaT', 'AR']
 	TraubCell.__init__(self, *args)
 
-
     def _topology(self):
-	self.presyn = 72
+	self.presyn = 59
 
     def _setup_passive(self):
 	for comp in self.comp[1:]:
-	    comp.initVm = -70e-3
+	    comp.initVm = -65e-3
 
     def _setup_channels(self):
 	for comp in self.comp[1:]:
@@ -80,11 +62,9 @@ class SupPyrFRB(TraubCell):
 		    obj_class = obj.className
 		    if obj_class == 'HHChannel':
 			obj = moose.HHChannel(child)
-#                         if not obj.name in self.chan_list:
-#                             obj.Gbar = 0.0
 			pyclass = eval(obj.name)
 			if issubclass(pyclass, KChannel):
-			    obj.Ek = -95e-3
+			    obj.Ek = -100e-3
 			    if issubclass(pyclass, KCaChannel):
 				ca_dep_chans.append(obj)
 			elif issubclass(pyclass, NaChannel):
@@ -94,7 +74,7 @@ class SupPyrFRB(TraubCell):
 			    if issubclass(pyclass, CaL):
 				ca_chans.append(obj)
 			elif issubclass(pyclass, AR):
-			    obj.Ek = -35e-3
+			    obj.Ek = -40e-3
 	    if ca_pool:
 		for channel in ca_chans:
 		    channel.connect('IkSrc', ca_pool, 'current')
@@ -105,20 +85,20 @@ class SupPyrFRB(TraubCell):
 		    print comp.name, ':', ca_pool.name, 'connected to', channel.name
 
 	obj = moose.CaConc(self.soma.path + '/CaPool')
-        obj.tau = 100e-3
+        obj.tau = 50e-3
 
 
     @classmethod
     def test_single_cell(cls):
         sim = Simulation()
-        mycell = SupPyrFRB(SupPyrFRB.prototype, sim.model.path + "/SupPyrFRB")
+        mycell = SupLTS(SupLTS.prototype, sim.model.path + "/SupLTS")
         print 'Created cell:', mycell.path
-        vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_suppyrFRB', 'Vm', sim.data)
+        vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_supLTS', 'Vm', sim.data)
         ca_conc_path = mycell.soma.path + '/CaPool'
         ca_table = None
         if config.context.exists(ca_conc_path):
             ca_conc = moose.CaConc(ca_conc_path)
-            ca_table = moose.Table('Ca_suppyrFRB', sim.data)
+            ca_table = moose.Table('Ca_supLTS', sim.data)
             ca_table.stepMode = 3
             ca_conc.connect('Ca', ca_table, 'inputRequest')
         kc_path = mycell.soma.path + '/KC'
@@ -130,7 +110,6 @@ class SupPyrFRB(TraubCell):
             kc.connect('Gk', gk_table, 'inputRequest')
             pymoose.showmsg(ca_conc)
         pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=50e-3, firstWidth=50e-3)
-#         pulsegen1 = mycell.soma.insertPulseGen('pulsegen1', sim.model, firstLevel=3e-7, firstDelay=150e-3, firstWidth=10e-3)
 
         sim.schedule()
         if mycell.has_cycle():
@@ -141,24 +120,19 @@ class SupPyrFRB(TraubCell):
         delta = t2 - t1
         print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
         sim.dump_data('data')
-        mycell.dump_cell('suppyrFRB.txt')
+        mycell.dump_cell('supLTS.txt')
         
         mus_vm = pylab.array(vm_table) * 1e3
-        nrn_vm = pylab.loadtxt('../nrn/mydata/Vm_suppyrFRB.plot')
+        nrn_vm = pylab.loadtxt('../nrn/mydata/Vm_supLTS.plot')
         nrn_t = nrn_vm[:, 0]
         mus_t = linspace(0, sim.simtime*1e3, len(mus_vm))
         nrn_vm = nrn_vm[:, 1]
-        nrn_ca = pylab.loadtxt('../nrn/mydata/Ca_suppyrFRB.plot')
+        nrn_ca = pylab.loadtxt('../nrn/mydata/Ca_supLTS.plot')
         nrn_ca = nrn_ca[:,1]
-        title = 'SupPyrFRB:' + string.join(mycell.chan_list,',')
+        title = 'SupLTS:' + string.join(mycell.chan_list,',')
         pylab.title(title)
         pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
         pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
-#         if ca_table:
-#             ca_array = pylab.array(ca_table)
-#             pylab.plot(nrn_t, -nrn_ca, 'r-', label='nrn (-)ca')
-#             pylab.plot(mus_t, -ca_array, 'b-.', label='mus (-)ca')
-#             print pylab.amax(ca_table)
         pylab.legend()
         pylab.show()
         
@@ -169,11 +143,11 @@ import pylab
 from subprocess import call
 
 if __name__ == "__main__":
-#     call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_suppyrFRB.hoc'], cwd='../nrn')
-    SupPyrFRB.test_single_cell()
+    call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_supLTS.hoc'], cwd='../nrn')
+    SupLTS.test_single_cell()
     
 
 
 
 # 
-# suppyrFRB.py ends here
+# supLTS.py ends here
