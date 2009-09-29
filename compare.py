@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 17 18:01:06 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Sep 21 02:18:42 2009 (+0530)
+# Last-Updated: Wed Sep 23 12:43:15 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 165
+#     Update #: 167
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -152,13 +152,14 @@ if __name__ == "__main__":
 #     compare_spinstell()
 #     print "SupPyrRS matching?"
 #     print comparecsv('py/suppyrrs.txt', 'nrn/suppyrRS')
-    print "SupPyrFRB matching?",
-    print comparecsv('py/suppyrFRB.txt', 'nrn/suppyrFRB')
+#     print "SupPyrFRB matching?",
+#     print comparecsv('py/suppyrFRB.txt', 'nrn/suppyrFRB')
 #     print "SpinyStellates matching?"
 #     print comparecsv('py/spinstell.txt', 'nrn/spinstell')
 #     print "TCR matching?"
 #     print comparecsv('py/tcr.txt', 'nrn/TCR')
-    
+    print 'SupLTS matching?',
+    print comparecsv('py/supLTS.txt', 'nrn/supLTS')
 
 # 
 # compare.py ends here

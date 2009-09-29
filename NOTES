@@ -1255,3 +1255,32 @@ hub. Why?
    going to check the analytical expressions for these two and compare
    successive [Ca2+] values based on Vm. Using difference formulae I should be
    able to tease out the problem source.
+* <2009-09-21 Mon 02:35> Refined utility.hoc
+  Now prints compartments in root->leaf sorted order and with EK, RM, CM and
+  RA as compartment parameters in .p file. Still have to set channel reversal
+  potentials in python code.
+* <2009-09-22 Tue 23:46> Retracted modification in Ca2+
+  As Upi suggested - in order to avoid performance issue in hsolve I made
+  Niraj retract the changes I made in hsolve (floor and ceiling for [Ca2+]). And I checked that the behaviour
+  did not change when all channels are enabled. 
+
+  But there was some serious bug in hsolve in that it did not use the xmin and
+  xmax values set by the user on an interpolation table but used default
+  constant values. We found this from a problem Padraig was facing when trying
+  to use physiological units. This might well have caused me some headache -
+  as I was using.
+* <2009-09-22 Tue 23:56> Looks like hsolve bug was the culprit
+  Now after Niraj did the bugfix, I am getting exact match with all channels
+  enabled in SupPyrFRB.
+* <2009-09-24 Thu 17:55> SupLTS - CaT_A not matching
+  NaF2 missed the shift. Fixed that. Now CaT_A is not matching. Checked the
+  m_inf, m_tau, h_inf and h_tau calculations - allright.
+* <2009-09-25 Fri 21:25> CaT_A : mus = genesis
+  Just tested the same test script with MOOSE and GENESIS - identical.
+  Genesis and Neuron give almost identical result. PyMoose output is less.
+
+** Finally found the bug when comparing the gate tables
+   I happened to use the tauh, taum, minf and hinf from CaT in CaT_A: this
+   happenned because I had copy pasted the CaT class and edited it to make
+   CaT_A - forgetting to change the CaT.minf to CaT_A.minf.
+   
