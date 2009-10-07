@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Sep 21 16:14:27 2009 (+0530)
+# Last-Updated: Tue Oct  6 17:20:35 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 579
+#     Update #: 580
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -87,7 +87,7 @@ class SupPyrRS(TraubCell):
             comp.Em = -70e-3
 
     def _setup_channels(self):
-        """Set up connections between """
+        """Set up connections between compartment and channels, and Ca pool"""
         for i in range(len(self.level)):
             for comp in self.level[i]:
                 ca_pool = None

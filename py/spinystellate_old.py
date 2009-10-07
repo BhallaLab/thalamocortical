@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Apr 29 10:24:37 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Jun 30 14:35:38 2009 (+0530)
+# Last-Updated: Wed Oct  7 14:27:29 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 573
+#     Update #: 574
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -403,7 +403,7 @@ if __name__ == '__main__':
     dump_cell(s, 'ss.p')
     path = s.soma.path + '/a_0/a_1/a_0_0/a_0_1'
     a2 = MyCompartment(path)
-    vm_table = s.soma.insertRecorder('Vm', sim.data)
+    vm_table = s.soma.insertRecorder('Vm_spinstell','Vm', sim.data)
     s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=20e-3, firstWidth=100e-3)
     sim.schedule()
     t1 = datetime.now()

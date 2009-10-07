@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:13 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Sep 23 08:04:34 2009 (+0530)
+# Last-Updated: Wed Oct  7 15:35:55 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 136
+#     Update #: 140
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -55,6 +55,7 @@ class NaChannel(ChannelBase):
     def __init__(self, name, parent, xpower, ypower=0.0, Ek=50e-3):
         ChannelBase.__init__(self, name, parent, xpower=xpower, ypower=ypower)
         self.Ek = Ek
+        self.X = 0.0
 
 class NaF(NaChannel):
     def __init__(self, name, parent, shift=-3.5e-3, Ek=50e-3):
@@ -98,6 +99,7 @@ class NaF2(NaChannel):
             self.yGate.B[i] = h_inf[i]
         self.xGate.tweakTau()
         self.yGate.tweakTau()
+        self.X = 0.0
         self.xGate.A.dumpFile('naf2_xa.plot')
         self.xGate.B.dumpFile('naf2_xb.plot')
         self.yGate.A.dumpFile('naf2_ya.plot')
@@ -132,6 +134,7 @@ class NaPF(NaChannel):
             self.xGate.B[i] = m_inf[i]
         self.xGate.tweakTau()
 
+
 class NaPF_SS(NaChannel):
     def __init__(self, name, parent, shift=-2.5e-3, Ek=50e-3):
         NaChannel.__init__(self, name, parent, xpower=3.0, Ek=Ek)
@@ -147,6 +150,7 @@ class NaPF_SS(NaChannel):
             self.xGate.A[i] = tau_m[i]
             self.xGate.B[i] = m_inf[i]
         self.xGate.tweakTau()
+
 
 class NaPF_TCR(NaChannel):
     """Persistent Na+ channel specific to TCR cells. Only difference

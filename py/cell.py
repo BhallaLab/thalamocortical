@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 24 10:04:47 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Sep  8 10:58:18 2009 (+0530)
+# Last-Updated: Wed Oct  7 16:37:16 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 210
+#     Update #: 216
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -96,6 +96,7 @@ class TraubCell(moose.Cell):
             self._topology()
             self._setup_passive()
             self._setup_channels()
+
         else:
             raise Exception("No compartment in the cell.")
         

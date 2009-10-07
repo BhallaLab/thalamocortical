@@ -1284,3 +1284,50 @@ hub. Why?
    happenned because I had copy pasted the CaT class and edited it to make
    CaT_A - forgetting to change the CaT.minf to CaT_A.minf.
    
+* <2009-10-06 Tue 16:49> Superficial Layer 2/3 Basket Cells
+* <2009-10-07 Wed 14:13> Fixed Padraig's code
+  Padraig's code for NaP channel of Traub model had a silly mistake - vmin and
+  vmax were swapped - fixed.
+  RandomSpike was not working for him. Turned out the it did not have default
+  scheduling: However useclock solves it, I updated moose RandomSpike class to
+  enable default scheduling. Not yet sure which clock should be scheduled to.
+  Printing channels twice: he was trying to print hh_channel and tabchannel
+  separately - but they are the same class in MOOSE - so I advised him to wrap
+  one with a version check for moose.
+* <2009-10-07 Wed 14:17> SpinyStellate - new version
+  Not working - initially I had not set cartesian, asymmetric and relative
+  options in the .p file. After fixing that the HHChannel Ek were not set
+  properly - I was setting Ek without casting the object to an HHChannel. Now
+  the cell comparison gives exact match.
+  Still it is nowhere close to the neuron output.
+
+** Testing individual channels
+   - [X] passive
+   - [X] NaF2
+   - [X] NaPF + NaF2
+   - [ ] NaPF + NaF2 + KDR_FS  - NO
+	 after 20 ms the spike times drift off.
+   - [X] KDR_FS
+   - [ ] KDR_FS + NaF2 
+	 After 20 ms spike times drift off - may be initial value of m and h
+         gates.
+	 I fixed the initial values for m gate in the channel codes - still
+         same problem.
+   - [X] NaF2 + NaPF_SS + KA + K2 + AR 
+	 NO
+	 not exactly matching
+	 <2009-10-07 Wed 16:43> after I set initial value of m table to 0.0 it matches.
+   - [X] NaF2 + NaPF_SS + KA + K2 
+   - [X] NaF2 + NaPF_SS + KA + K2 + AR + KM
+   - [X] NaF2 + NaPF_SS + KA + K2 + AR + KM + CaT_A
+   - [X] NaF2 + NaPF_SS + KA + K2 + AR + KM + CaT_A + KDR_FS
+   - [ ] NaF2 + NaPF_SS + KA + K2 + AR + KM + CaT_A + KDR_FS + CaL
+	 NO
+   - [X] CaL
+   - [X] CaL + NaF2
+   - [ ] CaL + NaF2 + KDR_FS
+	 difference spike timing by < 1 ms
+   - [ ] CaL + NaF2 + KDR_FS + KA + K2
+	 Same for 30 ms, goes out of sync after that.
+   - [ ]  NaF2 + KDR_FS + KA + K2 + KM + AR
+	 Same for ~40 ms, goes out of sync after that.
