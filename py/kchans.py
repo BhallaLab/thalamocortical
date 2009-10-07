@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Sep 17 11:04:14 2009 (+0530)
+# Last-Updated: Wed Oct  7 15:32:50 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 642
+#     Update #: 644
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -103,6 +103,7 @@ class KDR_FS(KChannel):
             self.xGate.A[i] = KDR_FS.tau_m[i]
             self.xGate.B[i] = KDR_FS.m_inf[i]
         self.xGate.tweakTau()
+        self.X = 0.0
 	self.xGate.A.dumpFile('kdrfs_xa.plot')
         self.xGate.B.dumpFile('kdrfs_xb.plot')
 
