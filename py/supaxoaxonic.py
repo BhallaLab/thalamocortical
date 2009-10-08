@@ -1,14 +1,14 @@
-# supbasket.py --- 
+# supaxoaxonic.py --- 
 # 
-# Filename: supbasket.py
-# Description: Superficial Layer 2/3 basket cells
+# Filename: supaxoaxonic.py
+# Description: Superficial Layer 2/3 axoaxonic cells
 # Author: subhasis ray
 # Maintainer: 
 # Created: Tue Oct  6 16:52:28 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Oct  8 17:37:14 2009 (+0530)
+# Last-Updated: Thu Oct  8 18:12:14 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 23
+#     Update #: 5
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -51,8 +51,8 @@ import config
 from cell import *
 from capool import CaPool
 
-class SupBasket(TraubCell):
-    prototype = TraubCell.read_proto('SupBasket.p', 'SupBasket')
+class SupAxoaxonic(TraubCell):
+    prototype = TraubCell.read_proto('SupAxoaxonic.p', 'SupAxoaxonic')
     def __init__(self, *args):
 	TraubCell.__init__(self, *args)
 	
@@ -104,9 +104,9 @@ class SupBasket(TraubCell):
     @classmethod
     def test_single_cell(cls):
         sim = Simulation()
-        mycell = SupBasket(SupBasket.prototype, sim.model.path + "/SupBasket")
+        mycell = SupAxoaxonic(SupAxoaxonic.prototype, sim.model.path + "/SupAxoaxonic")
         print 'Created cell:', mycell.path
-        vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_supbask', 'Vm', sim.data)
+        vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_supaxax', 'Vm', sim.data)
         pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=50e-3, firstWidth=50e-3)
 #         pulsegen1 = mycell.soma.insertPulseGen('pulsegen1', sim.model, firstLevel=3e-7, firstDelay=150e-3, firstWidth=10e-3)
 
@@ -119,14 +119,14 @@ class SupBasket(TraubCell):
         delta = t2 - t1
         print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
         sim.dump_data('data')
-        mycell.dump_cell('supbask.txt')
+        mycell.dump_cell('supaxax.txt')
         
         mus_vm = pylab.array(vm_table) * 1e3
-        nrn_vm = pylab.loadtxt('../nrn/mydata/Vm_supbask.plot')
+        nrn_vm = pylab.loadtxt('../nrn/mydata/Vm_supaxax.plot')
         nrn_t = nrn_vm[:, 0]
         mus_t = linspace(0, nrn_t[-1], len(mus_vm))
         nrn_vm = nrn_vm[:, 1]
-        nrn_ca = pylab.loadtxt('../nrn/mydata/Ca_supbask.plot')
+        nrn_ca = pylab.loadtxt('../nrn/mydata/Ca_supaxax.plot')
         nrn_ca = nrn_ca[:,1]
         pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
         pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
@@ -144,10 +144,10 @@ from simulation import Simulation
 import pylab
 from subprocess import call
 if __name__ == "__main__":
-#     call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_supbask.hoc'], cwd='../nrn')
-    SupBasket.test_single_cell()
+#     call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_supaxax.hoc'], cwd='../nrn')
+    SupAxoaxonic.test_single_cell()
     
 
 
 # 
-# supbasket.py ends here
+# supaxoaxonic.py ends here
