@@ -1331,3 +1331,22 @@ hub. Why?
 	 Same for 30 ms, goes out of sync after that.
    - [ ]  NaF2 + KDR_FS + KA + K2 + KM + AR
 	 Same for ~40 ms, goes out of sync after that.
+   - [ ] WIth all channels in and setting m0 = 0 for AR, it almost works (the
+     spike time goes out of sync at ~100ms. But shape is very similar.
+
+* <2009-10-08 Thu 11:19> Complete layer 4 -> layer 2/3
+  Now I have the following set of cells functioning:
+  - Spiny Stellate (L 4)
+  - LTS (L 2/3)
+  - Pyramidal FRB (L 2/3)
+  - Pyramidal RS (L 2/3)
+  
+  TODO:
+  - Basket cells (L 2/3)
+  - Chandelier/axo-axonic cells (L 2/3)
+  - Some cell types are lacking in Traub model 
+    1. L 4 Interneurons
+    2. L 4 star pyramidal
+       Not sure if 'superficial' basket cells are in L4 or L2/3
+* <2009-10-08 Thu 19:01> Basket cell - done
+  I finished the basket cell and it matched in the first go!
