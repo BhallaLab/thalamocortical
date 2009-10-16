@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:13 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Oct  7 15:35:55 2009 (+0530)
+# Last-Updated: Fri Oct 16 16:11:38 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 140
+#     Update #: 148
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -104,6 +104,12 @@ class NaF2(NaChannel):
         self.xGate.B.dumpFile('naf2_xb.plot')
         self.yGate.A.dumpFile('naf2_ya.plot')
         self.yGate.B.dumpFile('naf2_yb.plot')
+
+class NaF2_nRT(NaF2):
+    """This is a version of NaF2 without the fastNa_shift - applicable to nRT cell."""
+    def __init__(self, name, parent):
+        NaF2.__init__(self, name, parent, shift=0.0)
+
 
 class NaP(NaChannel):
     def __init__(self, name, parent, Ek=50e-3):

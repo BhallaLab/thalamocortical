@@ -109,8 +109,8 @@ proc runcell() {local i, t1,a1,t2,a2  localobj vvec, tvec, f, g
 	if (exact_) { traubexact(cell, tci) }
 	print tstr1
 	// The following are by Subha
-	print "### ", tstr1, "stim1 delay:", stim1.del, "duration:", stim1.dur, "amplitude:", stim1.amp 
-	print "### ", tstr1, "stim2 delay:", stim2.del, "duration:", stim2.dur, "amplitude:", stim2.amp 
+	print "### ", tstr1, ": stim1 delay:", stim1.del, "duration:", stim1.dur, "amplitude:", stim1.amp 
+	print "### ", tstr1, ": stim2 delay:", stim2.del, "duration:", stim2.dur, "amplitude:", stim2.amp 
 	print_cell(cell, tstr1)
 	print_readcell(cell, tstr1)
 	// Subha - till here

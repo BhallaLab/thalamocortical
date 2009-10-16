@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 24 10:04:47 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Oct  7 16:37:16 2009 (+0530)
+# Last-Updated: Fri Oct 16 17:03:54 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 216
+#     Update #: 219
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -59,10 +59,12 @@ from compartment import MyCompartment
 def init_channel_lib():
     """Initialize the prototype channels in library"""
     if not config.channel_lib:
+        print '* Generating channel prototypes in /library'
         for channel_name in config.channel_name_list:
             channel_class = eval(channel_name)
             channel = channel_class(channel_name, config.lib)
             config.channel_lib[channel_name] = channel
+            print '* Created ', channel.path
     return config.channel_lib
 
 def nameindex(comp):
