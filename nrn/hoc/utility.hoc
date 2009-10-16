@@ -1,4 +1,4 @@
-strdef tstr, parent_str, compname, comp_index
+strdef tstr, parent_str, compname, comp_index, cellname
 
 proc print_cell(){ localobj cell,dump_file, strfn, secref
     print "###### Printcell"
@@ -89,6 +89,7 @@ proc print_readcell(){ localobj cell,dump_file, strfn, secref, seclist
     print "Dump file created"
     print "arg ", numarg()
     strfn.head(secname(), "\\[", tstr)
+    sprint(cellname, "%s", tstr)
     sprint(tstr, "%s.p", tstr)
     dump_file.wopen(tstr)
     print "Opened dump file :", tstr
@@ -98,14 +99,32 @@ proc print_readcell(){ localobj cell,dump_file, strfn, secref, seclist
 	seclist.wholetree()
     }
     seclist.unique()
-    forsec seclist {
-	print secname()
-    }
+    // forsec seclist {
+    // 	print secname()
+    // }
     
     
     print "###### about to start traversing"
-    
-    
+    dump_file.printf("/***********************************************************************\n")
+    dump_file.printf(" * This code was generated from a NEURON model using stub hoc code\n")
+    dump_file.printf(" * by Subhasis Ray, NCBS, Bangalore.\n")
+    dump_file.printf(" * It corresponds to %s cell in the model by Traub, et al. 2005\n", cellname)
+    dump_file.printf(" * Reference: http://senselab.med.yale.edu/ModelDb/ShowModel.asp?model=45539\n\n")
+    dump_file.printf(" * Reference: Roger D. Traub, Eberhard H. Buhl, Tengis Gloveli, and \n")
+    dump_file.printf(" * Miles A. Whittington. Fast Rhythmic Bursting Can Be Induced in \n")
+    dump_file.printf(" * Layer 2/3 Cortical Neurons by Enhancing Persistent Na+ Conductance\n") 
+    dump_file.printf(" * or by Blocking BK Channels J Neurophysiol 89: 909-921, 2003\n")
+    dump_file.printf(" * Pubmed: http://www.ncbi.nlm.nih.gov/pubmed/12574468?dopt=Abstract\n\n")    
+    dump_file.printf(" * Reference: Roger D. Traub, Diego Contreras, Mark O. Cunningham,\n") 
+    dump_file.printf(" * Hilary Murray, Fiona E. N. LeBeau, Anita Roopun, Andrea Bibbig, \n")
+    dump_file.printf(" * W. Bryan Wilent, Michael J. Higley, and Miles A. Whittington\n")
+    dump_file.printf(" * Single-column thalamocortical network model exhibiting \n")
+    dump_file.printf(" * gamma oscillations, sleep spindles, and epileptogenic bursts.\n")
+    dump_file.printf(" * J. Neurophysiol. 93, 2194-2232, 2005\n")
+    dump_file.printf(" * Pubmed: http://www.ncbi.nlm.nih.gov/pubmed/15525801?dopt=Abstract\n")
+    dump_file.printf(" ***********************************************************************/\n")
+
+    dump_file.printf("*cartesian\n*relative\n*asymmetric\n")
     forsec seclist  {
 	    sarea = PI * L * diam * 1e-8 // um^2 to cm^2
 	    xarea = PI * diam * diam * 1e-8 / 4.0

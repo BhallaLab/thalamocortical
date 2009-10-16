@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Sep 14 09:57:59 2009 (+0530)
+# Last-Updated: Fri Oct 16 17:02:52 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 46
+#     Update #: 51
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -59,7 +59,33 @@ vmin = -120e-3
 vmax = 40e-3
 ndivs = 640
 dv = (vmax - vmin) / ndivs
-channel_name_list = ['AR','CaPool','CaL','CaT','CaT_A','K2','KA','KA_IB','KAHP','KAHP_DP','KAHP_SLOWER','KC','KC_FAST','KDR','KDR_FS','KM','NaF','NaF2','NaF_TCR','NaP','NaPF','NaPF_SS','NaPF_TCR']
+channel_name_list = ['AR','CaPool','CaL','CaT','CaT_A','K2','KA','KA_IB','KAHP','KAHP_DP','KAHP_SLOWER','KC','KC_FAST','KDR','KDR_FS','KM','NaF','NaF2','NaF_TCR','NaP','NaPF','NaPF_SS','NaPF_TCR', 'NaF2_nRT']
+
+channel_map = {'AR': 'ar',
+	       'CaPool': 'cad',
+	       'CaL': 'cal',
+	       'CaT': 'cat',
+	       'CaT_A': 'cat_a',
+	       'K2': 'k2',
+	       'KA': 'ka',
+	       'KA_IB': 'ka_ib',
+	       'KAHP': 'kahp',
+	       'KAHP_DP': 'kahp_deeppyr',
+	       'KAHP_SLOWER': 'kahp_slower',
+	       'KC': 'kc',
+	       'KC_FAST': 'kc_fast',
+	       'KDR': 'kdr',
+	       'KDR_FS': 'kdr_fs',
+	       'KM': 'km',
+	       'NaF': 'naf',
+	       'NaF2': 'naf2',
+	       'NaF2_nRT': 'naf2',
+	       'NaF_TCR': 'naf_tcr',
+	       'NaP': 'nap',
+	       'NaPF': 'napf',
+	       'NaPF_SS': 'napf_spinstell',
+	       'NaPF_TCR': 'napf_tcr'	      
+	       }
 
 channel_lib = {}
 

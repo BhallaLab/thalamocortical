@@ -1350,3 +1350,57 @@ hub. Why?
        Not sure if 'superficial' basket cells are in L4 or L2/3
 * <2009-10-08 Thu 19:01> Basket cell - done
   I finished the basket cell and it matched in the first go!
+* <2009-10-16 Fri 10:06> Release it!
+  I'll add this as a demo to the MOOSE subversion repo. For that I want to do
+  all the cells - which is a no-brainer now.
+  The list of cells:
+- [X] deepaxax_template.hoc
+- [X] nontuftRS_template.hoc
+- [X] supaxax_template.hoc
+- [X] suppyrFRB_template.hoc
+- [X] tuftIB_template.hoc
+      -- this is not matching
+      -- The CaCon tau was set specific for each compartment in level2 - after
+      fixing it matches.
+      -- But No spike when current injection is applied at 50 ms for 50
+      ms. Spikes come when current is injected right at the start of the
+      simulation and stays on for the duration of the current injection.
+- [X] deepbask_template.hoc - the last spike is slightly off
+- [X] nRT_template.hoc - not matching
+      - only passive - matching
+      - only noticed that NaF2 did not have -2.5mV shift in this case -
+        created another specialized channel - much closer
+      - only NaF2 - matching
+      - only KDR - matching
+      - NaF2 + KDR - matching
+      - NaPF - matching
+      - NaF2 + KDR + NaPF + K2 - matching
+      - NaF2 + KDR + NaPF + K2 + KM - goes out of sync after some time
+      - KM alone - matching at 0.3 nA, matching at 10 nA
+      - KM + NaF2 - match
+      - KM + NaF2 + KA - match
+      - K2 + KM + NaF2 + KA - match
+      - K2 + KM + NaF2 + KA - match
+      - K2 + KM + NaF2 + KA + NaPF - match
+      - K2 + KM + NaF2 + KA + NaPF + CaT_A - match
+      - K2 + KM + NaF2 + KA + NaPF + CaT_A + - slight mis-match
+      - AR alone - not matching - m0_ar is set to 0 for this cell - in others
+        it is -2.5 mV
+	- after correcting this all spikes except the last one are matching.
+      - ['NaPF', 'NaF2_nRT', 'KM', 'KA', 'K2', 'CaL', 'CaT_A', 'AR',
+        'KDR_FS'] - match
+      - ['NaPF', 'NaF2_nRT', 'KM', 'KA', 'K2', 'CaL', 'CaT_A', 'AR',,
+        'KDR_FS', 'KC' ] - match
+
+      - Added KAHP_SLOWER to above - last spike out of sync - looks fishy -
+        many other cells have the same problem : KAHP_SLOWER is culprit?
+	
+      - Set calcMode = 1 for KAHP_SLOWER and it works!!
+	
+- [X] supbask_template.hoc
+- [X] suppyrRS_template.hoc
+- [X] tuftRS_template.hoc
+- [ ] deepLTS_template.hoc
+- [X] spinstell_template.hoc
+- [X] supLTS_template.hoc
+- [X] TCR_template.hoc
