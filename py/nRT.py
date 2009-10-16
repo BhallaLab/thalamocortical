@@ -1,22 +1,22 @@
-# tcr.py --- 
+# nRT.py --- 
 # 
-# Filename: tcr.py
+# Filename: nRT.py
 # Description: 
 # Author: subhasis ray
 # Maintainer: 
-# Created: Fri Oct 16 10:14:07 2009 (+0530)
+# Created: Fri Oct 16 15:18:24 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct 16 11:06:31 2009 (+0530)
+# Last-Updated: Fri Oct 16 18:50:56 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 15
+#     Update #: 39
 # URL: 
 # Keywords: 
 # Compatibility: 
 # 
 # 
 
-# Commentary: This is a redoing of the Thalamocortical relay cells using prototype file.
-# It is a translation of the cell in Traub et al, 2005 model.
+# Commentary: 
+# 
 # 
 # 
 # 
@@ -52,19 +52,19 @@ from cell import *
 from capool import CaPool
 
 
-class TCR(TraubCell):
-    prototype = TraubCell.read_proto("TCR.p", "TCR")
+class nRT(TraubCell):
+    prototype = TraubCell.read_proto("nRT.p", "nRT")
     ca_dep_chans = ['KAHP','KAHP_SLOWER', 'KAHP_DP', 'KC', 'KC_FAST']
+    unblocked_chans = [ 'CaL', 'KAHP_SLOWER']#['NaPF', 'KDR_FS', 'NaF2_nRT', 'K2', 'KM']
     def __init__(self, *args):
 	TraubCell.__init__(self, *args)
 	
     def _topology(self):
-        self.presyn = 135
+        self.presyn = 59
     
     def _setup_passive(self):
         for comp in self.comp[1:]:
-            comp.Em = -70e-3
-	    comp.initVm = -70e-3
+	    comp.initVm = -75e-3
 
     def _setup_channels(self):
         """Set up connections between compartment and channels, and Ca pool"""
@@ -81,11 +81,12 @@ class TCR(TraubCell):
 		    obj_class = obj.className
 		    if obj_class == 'HHChannel':
 			obj = moose.HHChannel(child)
-#                         if not obj.name in self.chan_list:
+                        gbar = obj.Gbar
+#                         if not obj.name in nRT.unblocked_chans:
 #                             obj.Gbar = 0.0
 			pyclass = eval(obj.name)
 			if issubclass(pyclass, KChannel):
-			    obj.Ek = -95e-3
+			    obj.Ek = -100e-3
 			    if issubclass(pyclass, KCaChannel):
 				ca_dep_chans.append(obj)
 			elif issubclass(pyclass, NaChannel):
@@ -95,7 +96,8 @@ class TCR(TraubCell):
 			    if issubclass(pyclass, CaL):
 				ca_chans.append(obj)
 			elif issubclass(pyclass, AR):
-			    obj.Ek = -35e-3
+			    obj.Ek = -40e-3
+                            obj.X = 0.0
 	    if ca_pool:
 		for channel in ca_chans:
 		    channel.connect('IkSrc', ca_pool, 'current')
@@ -108,17 +110,18 @@ class TCR(TraubCell):
 	obj = moose.CaConc(self.soma.path + '/CaPool')
         obj.tau = 50e-3
 
+
     @classmethod
     def test_single_cell(cls):
         sim = Simulation()
-        mycell = TCR(TCR.prototype, sim.model.path + "/TCR")
+        mycell = nRT(nRT.prototype, sim.model.path + "/nRT")
         print 'Created cell:', mycell.path
-        vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_TCR', 'Vm', sim.data)
+        vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_nRT', 'Vm', sim.data)
         ca_conc_path = mycell.soma.path + '/CaPool'
         ca_table = None
         if config.context.exists(ca_conc_path):
             ca_conc = moose.CaConc(ca_conc_path)
-            ca_table = moose.Table('Ca_TCR', sim.data)
+            ca_table = moose.Table('Ca_nRT', sim.data)
             ca_table.stepMode = 3
             ca_conc.connect('Ca', ca_table, 'inputRequest')
         kc_path = mycell.soma.path + '/KC'
@@ -129,7 +132,7 @@ class TCR(TraubCell):
             kc = moose.HHChannel(kc_path)
             kc.connect('Gk', gk_table, 'inputRequest')
             pymoose.showmsg(ca_conc)
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=50e-3, firstWidth=50e-3)
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=50.0e-3, firstWidth=50e-3)
 #         pulsegen1 = mycell.soma.insertPulseGen('pulsegen1', sim.model, firstLevel=3e-7, firstDelay=150e-3, firstWidth=10e-3)
 
         sim.schedule()
@@ -141,14 +144,14 @@ class TCR(TraubCell):
         delta = t2 - t1
         print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
         sim.dump_data('data')
-        mycell.dump_cell('TCR.txt')
+        mycell.dump_cell('nRT.txt')
         
         mus_vm = pylab.array(vm_table) * 1e3
-        nrn_vm = pylab.loadtxt('../nrn/mydata/Vm_TCR.plot')
+        nrn_vm = pylab.loadtxt('../nrn/mydata/Vm_nRT.plot')
         nrn_t = nrn_vm[:, 0]
         mus_t = linspace(0, nrn_t[-1], len(mus_vm))
         nrn_vm = nrn_vm[:, 1]
-        nrn_ca = pylab.loadtxt('../nrn/mydata/Ca_TCR.plot')
+        nrn_ca = pylab.loadtxt('../nrn/mydata/Ca_nRT.plot')
         nrn_ca = nrn_ca[:,1]
         pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
         pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
@@ -166,9 +169,11 @@ from simulation import Simulation
 import pylab
 from subprocess import call
 if __name__ == "__main__":
-    call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_TCR.hoc'], cwd='../nrn')
-    TCR.test_single_cell()
+    call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_nRT.hoc'], cwd='../nrn')
+    nRT.test_single_cell()
+
+
 
 
 # 
-# tcr.py ends here
+# nRT.py ends here

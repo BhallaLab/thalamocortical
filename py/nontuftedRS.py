@@ -1,22 +1,22 @@
-# tcr.py --- 
+# nontuftedRS.py --- 
 # 
-# Filename: tcr.py
+# Filename: nontuftedRS.py
 # Description: 
 # Author: subhasis ray
 # Maintainer: 
-# Created: Fri Oct 16 10:14:07 2009 (+0530)
+# Created: Fri Oct 16 11:34:27 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct 16 11:06:31 2009 (+0530)
+# Last-Updated: Fri Oct 16 11:38:22 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 15
+#     Update #: 7
 # URL: 
 # Keywords: 
 # Compatibility: 
 # 
 # 
 
-# Commentary: This is a redoing of the Thalamocortical relay cells using prototype file.
-# It is a translation of the cell in Traub et al, 2005 model.
+# Commentary: 
+# 
 # 
 # 
 # 
@@ -52,18 +52,17 @@ from cell import *
 from capool import CaPool
 
 
-class TCR(TraubCell):
-    prototype = TraubCell.read_proto("TCR.p", "TCR")
+class NontuftedRS(TraubCell):
+    prototype = TraubCell.read_proto("NontuftedRS.p", "NontuftedRS")
     ca_dep_chans = ['KAHP','KAHP_SLOWER', 'KAHP_DP', 'KC', 'KC_FAST']
     def __init__(self, *args):
 	TraubCell.__init__(self, *args)
 	
     def _topology(self):
-        self.presyn = 135
+        self.presyn = 48
     
     def _setup_passive(self):
         for comp in self.comp[1:]:
-            comp.Em = -70e-3
 	    comp.initVm = -70e-3
 
     def _setup_channels(self):
@@ -106,19 +105,19 @@ class TCR(TraubCell):
 		    print comp.name, ':', ca_pool.name, 'connected to', channel.name
 
 	obj = moose.CaConc(self.soma.path + '/CaPool')
-        obj.tau = 50e-3
+        obj.tau = 100e-3
 
     @classmethod
     def test_single_cell(cls):
         sim = Simulation()
-        mycell = TCR(TCR.prototype, sim.model.path + "/TCR")
+        mycell = NontuftedRS(NontuftedRS.prototype, sim.model.path + "/NontuftedRS")
         print 'Created cell:', mycell.path
-        vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_TCR', 'Vm', sim.data)
+        vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_nontuftRS', 'Vm', sim.data)
         ca_conc_path = mycell.soma.path + '/CaPool'
         ca_table = None
         if config.context.exists(ca_conc_path):
             ca_conc = moose.CaConc(ca_conc_path)
-            ca_table = moose.Table('Ca_TCR', sim.data)
+            ca_table = moose.Table('Ca_nontuftRS', sim.data)
             ca_table.stepMode = 3
             ca_conc.connect('Ca', ca_table, 'inputRequest')
         kc_path = mycell.soma.path + '/KC'
@@ -141,14 +140,14 @@ class TCR(TraubCell):
         delta = t2 - t1
         print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
         sim.dump_data('data')
-        mycell.dump_cell('TCR.txt')
+        mycell.dump_cell('nontuftRS.txt')
         
         mus_vm = pylab.array(vm_table) * 1e3
-        nrn_vm = pylab.loadtxt('../nrn/mydata/Vm_TCR.plot')
+        nrn_vm = pylab.loadtxt('../nrn/mydata/Vm_nontuftRS.plot')
         nrn_t = nrn_vm[:, 0]
         mus_t = linspace(0, nrn_t[-1], len(mus_vm))
         nrn_vm = nrn_vm[:, 1]
-        nrn_ca = pylab.loadtxt('../nrn/mydata/Ca_TCR.plot')
+        nrn_ca = pylab.loadtxt('../nrn/mydata/Ca_nontuftRS.plot')
         nrn_ca = nrn_ca[:,1]
         pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
         pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
@@ -166,9 +165,13 @@ from simulation import Simulation
 import pylab
 from subprocess import call
 if __name__ == "__main__":
-    call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_TCR.hoc'], cwd='../nrn')
-    TCR.test_single_cell()
+    call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_nontuftRS.hoc'], cwd='../nrn')
+    NontuftedRS.test_single_cell()
+
+
+
+
 
 
 # 
-# tcr.py ends here
+# nontuftedRS.py ends here

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 17 18:01:06 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Oct  7 14:11:45 2009 (+0530)
+# Last-Updated: Fri Oct 16 15:24:57 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 174
+#     Update #: 177
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -160,8 +160,14 @@ if __name__ == "__main__":
 #     print comparecsv('py/tcr.txt', 'nrn/TCR')
 #     print 'SupLTS matching?',
 #     print comparecsv('py/supLTS.txt', 'nrn/supLTS')
-    print 'SpinyStellate matching?',
-    print comparecsv('py/spinstell.txt', 'nrn/spinstell')
+#     print 'SpinyStellate matching?',
+#     print comparecsv('py/spinstell.txt', 'nrn/spinstell')
+#     print 'TuftedIB matching?',
+#     print comparecsv('py/tuftIB.txt', 'nrn/tuftIB')
+#     print 'DeepBasket matching?',
+#     print comparecsv('py/deepbask.txt', 'nrn/deepbask')
+    print 'nRT matching?',
+    print comparecsv('py/nRT.txt', 'nrn/nRT')
 
 # 
 # compare.py ends here

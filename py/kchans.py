@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Oct  7 15:32:50 2009 (+0530)
+# Last-Updated: Fri Oct 16 19:29:08 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 644
+#     Update #: 650
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -127,7 +127,6 @@ class KA(KChannel):
         self.xGate.tweakTau()
 	self.yGate.tweakTau()
         self.X = 0.0
-
 
 class KA_IB(KChannel):
     """A type K+ channel for tufted intrinsically bursting cells -
@@ -249,6 +248,8 @@ class KAHP_SLOWER(KAHPBase):
             self.zGate.A[i] = KAHP_SLOWER.alpha[i]
             self.zGate.B[i] = KAHP_SLOWER.beta[i]
         self.zGate.tweakAlpha()
+        self.zGate.A.calcMode = 1
+        self.zGate.B.calcMode = 1
 
 
 class KAHP_DP(KAHPBase):
