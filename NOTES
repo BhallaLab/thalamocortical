@@ -1404,3 +1404,37 @@ hub. Why?
 - [X] spinstell_template.hoc
 - [X] supLTS_template.hoc
 - [X] TCR_template.hoc
+* <2009-10-22 Thu 14:36> Visualization
+  I have been googling around and reading mailing lists / documentations in
+  search for a good 3D visualization library in Python. What Karan has been
+  doing is great: but I am not sure how it will integrate with Python. Because
+  he has a stand-alone app for visualization, the number of processes to be
+  handled in Python increase. Also, I suspect that this standalone application
+  will need some wrapper code to integrate with PyQt. 
+
+  On the other hand, if I can make a 3D visualization widget using existing
+  python-opengl libraries, it can utilize Karan's class that writes out data
+  from MOOSE for the visualization application and seemlessly integrate with
+  PyQt gui.
+
+  Regarding this I am considering the following:
+
+  1. VPython - small (2.4 MB), object oriented, high-level (has basic solids
+     like cylinder built-in - so I just need to put the compartment x,y,z and
+     diameter into it), interactive, easy to learn for novice programmars.
+     - Though it seems sufficient for MOOSE, I am not sure how far it can go
+       if we need more sophisticated 3D rendering in future.
+
+  2. MayaVi2 / VTK - big (~10 MB), targeted at scientific data
+     visualization,comes with built-in gui. renders 3D surfaces. 
+     - Does not look easy. Seems to be oriented more towards 3D data rather
+       than standard shapes. Release version requires wx threads. PyQt support
+       incomplete and not well documented, available as source code only.
+     - Some lists said it is easier to use VTK directly and that resolves the
+       blockage with PyQt.
+
+  4. Panda3D - huge (~60 MB). Targeted at industry quality 3D animation and
+     gaming. Portable between mac/linux/windows. Has lots of extra
+     functinoality (like utilities for online multiplayer gaming). Well
+     supported by Disney and CMU.
+     

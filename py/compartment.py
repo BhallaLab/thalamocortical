@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Sep 18 16:51:57 2009 (+0530)
+# Last-Updated: Sat Oct 17 15:21:43 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 164
+#     Update #: 165
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -138,6 +138,19 @@ class MyCompartment(moose.Compartment):
         table.stepMode = 3
         self.connect(field_name, table, "inputRequest")
         return table
+
+    def insertCaRecorder(self, object_name, data_container):
+        """Creates a table for recording [Ca2+] under data_container"""
+        ca_table = None
+        ca_conc_path = self.path + '/' + object_name
+        if config.context.exists(ca_conc_path):
+            ca_conc = moose.CaConc(ca_conc_path)
+            ca_table = moose.Table(object_name, data_container)
+            ca_table.stepMode = 3
+            ca_conc.connect('Ca', ca_table, 'inputRequest')
+
+        return ca_table
+
 
     def insertPulseGen(self, name, parent,      \
                            baseLevel=0.0,       \

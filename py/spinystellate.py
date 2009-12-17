@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Sep 29 11:43:22 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Oct  7 17:21:03 2009 (+0530)
+# Last-Updated: Thu Nov 12 14:38:37 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 117
+#     Update #: 149
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -32,6 +32,7 @@ import moose
 import config
 from cell import *
 from capool import CaPool
+# from cellview import MyCellView
 
 class SpinyStellate(TraubCell):
     ENa = 50e-3
@@ -45,6 +46,29 @@ class SpinyStellate(TraubCell):
 
     def _topology(self):
 	self.presyn = 57
+        self.level[1].add(self.comp[1])
+        for i in range(2, 42, 13):
+            self.level[2].add(self.comp[i])
+        for i in range(3, 43, 13):
+            self.level[3].add(self.comp[i])
+            self.level[3].add(self.comp[i+1])
+        for i in range(5, 45, 13):
+            self.level[4].add(self.comp[i])
+            self.level[4].add(self.comp[i+1])
+            self.level[4].add(self.comp[i+2])
+        for i in range(8, 48, 13):
+            self.level[5].add(self.comp[i])
+            self.level[5].add(self.comp[i+1])
+            self.level[5].add(self.comp[i+2])
+        for i in range(11, 51, 13):
+            self.level[6].add(self.comp[i])
+            self.level[7].add(self.comp[i+1])
+            self.level[8].add(self.comp[i+2])
+            self.level[9].add(self.comp[i+3])
+
+        for i in range(54, 60):
+            self.level[0].add(self.comp[i])
+            
         # Skipping the categorizatioon into levels for the time being
 
     def _setup_passive(self):
@@ -94,7 +118,18 @@ class SpinyStellate(TraubCell):
     def test_single_cell(cls):
         sim = Simulation()
         mycell = SpinyStellate(SpinyStellate.prototype, sim.model.path + "/SpinyStellate")
+        mycell.soma.x0 = 0.0
+        mycell.soma.y0 = 0.0
+        mycell.soma.z0 = 0.0
+        mycell.soma.x = 0.0
+        mycell.soma.y = 0.0
+        mycell.soma.z = mycell.soma.length
+        mycellview = MyCellView(mycell)
         print 'Created cell:', mycell.path
+        for neighbour in mycell.soma.neighbours('raxial'):
+            print 'RAXIAL', neighbours.path()
+        for neighbour in mycell.soma.neighbours('axial'):
+            print 'AXIAL', neighbour.path()
         vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_spinstell', 'Vm', sim.data)
         pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=50e-3, firstWidth=50e-3)
 #         pulsegen1 = mycell.soma.insertPulseGen('pulsegen1', sim.model, firstLevel=3e-7, firstDelay=150e-3, firstWidth=10e-3)
@@ -133,7 +168,7 @@ from simulation import Simulation
 import pylab
 from subprocess import call
 if __name__ == "__main__":
-    call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_spinstell.hoc'], cwd='../nrn')
+#     call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_spinstell.hoc'], cwd='../nrn')
     SpinyStellate.test_single_cell()
     
 
