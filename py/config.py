@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct 16 17:02:52 2009 (+0530)
+# Last-Updated: Sat Oct 17 15:23:35 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 51
+#     Update #: 55
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -53,8 +53,8 @@ context = moose.PyMooseBase.getContext()
 lib = moose.Neutral('/library')
 root = moose.Neutral("/")
 
-simdt = 1e-6
-plotdt = 1e-6
+simdt = 1e-5
+plotdt = 1e-5
 vmin = -120e-3
 vmax = 40e-3
 ndivs = 640
@@ -88,6 +88,24 @@ channel_map = {'AR': 'ar',
 	       }
 
 channel_lib = {}
+
+# Locate the neuron binaries
+import subprocess
+neuron_bin = None
+try:
+    which_neuron = subprocess.Popen(['which', 'nrngui'], stdout=subprocess.PIPE, close_fds=True)
+    for neuron_bin in which_neuron.stdout:
+        neuron_bin = neuron_bin.strip()
+        if neuron_bin:
+            print 'nrngui fount at:', neuron_bin
+            break
+except Exception, e:
+    print e
+    print 'config.py: could not locate nrngui. Set the full path to it in this file.'
+finally:
+    if not neuron_bin:
+        print 'config.py: could not locate nrngui. Set variable neuron_bin to the full path to it in this file. Otherwise the .plot files in the data directory will be used for plotting'
+
 
 # 
 # config.py ends here
