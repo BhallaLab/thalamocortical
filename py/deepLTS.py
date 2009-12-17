@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 19:32:34 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct 16 19:40:31 2009 (+0530)
+# Last-Updated: Mon Oct 26 10:41:27 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 5
+#     Update #: 17
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -48,6 +48,8 @@
 from datetime import datetime
 import moose
 import config
+import trbutil
+import moose
 from cell import *
 from capool import CaPool
 
@@ -60,6 +62,27 @@ class DeepLTS(TraubCell):
 	
     def _topology(self):
         self.presyn = 59
+        self.level[1].add(self.comp[1])
+        for ii in range(2, 42, 13):
+            self.level[2].add(self.comp[i])
+        for ii in range(3, 43, 13):
+            self.level[3].add(self.comp[i])
+            self.level[3].add(self.comp[i+1])
+        for ii in range(5, 45, 13):
+            self.level[4].add(self.comp[i])
+            self.level[4].add(self.comp[i+1])
+            self.level[4].add(self.comp[i+2])
+        for ii in range(8, 48, 13):
+            self.level[5].add(self.comp[i])
+            self.level[5].add(self.comp[i+1])
+            self.level[5].add(self.comp[i+2])
+        for ii in range(11, 51, 13):
+            self.level[6].add(self.comp[i])
+            self.level[7].add(self.comp[i+1])
+            self.level[8].add(self.comp[i+2])
+            self.level[9].add(self.comp[i+3])
+        for ii in range(54, 60):
+            self.level[0].add(self.comp[i])
     
     def _setup_passive(self):
         for comp in self.comp[1:]:

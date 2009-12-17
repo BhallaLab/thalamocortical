@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 14:30:33 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct 16 19:43:43 2009 (+0530)
+# Last-Updated: Mon Oct 26 10:56:46 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 23
+#     Update #: 38
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -46,8 +46,9 @@
 # Code:
 
 from datetime import datetime
-import moose
 import config
+import moose
+import trbutil
 from cell import *
 from capool import CaPool
 
@@ -60,7 +61,29 @@ class DeepBasket(TraubCell):
 	
     def _topology(self):
         self.presyn = 59
-    
+        self.level[1].add(self.comp[1])
+        for ii in range(2, 42, 13):
+            self.level[2].add(self.comp[ii])
+        for ii in range(3, 43, 13):
+            self.level[3].add(self.comp[ii])
+            self.level[3].add(self.comp[ii+1])
+        for ii in range(5, 45, 13):
+            self.level[4].add(self.comp[ii])
+            self.level[4].add(self.comp[ii+1])
+            self.level[4].add(self.comp[ii+2])
+        for ii in range(8, 48, 13):
+            self.level[5].add(self.comp[ii])
+            self.level[5].add(self.comp[ii+1])
+            self.level[5].add(self.comp[ii+2]) 
+        for ii in range(11, 51, 13):
+            self.level[6].add(self.comp[ii])
+            self.level[7].add(self.comp[ii+1])
+            self.level[8].add(self.comp[ii+2])
+            self.level[9].add(self.comp[ii+3])
+        for ii in range(54, 60):
+            self.level[0].add(self.comp[ii])
+            
+   
     def _setup_passive(self):
         for comp in self.comp[1:]:
 	    comp.initVm = -65e-3
