@@ -1,4 +1,4 @@
-supRS,supFRB,supBasket,supAxoaxonic,SupLTS,SpinyStellate,tuftedIB,tuftedRS,deepBasket,deepAxoaxonic,deepLTS,nontuftedRS,TCR,nRT
+SupPyrRS,SupPyrFRB,SupBasket,SupAxoaxonic,SupLTS,SpinyStellate,TuftedIB,TuftedRS,DeepBasket,DeepAxoaxonic,DeepLTS,NontuftedRS,TCR,nRT
 50,50,90,90,90,3,60,60,30,30,30,3,0,0
 5,5,5,5,5,1,3,3,3,3,3,1,0,0
 20,20,20,20,20,20,0,0,0,0,0,0,0,0
