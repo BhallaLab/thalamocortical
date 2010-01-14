@@ -133,7 +133,8 @@ Original comments in FORTRAN are retained as hoc comments
          num_tuftIB_to_deepaxax    = 20 
          num_tuftIB_to_deepLTS     = 20 
          num_tuftIB_to_nontuftRS   = 20 
-//        num_tuftRS_to_suppyrRS    = 20 
+	 
+	 //        num_tuftRS_to_suppyrRS    = 20 
          num_tuftRS_to_suppyrRS    =  2  // small per Thomson   Bannister
 //        num_tuftRS_to_suppyrFRB   = 20 
          num_tuftRS_to_suppyrFRB   =  2  // small per Thomson   Bannister
@@ -155,14 +156,15 @@ Original comments in FORTRAN are retained as hoc comments
          num_deepbask_to_deepaxax  = 20 
          num_deepbask_to_deepLTS   = 20 
          num_deepbask_to_nontuftRS = 20 
+	 
          num_deepaxax_to_suppyrRS  =  5 
          num_deepaxax_to_suppyrFRB =  5 
          num_deepaxax_to_spinstell =  5 
          num_deepaxax_to_tuftIB    =  5 
          num_deepaxax_to_tuftRS    =  5 
          num_deepaxax_to_nontuftRS =  5 
-         num_deepLTS_to_suppyrRS   = 10 
-        
+	 
+         num_deepLTS_to_suppyrRS   = 10         
          num_deepLTS_to_suppyrFRB  = 10 
          num_deepLTS_to_supbask    = 10 
          num_deepLTS_to_supaxax    = 10 
@@ -174,6 +176,7 @@ Original comments in FORTRAN are retained as hoc comments
          num_deepLTS_to_deepaxax   = 20 
          num_deepLTS_to_deepLTS    = 20 
          num_deepLTS_to_nontuftRS  = 20 
+	 
          num_TCR_to_suppyrRS       = 10 
          num_TCR_to_suppyrFRB      = 10 
          num_TCR_to_supbask        = 10 
@@ -187,6 +190,7 @@ Original comments in FORTRAN are retained as hoc comments
          num_TCR_to_deepaxax       = 10 
          num_TCR_to_nRT            = 25  // note
          num_TCR_to_nontuftRS      = 10 
+	 
          num_nRT_to_TCR            = 15  // note
          num_nRT_to_nRT            = 10 
         

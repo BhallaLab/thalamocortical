@@ -1438,3 +1438,72 @@ hub. Why?
      functinoality (like utilities for online multiplayer gaming). Well
      supported by Disney and CMU.
      
+* <2010-01-13 Wed 17:46> Starting after another break
+  Restarting the work again after coming back from home. The listing for
+  connectivity is below (embarassed by questions about connectivity from
+  Elisha Moses: but I realized why I could not remember the connection
+  probability - there was none precisely: it was just the number of
+  pre-synaptic neurons for each type of neuron):
+
+  Superficial RS 50 -> 1 Superficial RS 
+  Superficial RS 50 -> 1 Superficial FRB
+  SuperficialRS 50 -> 1 Superficial Basket 
+  SuperficialRS 90 -> 1 Superficial Axoaxonic 
+  SuperficialRS 90 -> 1 Superficial LTS Interneuron 
+  SuperficialRS 3 ->  1 SpinyStellate 
+  SuperficialRS 60 -> 1 Tufted IB Pyramid 
+  SuperficialRS 60 -> 1 Tufted RS Pyramid 
+  SuperficialRS 30 -> 1 deep basket
+  SuperficialRS 30 -> 1 deep axoaxonic
+  SuperficialRS 30 -> 1 deep LTS
+  SuperficialRS 3 -> 1 nontufted RS pyramid
+  SuperficialRS 0 -> 1 TCR
+  SuperficialRS 0 -> 1 nRT
+
+  Superficial FRB Pyramids
+  5 -> Superficial RS
+  5 -> Superficial FRB
+  5 -> Superficial Basket
+  5 -> Superficial Axoaxonic
+  5 -> Superficial LTS
+  1 -> Spiny Stellate
+  3 -> tufted IB
+  3 -> tufted RS
+  3 -> deep basket
+  3 -> deep axoaxonic
+  3 -> deep LTS
+  1 -> nontufted RS
+  0 -> TCR
+  0 -> nRT                      
+
+
+-- I realize that this is basically a matrix with cell types as rows and
+columns. How to represent this in NeuroML?
+
+|               | supRS | supFRB | supBasket | supAxoaxonic | SupLTS | SpinyStellate | tuftedIB | tuftedRS | deepBasket | deepAxoaxonic | deepLTS | nontuftedRS | TCR | nRT |
+|---------------+-------+--------+-----------+--------------+--------+---------------+----------+----------+------------+---------------+---------+-------------+-----+-----|
+| SupRS         |    50 |     50 |        90 |           90 |     90 |             3 |       60 |       60 |         30 |            30 |      30 |           3 |   0 |   0 |
+| SupFRB        |     5 |      5 |         5 |            5 |      5 |             1 |        3 |        3 |          3 |             3 |       3 |           1 |   0 |   0 |
+| SupBasket     |    20 |     20 |        20 |           20 |     20 |            20 |        0 |        0 |          0 |             0 |       0 |           0 |   0 |   0 |
+| SupAxoaxonic  |    20 |     20 |         0 |            0 |      0 |             5 |        5 |        5 |          0 |             0 |       0 |           5 |   0 |   0 |
+| SupLTS        |    20 |     20 |        20 |           20 |     20 |            20 |       20 |       20 |         20 |            20 |      20 |          20 |   0 |   0 |
+| SpinyStellate |    20 |     20 |        20 |           20 |     20 |            30 |       20 |       20 |         20 |            20 |      20 |          20 |   0 |   0 |
+| tuftedIB      |     2 |      2 |        20 |           20 |     20 |            20 |       50 |       20 |         20 |            20 |      20 |          20 |   0 |   0 |
+| tuftedRS      |     2 |      2 |        20 |           20 |     20 |            20 |       20 |       10 |         20 |            20 |      20 |          20 |   0 |   0 |
+| deepBasket    |     0 |      0 |         0 |            0 |      0 |            20 |       20 |       20 |         20 |            20 |      20 |          20 |   0 |   0 |
+| deepAxoaxonic |     5 |      5 |         0 |            0 |      0 |             5 |        5 |        5 |          0 |             0 |       0 |           5 |   0 |   0 |
+| deepLTS       |    10 |     10 |        10 |           10 |     10 |            20 |       20 |       20 |         20 |            20 |      20 |          20 |   0 |   0 |
+| nontuftedRS   |    10 |     10 |        10 |           10 |     10 |            10 |       10 |       10 |         10 |            10 |      10 |          20 |  20 |  20 |
+| TCR           |    10 |     10 |        10 |           10 |      0 |             0 |       10 |       10 |         20 |            10 |       0 |          10 |   0 |  25 |
+| nRT           |     0 |      0 |         0 |            0 |      0 |             0 |        0 |        0 |          0 |             0 |       0 |           0 |  15 |  10 |
+|               |       |        |           |              |        |               |          |          |            |               |         |             |     |     |
+
+
+
+
+
+
+
+
+
+
