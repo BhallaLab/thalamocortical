@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 10:14:07 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Oct 26 10:34:11 2009 (+0530)
-#           By: subhasis ray
-#     Update #: 24
+# Last-Updated: Wed Feb 17 17:26:40 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 25
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -46,8 +46,9 @@
 # Code:
 
 from datetime import datetime
-import moose
 import config
+import trbutil
+import moose
 from cell import *
 from capool import CaPool
 
@@ -123,7 +124,15 @@ class TCR(TraubCell):
 
     @classmethod
     def test_single_cell(cls):
-        sim = Simulation()
+        """Simulates a single thalamocortical relay cell
+        and plots the Vm and [Ca2+]"""
+
+        config.LOGGER.info("/**************************************************************************")
+        config.LOGGER.info(" *")
+        config.LOGGER.info(" * Simulating a single cell: %s" % (cls.__name__))
+        config.LOGGER.info(" *")
+        config.LOGGER.info(" **************************************************************************/")
+        sim = Simulation(cls.__name__)
         mycell = TCR(TCR.prototype, sim.model.path + "/TCR")
         print 'Created cell:', mycell.path
         vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_TCR', 'Vm', sim.data)

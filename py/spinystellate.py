@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Sep 29 11:43:22 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Nov 12 14:38:37 2009 (+0530)
-#           By: subhasis ray
-#     Update #: 149
+# Last-Updated: Wed Feb 17 17:24:09 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 150
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -28,11 +28,12 @@
 # Code:
 
 from datetime import datetime
-import moose
 import config
+import trbutil
+import moose
 from cell import *
 from capool import CaPool
-# from cellview import MyCellView
+from cellview import MyCellView
 
 class SpinyStellate(TraubCell):
     ENa = 50e-3
@@ -116,7 +117,15 @@ class SpinyStellate(TraubCell):
 
     @classmethod
     def test_single_cell(cls):
-        sim = Simulation()
+        """Simulates a single spiny stellate cell and plots the Vm and
+        [Ca2+]"""
+
+        config.LOGGER.info("/**************************************************************************")
+        config.LOGGER.info(" *")
+        config.LOGGER.info(" * Simulating a single cell: %s" % (cls.__name__))
+        config.LOGGER.info(" *")
+        config.LOGGER.info(" **************************************************************************/")
+        sim = Simulation(cls.__name__)
         mycell = SpinyStellate(SpinyStellate.prototype, sim.model.path + "/SpinyStellate")
         mycell.soma.x0 = 0.0
         mycell.soma.y0 = 0.0

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Sep 23 00:18:00 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Sep 28 14:16:28 2009 (+0530)
-#           By: subhasis ray
-#     Update #: 49
+# Last-Updated: Wed Feb 17 17:24:28 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 50
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -30,8 +30,9 @@
 # Code:
 import string
 from datetime import datetime
-import moose
 import config
+import trbutil
+import moose
 from cell import *
 from capool import CaPool
 
@@ -90,7 +91,14 @@ class SupLTS(TraubCell):
 
     @classmethod
     def test_single_cell(cls):
-        sim = Simulation()
+        """Simulates a single superficial LTS cell and plots the Vm and [Ca2+]"""
+
+        config.LOGGER.info("/**************************************************************************")
+        config.LOGGER.info(" *")
+        config.LOGGER.info(" * Simulating a single cell: %s" % (cls.__name__))
+        config.LOGGER.info(" *")
+        config.LOGGER.info(" **************************************************************************/")
+        sim = Simulation(cls.__name__)
         mycell = SupLTS(SupLTS.prototype, sim.model.path + "/SupLTS")
         print 'Created cell:', mycell.path
         vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_supLTS', 'Vm', sim.data)
