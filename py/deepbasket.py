@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 14:30:33 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Oct 26 10:56:46 2009 (+0530)
-#           By: subhasis ray
-#     Update #: 38
+# Last-Updated: Wed Feb 17 17:20:57 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 39
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -122,11 +122,11 @@ class DeepBasket(TraubCell):
 	    if ca_pool:
 		for channel in ca_chans:
 		    channel.connect('IkSrc', ca_pool, 'current')
-		    print comp.name, ':', channel.name, 'connected to', ca_pool.name
+		    config.LOGGER.debug(comp.name + ' : ' + channel.name + ' connected to ' + ca_pool.name)
 		for channel in ca_dep_chans:
 		    channel.useConcentration = 1
 		    ca_pool.connect("concSrc", channel, "concen")
-		    print comp.name, ':', ca_pool.name, 'connected to', channel.name
+		    config.LOGGER.debug(comp.name + ' : ' + ca_pool.name + ' connected to ' + channel.name)
 
 	obj = moose.CaConc(self.soma.path + '/CaPool')
         obj.tau = 50e-3
@@ -134,7 +134,13 @@ class DeepBasket(TraubCell):
 
     @classmethod
     def test_single_cell(cls):
-        sim = Simulation()
+        """Simulates a single deep basket cell and plots the Vm and [Ca2+]"""
+        config.LOGGER.info("/**************************************************************************")
+        config.LOGGER.info(" *")
+        config.LOGGER.info(" * Simulating a single cell: %s" % (cls.__name__))
+        config.LOGGER.info(" *")
+        config.LOGGER.info(" **************************************************************************/")
+        sim = Simulation(cls.__name__)
         mycell = DeepBasket(DeepBasket.prototype, sim.model.path + "/DeepBasket")
         print 'Created cell:', mycell.path
         vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_deepbask', 'Vm', sim.data)

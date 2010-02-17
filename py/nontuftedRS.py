@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 11:34:27 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct 16 11:38:22 2009 (+0530)
-#           By: subhasis ray
-#     Update #: 7
+# Last-Updated: Wed Feb 17 17:23:01 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 8
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -46,8 +46,9 @@
 # Code:
 
 from datetime import datetime
-import moose
 import config
+import trbutil
+import moose
 from cell import *
 from capool import CaPool
 
@@ -80,8 +81,6 @@ class NontuftedRS(TraubCell):
 		    obj_class = obj.className
 		    if obj_class == 'HHChannel':
 			obj = moose.HHChannel(child)
-#                         if not obj.name in self.chan_list:
-#                             obj.Gbar = 0.0
 			pyclass = eval(obj.name)
 			if issubclass(pyclass, KChannel):
 			    obj.Ek = -95e-3
@@ -109,7 +108,16 @@ class NontuftedRS(TraubCell):
 
     @classmethod
     def test_single_cell(cls):
-        sim = Simulation()
+        """Simulates a single nontufted regular spiking cell and plots
+        the Vm and [Ca2+]"""
+
+        config.LOGGER.info("/**************************************************************************")
+        config.LOGGER.info(" *")
+        config.LOGGER.info(" * Simulating a single cell: %s" % (cls.__name__))
+        config.LOGGER.info(" *")
+        config.LOGGER.info(" **************************************************************************/")
+
+        sim = Simulation(cls.__name__)
         mycell = NontuftedRS(NontuftedRS.prototype, sim.model.path + "/NontuftedRS")
         print 'Created cell:', mycell.path
         vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_nontuftRS', 'Vm', sim.data)

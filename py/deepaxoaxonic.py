@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 11:11:39 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Oct 26 10:46:51 2009 (+0530)
-#           By: subhasis ray
-#     Update #: 27
+# Last-Updated: Wed Feb 17 17:19:50 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 28
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -119,20 +119,24 @@ class DeepAxoaxonic(TraubCell):
 	    if ca_pool:
 		for channel in ca_chans:
 		    channel.connect('IkSrc', ca_pool, 'current')
-		    print comp.name, ':', channel.name, 'connected to', ca_pool.name
 		for channel in ca_dep_chans:
 		    channel.useConcentration = 1
 		    ca_pool.connect("concSrc", channel, "concen")
-		    print comp.name, ':', ca_pool.name, 'connected to', channel.name
 
 	obj = moose.CaConc(self.soma.path + '/CaPool')
         obj.tau = 50e-3
 
     @classmethod
     def test_single_cell(cls):
-        sim = Simulation()
+        """Simulates a single deep axoaxonic cell and plots the Vm and [Ca2+]"""
+        config.LOGGER.info("/**************************************************************************")
+        config.LOGGER.info(" *")
+        config.LOGGER.info(" * Simulating a single cell: %s" % (cls.__name__))
+        config.LOGGER.info(" *")
+        config.LOGGER.info(" **************************************************************************/")
+        sim = Simulation(cls.__name__)
         mycell = DeepAxoaxonic(DeepAxoaxonic.prototype, sim.model.path + "/DeepAxoaxonic")
-        print 'Created cell:', mycell.path
+        config.LOGGER.info('Created cell: %s' % (mycell.path))
         vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_deepaxax', 'Vm', sim.data)
         ca_conc_path = mycell.soma.path + '/CaPool'
         ca_table = None

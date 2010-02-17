@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Oct  6 17:20:35 2009 (+0530)
-#           By: subhasis ray
-#     Update #: 580
+# Last-Updated: Wed Feb 17 17:26:11 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 581
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -46,8 +46,9 @@
 # Code:
 
 from datetime import datetime
-import moose
 import config
+import trbutil
+import moose
 from cell import *
 from capool import CaPool
 
@@ -120,22 +121,30 @@ class SupPyrRS(TraubCell):
                 if ca_pool: # Setup connections for CaPool : from CaL, to KAHP and KC
                     for channel in ca_chans:
                         channel.connect('IkSrc', ca_pool, 'current')
-                        print comp.name, ':', channel.name, 'connected to', ca_pool.name
+
                     for channel in ca_dep_chans:
                         channel.useConcentration = 1
                         ca_pool.connect("concSrc", channel, "concen")
-                        print comp.name, ':', ca_pool.name, 'connected to', channel.name
+
 
 
         obj = moose.CaConc(self.soma.path + '/CaPool')
         obj.tau = 1e-3 / 0.01
-        print obj.path, 'set tau to', obj.tau
+        config.LOGGER.debug(obj.path + 'set tau to %g' % (obj.tau))
 
     @classmethod
     def test_single_cell(cls):
-        sim = Simulation()
+        """Simulates a single superficial pyramidal regula spiking
+        cell and plots the Vm and [Ca2+]"""
+
+        config.LOGGER.info("/**************************************************************************")
+        config.LOGGER.info(" *")
+        config.LOGGER.info(" * Simulating a single cell: %s" % (cls.__name__))
+        config.LOGGER.info(" *")
+        config.LOGGER.info(" **************************************************************************/")
+        sim = Simulation(cls.__name__)
         mycell = SupPyrRS(SupPyrRS.prototype, sim.model.path + "/SupPyrRS")
-        print 'Created cell:', mycell.path
+        config.LOGGER.info('Created cell: %s' % (mycell.path))
         vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_suppyrrs', 'Vm', sim.data)
         ca_conc_path = mycell.soma.path + '/CaPool'
         ca_table = None
@@ -157,7 +166,7 @@ class SupPyrRS(TraubCell):
 
         sim.schedule()
         if mycell.has_cycle():
-            print "WARNING!! CYCLE PRESENT IN CICRUIT."
+            config.LOGGER.warning("WARNING!! CYCLE PRESENT IN CICRUIT.")
         t1 = datetime.now()
         sim.run(200e-3)
         t2 = datetime.now()

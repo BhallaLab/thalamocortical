@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Oct  6 16:52:28 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Oct  8 18:12:14 2009 (+0530)
-#           By: subhasis ray
-#     Update #: 5
+# Last-Updated: Wed Feb 17 17:24:49 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 6
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -46,8 +46,9 @@
 # Code:
 
 from datetime import datetime
-import moose
 import config
+import trbutil
+import moose
 from cell import *
 from capool import CaPool
 
@@ -103,7 +104,15 @@ class SupAxoaxonic(TraubCell):
 
     @classmethod
     def test_single_cell(cls):
-        sim = Simulation()
+        """Simulates a single superficial axo-axonic cell and plots
+        the Vm and [Ca2+]"""
+
+        config.LOGGER.info("/**************************************************************************")
+        config.LOGGER.info(" *")
+        config.LOGGER.info(" * Simulating a single cell: %s" % (cls.__name__))
+        config.LOGGER.info(" *")
+        config.LOGGER.info(" **************************************************************************/")
+        sim = Simulation(cls.__name__)
         mycell = SupAxoaxonic(SupAxoaxonic.prototype, sim.model.path + "/SupAxoaxonic")
         print 'Created cell:', mycell.path
         vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_supaxax', 'Vm', sim.data)

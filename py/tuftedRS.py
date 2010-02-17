@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 13:42:14 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct 16 14:29:03 2009 (+0530)
-#           By: subhasis ray
-#     Update #: 4
+# Last-Updated: Wed Feb 17 17:27:53 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 5
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -48,6 +48,7 @@
 from datetime import datetime
 import moose
 import config
+import trbutil
 from cell import *
 from capool import CaPool
 
@@ -80,8 +81,6 @@ class TuftedRS(TraubCell):
 		    obj_class = obj.className
 		    if obj_class == 'HHChannel':
 			obj = moose.HHChannel(child)
-#                         if not obj.name in self.chan_list:
-#                             obj.Gbar = 0.0
 			pyclass = eval(obj.name)
 			if issubclass(pyclass, KChannel):
 			    obj.Ek = -95e-3
@@ -122,9 +121,17 @@ class TuftedRS(TraubCell):
 
     @classmethod
     def test_single_cell(cls):
-        sim = Simulation()
+        """Simulates a single thalamocortical relay cell
+        and plots the Vm and [Ca2+]"""
+
+        config.LOGGER.info("/**************************************************************************")
+        config.LOGGER.info(" *")
+        config.LOGGER.info(" * Simulating a single cell: %s" % (cls.__name__))
+        config.LOGGER.info(" *")
+        config.LOGGER.info(" **************************************************************************/")
+        sim = Simulation(cls.__name__)
         mycell = TuftedRS(TuftedRS.prototype, sim.model.path + "/TuftedRS")
-        print 'Created cell:', mycell.path
+        print 'MOOSE: Created cell:', mycell.path
         vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_tuftRS', 'Vm', sim.data)
         ca_conc_path = mycell.soma.path + '/CaPool'
         ca_table = None
@@ -151,7 +158,7 @@ class TuftedRS(TraubCell):
         sim.run(200e-3)
         t2 = datetime.now()
         delta = t2 - t1
-        print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
+        print 'MOOSE: simulation time: ', delta.seconds + 1e-6 * delta.microseconds
         sim.dump_data('data')
         mycell.dump_cell('tuftRS.txt')
         
