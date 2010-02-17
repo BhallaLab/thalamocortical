@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 19:32:34 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Oct 26 10:41:27 2009 (+0530)
-#           By: subhasis ray
-#     Update #: 17
+# Last-Updated: Wed Feb 17 17:18:39 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 18
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -46,7 +46,6 @@
 # Code:
 
 from datetime import datetime
-import moose
 import config
 import trbutil
 import moose
@@ -119,11 +118,11 @@ class DeepLTS(TraubCell):
 	    if ca_pool:
 		for channel in ca_chans:
 		    channel.connect('IkSrc', ca_pool, 'current')
-		    print comp.name, ':', channel.name, 'connected to', ca_pool.name
+		    config.LOGGER.debug(comp.name + ' : ' + channel.name + ' connected to ' + ca_pool.name)
 		for channel in ca_dep_chans:
 		    channel.useConcentration = 1
 		    ca_pool.connect("concSrc", channel, "concen")
-		    print comp.name, ':', ca_pool.name, 'connected to', channel.name
+		    config.LOGGER.debug(comp.name + ' : ' + ca_pool.name + ' connected to ' + channel.name)
 
 	obj = moose.CaConc(self.soma.path + '/CaPool')
         obj.tau = 50e-3
@@ -131,9 +130,16 @@ class DeepLTS(TraubCell):
 
     @classmethod
     def test_single_cell(cls):
-        sim = Simulation()
+        """Simulates a single deep LTS cell and plots the Vm and [Ca2+]"""
+        config.LOGGER.info("/**************************************************************************")
+        config.LOGGER.info(" *")
+        config.LOGGER.info(" * Simulating a single cell: %s" % (cls.__name__))
+        config.LOGGER.info(" *")
+        config.LOGGER.info(" **************************************************************************/")
+        sim = Simulation(cls.__name__)
         mycell = DeepLTS(DeepLTS.prototype, sim.model.path + "/DeepLTS")
-        print 'Created cell:', mycell.path
+        
+        config.LOGGER.debug(('Created cell: %s' % mycell.path))
         vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_deepLTS', 'Vm', sim.data)
         ca_conc_path = mycell.soma.path + '/CaPool'
         ca_table = None
@@ -155,39 +161,30 @@ class DeepLTS(TraubCell):
 
         sim.schedule()
         if mycell.has_cycle():
-            print "WARNING!! CYCLE PRESENT IN CICRUIT."
-        t1 = datetime.now()
+            config.LOGGER.warning("WARNING!! CYCLE PRESENT IN CICRUIT.")
+
         sim.run(200e-3)
-        t2 = datetime.now()
-        delta = t2 - t1
-        print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
         sim.dump_data('data')
         mycell.dump_cell('deepLTS.txt')
         
         mus_vm = pylab.array(vm_table) * 1e3
-        nrn_vm = pylab.loadtxt('../nrn/mydata/Vm_deepLTS.plot')
-        nrn_t = nrn_vm[:, 0]
-        mus_t = linspace(0, nrn_t[-1], len(mus_vm))
-        nrn_vm = nrn_vm[:, 1]
-        nrn_ca = pylab.loadtxt('../nrn/mydata/Ca_deepLTS.plot')
-        nrn_ca = nrn_ca[:,1]
-        pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
-        pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
-#         if ca_table:
-#             ca_array = pylab.array(ca_table)
-#             pylab.plot(nrn_t, -nrn_ca, 'r-', label='nrn (-)ca')
-#             pylab.plot(mus_t, -ca_array, 'b-.', label='mus (-)ca')
-#             print pylab.amax(ca_table)
-        pylab.legend()
-        pylab.show()
-        
+        mus_t = linspace(0, sim.simtime * 1e3, len(mus_vm))
+        mus_ca = pylab.array(ca_table)
+        nrn_vm = trbutil.read_nrn_data('Vm_deepLTS.plot', 'test_deepLTS.hoc')
+        nrn_ca = trbutil.read_nrn_data('Ca_deepLTS.plot', 'test_deepLTS.hoc')
+        if len(nrn_vm) > 0:
+            nrn_t = nrn_vm[:, 0]
+            nrn_vm = nrn_vm[:, 1]
+            nrn_ca = nrn_ca[:,1]
+
+        trbutil.do_plot(cls.__name__, mus_t, mus_ca, mus_vm, nrn_t, nrn_ca, nrn_vm)
+
         
 # test main --
 from simulation import Simulation
 import pylab
 from subprocess import call
 if __name__ == "__main__":
-    call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_deepLTS.hoc'], cwd='../nrn')
     DeepLTS.test_single_cell()
 
 

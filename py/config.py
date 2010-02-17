@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Oct 17 15:23:35 2009 (+0530)
-#           By: subhasis ray
-#     Update #: 55
+# Last-Updated: Wed Feb 17 17:16:42 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 56
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -46,14 +46,15 @@
 # Code:
 
 import sys
-sys.path.append('/home/src/sim/cortical/py')
+import logging
 import moose
 
 context = moose.PyMooseBase.getContext()
 lib = moose.Neutral('/library')
 root = moose.Neutral("/")
 
-simdt = 1e-5
+#simdt = 1e-5
+simdt = 0.025e-3
 plotdt = 1e-5
 vmin = -120e-3
 vmax = 40e-3
@@ -89,6 +90,16 @@ channel_map = {'AR': 'ar',
 
 channel_lib = {}
 
+# Logging
+LOG_FILENAME = 'traub_2005.log'
+LOG_LEVEL = logging.ERROR
+logging.basicConfig(filename=LOG_FILENAME, level=LOG_LEVEL)#, filemode='w')
+LOGGER = logging.getLogger('traub2005')
+BENCHMARK_LOGGER = logging.getLogger('traub2005.benchmark')
+BENCHMARK_LOGGER.setLevel(logging.INFO)
+benchmarking=True # Dump benchmarking information
+
+
 # Locate the neuron binaries
 import subprocess
 neuron_bin = None
@@ -97,7 +108,7 @@ try:
     for neuron_bin in which_neuron.stdout:
         neuron_bin = neuron_bin.strip()
         if neuron_bin:
-            print 'nrngui fount at:', neuron_bin
+            LOGGER.info('nrngui fount at: %s' % (neuron_bin))
             break
 except Exception, e:
     print e
