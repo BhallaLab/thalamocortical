@@ -1508,3 +1508,21 @@ columns. How to represent this in NeuroML?
 
 * <2010-01-19 Tue 13:53> Create the Spiny Stellate cells
   There are 240 of them.
+* <2010-02-19 Fri 02:17> Trouble with read_proto
+  In the current version, I am using read_proto() - class method in TraubCell
+  to read the prototype into a class level variable before getting into
+  __init__ method of subclass.
+  It turns out that when I import the derived class and use it, the __init__
+  of TraubCell throws an error saying that prototype does not exist.
+
+  - realized that I was not making copies of the prototype cell in the
+    constructor.
+
+  - fixed. 
+  - Benchmark: 40 spinystellates connecting to each other
+
+     innerRead: 59 compartments, 539 channels, 53 others
+
+    real	0m10.557s
+    user	0m10.390s
+    sys		0m0.150s

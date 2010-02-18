@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 15:18:24 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Feb 17 17:22:09 2010 (+0530)
+# Last-Updated: Fri Feb 19 02:45:27 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 53
+#     Update #: 59
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -123,11 +123,11 @@ class nRT(TraubCell):
 	    if ca_pool:
 		for channel in ca_chans:
 		    channel.connect('IkSrc', ca_pool, 'current')
-		    print comp.name, ':', channel.name, 'connected to', ca_pool.name
+		    config.LOGGER.debug(comp.name + ':' + channel.name + ' connected to ' + ca_pool.name)
 		for channel in ca_dep_chans:
 		    channel.useConcentration = 1
 		    ca_pool.connect("concSrc", channel, "concen")
-		    print comp.name, ':', ca_pool.name, 'connected to', channel.name
+		    config.LOGGER.debug(comp.name + ':' + ca_pool.name +' connected to ' + channel.name)
 
 	obj = moose.CaConc(self.soma.path + '/CaPool')
         obj.tau = 50e-3
