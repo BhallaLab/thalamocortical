@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Feb 17 17:16:42 2010 (+0530)
+# Last-Updated: Fri Feb 19 03:11:19 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 56
+#     Update #: 63
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -91,9 +91,12 @@ channel_map = {'AR': 'ar',
 channel_lib = {}
 
 # Logging
+def handleError(self, record):
+    raise
 LOG_FILENAME = 'traub_2005.log'
-LOG_LEVEL = logging.ERROR
-logging.basicConfig(filename=LOG_FILENAME, level=LOG_LEVEL)#, filemode='w')
+LOG_LEVEL = logging.WARNING
+logging.Handler.handleError = handleError
+logging.basicConfig(filename=LOG_FILENAME, level=LOG_LEVEL, filemode='w')
 LOGGER = logging.getLogger('traub2005')
 BENCHMARK_LOGGER = logging.getLogger('traub2005.benchmark')
 BENCHMARK_LOGGER.setLevel(logging.INFO)
