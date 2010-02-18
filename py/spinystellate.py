@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Sep 29 11:43:22 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Feb 17 17:24:09 2010 (+0530)
+# Last-Updated: Fri Feb 19 02:46:45 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 150
+#     Update #: 157
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -33,7 +33,7 @@ import trbutil
 import moose
 from cell import *
 from capool import CaPool
-from cellview import MyCellView
+# from cellview import MyCellView
 
 class SpinyStellate(TraubCell):
     ENa = 50e-3
@@ -43,7 +43,6 @@ class SpinyStellate(TraubCell):
     prototype = TraubCell.read_proto("SpinyStellate.p", "SpinyStellate")
     def __init__(self, *args):
 	TraubCell.__init__(self, *args)
-        self.ar = moose.HHChannel('/model/SpinyStellate/comp_1/AR')
 
     def _topology(self):
 	self.presyn = 57
@@ -106,11 +105,11 @@ class SpinyStellate(TraubCell):
                 if ca_pool:
                     for channel in ca_chans:
                         channel.connect('IkSrc', ca_pool, 'current')
-                        print comp.name, ':', channel.name, 'connected to', ca_pool.name
+                        config.LOGGER.debug( comp.name + ' : ' + channel.name + ' connected to ' + ca_pool.name)
                     for channel in ca_dep_chans:
                         channel.useConcentration = 1
                         ca_pool.connect("concSrc", channel, "concen")
-                        print comp.name, ':', ca_pool.name, 'connected to', channel.name
+                        config.LOGGER.debug(comp.name + ' : ' + ca_pool.name + ' connected to ' + channel.name)
                     
         obj = moose.CaConc(self.soma.path + '/CaPool')
         obj.tau = 50e-3
@@ -133,7 +132,7 @@ class SpinyStellate(TraubCell):
         mycell.soma.x = 0.0
         mycell.soma.y = 0.0
         mycell.soma.z = mycell.soma.length
-        mycellview = MyCellView(mycell)
+        # mycellview = MyCellView(mycell)
         print 'Created cell:', mycell.path
         for neighbour in mycell.soma.neighbours('raxial'):
             print 'RAXIAL', neighbours.path()

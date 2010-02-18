@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 24 10:04:47 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Feb 17 17:15:36 2010 (+0530)
+# Last-Updated: Fri Feb 19 02:23:32 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 220
+#     Update #: 232
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -64,7 +64,7 @@ def init_channel_lib():
             channel_class = eval(channel_name)
             channel = channel_class(channel_name, config.lib)
             config.channel_lib[channel_name] = channel
-            config.LOGGER.debug( '* Created ', channel.path)
+            config.LOGGER.debug( '* Created %s' % (channel.path))
     return config.channel_lib
 
 def nameindex(comp):
@@ -88,7 +88,9 @@ class TraubCell(moose.Cell):
         self.level = defaultdict(set)
 	self.dendrites = set()
         self.presyn = 0
+        config.LOGGER.debug(self.name + ' going through the children')
         for child in self.children():
+            config.LOGGER.debug(self.name + ' going through the children:' + child.path())
             comp = MyCompartment(child)
             if comp.className == "Compartment": # Ensure it is a compartment
                 self.comp.append(comp)
@@ -98,7 +100,6 @@ class TraubCell(moose.Cell):
             self._topology()
             self._setup_passive()
             self._setup_channels()
-
         else:
             raise Exception("No compartment in the cell.")
         
@@ -117,6 +118,7 @@ class TraubCell(moose.Cell):
         ret = None
         cellpath = config.lib.path + '/' + cellname
         if not config.context.exists(cellpath):
+            config.LOGGER.debug(__name__ + ' reading cell: ' + cellpath)
             config.context.readCell(filename, cellpath)
         return moose.Cell(cellpath)
 
@@ -139,7 +141,7 @@ class TraubCell(moose.Cell):
         ret = False
         for item in comp.raxial_list:
             if hasattr(item, '_visited') and item._visited:
-                config.LOGGER.warning('Cycle between: ', comp.path, 'and', item.path)
+                config.LOGGER.warning('Cycle between: %s and %s.' % (comp.path, item.path))
                 return True
             ret = ret or has_cycle(item)
         return ret
