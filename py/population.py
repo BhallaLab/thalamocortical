@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 18 22:00:46 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Feb 19 03:13:30 2010 (+0530)
+# Last-Updated: Fri Feb 19 23:42:11 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 221
+#     Update #: 352
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -46,19 +46,35 @@
 # Code:
 
 from collections import defaultdict
+from datetime import datetime
 import csv 
 import numpy
-
 import moose
 import allowedcomp
 import config
-
+from simulation import Simulation
 class Population(moose.Neutral):
     """Homogeneous cell population - handles setting up connections
     between populations based on connection matrix.
 
     cell_class -- class name of cells contained in this population
     cell_list -- cells contained in this population
+    conn_map -- a dictionary of actual connection map for each post-synaptic population.
+                the key is the target Population object, value is an n X m x 2 array where n
+                is the number of cells in the postsynaptic population, m is the number of 
+                presynaptic cells from this population per postsynaptic cell in the target 
+                population.
+
+                conn_map[target][i][j][0] is
+                for the i-th cell in 'target' population, the index of the j-th presynaptic 
+                cell in this population.
+
+                conn_map[target][i][j][1] is 
+                for the i-th cell in 'target' population, the index of the postsynaptic 
+                compartment for j-th presynaptic cell in this population.
+
+                This is rather convoluted - but there is no clear workaround because of the
+                way the connectivity is specified (number of pre-cells per post-cell).
 
     """
     
@@ -87,6 +103,8 @@ class Population(moose.Neutral):
 	    cell_name = '%s_%d' % (prefix, number)
 	    cell_instance = cell_class(cell_class.prototype, self.path + '/' + cell_name)
 	    self.cell_list.append(cell_instance)
+        self.conn_map = {}
+        self._setup_visualization()
 
     def connect(self, target):
         """Connect cells from this population to cells on the target
@@ -94,8 +112,10 @@ class Population(moose.Neutral):
         
         """
         config.LOGGER.debug(__name__ + ' starting')
+        start = datetime.now()
         connection_map = self.get_connection_map()
         num_pre_per_post = connection_map[self.cell_type][target.cell_type]
+        self.conn_map[target] = numpy.zeros((len(target.cell_list), num_pre_per_post, 2), dtype=int)
         # This gets a 2_D matrix whose row[i] is the array of indices
         # of the pre-synaptic cells for i-th post-synaptic cell.
         precell_indices = numpy.random.randint(0, 
@@ -103,7 +123,7 @@ class Population(moose.Neutral):
                                                size=(len(target.cell_list), num_pre_per_post))
 
         allowed_comp_map = self.get_allowed_comp_map()
-        allowed_comp_list = numpy.array(allowed_comp_map[self.cell_type][target.cell_type])
+        allowed_comp_list = numpy.array(allowed_comp_map[self.cell_type][target.cell_type], dtype=int)
         target_comp_indices = numpy.random.randint(0, 
                                                    high=len(allowed_comp_list), 
                                                    size=(len(target.cell_list), num_pre_per_post))
@@ -117,6 +137,13 @@ class Population(moose.Neutral):
                 post_syn_comp = postcell.comp[post_syn_comp_index]
                 pre_syn_comp = precell.comp[precell.presyn]
                 config.LOGGER.debug('connecting: \t%s \tto \t%s' % (pre_syn_comp.path, post_syn_comp.path))
+                pre_syn_comp.makeSynapse(post_syn_comp)
+                self.conn_map[target][ii][jj][0] = precell_index
+                self.conn_map[target][ii][jj][1] = post_syn_comp_index
+                
+        end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('(%s[%d], %s[%d]) - time: %g' % (self.cell_type, len(self.cell_list), target.cell_type, len(target.cell_list), delta.seconds + 1e-6 * delta.microseconds))
 
     def get_connection_map(self, filename='connmatrix.txt'):
 	"""Load the celltype-to-celltype connectivity map from file
@@ -178,15 +205,48 @@ class Population(moose.Neutral):
         else:
             raise Error, '%s - Loading allowed_compartment map from file is not yet implemented' % (__name__)
         return Population.ALLOWED_COMP_MAP
-	
+
+
+    def _setup_visualization(self):
+        self.glView = moose.GLview('gl', self)
+        self.glView.vizpath = self.path + '/##[CLASS=Compartment]'
+        self.glView.port = '9999'
+        self.glView.host = 'localhost'
+        self.glView.value1 = 'Vm'
+        self.glView.value1min = -0.1
+        self.glView.value1max = 0.05
+        self.glView.morph_val = 1
+        self.glView.color_val = 1
+        self.glView.sync = 'off'
+        self.glView.grid = 'on'
 
 from spinystellate import SpinyStellate
 # from suppyrRS import SupPyrRS
 
 def test_main():
-    pre = Population('/ss', SpinyStellate, 40)
+    sim = Simulation('/sim')
+    cellcount = 40
+    start = datetime.now()
+    pre = Population(sim.model.path + '/ss', SpinyStellate, cellcount)
+    end = datetime.now()
+    delta = end - start
+    config.BENCHMARK_LOGGER.info('time to create population of %d cells: %g' % (cellcount, delta.seconds + 1e-6 * delta.microseconds))
+    
     post = pre
     pre.connect(post)
+    precell_index = pre.conn_map[post][0][0][0]
+    post_comp_index = pre.conn_map[post][0][0][1]
+    print precell_index, post_comp_index
+    precell = pre.cell_list[precell_index]
+    precomp = precell.comp[precell.presyn]
+    postcomp = post.cell_list[0].comp[post_comp_index]
+    precell.soma.insertPulseGen('inject', sim.model)
+    preVmTable = precomp.insertRecorder('preVmTable', 'Vm', sim.data)
+    postVmTable = postcomp.insertRecorder('postVmTable', 'Vm', sim.data)
+    sim.schedule()
+    sim.run()
+    preVmTable.dumpFile('preVm.txt')
+    postVmTable.dumpFile('postVmTable.txt')
 
 if __name__ == '__main__':
     test_main()
