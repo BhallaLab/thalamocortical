@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Feb 17 22:14:29 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Feb 18 02:05:50 2010 (+0530)
+# Last-Updated: Fri Feb 19 16:08:55 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 18
+#     Update #: 26
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -361,5 +361,12 @@ ALLOWED_COMP['NontuftedRS']['nRT'] = [ 2,3,4,15,16,17,28,29,30,41,42,43]
 ALLOWED_COMP['NontuftedRS']['NontuftedRS'] = [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,
 					      21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,
 					      37,38,39,40,41,42,43,44]
+
+# import netCDF4 as netcdf
+# import numpy
+# def write_to_netcdf(filename):
+#     dataset = netcdf.Dataset('allowedcompmap.nc', 'w')
+#     celltype = numpy.dtype([()])
+
 #
 # allowedcomp.py ends here

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Feb 17 17:15:54 2010 (+0530)
+# Last-Updated: Fri Feb 19 16:29:46 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 166
+#     Update #: 184
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -182,6 +182,23 @@ class MyCompartment(moose.Compartment):
         self.connect('axial', child, 'raxial')
         print 'Connecting', self.name, 'to', child.name
             
+    def makeSynapse(self, target, name='synapse', threshold=0.0, absRefract=0.0, Ek=0.0, Gbar=1e-8, tau1=1e-3, tau2=2e-3):
+        """Make a synaptic connection from this compartment to target
+        compartment and set the properties of the synaptic connection
+        as specified in the parametrs."""
+        synapse = moose.SynChan(target.path + '/synapse')
+        synapse.Ek = Ek # TODO set value according to original model
+        synapse.Gbar = Gbar # TODO set value according to original model
+        synapse.tau1 = tau1
+        synapse.tau2 = tau2
+        target.connect('channel', synapse, 'channel')
+        spikegen = moose.SpikeGen(self.path + '/spike')
+        spikegen.threshold = threshold
+        spikegen.absRefract = absRefract
+        self.connect('VmSrc', spikegen, 'Vm')
+        spikegen.connect('event', synapse, 'synapse')
+        return synapse
+        
 
     def get_props(self):
         """Returns information about the compartment as a string

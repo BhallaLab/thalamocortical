@@ -1526,3 +1526,16 @@ columns. How to represent this in NeuroML?
     real	0m10.557s
     user	0m10.390s
     sys		0m0.150s
+
+* <2010-02-19 Fri 23:47> GLview with the model
+  I had put a bug report on GLview - the client was crashing.
+  It turned out to be my mistake - I was starting the client in glcell mode,
+  whereas it should have been glview mode.
+
+  After correcting that, and setting the tick interval for glview to rather
+  large value (gldt = 1e-2, plotdt = 1e-3, simdt = 0.025), it shows the
+  compartments. 
+
+  But I cannot separate out the cells here: so need some other way to view
+  them. Need to investigate how vizpath works: may be I can just see the
+  somas?
