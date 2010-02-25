@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Jan 13 22:33:35 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Feb 18 22:00:33 2010 (+0530)
+# Last-Updated: Thu Feb 25 11:48:11 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 334
+#     Update #: 335
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -83,8 +83,7 @@ class ConnectionData:
         # Conn matrix is the representation of the square matrix whose
         # element [i][j] represents how many celltype[i] connect to a
         # single cell of celltype[j]
-        self.matrix = numpy.array[[50, 50, 90, 90, 90,  3, 60, 60, 30, 30, 30,  3,  0
-,  0],
+        self.matrix = numpy.array[[50, 50, 90, 90, 90,  3, 60, 60, 30, 30, 30,  3,  0,  0],
                                   [ 5,  5,  5,  5,  5,  1,  3,  3,  3,  3,  3,  1,  0,  0],
                                   [20, 20, 20, 20, 20, 20,  0,  0,  0,  0,  0,  0,  0,  0],
                                   [20, 20,  0,  0,  0,  5,  5,  5,  0,  0,  0,  5,  0,  0],

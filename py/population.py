@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 18 22:00:46 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Feb 19 23:42:11 2010 (+0530)
+# Last-Updated: Mon Feb 22 17:52:54 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 352
+#     Update #: 380
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -104,7 +104,7 @@ class Population(moose.Neutral):
 	    cell_instance = cell_class(cell_class.prototype, self.path + '/' + cell_name)
 	    self.cell_list.append(cell_instance)
         self.conn_map = {}
-        self._setup_visualization()
+        self.glView = None
 
     def connect(self, target):
         """Connect cells from this population to cells on the target
@@ -207,11 +207,11 @@ class Population(moose.Neutral):
         return Population.ALLOWED_COMP_MAP
 
 
-    def _setup_visualization(self):
-        self.glView = moose.GLview('gl', self)
-        self.glView.vizpath = self.path + '/##[CLASS=Compartment]'
-        self.glView.port = '9999'
-        self.glView.host = 'localhost'
+    def setup_visualization(self, glviewname, parent, host='localhost', port='9999'):
+        self.glView = moose.GLview(glviewname, parent)
+        self.glView.vizpath = self.path + '/#/comp_1'
+        self.glView.port = port
+        self.glView.host = host
         self.glView.value1 = 'Vm'
         self.glView.value1min = -0.1
         self.glView.value1max = 0.05
@@ -223,11 +223,20 @@ class Population(moose.Neutral):
 from spinystellate import SpinyStellate
 # from suppyrRS import SupPyrRS
 
+import time
+from glclient import GLClient
+def start_test_client():
+    testclient = GLClient(exe='/home/subha/src/moose/gl/src/glclient', mode='v', colormap='/home/subha/src/moose/gl/colormaps/rainbow2', save_directory='/tmp')
+    return testclient
+
 def test_main():
+    client = start_test_client()
+    # time.sleep(3)
     sim = Simulation('/sim')
     cellcount = 40
     start = datetime.now()
     pre = Population(sim.model.path + '/ss', SpinyStellate, cellcount)
+    pre.setup_visualization('gl_' + pre.name, sim.data)
     end = datetime.now()
     delta = end - start
     config.BENCHMARK_LOGGER.info('time to create population of %d cells: %g' % (cellcount, delta.seconds + 1e-6 * delta.microseconds))
@@ -240,7 +249,7 @@ def test_main():
     precell = pre.cell_list[precell_index]
     precomp = precell.comp[precell.presyn]
     postcomp = post.cell_list[0].comp[post_comp_index]
-    precell.soma.insertPulseGen('inject', sim.model)
+    # precell.soma.insertPulseGen('inject', sim.model, firstLevel=0.0)
     preVmTable = precomp.insertRecorder('preVmTable', 'Vm', sim.data)
     postVmTable = postcomp.insertRecorder('postVmTable', 'Vm', sim.data)
     sim.schedule()
