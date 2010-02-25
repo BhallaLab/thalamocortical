@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Sep 29 11:43:22 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Feb 19 02:46:45 2010 (+0530)
+# Last-Updated: Sat Feb 20 22:39:12 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 157
+#     Update #: 161
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -40,6 +40,7 @@ class SpinyStellate(TraubCell):
     EK = -100e-3
     EAR = -40e-3
     ECa = 100e-3
+    EGABA = -75e-3 # Sanchez-Vives et al. 1997 
     prototype = TraubCell.read_proto("SpinyStellate.p", "SpinyStellate")
     def __init__(self, *args):
 	TraubCell.__init__(self, *args)
