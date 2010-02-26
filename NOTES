@@ -1539,3 +1539,31 @@ columns. How to represent this in NeuroML?
   But I cannot separate out the cells here: so need some other way to view
   them. Need to investigate how vizpath works: may be I can just see the
   somas?
+* <2010-02-27 Sat 01:33> Mg_block with NMDA
+  In the model NMDA channel conductance is calculated according to Jahr and
+  Stevens, 1990: the same code as Traub et al 1994.
+
+  The conductance is = c * g(V, [Mg2+]) * S(t)
+
+  where c is scaling constant, g is a function specified in Jahr and Stevens,
+  1990 and S(t) is time dependent: linearly rises for 5 ms and decays with a
+  time constant = 150 ms( Traub et al 1994) [ specified for each cell type in
+  Traub et al 2005 ]. I tried to match it with Mg_block implementation in
+  MOOSE - but does not seem to have as many terms. 
+
+  Today I got the synaptic channel code / data specification done. I was
+  considering netCDF4-python and hdf5 for storing the model data - but they
+  seemed too complicated for a simple 2-D dictionary. My code is having a lot
+  of data. 
+
+  synapse.py contains the tau and gbar values for each pair of pre- and
+  post-synaptic cell types.
+
+  In population.py I enhanced the Population class to lookup the tau and gbar
+  and use that for setting up all three kinds of synapses in the same connect
+  method.
+
+  With this the spontaneous oscillation with 40 spiny stellate cells is gone -
+  which was present with default excitatory synapse I used for the demo.
+
+
