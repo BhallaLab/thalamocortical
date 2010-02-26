@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 18 22:00:46 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Feb 22 17:52:54 2010 (+0530)
+# Last-Updated: Sat Feb 27 00:05:36 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 380
+#     Update #: 477
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -26,22 +26,6 @@
 # 
 # 
 # 
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as
-# published by the Free Software Foundation; either version 3, or
-# (at your option) any later version.
-# 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License
-# along with this program; see the file COPYING.  If not, write to
-# the Free Software Foundation, Inc., 51 Franklin Street, Fifth
-# Floor, Boston, MA 02110-1301, USA.
-# 
-# 
 
 # Code:
 
@@ -51,6 +35,7 @@ import csv
 import numpy
 import moose
 import allowedcomp
+import synapse
 import config
 from simulation import Simulation
 class Population(moose.Neutral):
@@ -97,6 +82,7 @@ class Population(moose.Neutral):
         self.get_connection_map()
 	self.cell_list = []
 	self.cell_type = cell_class.__name__
+        self.cell_class = cell_class
 	if prefix is None:
 	    prefix = self.cell_type
 	for number in range(cell_count):
@@ -127,6 +113,14 @@ class Population(moose.Neutral):
         target_comp_indices = numpy.random.randint(0, 
                                                    high=len(allowed_comp_list), 
                                                    size=(len(target.cell_list), num_pre_per_post))
+        tau_GABA_fast = self.get_tauGABA(target)
+        tau_GABA_slow = self.get_tauGABA(target, fast=False)
+        tau_NMDA = self.get_tauNMDA(target)
+        tau_AMPA = self.get_tauAMPA(target)
+        gbar_GABA = self.get_GbarGABA(target)
+        gbar_AMPA = self.get_GbarAMPA(target)
+        gbar_NMDA = self.get_GbarNMDA(target)
+
         for ii in range(len(target.cell_list)):
             target_comp_list = allowed_comp_list[target_comp_indices[ii]] # list containing the target compartment for each presynaptic cell
             for jj in range(num_pre_per_post):
@@ -137,7 +131,21 @@ class Population(moose.Neutral):
                 post_syn_comp = postcell.comp[post_syn_comp_index]
                 pre_syn_comp = precell.comp[precell.presyn]
                 config.LOGGER.debug('connecting: \t%s \tto \t%s' % (pre_syn_comp.path, post_syn_comp.path))
-                pre_syn_comp.makeSynapse(post_syn_comp)
+
+                if tau_GABA_fast is not None:
+                    pre_syn_comp.makeSynapse(post_syn_comp, name='GABA', Ek=self.cell_class.EGABA, Gbar=gbar_GABA, tau1=tau_GABA_fast, tau2=tau_GABA_slow, absRefract=1.5e-3)
+                    config.LOGGER.debug('%s\tto%s\tGABA' % (pre_syn_comp.path, post_syn_comp.path))
+                if tau_AMPA is not None:
+                    pre_syn_comp.makeSynapse(post_syn_comp, name='AMPA', Ek=0.0, tau1=tau_AMPA, tau2=tau_AMPA)
+                    config.LOGGER.debug('%s\tto%s\tAMPA' % (pre_syn_comp.path, post_syn_comp.path))
+                if tau_NMDA is not None:
+                    # TODO: NMDA time course is defined as:
+                    # c * g(V, [Mg2+]) * S(t) where c is scaling constant,
+                    # g is a function of V and [Mg2+]o, 0 < g <= 1 
+                    # and S(t) is time dependent component of the ligand gated conductance.
+                    pre_syn_comp.makeSynapse(post_syn_comp, name='NMDA', Ek=0.0, tau1=tau_NMDA, tau2=tau_NMDA, absRefract=1.5e-3)
+                    config.LOGGER.debug('%s\tto%s\tNMDA' % (pre_syn_comp.path, post_syn_comp.path))
+
                 self.conn_map[target][ii][jj][0] = precell_index
                 self.conn_map[target][ii][jj][1] = post_syn_comp_index
                 
@@ -196,8 +204,8 @@ class Population(moose.Neutral):
 	filename -- the source of the map. A netcdf-4 file?
 
 	"""
-	# Right now I am compiling the Python interface for
-	# netcdf4. Until it works, just use the raw python dictionary
+	# netCDF4 seems to be too complicated for simple things like a
+        # map. So just using the dict objects
         if Population.ALLOWED_COMP_MAP is not None:
             return Population.ALLOWED_COMP_MAP
         if filename is None:
@@ -206,6 +214,50 @@ class Population(moose.Neutral):
             raise Error, '%s - Loading allowed_compartment map from file is not yet implemented' % (__name__)
         return Population.ALLOWED_COMP_MAP
 
+    def get_tauGABA(self, post, fast=True):
+        tau_gaba_map = None
+        if self.cell_type != 'nRT':
+            tau_gaba_map = synapse.TAU_GABA
+        elif fast:
+            tau_gaba_map = synapse.TAU_GABA_FAST
+        else:
+            tau_gaba_map = synapse.TAU_GABA_SLOW
+        try:
+            return tau_gaba_map[self.cell_type][post.cell_type]
+        except KeyError:
+            return None
+
+    def get_tauAMPA(self, post):
+        try:
+            return synapse.TAU_AMPA[self.cell_type][post.cell_type]
+        except KeyError:
+            return None
+    
+    def get_tauNMDA(self, post):
+        try:
+            return synapse.TAU_NMDA[self.cell_type][post.cell_type]
+        except KeyError:
+            return None
+
+    def get_GbarAMPA(self, post):
+        try:
+            return synapse.G_AMPA[self.cell_type][post.cell_type]
+        except KeyError:
+            return None
+    
+    def get_GbarNMDA(self, post):
+        try:
+            return synapse.G_NMDA[self.cell_type][post.cell_type]
+        except KeyError:
+            return None
+
+    def get_GbarGABA(self, post):
+        try:
+            return synapse.G_GABA[self.cell_type][post.cell_type]
+        except KeyError:
+            return None
+    
+        
 
     def setup_visualization(self, glviewname, parent, host='localhost', port='9999'):
         self.glView = moose.GLview(glviewname, parent)
@@ -233,7 +285,7 @@ def test_main():
     client = start_test_client()
     # time.sleep(3)
     sim = Simulation('/sim')
-    cellcount = 40
+    cellcount = 4
     start = datetime.now()
     pre = Population(sim.model.path + '/ss', SpinyStellate, cellcount)
     pre.setup_visualization('gl_' + pre.name, sim.data)
@@ -256,6 +308,7 @@ def test_main():
     sim.run()
     preVmTable.dumpFile('preVm.txt')
     postVmTable.dumpFile('postVmTable.txt')
+    client.stop()
 
 if __name__ == '__main__':
     test_main()
