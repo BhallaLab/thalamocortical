@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Feb 19 23:41:33 2010 (+0530)
+# Last-Updated: Mon Mar 22 11:30:25 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 71
+#     Update #: 81
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -94,7 +94,7 @@ channel_lib = {}
 def handleError(self, record):
     raise
 LOG_FILENAME = 'traub_2005.log'
-LOG_LEVEL = logging.WARNING
+LOG_LEVEL = logging.DEBUG
 logging.Handler.handleError = handleError
 logging.basicConfig(filename=LOG_FILENAME, level=LOG_LEVEL, format='%(asctime)s %(levelname)s %(filename)s %(funcName)s: %(message)s', filemode='w')
 LOGGER = logging.getLogger('traub2005')
@@ -102,6 +102,10 @@ BENCHMARK_LOGGER = logging.getLogger('traub2005.benchmark')
 BENCHMARK_LOGGER.setLevel(logging.INFO)
 benchmarking=True # Dump benchmarking information
 
+# Unit Conversion Factors
+uS = 1e-6 # micro Siemens to Siemens
+ms = 1e-3 # milli second to second
+mV = 1e-3 # milli Volt to Volt
 
 # Locate the neuron binaries
 import subprocess

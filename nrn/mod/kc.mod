@@ -44,7 +44,7 @@ BREAKPOINT {
 	if( 0.004(1/mM) * cai < 1 ) {
 		iktmp =  m * 0.004(1/mM) * cai * ( v - ek ) 
 		gamma = 0.004 * cai
-	    }else{
+	}else{
 		iktmp =  m * ( v - ek )
 	        gamma = 1.0
 	}
