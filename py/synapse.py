@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 25 15:22:11 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Feb 26 22:13:33 2010 (+0530)
+# Last-Updated: Mon Mar 22 11:32:41 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 114
+#     Update #: 127
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -305,6 +305,8 @@ TAU_NMDA['NontuftedRS']['NontuftedRS'] = 130.e0
 # End definition of synaptic time constants
 
 # Synaptic conductance scaling factors.
+# The values are taken directly from the NEURON file: groucho.hoc
+# The units are updated to SI programmatically later ( uS -> S)
 G_AMPA['SupPyrRS']['SupPyrRS'] = 0.25e-3
 G_NMDA['SupPyrRS']['SupPyrRS'] = 0.025e-3
 G_AMPA['SupPyrRS']['SupPyrFRB'] = 0.25e-3
@@ -559,31 +561,35 @@ G_AMPA['NontuftedRS']['NontuftedRS'] = 1.0e-3
 G_NMDA['NontuftedRS']['NontuftedRS'] = 0.1e-3
 # End defining synaptic conductance scaling factors
 
+from config import ms, uS
+
+# Here we update the units : from uS to S
 for pre, gmap in G_AMPA.items():
     for post, g in gmap.items():
-        G_AMPA[pre][post] = g * 1e-6 # uS to S
+        G_AMPA[pre][post] = g * uS # uS to S
 for pre, gmap in G_GABA.items():
     for post, g in gmap.items():
-        G_GABA[pre][post] = g * 1e-6 # uS to S
+        G_GABA[pre][post] = g * uS # uS to S
 for pre, gmap in G_NMDA.items():
     for post, g in gmap.items():
-        G_NMDA[pre][post] = g * 1e-6 # uS to S
+        G_NMDA[pre][post] = g * uS # uS to S
 
+# Convert unit of time constant tau from ms to s
 for pre, taumap in TAU_NMDA.items():
     for post, tau in taumap.items():
-        TAU_NMDA[pre][post] = g * 1e-3 # ms to s
+        TAU_NMDA[pre][post] = tau * ms # ms to s
 for pre, taumap in TAU_AMPA.items():
     for post, tau in taumap.items():
-        TAU_AMPA[pre][post] = g * 1e-3 # ms to s
+        TAU_AMPA[pre][post] = tau * ms # ms to s
 for pre, taumap in TAU_GABA.items():
     for post, tau in taumap.items():
-        TAU_GABA[pre][post] = g * 1e-3 # ms to s
+        TAU_GABA[pre][post] = tau * ms # ms to s
 for pre, taumap in TAU_GABA_FAST.items():
     for post, tau in taumap.items():
-        TAU_GABA_FAST[pre][post] = g * 1e-3 # ms to s
+        TAU_GABA_FAST[pre][post] = tau * ms # ms to s
 for pre, taumap in TAU_GABA_SLOW.items():
     for post, tau in taumap.items():
-        TAU_GABA_SLOW[pre][post] = g * 1e-3 # ms to s
+        TAU_GABA_SLOW[pre][post] = tau * ms # ms to s
 
 
     
