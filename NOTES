@@ -555,6 +555,7 @@
   
   spcific membrane capacitance: uF/cm^2
   cytoplasimic resistivity: ohm-cm
+  membrane conductance density: S/cm^2
   
 * <2009-04-20 Mon 11:47> Reset is not so safe
   I subclassed Compartment to allow nicer ways to insert channel conductances
@@ -1566,4 +1567,108 @@ columns. How to represent this in NeuroML?
   With this the spontaneous oscillation with 40 spiny stellate cells is gone -
   which was present with default excitatory synapse I used for the demo.
 
+* <2010-03-08 Mon 17:58> NMDA Channel
+  I have been struggling with NMDA channel. The two versions in FORTRAN and
+  NEURON look rather different in terms of handling the linear component.
 
+! NMDA part
+        if (delta.le.5.d0) then
+       gNMDA_suppyrRS(k,L) = gNMDA_suppyrRS(k,L) +
+     &  gNMDA_suppyrRS_to_suppyrRS * delta * 0.2d0
+        else
+       dexparg = (delta - 5.d0)/tauNMDA_suppyrRS_to_suppyrRS
+          if (dexparg.le.5.d0) then
+          z = dexptablesmall (int(dexparg*1000.d0))
+         else if (dexparg.le.100.d0) then
+          z = dexptablebig (int(dexparg*10.d0))
+         else
+          z = 0.d0
+         endif
+       gNMDA_suppyrRS(k,L) = gNMDA_suppyrRS(k,L) +
+     &  gNMDA_suppyrRS_to_suppyrRS * z
+        endif
+c Test for NMDA saturation
+       z = NMDA_saturation_fact * gNMDA_suppyrRS_to_suppyrRS
+       if (gNMDA_suppyrRS(k,L).gt.z)
+     &  gNMDA_suppyrRS(k,L) = z
+! end NMDA part
+
+  NEURON code:
+
+NET_RECEIVE(weight (uS)) {
+	if (flag>=1) {
+		: self event arrived, terminate ramp up
+	: remove one event's contribution to the slope, k
+		k = k - weight/time_interval
+	: Transfer the conductance over from A to B
+		B = B + weight
+		A = A - weight
+	} else {
+		: stimulus arrived, make or continue ramp
+		net_send(time_interval, 1) : self event to terminate ramp
+	: add one event ramp to slope k:
+		k = k + weight/time_interval
+:	note there are no state discontinuities at event start since the begining of a ramp
+:	only has a discontinuous change in derivative
+	}
+}
+
+
+   So I understand that the NEURON code puts a self event for end of linear
+   rise of legand gated component (at time = tau1 = time_interval). When this
+   event happens, i.e., the exponential decay of the legand gated component
+   starts, the weight(conductance) is transferred from A to B.
+
+   The FORTRAN code has no sense of events. So it checks if current time is
+   within the linear rise period (5 ms) and if so, it calculates:
+
+   g += g_cell1_cell2 * delta  / tau1 [tau1 = 5 ms]
+
+   Otherwise, it calculates the decay as:
+
+   g += g_cell1_cell2 *exp((tau1 - delta) / tau2) where tau2 is the decay time
+   constant.
+
+   Looks like the FORTRAN code is using Forward Euler method, but I am not
+   clear about NEURON.
+
+   MOOSE SynChan uses exponential Euler method, but again I am not clear about
+   how it is coming to the difference relation from the double exponential
+   formula.
+
+
+   - My implementation simulates self-events in NEURON by maintaining a
+     separate queue of old events, which pop out when they are ripe and
+     transfer the conductance from A (x_ in my code) to B_ (y_ in my code).
+
+     I am assuming gNMDA_suppyrRS_to_suppyrRS is weight of the synapse from
+     SupPyrRS to SupPyrRS and gNMDA_suppyrRS is the Gk_ for the channel.
+* <2010-03-19 Fri 16:57> Busy with NMDAChannel
+  I have implemenetd the NMDAChan class in MOOSE to emulate the NMDAChannel by
+  Jahr and Stevens, 1990 and as implemented by Traub et al. Did not do a
+  proper test/comparison with NEURON.
+
+  Upi advised me to leave this out and use the regular SynChan with regular
+  MgBlock as this much detail may not be relevant.
+
+  I also found a paper by Destexhe, Mainen and Sejnowski (1994) and chapter 1
+  of Methods in Neuronal Modleing (2nd ed) edited by Koch and Segev, which was
+  written by the same three authors in 1998. This model solves the issue of
+  quick succession of incoming pulses to synapse.
+
+  No matter whether I use NMDAChan or SynChan with MgBlock, I'll have to
+  compare the behaviour with the NEURON model.
+
+* <2010-03-22 Mon 19:59> Testing NMDAChan
+  - py/test_nmda.py
+  - nrn/test_nmda.hoc
+
+  I suspect the weight factor might pose some problem.
+  Once this is done I'll be fully ready to start the network. 
+  
+  The issues: 
+  - whether to test the network against neuron or just go ahead.
+  - gap junctions - I have not done anything about them.
+  - ectopic current injection: not sure what this means physiologically.
+
+    
