@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Feb 19 16:29:46 2010 (+0530)
+# Last-Updated: Mon Mar 29 10:08:22 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 184
+#     Update #: 225
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -182,11 +182,28 @@ class MyCompartment(moose.Compartment):
         self.connect('axial', child, 'raxial')
         print 'Connecting', self.name, 'to', child.name
             
-    def makeSynapse(self, target, name='synapse', threshold=0.0, absRefract=0.0, Ek=0.0, Gbar=1e-8, tau1=1e-3, tau2=2e-3):
+    def makeSynapse(self, target, 
+                    classname='SynChan', 
+                    name='synapse', 
+                    threshold=0.0, 
+                    absRefract=0.0, 
+                    Ek=0.0, 
+                    Gbar=1e-8, 
+                    tau1=1e-3, 
+                    tau2=2e-3,
+                    weight=1.0,
+                    delay=0.0):
         """Make a synaptic connection from this compartment to target
         compartment and set the properties of the synaptic connection
-        as specified in the parametrs."""
-        synapse = moose.SynChan(target.path + '/synapse')
+        as specified in the parametrs.
+
+        For NMDAChan, [Mg2+] has to be set separately. Also note that
+        the weight and delay vectors are not available until reset is
+        called. So these must be assigned afterwards.
+
+        """
+        classobj = eval('moose.' + classname)
+        synapse = classobj(name, target)
         synapse.Ek = Ek # TODO set value according to original model
         synapse.Gbar = Gbar # TODO set value according to original model
         synapse.tau1 = tau1
@@ -197,6 +214,16 @@ class MyCompartment(moose.Compartment):
         spikegen.absRefract = absRefract
         self.connect('VmSrc', spikegen, 'Vm')
         spikegen.connect('event', synapse, 'synapse')
+
+        # We have an awkward situation here: the weight and delay
+        # vectors are not updated until reset/setDelay/setWeight is
+        # called.  So we have to use num_synapse (which should
+        # actually have been incremented by 1 due to the connection)
+        # instead of (num_synapse - 1).
+
+        num_synapse = synapse.numSynapses
+        synapse.delay[num_synapse] = delay
+        synapse.weight[num_synapse] = weight
         return synapse
         
 
