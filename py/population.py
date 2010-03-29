@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 18 22:00:46 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Feb 27 00:05:36 2010 (+0530)
+# Last-Updated: Mon Mar 29 10:03:13 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 477
+#     Update #: 585
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -17,8 +17,9 @@
 
 # Commentary: 
 # 
-# 
-# 
+# Separates the Population class from the network.py file.  Current
+# network.py is deprecated. In future I may use the same filename to
+# create the actual network.
 # 
 
 # Change log:
@@ -43,7 +44,9 @@ class Population(moose.Neutral):
     between populations based on connection matrix.
 
     cell_class -- class name of cells contained in this population
+
     cell_list -- cells contained in this population
+
     conn_map -- a dictionary of actual connection map for each post-synaptic population.
                 the key is the target Population object, value is an n X m x 2 array where n
                 is the number of cells in the postsynaptic population, m is the number of 
@@ -66,15 +69,19 @@ class Population(moose.Neutral):
 
     CELL_CONNECTION_MAP = None
     ALLOWED_COMP_MAP = None
-
+    THALAMIC_CELLS = ['TCR', 'nRT']
     def __init__(self, path, cell_class, cell_count, prefix=None):
 	"""Initialze the population by creating the cells.
 
 	path -- path of this element as a container
+
 	cell_class -- classobject for the cell type to be contained in
-	this element.
+                      this element.
+
 	cell_count -- number of cells in this population
-	prefix -- the n-th cell in this population gets the name {prefix}_{n}
+
+	prefix -- the n-th cell in this population gets the name
+                  {prefix}_{n}
 
 	"""
 	moose.Neutral.__init__(self, path)
@@ -91,6 +98,11 @@ class Population(moose.Neutral):
 	    self.cell_list.append(cell_instance)
         self.conn_map = {}
         self.glView = None
+
+    # This function does a lot of work - actually all about setting up
+    # the connection: It looks up the peak channel conductances, time
+    # constants via the get_Gbar*** and get_Tau*** functions and uses
+    # those values to set up actual connection. 
 
     def connect(self, target):
         """Connect cells from this population to cells on the target
@@ -120,30 +132,55 @@ class Population(moose.Neutral):
         gbar_GABA = self.get_GbarGABA(target)
         gbar_AMPA = self.get_GbarAMPA(target)
         gbar_NMDA = self.get_GbarNMDA(target)
-
+        delay = self.get_delay(target)
+        # Go through all the target cells, pick up the list of target compartments
         for ii in range(len(target.cell_list)):
             target_comp_list = allowed_comp_list[target_comp_indices[ii]] # list containing the target compartment for each presynaptic cell
+            postcell = target.cell_list[ii]
+            # For each target cell, get the presynaptic cells 
             for jj in range(num_pre_per_post):
                 precell_index = precell_indices[ii][jj]
                 precell = self.cell_list[precell_index]
-                postcell = target.cell_list[ii]
                 post_syn_comp_index = target_comp_list[jj]
                 post_syn_comp = postcell.comp[post_syn_comp_index]
                 pre_syn_comp = precell.comp[precell.presyn]
                 config.LOGGER.debug('connecting: \t%s \tto \t%s' % (pre_syn_comp.path, post_syn_comp.path))
-
+                
                 if tau_GABA_fast is not None:
-                    pre_syn_comp.makeSynapse(post_syn_comp, name='GABA', Ek=self.cell_class.EGABA, Gbar=gbar_GABA, tau1=tau_GABA_fast, tau2=tau_GABA_slow, absRefract=1.5e-3)
+                    pre_syn_comp.makeSynapse(post_syn_comp, 
+                                             name='GABA', 
+                                             Ek=self.cell_class.EGABA, 
+                                             Gbar=gbar_GABA, 
+                                             tau1=tau_GABA_fast, 
+                                             tau2=tau_GABA_slow, 
+                                             absRefract=1.5e-3, 
+                                             weight=1.0, 
+                                             delay=delay)
                     config.LOGGER.debug('%s\tto%s\tGABA' % (pre_syn_comp.path, post_syn_comp.path))
                 if tau_AMPA is not None:
-                    pre_syn_comp.makeSynapse(post_syn_comp, name='AMPA', Ek=0.0, tau1=tau_AMPA, tau2=tau_AMPA)
+                    pre_syn_comp.makeSynapse(post_syn_comp, 
+                                             name='AMPA', 
+                                             Ek=0.0, 
+                                             Gbar=gbar_AMPA,
+                                             tau1=tau_AMPA, 
+                                             tau2=tau_AMPA, 
+                                             weight=1.0, 
+                                             delay=delay)
                     config.LOGGER.debug('%s\tto%s\tAMPA' % (pre_syn_comp.path, post_syn_comp.path))
                 if tau_NMDA is not None:
                     # TODO: NMDA time course is defined as:
                     # c * g(V, [Mg2+]) * S(t) where c is scaling constant,
                     # g is a function of V and [Mg2+]o, 0 < g <= 1 
                     # and S(t) is time dependent component of the ligand gated conductance.
-                    pre_syn_comp.makeSynapse(post_syn_comp, name='NMDA', Ek=0.0, tau1=tau_NMDA, tau2=tau_NMDA, absRefract=1.5e-3)
+                    pre_syn_comp.makeSynapse(post_syn_comp,
+                                             name='NMDA', 
+                                             Ek=0.0, 
+                                             Gbar=1.0, 
+                                             tau1=tau_NMDA, 
+                                             tau2=tau_NMDA, 
+                                             absRefract=1.5e-3, 
+                                             weight=gbar_NMDA, 
+                                             delay=delay)
                     config.LOGGER.debug('%s\tto%s\tNMDA' % (pre_syn_comp.path, post_syn_comp.path))
 
                 self.conn_map[target][ii][jj][0] = precell_index
@@ -151,7 +188,9 @@ class Population(moose.Neutral):
                 
         end = datetime.now()
         delta = end - start
-        config.BENCHMARK_LOGGER.info('(%s[%d], %s[%d]) - time: %g' % (self.cell_type, len(self.cell_list), target.cell_type, len(target.cell_list), delta.seconds + 1e-6 * delta.microseconds))
+        config.BENCHMARK_LOGGER.info('(%s[%d], %s[%d]) - time: %g' % (self.cell_type, len(self.cell_list), 
+                                                                      target.cell_type, len(target.cell_list), 
+                                                                      delta.seconds + 1e-6 * delta.microseconds))
 
     def get_connection_map(self, filename='connmatrix.txt'):
 	"""Load the celltype-to-celltype connectivity map from file
@@ -160,12 +199,14 @@ class Population(moose.Neutral):
 	postsynaptic cell of type Y.
 
 	filename -- the path of a csv file containing the connectivity
-	matrix. The first row in the file should be the column headers
-	- which are the cell types. The connection matrix itself is a
-	square matrix with entry[i][j] specifying the number of
-	presynaptic cells per postsynaptic cell, where the presynaptic
-	cells are of type header[i] and the postsynaptic cell is of
-	type header[j]
+	matrix.
+
+        The first row in the file should be the column headers - which
+        are the cell types. The connection matrix itself is a square
+        matrix with entry[i][j] specifying the number of presynaptic
+        cells per postsynaptic cell, where the presynaptic cells are
+        of type header[i] and the postsynaptic cell is of type
+        header[j]
 
 	"""
         if Population.CELL_CONNECTION_MAP is not None:
@@ -215,6 +256,14 @@ class Population(moose.Neutral):
         return Population.ALLOWED_COMP_MAP
 
     def get_tauGABA(self, post, fast=True):
+        """Get the time constant for GABAergic synapses. 
+
+        Just look-up the TAU_GABA dictionary in synapse.py for the
+        pre- and post-synaptic cell pair.  nRT cells are special in
+        that their GABAergic synaptic conductance has two components:
+        the fast one has a time constant tau1 and the slower component
+        has tau2. These are stored in separate dictionaries.
+        """
         tau_gaba_map = None
         if self.cell_type != 'nRT':
             tau_gaba_map = synapse.TAU_GABA
@@ -228,37 +277,88 @@ class Population(moose.Neutral):
             return None
 
     def get_tauAMPA(self, post):
+        """Look up the AMPA synapse time constant.
+
+        post -- postsynaptic population.
+        """
         try:
             return synapse.TAU_AMPA[self.cell_type][post.cell_type]
         except KeyError:
             return None
     
     def get_tauNMDA(self, post):
+        """Get the NMDA synapse time constant. 
+
+        NMDA channel conductance has two components: it rises linearly
+        for tau1 - which is 5 ms in all cases, followed by a complex
+        decay that depends on [Mg2+] and Vm. The time constant for
+        this decay is tau2, which depends on the pre- and
+        post-synaptic cell type. This function looks up tau2.
+        
+        post -- post synaptic population.
+
+        """
         try:
             return synapse.TAU_NMDA[self.cell_type][post.cell_type]
         except KeyError:
             return None
 
     def get_GbarAMPA(self, post):
+        """Lookup the peak conductance for AMPA synapse.
+
+        post -- post synaptic population.
+
+        """
         try:
             return synapse.G_AMPA[self.cell_type][post.cell_type]
         except KeyError:
             return None
     
     def get_GbarNMDA(self, post):
+        """Get the peak conductance of NMDA synapses.
+
+        This function is somewhat a misnomer - as the looked up value
+        is actually assigned to the weight of the synapse. The NMDA
+        channel is modeled after Jahr and Stevens, 1990. In the MOOSE
+        implementation the Gbar just scales the overall conductance
+        (and set to 1.0) whereas weight influences the dynamics of the
+        conductance.
+        
+        post -- post synaptic population.
+
+        """
         try:
             return synapse.G_NMDA[self.cell_type][post.cell_type]
         except KeyError:
             return None
 
     def get_GbarGABA(self, post):
+        """Get peak conductance of GABAergic synapses.
+
+        post -- post synaptic population.
+
+        """
         try:
             return synapse.G_GABA[self.cell_type][post.cell_type]
         except KeyError:
             return None
     
-        
+    def get_delay(self, post):
+        """Get delay for the synaptic connection.
 
+        post -- postsynaptic population.
+        
+        """
+        if ((self.cell_type in Population.THALAMIC_CELLS) \
+                and (post.cell_type not in Population.THALAMIC_CELLS)):
+            return synapse.SYNAPTIC_DELAY_THALAMOCORTICAL
+        elif ((self.cell_type not in Population.THALAMIC_CELLS) \
+                and (post.cell_type in Population.THALAMIC_CELLS)):
+            return synapse.SYNAPTIC_DELAY_CORTICOTHALAMIC
+        else:
+            return synapse.SYNAPTIC_DELAY_DEFAULT
+
+    
     def setup_visualization(self, glviewname, parent, host='localhost', port='9999'):
         self.glView = moose.GLview(glviewname, parent)
         self.glView.vizpath = self.path + '/#/comp_1'
