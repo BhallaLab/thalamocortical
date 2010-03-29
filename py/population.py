@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 18 22:00:46 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Mar 29 10:03:13 2010 (+0530)
+# Last-Updated: Mon Mar 29 12:00:07 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 585
+#     Update #: 586
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -385,7 +385,7 @@ def test_main():
     client = start_test_client()
     # time.sleep(3)
     sim = Simulation('/sim')
-    cellcount = 4
+    cellcount = 40
     start = datetime.now()
     pre = Population(sim.model.path + '/ss', SpinyStellate, cellcount)
     pre.setup_visualization('gl_' + pre.name, sim.data)
