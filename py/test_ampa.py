@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Mar 22 16:58:57 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Mar 29 19:29:23 2010 (+0530)
+# Last-Updated: Mon Mar 29 19:41:39 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 167
+#     Update #: 168
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -67,7 +67,7 @@ def testAMPAChan(simtime=100e-3, simdt=1e-5, plotdt=1e-5):
     soma_b.Ra = 282942.12 # RA = 250 Ohm-cm
     
     ampa = moose.SynChan('ampa', container)
-    ampa.tau2 = 0.999 *  2e-3 
+    ampa.tau2 = 2e-3 
     ampa.tau1 = 2e-3
     ampa.connect('channel', soma_b, 'channel')
     
