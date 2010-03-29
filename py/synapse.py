@@ -6,19 +6,19 @@
 # Maintainer: 
 # Created: Thu Feb 25 15:22:11 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Mar 22 11:32:41 2010 (+0530)
+# Last-Updated: Thu Mar 25 14:47:26 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 127
+#     Update #: 138
 # URL: 
 # Keywords: 
 # Compatibility: 
 # 
 # 
 
-# Commentary: This file is for data on synapse of various
-# kinds. Ideally it should be replaced by something in netCDF/HDF5 or
-# some other data format. But given the small size of this data, I
-# don't see much savings in that.
+# Commentary: This file is for data on synapses of various
+# kinds. Ideally it should be replaced by a datafile (something in
+# netCDF/HDF5?). But given the small size of this data, I don't see
+# much savings in that.
 # 
 
 # Change log:
@@ -592,7 +592,13 @@ for pre, taumap in TAU_GABA_SLOW.items():
         TAU_GABA_SLOW[pre][post] = tau * ms # ms to s
 
 
-    
+SYNAPTIC_DELAY_DEFAULT = 0.05e-3
+SYNAPTIC_DELAY_THALAMOCORTICAL = 1e-3
+SYNAPTIC_DELAY_CORTICOTHALAMIC = 5e-3
+
+
+THRESHOLD_DEFAULT = 0.0
+
 
 
 # 

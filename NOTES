@@ -1643,6 +1643,7 @@ NET_RECEIVE(weight (uS)) {
 
      I am assuming gNMDA_suppyrRS_to_suppyrRS is weight of the synapse from
      SupPyrRS to SupPyrRS and gNMDA_suppyrRS is the Gk_ for the channel.
+
 * <2010-03-19 Fri 16:57> Busy with NMDAChannel
   I have implemenetd the NMDAChan class in MOOSE to emulate the NMDAChannel by
   Jahr and Stevens, 1990 and as implemented by Traub et al. Did not do a
@@ -1672,3 +1673,27 @@ NET_RECEIVE(weight (uS)) {
   - ectopic current injection: not sure what this means physiologically.
 
     
+* <2010-03-25 Thu 10:53> NMDAChan done
+  Finally fixed the NMDAChan class - I had mixed up the terms in the equation
+  for unblocked Mg, also I had confused dt with tau - (in the neuron code they
+  cryptically call it time_interval).
+
+  Now everything works and I committed the fix and the test scripts - both in
+  hoc and python.
+
+* <2010-03-29 Mon 09:30> Setting up the connections
+  SynChan has this awkward behaviour that the synaptic connections don't get
+  updated until reset call. This forces one to set up the connections while
+  creating the model, make a reset call and then set the delays and weights
+  later. But delays and weights are easiest and most intuitive to access when
+  I am looping through different cells/populations.
+
+  The other way will be fortran-like programming, where one does all of the
+  setup except setting delays and weights, then going through all the
+  populations once again and setting the weights and delays. This also
+  requires me to maintain a list of all the SynChan objects and pre and post
+  synaptic cell type information.
+
+  - Turns out the setDelay and setWeight methods do updateSynapse. Only
+    getNumSynapse does not return the latest synapse count. So using it one
+    incremented works.
