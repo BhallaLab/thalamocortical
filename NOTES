@@ -1712,3 +1712,16 @@ NET_RECEIVE(weight (uS)) {
     make_NMDA_synapse(pre, post)
 
     Which is something I do not expect physiologically.
+
+* <2010-03-29 Mon 19:36> Created a test for AMPA synapse
+  In the process I learnt that Traub uses the alpha function
+
+  (t-t0) * exp(-(t-t0)/tau)
+
+  for which the peak conductance becomes: tau * exp(-1)
+  
+  After set Gbar to this value, it works fine.
+
+  I was initially breaking my head over a square pulse appearing as gAMPA -
+  but turned out that I forgot to set clock 1 to simdt, while I did that for
+  clock 0.

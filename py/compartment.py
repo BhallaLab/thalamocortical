@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Mar 29 10:08:22 2010 (+0530)
+# Last-Updated: Mon Mar 29 11:24:18 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 225
+#     Update #: 227
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -215,15 +215,17 @@ class MyCompartment(moose.Compartment):
         self.connect('VmSrc', spikegen, 'Vm')
         spikegen.connect('event', synapse, 'synapse')
 
-        # We have an awkward situation here: the weight and delay
-        # vectors are not updated until reset/setDelay/setWeight is
-        # called.  So we have to use num_synapse (which should
+        # We had an awkward situation here: the weight and delay
+        # vectors were not updated until reset/setDelay/setWeight was
+        # called.  So we had to use num_synapse (which should
         # actually have been incremented by 1 due to the connection)
         # instead of (num_synapse - 1).
+        # 2010-03-29 After making a mandatory call to updateNumSynapse()
+        # in getNumSynapses(), this is fixed. 
 
         num_synapse = synapse.numSynapses
-        synapse.delay[num_synapse] = delay
-        synapse.weight[num_synapse] = weight
+        synapse.delay[num_synapse - 1] = delay
+        synapse.weight[num_synapse - 1] = weight
         return synapse
         
 
