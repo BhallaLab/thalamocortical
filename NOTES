@@ -1697,3 +1697,18 @@ NET_RECEIVE(weight (uS)) {
   - Turns out the setDelay and setWeight methods do updateSynapse. Only
     getNumSynapse does not return the latest synapse count. So using it one
     incremented works.
+
+  - I just fixed getNumSynapse to call updateSynapse so that we get a value
+    consistent with the actual number of connections.
+
+  - Now, one funny thing about the synaptic connections is all the synapses
+    are between the same pair of compartments.
+
+    The code is like:
+    pre = pre_synaptic_compartment
+    post = post_synaptic_compartment
+    make_AMPA_synapse(pre, post)
+    make_GABA_synapse(pre, post)
+    make_NMDA_synapse(pre, post)
+
+    Which is something I do not expect physiologically.
