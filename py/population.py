@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 18 22:00:46 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Mar 29 12:00:07 2010 (+0530)
+# Last-Updated: Mon Mar 29 19:43:11 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 586
+#     Update #: 592
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -161,10 +161,10 @@ class Population(moose.Neutral):
                     pre_syn_comp.makeSynapse(post_syn_comp, 
                                              name='AMPA', 
                                              Ek=0.0, 
-                                             Gbar=gbar_AMPA,
+                                             Gbar=tau_AMPA/numpy.e, # This is special for Traub model
                                              tau1=tau_AMPA, 
-                                             tau2=tau_AMPA, 
-                                             weight=1.0, 
+                                             tau2=tau_AMPA,
+                                             weight=gbar_AMPA, 
                                              delay=delay)
                     config.LOGGER.debug('%s\tto%s\tAMPA' % (pre_syn_comp.path, post_syn_comp.path))
                 if tau_NMDA is not None:

@@ -1725,3 +1725,15 @@ NET_RECEIVE(weight (uS)) {
   I was initially breaking my head over a square pulse appearing as gAMPA -
   but turned out that I forgot to set clock 1 to simdt, while I did that for
   clock 0.
+
+* <2010-03-30 Tue 11:42> GABA channel
+  Just like AMPA synapse, GABA_A channel for all the synapses, except for
+  those made by nRT cells, have the time course:
+
+  g = c * exp(-t/tau)
+
+  For nRT neurons:
+
+  g = c1 * exp(-t/tau_fast) + c2 * exp(-t/tau_slow)
+
+  So, if we set tau_slow = 0, then MOOSE SynChan can handle this. But it does
