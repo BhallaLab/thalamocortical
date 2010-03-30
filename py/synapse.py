@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 25 15:22:11 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Mar 25 14:47:26 2010 (+0530)
+# Last-Updated: Tue Mar 30 17:39:08 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 138
+#     Update #: 145
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -46,6 +46,7 @@
 # Code:
 
 from collections import defaultdict
+import numpy
 
 TAU_AMPA = defaultdict(dict)
 TAU_NMDA = defaultdict(dict)
@@ -528,6 +529,10 @@ G_NMDA['TCR']['NontuftedRS'] = .10e-3
 # objref G_GABA['nRT']['TCR']
 # 	G_GABA['nRT']['TCR'] = new Vector(num_nRT+1)
 
+# The GABA conductance baseline is uniformly randomly distributed
+# between 0.7 - 2.1 nS 
+# (numpy.random.random_sample()*(2.1 - 0.7) + 0.7) * 1e-3 # nS -> uS
+G_GABA['nRT']['TCR'] = 1.0 
 # Values here need to be set below  
 G_GABA['nRT']['nRT'] = 0.30e-3
 

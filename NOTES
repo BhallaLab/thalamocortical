@@ -1736,4 +1736,13 @@ NET_RECEIVE(weight (uS)) {
 
   g = c1 * exp(-t/tau_fast) + c2 * exp(-t/tau_slow)
 
-  So, if we set tau_slow = 0, then MOOSE SynChan can handle this. But it does
+  So, if we set tau_slow = 0, then MOOSE SynChan can handle this. But it
+  cannot actually handle 0 values for tau, so I modified SynChan to take care
+  of that (without breaking the regular behaviour).
+
+  Also, the double exponential is implemented as two synchans with tau1 =
+  tau_fast and tau2 = tau_slow respectively (the regular GENESIS/MOOSE synchan
+  does not allow for arbitrary c1, c2 and tau1, tau2, c1 and c2 are tied with
+  tau). This is same approach as the NEURON model.
+
+  

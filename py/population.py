@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 18 22:00:46 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Mar 29 19:43:11 2010 (+0530)
+# Last-Updated: Tue Mar 30 17:41:33 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 592
+#     Update #: 605
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -147,15 +147,42 @@ class Population(moose.Neutral):
                 config.LOGGER.debug('connecting: \t%s \tto \t%s' % (pre_syn_comp.path, post_syn_comp.path))
                 
                 if tau_GABA_fast is not None:
-                    pre_syn_comp.makeSynapse(post_syn_comp, 
-                                             name='GABA', 
-                                             Ek=self.cell_class.EGABA, 
-                                             Gbar=gbar_GABA, 
-                                             tau1=tau_GABA_fast, 
-                                             tau2=tau_GABA_slow, 
-                                             absRefract=1.5e-3, 
-                                             weight=1.0, 
-                                             delay=delay)
+                    if self.cell_type == 'nRT':                    
+                        if post.cell_type = 'TCR':
+                            # For nRT -> TCR GABAergic synapses, the
+                            # baseline conductance is uniformly
+                            # randomly distributed between 0.7 nS and
+                            # 2.1 nS
+                            gbar_GABA = numpy.random.random_sample() * (2.1e-9 -0.7e-9) + 0.7e-9
+                        pre_syn_comp.makeSynapse(post_syn_comp, 
+                                                 name='GABA_FAST', 
+                                                 Ek=self.cell_class.EGABA, 
+                                                 Gbar=1.0, 
+                                                 tau1=tau_GABA_fast, 
+                                                 tau2=0.0, 
+                                                 absRefract=1.5e-3, 
+                                                 weight=gbar_GABA * 0.625, 
+                                                 delay=delay)
+                        pre_syn_comp.makeSynapse(post_syn_comp, 
+                                                 name='GABA_SLOW', 
+                                                 Ek=self.cell_class.EGABA, 
+                                                 Gbar=1.0, 
+                                                 tau1=tau_GABA_slow, 
+                                                 tau2=0.0, 
+                                                 absRefract=1.5e-3, 
+                                                 weight=gbar_GABA * 0.375, 
+                                                 delay=delay)
+                    else:
+                        pre_syn_comp.makeSynapse(post_syn_comp, 
+                                                 name='GABA', 
+                                                 Ek=self.cell_class.EGABA, 
+                                                 Gbar=gbar_GABA, 
+                                                 tau1=tau_GABA_fast, 
+                                                 tau2=0.0, 
+                                                 absRefract=1.5e-3, 
+                                                 weight=1.0, 
+                                                 delay=delay)
+                        
                     config.LOGGER.debug('%s\tto%s\tGABA' % (pre_syn_comp.path, post_syn_comp.path))
                 if tau_AMPA is not None:
                     pre_syn_comp.makeSynapse(post_syn_comp, 
