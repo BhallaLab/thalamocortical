@@ -1746,3 +1746,52 @@ NET_RECEIVE(weight (uS)) {
   tau). This is same approach as the NEURON model.
 
   
+
+* <2010-03-31 Wed 10:14> Small network of SpinyStellate cells
+  I think Spiny Stellate cells are worthy of studying by themselves.
+
+  I am setting the reversal potential for GABAergic synapses: I was not clear
+  about what are the GABAergic cells. Although the text does not list them
+  explicitly, I worked backward from the code and figured this: All cells have
+  an e_gaba_a in the cell template of neuron version of the model:
+  - nRT:		-75e-3 V
+  - SupBasket:		-75e-3 V
+  - SupAxoaxonic:	-75e-3 V
+  - SupLTS:		-75e-3 V
+  - SupBasket:		-75e-3 V
+  - SupPyrFRB:		-81e-3 V
+  - SupPyrRS:		-81e-3 V
+  - DeepBasket:		-75e-3 V
+  - DeepAxoaxonic:	-75e-3 V
+  - DeepLTS:		-75e-3 V
+  - SpinyStellate:	-75e-3 V
+  - NontuftedRS:	-75e-3 V
+  - TuftedIB:		-75e-3 V
+  - TuftedRS:		-75e-3 V
+  - TCR:		-81e-3 V
+
+  From the list of time constants in the paper:
+  FS, basket, LTS, nRT are sources of GABAergic synapse.
+
+  From the connection set-up in groucho.hoc, these are the pre-synaptic cell
+  types for GABA synapse: 
+  - Superficial Axoaxonic
+  - Superficial Basket
+  - Superficial LTS
+  - Deep Axoaxonic
+  - Deep Basket
+  - Deep LTS 
+  - nRT
+
+    - This is also confirmed by the list of g_gaba values.
+
+* <2010-04-05 Mon 17:26> Info on population-to-population connectivity
+  For debugging purposes and for understanding the syatem from a biological
+  point of view it will be useful to have a gross estimate of various kinds of
+  synapses. So I have put in a field called syncount in Population which is a dict of dicts
+  maintaining, for each kind of post-synaptic cell, count of each kind of
+  synapse.
+
+  It is like :
+  
+  pre.syncount[post][synapse_type] = count

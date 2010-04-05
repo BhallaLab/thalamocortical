@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 18 22:00:46 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Mar 30 17:41:33 2010 (+0530)
+# Last-Updated: Mon Apr  5 17:24:48 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 605
+#     Update #: 664
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -39,6 +39,8 @@ import allowedcomp
 import synapse
 import config
 from simulation import Simulation
+
+
 class Population(moose.Neutral):
     """Homogeneous cell population - handles setting up connections
     between populations based on connection matrix.
@@ -70,6 +72,7 @@ class Population(moose.Neutral):
     CELL_CONNECTION_MAP = None
     ALLOWED_COMP_MAP = None
     THALAMIC_CELLS = ['TCR', 'nRT']
+
     def __init__(self, path, cell_class, cell_count, prefix=None):
 	"""Initialze the population by creating the cells.
 
@@ -90,6 +93,7 @@ class Population(moose.Neutral):
 	self.cell_list = []
 	self.cell_type = cell_class.__name__
         self.cell_class = cell_class
+        self.syncount = defaultdict(lambda: defaultdict(lambda: 0))
 	if prefix is None:
 	    prefix = self.cell_type
 	for number in range(cell_count):
@@ -148,7 +152,7 @@ class Population(moose.Neutral):
                 
                 if tau_GABA_fast is not None:
                     if self.cell_type == 'nRT':                    
-                        if post.cell_type = 'TCR':
+                        if post.cell_type == 'TCR':
                             # For nRT -> TCR GABAergic synapses, the
                             # baseline conductance is uniformly
                             # randomly distributed between 0.7 nS and
@@ -182,7 +186,8 @@ class Population(moose.Neutral):
                                                  absRefract=1.5e-3, 
                                                  weight=1.0, 
                                                  delay=delay)
-                        
+                    count = self.syncount[post]['GABA']
+                    self.syncount[post]['GABA'] = count + 1
                     config.LOGGER.debug('%s\tto%s\tGABA' % (pre_syn_comp.path, post_syn_comp.path))
                 if tau_AMPA is not None:
                     pre_syn_comp.makeSynapse(post_syn_comp, 
@@ -193,6 +198,8 @@ class Population(moose.Neutral):
                                              tau2=tau_AMPA,
                                              weight=gbar_AMPA, 
                                              delay=delay)
+                    count = self.syncount[post]['AMPA']
+                    self.syncount[post]['AMPA'] = count + 1
                     config.LOGGER.debug('%s\tto%s\tAMPA' % (pre_syn_comp.path, post_syn_comp.path))
                 if tau_NMDA is not None:
                     # TODO: NMDA time course is defined as:
@@ -208,6 +215,8 @@ class Population(moose.Neutral):
                                              absRefract=1.5e-3, 
                                              weight=gbar_NMDA, 
                                              delay=delay)
+                    count = self.syncount[post]['NMDA']
+                    self.syncount[post]['NMDA'] = count + 1
                     config.LOGGER.debug('%s\tto%s\tNMDA' % (pre_syn_comp.path, post_syn_comp.path))
 
                 self.conn_map[target][ii][jj][0] = precell_index
@@ -385,6 +394,7 @@ class Population(moose.Neutral):
         else:
             return synapse.SYNAPTIC_DELAY_DEFAULT
 
+                
     
     def setup_visualization(self, glviewname, parent, host='localhost', port='9999'):
         self.glView = moose.GLview(glviewname, parent)
@@ -435,6 +445,9 @@ def test_main():
     sim.run()
     preVmTable.dumpFile('preVm.txt')
     postVmTable.dumpFile('postVmTable.txt')
+    print 'Synapse count from ', pre.cell_type, 'to', post.cell_type, ':'
+    for key, value in pre.syncount[post].items():
+        print key, value
     client.stop()
 
 if __name__ == '__main__':

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 25 15:22:11 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Mar 30 17:39:08 2010 (+0530)
+# Last-Updated: Wed Mar 31 18:13:08 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 145
+#     Update #: 172
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -48,6 +48,22 @@
 from collections import defaultdict
 import numpy
 
+E_GABA = {
+    'nRT': -75e-3,
+    'SupBasket': -75e-3,
+    'SupAxoaxonic': -75e-3,
+    'SupLTS': -75e-3,
+    # 'SupPyrFRB': -81e-3,
+    # 'SupPyrRS': -81e-3,
+    'DeepBasket': -75e-3,
+    'DeepAxoaxonic': -75e-3,
+    'DeepLTS': -75e-3,
+    'nRT': -75e-3,
+    # 'SpinyStellate': -75e-3,
+    # 'NontuftedRS': -75e-3,
+    # 'TuftedIB': -75e-3,
+    # 'TuftedRS': -75e-3
+}
 TAU_AMPA = defaultdict(dict)
 TAU_NMDA = defaultdict(dict)
 TAU_GABA = defaultdict(dict)
