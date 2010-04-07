@@ -120,6 +120,7 @@ class TraubCell(moose.Cell):
         if not config.context.exists(cellpath):
             config.LOGGER.debug(__name__ + ' reading cell: ' + cellpath)
             config.context.readCell(filename, cellpath)
+	config.LOGGER.debug('returning cell %s' % (cellpath))
         return moose.Cell(cellpath)
 
     def _ca_tau(self):

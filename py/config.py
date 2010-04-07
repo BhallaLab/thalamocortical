@@ -99,7 +99,7 @@ logging.Handler.handleError = handleError
 logging.basicConfig(filename=LOG_FILENAME, level=LOG_LEVEL, format='%(asctime)s %(levelname)s %(filename)s %(funcName)s: %(message)s', filemode='w')
 LOGGER = logging.getLogger('traub2005')
 BENCHMARK_LOGGER = logging.getLogger('traub2005.benchmark')
-BENCHMARK_LOGGER.setLevel(logging.INFO)
+BENCHMARK_LOGGER.setLevel(logging.DEBUG)
 benchmarking=True # Dump benchmarking information
 
 # Unit Conversion Factors
