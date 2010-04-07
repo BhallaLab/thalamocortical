@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 18 22:00:46 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Apr  5 17:24:48 2010 (+0530)
+# Last-Updated: Wed Apr  7 12:07:27 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 664
+#     Update #: 672
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -88,6 +88,7 @@ class Population(moose.Neutral):
 
 	"""
 	moose.Neutral.__init__(self, path)
+        config.BENCHMARK_LOGGER.debug('Starting creation of population %s' % (cell_class.__name__))
         self.get_allowed_comp_map()
         self.get_connection_map()
 	self.cell_list = []
@@ -98,10 +99,12 @@ class Population(moose.Neutral):
 	    prefix = self.cell_type
 	for number in range(cell_count):
 	    cell_name = '%s_%d' % (prefix, number)
+            config.LOGGER.debug('Creating cell: %s' % (cell_name))
 	    cell_instance = cell_class(cell_class.prototype, self.path + '/' + cell_name)
 	    self.cell_list.append(cell_instance)
         self.conn_map = {}
         self.glView = None
+        config.LOGGER.debug('Finished creating population %s' % (cell_type))
 
     # This function does a lot of work - actually all about setting up
     # the connection: It looks up the peak channel conductances, time
@@ -186,8 +189,8 @@ class Population(moose.Neutral):
                                                  absRefract=1.5e-3, 
                                                  weight=1.0, 
                                                  delay=delay)
-                    count = self.syncount[post]['GABA']
-                    self.syncount[post]['GABA'] = count + 1
+                    count = self.syncount[target]['GABA']
+                    self.syncount[target]['GABA'] = count + 1
                     config.LOGGER.debug('%s\tto%s\tGABA' % (pre_syn_comp.path, post_syn_comp.path))
                 if tau_AMPA is not None:
                     pre_syn_comp.makeSynapse(post_syn_comp, 
@@ -198,8 +201,8 @@ class Population(moose.Neutral):
                                              tau2=tau_AMPA,
                                              weight=gbar_AMPA, 
                                              delay=delay)
-                    count = self.syncount[post]['AMPA']
-                    self.syncount[post]['AMPA'] = count + 1
+                    count = self.syncount[target]['AMPA']
+                    self.syncount[target]['AMPA'] = count + 1
                     config.LOGGER.debug('%s\tto%s\tAMPA' % (pre_syn_comp.path, post_syn_comp.path))
                 if tau_NMDA is not None:
                     # TODO: NMDA time course is defined as:
@@ -215,8 +218,8 @@ class Population(moose.Neutral):
                                              absRefract=1.5e-3, 
                                              weight=gbar_NMDA, 
                                              delay=delay)
-                    count = self.syncount[post]['NMDA']
-                    self.syncount[post]['NMDA'] = count + 1
+                    count = self.syncount[target]['NMDA']
+                    self.syncount[target]['NMDA'] = count + 1
                     config.LOGGER.debug('%s\tto%s\tNMDA' % (pre_syn_comp.path, post_syn_comp.path))
 
                 self.conn_map[target][ii][jj][0] = precell_index

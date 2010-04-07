@@ -198,7 +198,7 @@ from simulation import Simulation
 import pylab
 from subprocess import call
 if __name__ == "__main__":
-    call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_nRT.hoc'], cwd='../nrn')
+    call(['nrngui', 'test_nRT.hoc'], cwd='../nrn')
     nRT.test_single_cell()
 
 
