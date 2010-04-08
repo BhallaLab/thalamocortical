@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Oct  6 16:52:28 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Feb 17 17:25:08 2010 (+0530)
+# Last-Updated: Thu Apr  8 11:53:57 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 24
+#     Update #: 26
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -53,6 +53,11 @@ from cell import *
 from capool import CaPool
 
 class SupBasket(TraubCell):
+    ENa = 50e-3
+    EK = -100e-3
+    EAR = -40e-3
+    ECa = 125e-3
+    EGABA = -75e-3 # Sanchez-Vives et al. 1997 
     prototype = TraubCell.read_proto('SupBasket.p', 'SupBasket')
     def __init__(self, *args):
 	TraubCell.__init__(self, *args)

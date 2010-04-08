@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 19:32:34 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Feb 19 01:45:18 2010 (+0530)
+# Last-Updated: Thu Apr  8 11:46:24 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 19
+#     Update #: 22
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -54,6 +54,11 @@ from capool import CaPool
 
 
 class DeepLTS(TraubCell):
+    ENa = 50e-3
+    EK = -100e-3
+    EAR = -40e-3
+    ECa = 125e-3
+    EGABA = -75e-3 # Sanchez-Vives et al. 1997 
     prototype = TraubCell.read_proto("DeepLTS.p", "DeepLTS")
     ca_dep_chans = ['KAHP','KAHP_SLOWER', 'KAHP_DP', 'KC', 'KC_FAST']
     def __init__(self, *args):
@@ -63,25 +68,25 @@ class DeepLTS(TraubCell):
         self.presyn = 59
         self.level[1].add(self.comp[1])
         for ii in range(2, 42, 13):
-            self.level[2].add(self.comp[i])
+            self.level[2].add(self.comp[ii])
         for ii in range(3, 43, 13):
-            self.level[3].add(self.comp[i])
-            self.level[3].add(self.comp[i+1])
+            self.level[3].add(self.comp[ii])
+            self.level[3].add(self.comp[ii+1])
         for ii in range(5, 45, 13):
-            self.level[4].add(self.comp[i])
-            self.level[4].add(self.comp[i+1])
-            self.level[4].add(self.comp[i+2])
+            self.level[4].add(self.comp[ii])
+            self.level[4].add(self.comp[ii+1])
+            self.level[4].add(self.comp[ii+2])
         for ii in range(8, 48, 13):
-            self.level[5].add(self.comp[i])
-            self.level[5].add(self.comp[i+1])
-            self.level[5].add(self.comp[i+2])
+            self.level[5].add(self.comp[ii])
+            self.level[5].add(self.comp[ii+1])
+            self.level[5].add(self.comp[ii+2])
         for ii in range(11, 51, 13):
-            self.level[6].add(self.comp[i])
-            self.level[7].add(self.comp[i+1])
-            self.level[8].add(self.comp[i+2])
-            self.level[9].add(self.comp[i+3])
+            self.level[6].add(self.comp[ii])
+            self.level[7].add(self.comp[ii+1])
+            self.level[8].add(self.comp[ii+2])
+            self.level[9].add(self.comp[ii+3])
         for ii in range(54, 60):
-            self.level[0].add(self.comp[i])
+            self.level[0].add(self.comp[ii])
     
     def _setup_passive(self):
         for comp in self.comp[1:]:

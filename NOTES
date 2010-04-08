@@ -1795,3 +1795,6 @@ NET_RECEIVE(weight (uS)) {
   It is like :
   
   pre.syncount[post][synapse_type] = count
+* <2010-04-08 Thu 12:12> Setting up for big network
+  I fixed quite a few minor mistakes (like forgetting to set EGABA for LTS
+  and Basket cells). Now I am setting up chikki for a big simulation.
