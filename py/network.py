@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Jan 13 22:33:35 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Apr  8 12:06:15 2010 (+0530)
+# Last-Updated: Thu Apr  8 19:00:52 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 386
+#     Update #: 389
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -101,6 +101,7 @@ def test_all_cell_type():
         cell_class = eval(cell_type)
 	cells.append(cell_class(cell_type))
 	config.LOGGER.debug('Created cell %s' % (cell_type))
+
 
 if __name__ == '__main__':
     test_full_model(50e-3)
