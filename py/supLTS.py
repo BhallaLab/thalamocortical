@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Sep 23 00:18:00 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Feb 17 17:24:28 2010 (+0530)
+# Last-Updated: Thu Apr  8 11:47:55 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 50
+#     Update #: 52
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -37,6 +37,11 @@ from cell import *
 from capool import CaPool
 
 class SupLTS(TraubCell):
+    ENa = 50e-3
+    EK = -100e-3
+    EAR = -40e-3
+    ECa = 125e-3
+    EGABA = -75e-3 # Sanchez-Vives et al. 1997 
     prototype = TraubCell.read_proto("SupLTS.p", "SupLTS")
     def __init__(self, *args):
         self.chan_list = ['all channels']
