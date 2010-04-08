@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Jan 13 22:33:35 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Apr  7 12:14:48 2010 (+0530)
+# Last-Updated: Thu Apr  8 12:06:15 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 377
+#     Update #: 386
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -35,6 +35,8 @@
 # Code:
 
 from datetime import datetime
+import config
+
 from spinystellate import SpinyStellate
 from suppyrRS import SupPyrRS
 from suppyrFRB import SupPyrFRB
@@ -75,19 +77,21 @@ def test_full_model(simtime, simdt=1e-4, plotdt=1e-3):
     """Setup and run the full Traub model"""
     sim = Simulation('traub')
     net = []
-    
+    scale = 10
     start = datetime.now()
  
     for cell_type, count in CELL_COUNT.items():
         cell_class = eval(cell_type)
-        net.append(Population(sim.model.path + '/' + cell_type, cell_class, count))
+        # net.append(Population(sim.model.path + '/' + cell_type, cell_class, count))
+        net.append(Population(sim.model.path + '/' + cell_type, cell_class, 1))
     for pre_population in net:
         for post_population in net:
             pre_population.connect(post_population)
  
     end = datetime.now()
-    config.LOGGER.info('time to create all the population:' % (delta.seconds + 1e-6 * delta.microseconds))
-    sim.schedule(simtime, simdt=simdt, plotdt=plotdt, gldt=1e10)
+    delta = end - start
+    config.LOGGER.info('time to create all the population: %g' % (delta.seconds + 1e-6 * delta.microseconds))
+    sim.schedule(simdt=simdt, plotdt=plotdt, gldt=1e10)
     sim.run(time=simtime)
 
 def test_all_cell_type():

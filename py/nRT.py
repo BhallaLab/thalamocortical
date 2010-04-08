@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 15:18:24 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Feb 19 02:45:27 2010 (+0530)
+# Last-Updated: Thu Apr  8 11:53:02 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 59
+#     Update #: 61
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -54,6 +54,11 @@ from capool import CaPool
 
 
 class nRT(TraubCell):
+    ENa = 50e-3
+    EK = -100e-3
+    EAR = -40e-3
+    ECa = 125e-3
+    EGABA = -75e-3 # Sanchez-Vives et al. 1997 
     prototype = TraubCell.read_proto("nRT.p", "nRT")
     ca_dep_chans = ['KAHP','KAHP_SLOWER', 'KAHP_DP', 'KC', 'KC_FAST']
     unblocked_chans = [ 'CaL', 'KAHP_SLOWER']#['NaPF', 'KDR_FS', 'NaF2_nRT', 'K2', 'KM']

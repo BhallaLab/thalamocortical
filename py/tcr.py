@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 10:14:07 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Feb 17 17:26:40 2010 (+0530)
+# Last-Updated: Thu Apr  8 11:32:35 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 25
+#     Update #: 29
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -62,17 +62,17 @@ class TCR(TraubCell):
     def _topology(self):
         self.presyn = 135
         self.level[1].add(self.comp[1])
-        for i in range(2, 120, 13):
-            self.level[2].add(self.comp[i])
-        for i in range(3, 121, 13):
-            self.level[3].add(self.comp[i])
-            self.level[3].add(self.comp[i+1])
-            self.level[3].add(self.comp[i+2])
-        for i in range(6, 124, 13):
-            for k in range(0,9):
-                self.level[4].add(self.comp[i+j])
-        for i in range(132, 138):
-            self.level[0].add(self.comp[i])
+        for ii  in range(2, 120, 13):
+            self.level[2].add(self.comp[ii])
+        for ii  in range(3, 121, 13):
+            self.level[3].add(self.comp[ii])
+            self.level[3].add(self.comp[ii+1])
+            self.level[3].add(self.comp[ii+2])
+        for ii  in range(6, 124, 13):
+            for kk in range(0,9):
+                self.level[4].add(self.comp[ii+kk])
+        for ii  in range(132, 138):
+            self.level[0].add(self.comp[ii])
             
     
     def _setup_passive(self):

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 18 22:00:46 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Apr  7 12:07:27 2010 (+0530)
+# Last-Updated: Thu Apr  8 11:50:16 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 672
+#     Update #: 684
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -104,7 +104,7 @@ class Population(moose.Neutral):
 	    self.cell_list.append(cell_instance)
         self.conn_map = {}
         self.glView = None
-        config.LOGGER.debug('Finished creating population %s' % (cell_type))
+        config.LOGGER.debug('Finished creating population %s' % (self.cell_type))
 
     # This function does a lot of work - actually all about setting up
     # the connection: It looks up the peak channel conductances, time
@@ -128,7 +128,13 @@ class Population(moose.Neutral):
                                                size=(len(target.cell_list), num_pre_per_post))
 
         allowed_comp_map = self.get_allowed_comp_map()
-        allowed_comp_list = numpy.array(allowed_comp_map[self.cell_type][target.cell_type], dtype=int)
+        try:
+            allowed_comp_list = numpy.array(allowed_comp_map[self.cell_type][target.cell_type], dtype=int)
+        except KeyError:
+            config.LOGGER.info('(%s, %s) - No connections.' % (self.cell_type, 
+                                                               target.cell_type))
+            return
+
         target_comp_indices = numpy.random.randint(0, 
                                                    high=len(allowed_comp_list), 
                                                    size=(len(target.cell_list), num_pre_per_post))
@@ -155,7 +161,7 @@ class Population(moose.Neutral):
                 
                 if tau_GABA_fast is not None:
                     if self.cell_type == 'nRT':                    
-                        if post.cell_type == 'TCR':
+                        if target.cell_type == 'TCR':
                             # For nRT -> TCR GABAergic synapses, the
                             # baseline conductance is uniformly
                             # randomly distributed between 0.7 nS and
