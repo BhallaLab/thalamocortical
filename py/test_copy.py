@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Apr  8 19:01:04 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Apr  8 19:05:05 2010 (+0530)
+# Last-Updated: Fri Apr  9 16:17:11 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 7
+#     Update #: 19
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -50,14 +50,26 @@ import moose
 from spinystellate import SpinyStellate
 
 def test_copy():
+    cellcount = 100
     proto = SpinyStellate.prototype
     cells = []
-    config.BENCHMARK_LOGGER.info('Starting making cell copies.')
-    for ii in range(1000):
+    config.BENCHMARK_LOGGER.info('TEST1: Starting making cell copies.')
+    for ii in range(cellcount):
         cell = moose.Cell(proto, 'cell' + str(ii))
         cells.append(cell)
-    config.BENCHMARK_LOGGER.info('Finished making cell copies.')
-        
+    config.BENCHMARK_LOGGER.info('TEST1: Finished making cell copies.')
+    config.BENCHMARK_LOGGER.info('TEST2.A: Starting making TraubCell copies.')
+    ss = []
+    for ii in range(cellcount):
+        cell = SpinyStellate(proto, 'ss' + str(ii))
+        ss.append(cell)
+    config.BENCHMARK_LOGGER.info('TEST2.A: Finished making TraubCell copies.')
+    config.BENCHMARK_LOGGER.info('TEST2.B: Starting making TraubCells fresh.')
+    ss = []
+    for ii in range(cellcount):
+        cell = SpinyStellate('freshss' + str(ii))
+        ss.append(cell)
+    config.BENCHMARK_LOGGER.info('TEST2.B: Finished making TraubCells fresh.')        
 if __name__ == '__main__':
     test_copy()
 
