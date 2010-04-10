@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Apr  8 19:01:04 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Apr  9 16:17:11 2010 (+0530)
+# Last-Updated: Fri Apr  9 17:32:24 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 19
+#     Update #: 41
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -45,6 +45,7 @@
 
 # Code:
 
+from datetime import datetime
 import config
 import moose
 from spinystellate import SpinyStellate
@@ -53,23 +54,38 @@ def test_copy():
     cellcount = 100
     proto = SpinyStellate.prototype
     cells = []
-    config.BENCHMARK_LOGGER.info('TEST1: Starting making cell copies.')
+    start_0 = datetime.now()
     for ii in range(cellcount):
+        start = datetime.now()
         cell = moose.Cell(proto, 'cell' + str(ii))
+        end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('TEST1 - %d: %g s.' % (ii, delta.seconds + 1e-6 * delta.microseconds))
         cells.append(cell)
-    config.BENCHMARK_LOGGER.info('TEST1: Finished making cell copies.')
+    end_0 = datetime.now()
+    delta_0 = end_0 - start_0
+    config.BENCHMARK_LOGGER.info('TEST1: %g s.' % (delta_0.seconds + 1e-6 * delta_0.microseconds))
+                                     
     config.BENCHMARK_LOGGER.info('TEST2.A: Starting making TraubCell copies.')
     ss = []
+    start_0 = datetime.now()
     for ii in range(cellcount):
+        start = datetime.now()
         cell = SpinyStellate(proto, 'ss' + str(ii))
+        end = datetime.now()
         ss.append(cell)
-    config.BENCHMARK_LOGGER.info('TEST2.A: Finished making TraubCell copies.')
-    config.BENCHMARK_LOGGER.info('TEST2.B: Starting making TraubCells fresh.')
-    ss = []
-    for ii in range(cellcount):
-        cell = SpinyStellate('freshss' + str(ii))
-        ss.append(cell)
-    config.BENCHMARK_LOGGER.info('TEST2.B: Finished making TraubCells fresh.')        
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('TEST2.A - %d: %g s.' % (ii, delta.seconds + 1e-6 * delta.microseconds))
+    end_0 = datetime.now()
+    config.BENCHMARK_LOGGER.info('TEST2.A: %d s.' % (delta.seconds + 1e-6 * delta.microseconds))
+    # Right now the follwoing raises an Exception: No compartment in the cell.
+    # config.BENCHMARK_LOGGER.info('TEST2.B: Starting making TraubCells fresh.')
+    # ss = []
+    # for ii in range(cellcount):
+    #     cell = SpinyStellate('freshss' + str(ii))
+    #     ss.append(cell)
+    # config.BENCHMARK_LOGGER.info('TEST2.B: Finished making TraubCells fresh.')       
+    
 if __name__ == '__main__':
     test_copy()
 
