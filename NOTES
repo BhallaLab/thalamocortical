@@ -1798,3 +1798,35 @@ NET_RECEIVE(weight (uS)) {
 * <2010-04-08 Thu 12:12> Setting up for big network
   I fixed quite a few minor mistakes (like forgetting to set EGABA for LTS
   and Basket cells). Now I am setting up chikki for a big simulation.
+* <2010-04-10 Sat 14:07> Bottleneck with copy
+  As posted in blog, Niraj pointed out that making copies of cells slows down
+  as number of cells increase. The following code snippette:
+  \begin{verbatim*}
+
+    for ii in range(cellcount):
+        start = datetime.now()
+        cell = moose.Cell(proto, 'cell' + str(ii))
+        end = datetime.now()
+        delta = end - start
+
+   \end{verbatim*}  
+
+   Creates 100 copies of a cell and on my laptop, the first copy takes 17 ms
+   whereas the 100-th copy takes 1.32 s. I checked that my python code only
+   adds an overhead: 
+   just copy takes 5 minutes for 100 spiny stellate cells.
+   SpinyStellate constructor takes 17 minutes for the same.
+
+
+   One solution I can think of is avoiding creating wrappers except for the
+   necessary components - pre and postsynaptic compartments, Ca and
+   Ca-dependent channels.
+
+
+   Niraj also suggested that I can avoid the Ca - Ca-dep-chan wrapping if I
+   create an additional message (the GENESIS way) which both I and Upi agree
+   that is not an elegant solution.
+
+
+  Upi said we should discuss this later - as it seems to be a common problem
+  we are facing.
