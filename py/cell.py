@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 24 10:04:47 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Feb 19 02:23:32 2010 (+0530)
+# Last-Updated: Fri Apr  9 17:11:29 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 232
+#     Update #: 234
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -115,12 +115,14 @@ class TraubCell(moose.Cell):
 
         prototype = TraubCell.read_proto("MyCellType.p", "MyClassName")
         """
+        config.BENCHMARK_LOGGER.info('start reading prototype')
         ret = None
         cellpath = config.lib.path + '/' + cellname
         if not config.context.exists(cellpath):
             config.LOGGER.debug(__name__ + ' reading cell: ' + cellpath)
             config.context.readCell(filename, cellpath)
 	config.LOGGER.debug('returning cell %s' % (cellpath))
+        config.BENCHMARK_LOGGER.info('end reading prototype')
         return moose.Cell(cellpath)
 
     def _ca_tau(self):
