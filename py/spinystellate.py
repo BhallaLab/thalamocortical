@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Sep 29 11:43:22 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Feb 20 22:39:12 2010 (+0530)
+# Last-Updated: Mon Apr 12 16:57:21 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 161
+#     Update #: 181
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -70,7 +70,7 @@ class SpinyStellate(TraubCell):
         for i in range(54, 60):
             self.level[0].add(self.comp[i])
             
-        # Skipping the categorizatioon into levels for the time being
+        # Skipping the categorization into levels for the time being
 
     def _setup_passive(self):
 	for comp in self.comp[1:]:
@@ -78,6 +78,7 @@ class SpinyStellate(TraubCell):
 
     def _setup_channels(self):
         """Set up connection between CaPool, Ca channels, Ca dependnet channels."""
+        return # The explicit connection is unnecessary after addmsg1 in CaPool and CaConc dependent channels.
         for comp in self.comp[1:]:
             ca_pool = None
             ca_dep_chans = []
@@ -103,14 +104,27 @@ class SpinyStellate(TraubCell):
                     elif issubclass(pyclass, AR):
                         obj.Ek = -40e-3
                         obj.X = 0.0
-                if ca_pool:
-                    for channel in ca_chans:
-                        channel.connect('IkSrc', ca_pool, 'current')
-                        config.LOGGER.debug( comp.name + ' : ' + channel.name + ' connected to ' + ca_pool.name)
-                    for channel in ca_dep_chans:
-                        channel.useConcentration = 1
-                        ca_pool.connect("concSrc", channel, "concen")
-                        config.LOGGER.debug(comp.name + ' : ' + ca_pool.name + ' connected to ' + channel.name)
+                # if ca_pool:
+                #     for msg in ca_pool.inMessages():
+                #         print msg
+                #     for msg in ca_pool.outMessages():
+                #         print msg
+                    
+                #     neighbours = []
+                #     for chan in  ca_pool.neighbours():
+                #         neighbours.append(chan.path())
+                #     print 'Neighbours:', neighbours
+                #     for channel in ca_chans:
+                #         if not channel.path in neighbours:
+                #             raise Exception, '%s not connected to CaPool' % (channel.path)
+                #         channel.connect('IkSrc', ca_pool, 'current')
+                #         config.LOGGER.debug( comp.name + ' : ' + channel.name + ' connected to ' + ca_pool.name)
+                #     for channel in ca_dep_chans:
+                #         if not channel.path in neighbours:
+                #             raise Exception, '%s not connected to CaPool' % (channel.path)
+                #         channel.useConcentration = 1
+                #         ca_pool.connect("concSrc", channel, "concen")
+                #         config.LOGGER.debug(comp.name + ' : ' + ca_pool.name + ' connected to ' + channel.name)
                     
         obj = moose.CaConc(self.soma.path + '/CaPool')
         obj.tau = 50e-3
