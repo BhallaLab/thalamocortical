@@ -153,7 +153,7 @@ comp_5	comp_3	40	0	0	0.837945	CaPool	-4.93831e+17	CaL	2	KA	10	KC_FAST	250	KDR_FS
 *set_compt_param RM 0.1
 *set_compt_param CM 0.01
 *set_compt_param RA 1
-comp_59	comp_58	50	0	0	1	KA	10	KDR_FS	4000	NaF2	4000
+comp_59	comp_58	50	0	0	1	KA	10	KDR_FS	4000	NaF2	4000 spike 0.0
 *set_compt_param ELEAK -0.065
 *set_compt_param RM 0.1
 *set_compt_param CM 0.01

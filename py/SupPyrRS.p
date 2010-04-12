@@ -114,5 +114,5 @@ comp_74	comp_73	50	0	0	1	K2	1	KA	20	KDR	4000	NaF	4000
 
 comp_71	comp_70	50	0	0	1	K2	1	KA	20	KDR	4000	NaF	4000
 
-comp_72	comp_71	50	0	0	1	K2	1	KA	20	KDR	4000	NaF	4000
+comp_72	comp_71	50	0	0	1	K2	1	KA	20	KDR	4000	NaF	4000 spike 0.0
 

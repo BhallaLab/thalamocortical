@@ -1830,3 +1830,18 @@ NET_RECEIVE(weight (uS)) {
 
   Upi said we should discuss this later - as it seems to be a common problem
   we are facing.
+
+* <2010-04-12 Mon 10:14> Updating code to reduce python-loops.
+  I am going to update the cell models to avoid loops in python. Also avoid
+  copy and use readcell for all cells.
+
+  This will involve:
+  1. addmsg1 for Ca_conc objects and Ca_conc depenednet channels.
+  2. adding a spike element in the cell prototype file for the presynaptic compartment.
+  3. no wrapper for compartments unless required absolutely. It will be mostly
+     coded in strings. CON: this can make the code really ugly, defeating the
+     purpose of using python.
+
+  1. It did not work - although addField adds a field, addmsg1 does not seem
+     to work for setting up connection.
+     

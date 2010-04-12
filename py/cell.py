@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 24 10:04:47 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Apr  9 17:11:29 2010 (+0530)
+# Last-Updated: Mon Apr 12 12:05:56 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 234
+#     Update #: 244
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -46,6 +46,7 @@
 # Code:
 from collections import defaultdict
 
+import moose
 import config
 import pymoose
 
@@ -65,6 +66,7 @@ def init_channel_lib():
             channel = channel_class(channel_name, config.lib)
             config.channel_lib[channel_name] = channel
             config.LOGGER.debug( '* Created %s' % (channel.path))
+        config.channel_lib['SpikeGen'] = moose.SpikeGen('spike', config.lib)
     return config.channel_lib
 
 def nameindex(comp):
@@ -115,6 +117,7 @@ class TraubCell(moose.Cell):
 
         prototype = TraubCell.read_proto("MyCellType.p", "MyClassName")
         """
+        print 'READING PROTO:', filename
         config.BENCHMARK_LOGGER.info('start reading prototype')
         ret = None
         cellpath = config.lib.path + '/' + cellname
