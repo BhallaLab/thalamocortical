@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Jan 13 22:33:35 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Apr  8 19:00:52 2010 (+0530)
+# Last-Updated: Mon Apr 12 12:21:23 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 389
+#     Update #: 396
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -95,16 +95,18 @@ def test_full_model(simtime, simdt=1e-4, plotdt=1e-3):
     sim.run(time=simtime)
 
 def test_all_cell_type():
-    """test-load all different cell type. this is fro debugging - as test_full_model is crashing silently after reading nRT cell"""
+    """test-load all different cell type. this is for debugging - as test_full_model is crashing silently after reading nRT cell"""
     cells = []
     for cell_type in CELL_COUNT.keys():
+        print '####', cell_type
         cell_class = eval(cell_type)
-	cells.append(cell_class(cell_type))
+	cells.append(cell_class(cell_class.prototype, cell_type))
 	config.LOGGER.debug('Created cell %s' % (cell_type))
 
 
 if __name__ == '__main__':
-    test_full_model(50e-3)
+    test_all_cell_type()
+    # test_full_model(50e-3)
     config.LOGGER.info('Finished simulation')
 
 

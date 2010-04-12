@@ -175,7 +175,7 @@ comp_61	comp_59	50	0	0	1	K2	5	KA	6	KDR	4500	KM	300	NaF	4500
 *set_compt_param RM 0.1
 *set_compt_param CM 0.009
 *set_compt_param RA 1
-comp_60	comp_58	50	0	0	1	K2	5	KA	6	KDR	4500	KM	300	NaF	4500
+comp_60	comp_58	50	0	0	1	K2	5	KA	6	KDR	4500	KM	300	NaF	4500  spike 0.0
 *set_compt_param ELEAK -0.07
 *set_compt_param RM 2.5
 *set_compt_param CM 0.018

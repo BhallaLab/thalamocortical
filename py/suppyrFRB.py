@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Sep 21 01:45:00 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Feb 17 17:25:32 2010 (+0530)
+# Last-Updated: Mon Apr 12 16:51:28 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 105
+#     Update #: 113
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -53,10 +53,13 @@ from cell import *
 from capool import CaPool
 
 class SupPyrFRB(TraubCell):
+    ENa = 50e-3
+    EK = -95e-3
+    EAR = -35e-3
+    ECa = 125e-3
+    EGABA = -81e-3
     prototype = TraubCell.read_proto("SupPyrFRB.p", "SupPyrFRB")
     def __init__(self, *args):
-        self.chan_list = ['all channels']
-#         self.chan_list = ['NaF', 'NaP', 'KC', 'KAHP', 'KDR', 'KA', 'K2', 'KM', 'CaL', 'CaT', 'AR']
 	TraubCell.__init__(self, *args)
 
 

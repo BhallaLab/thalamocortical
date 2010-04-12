@@ -704,4 +704,4 @@ comp_137	comp_136	50	0	0	1	K2	5	KA	2	KDR	1800	NaF_TCR	4000
 *set_compt_param RM 0.1
 *set_compt_param CM 0.009
 *set_compt_param RA 1
-comp_135	comp_134	50	0	0	1	K2	5	KA	2	KDR	1800	NaF_TCR	4000
+comp_135	comp_134	50	0	0	1	K2	5	KA	2	KDR	1800	NaF_TCR	4000 spike 0.0
