@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 12 17:12:41 2010 (+0530)
+# Last-Updated: Wed Apr 14 19:46:06 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 674
+#     Update #: 682
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -234,11 +234,14 @@ class KCaChannel(KChannel):
         self.zGate.B.xmin = KCaChannel.ca_min
         self.zGate.B.xdivs = KCaChannel.ca_divs        
         self.zGate.B.xmax = KCaChannel.ca_max
-#         self.zGate.A.calcMode = 1
-#         self.zGate.B.calcMode = 1
+        self.zGate.A.calcMode = 1
+        self.zGate.B.calcMode = 1
         self.useConcentration = True # TODO - uncomment after test
         self.addField('addmsg1')
         self.setField('addmsg1', '../CaPool . CONCEN Ca')
+        config.LOGGER.debug('%s.addmsg1: %s' % (self.path,  self.getField('addmsg1')))
+        for handler in config.LOGGER.handlers:
+            handler.flush()
 
 
 class KAHPBase(KCaChannel):
