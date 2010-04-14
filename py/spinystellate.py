@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Sep 29 11:43:22 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 12 16:57:21 2010 (+0530)
+# Last-Updated: Wed Apr 14 19:49:42 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 181
+#     Update #: 243
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -78,7 +78,7 @@ class SpinyStellate(TraubCell):
 
     def _setup_channels(self):
         """Set up connection between CaPool, Ca channels, Ca dependnet channels."""
-        return # The explicit connection is unnecessary after addmsg1 in CaPool and CaConc dependent channels.
+        # return # The explicit connection is unnecessary after addmsg1 in CaPool and CaConc dependent channels.
         for comp in self.comp[1:]:
             ca_pool = None
             ca_dep_chans = []
@@ -104,12 +104,16 @@ class SpinyStellate(TraubCell):
                     elif issubclass(pyclass, AR):
                         obj.Ek = -40e-3
                         obj.X = 0.0
-                # if ca_pool:
-                #     for msg in ca_pool.inMessages():
-                #         print msg
-                #     for msg in ca_pool.outMessages():
-                #         print msg
-                    
+                if ca_pool:
+                    print ca_pool.path, ca_pool.getField('addmsg1')
+                    print self.path, ': MESSAGES - START'
+                    for msg in ca_pool.inMessages():
+                        print msg
+                    for msg in ca_pool.outMessages():
+                        print msg
+                    print self.path, ': MESSAGES - END'
+                    print '-------------------------------------'
+
                 #     neighbours = []
                 #     for chan in  ca_pool.neighbours():
                 #         neighbours.append(chan.path())
@@ -141,6 +145,10 @@ class SpinyStellate(TraubCell):
         config.LOGGER.info(" **************************************************************************/")
         sim = Simulation(cls.__name__)
         mycell = SpinyStellate(SpinyStellate.prototype, sim.model.path + "/SpinyStellate")
+        for handler in config.LOGGER.handlers:
+            handler.flush()
+
+
         mycell.soma.x0 = 0.0
         mycell.soma.y0 = 0.0
         mycell.soma.z0 = 0.0
@@ -148,11 +156,11 @@ class SpinyStellate(TraubCell):
         mycell.soma.y = 0.0
         mycell.soma.z = mycell.soma.length
         # mycellview = MyCellView(mycell)
-        print 'Created cell:', mycell.path
-        for neighbour in mycell.soma.neighbours('raxial'):
-            print 'RAXIAL', neighbours.path()
-        for neighbour in mycell.soma.neighbours('axial'):
-            print 'AXIAL', neighbour.path()
+        config.LOGGER.debug('Created cell: %s' % (mycell.path))
+        # for neighbour in mycell.soma.neighbours('raxial'):
+        #     print 'RAXIAL', neighbours.path()
+        # for neighbour in mycell.soma.neighbours('axial'):
+        #     print 'AXIAL', neighbour.path()
         vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_spinstell', 'Vm', sim.data)
         pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=50e-3, firstWidth=50e-3)
 #         pulsegen1 = mycell.soma.insertPulseGen('pulsegen1', sim.model, firstLevel=3e-7, firstDelay=150e-3, firstWidth=10e-3)
@@ -165,8 +173,8 @@ class SpinyStellate(TraubCell):
         t2 = datetime.now()
         delta = t2 - t1
         print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
-        sim.dump_data('data')
-        mycell.dump_cell('spinstell.txt')
+        # sim.dump_data('data')
+        # mycell.dump_cell('spinstell.txt')
         
         mus_vm = pylab.array(vm_table) * 1e3
         nrn_vm = pylab.loadtxt('../nrn/mydata/Vm_spinstell.plot')

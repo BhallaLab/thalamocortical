@@ -1844,4 +1844,13 @@ NET_RECEIVE(weight (uS)) {
 
   1. It did not work - although addField adds a field, addmsg1 does not seem
      to work for setting up connection.
+
+* <2010-04-14 Wed 19:58> Fixed the issue for (1) 
+  of <2010-04-12 Mon 10:14>
+
+  This turned out to be due to a dependency on GenesisParser
+  (Shell->ReadCell->GenesisParser) which is disconnected from Shell, so the
+  message to call Shell.addMessage() was getting lost - the actual addmsg
+  never happenning.
+  
      

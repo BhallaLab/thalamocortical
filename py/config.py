@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Apr  9 17:19:23 2010 (+0530)
+# Last-Updated: Tue Apr 13 17:09:00 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 82
+#     Update #: 83
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -96,7 +96,9 @@ def handleError(self, record):
 LOG_FILENAME = 'traub_2005.log'
 LOG_LEVEL = logging.DEBUG
 logging.Handler.handleError = handleError
-logging.basicConfig(filename=LOG_FILENAME, level=LOG_LEVEL, format='%(asctime)s %(levelname)s %(name)s %(filename)s %(funcName)s: %(message)s', filemode='w')
+# logging.basicConfig(filename=LOG_FILENAME, level=LOG_LEVEL, format='%(asctime)s %(levelname)s %(name)s %(filename)s %(funcName)s: %(message)s', filemode='w')
+logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s %(levelname)s %(name)s %(filename)s %(funcName)s: %(message)s', filemode='w')
+
 LOGGER = logging.getLogger('traub2005')
 BENCHMARK_LOGGER = logging.getLogger('traub2005.benchmark')
 BENCHMARK_LOGGER.setLevel(logging.DEBUG)
