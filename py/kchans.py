@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Apr 14 19:46:06 2010 (+0530)
+# Last-Updated: Wed Apr 14 22:07:51 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 682
+#     Update #: 683
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -236,7 +236,7 @@ class KCaChannel(KChannel):
         self.zGate.B.xmax = KCaChannel.ca_max
         self.zGate.A.calcMode = 1
         self.zGate.B.calcMode = 1
-        self.useConcentration = True # TODO - uncomment after test
+        self.useConcentration = True
         self.addField('addmsg1')
         self.setField('addmsg1', '../CaPool . CONCEN Ca')
         config.LOGGER.debug('%s.addmsg1: %s' % (self.path,  self.getField('addmsg1')))

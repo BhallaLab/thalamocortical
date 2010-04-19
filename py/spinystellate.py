@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Sep 29 11:43:22 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Apr 14 19:49:42 2010 (+0530)
+# Last-Updated: Tue Apr 20 00:22:30 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 243
+#     Update #: 291
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -36,16 +36,22 @@ from capool import CaPool
 # from cellview import MyCellView
 
 class SpinyStellate(TraubCell):
-    ENa = 50e-3
-    EK = -100e-3
-    EAR = -40e-3
-    ECa = 100e-3
-    EGABA = -75e-3 # Sanchez-Vives et al. 1997 
-    prototype = TraubCell.read_proto("SpinyStellate.p", "SpinyStellate")
-    def __init__(self, *args):
-	TraubCell.__init__(self, *args)
+    channel_params = {
+        'ENa': 50e-3,
+        'EK': -100e-3,
+        'EAR': -40e-3,
+        'ECa': 100e-3,
+        'EGABA': -75e-3 # Sanchez-Vives et al. 1997 
+        }
+    prototype = TraubCell.read_proto("SpinyStellate.p", "SpinyStellate", channel_params)
+    def __init__(self, objpath_or_src, destpath_or_parent=None, parent=None):
+	TraubCell.__init__(self, objpath_or_src, destpath_or_parent, parent)
+        self.presyn = 57
+        obj = moose.CaConc(self.soma.path + '/CaPool')
+        obj.tau = 50e-3
 
     def _topology(self):
+        raise Exception, 'Deprecated method.'
 	self.presyn = 57
         self.level[1].add(self.comp[1])
         for i in range(2, 42, 13):
@@ -73,11 +79,14 @@ class SpinyStellate(TraubCell):
         # Skipping the categorization into levels for the time being
 
     def _setup_passive(self):
+        raise Exception, 'Deprecated. All passive properties including initVm and Em are set in .p file.'
 	for comp in self.comp[1:]:
 	    comp.initVm = -65e-3
+    
 
     def _setup_channels(self):
         """Set up connection between CaPool, Ca channels, Ca dependnet channels."""
+        # raise Exception, 'Deprecated.'
         # return # The explicit connection is unnecessary after addmsg1 in CaPool and CaConc dependent channels.
         for comp in self.comp[1:]:
             ca_pool = None
@@ -192,7 +201,13 @@ class SpinyStellate(TraubCell):
 #             print pylab.amax(ca_table)
         pylab.legend()
         pylab.show()
-        
+
+from unittest import TestCase
+
+class SpinyStellateTestCase(TestCase):
+    def setUp(self):
+        self.sim = Simulation('SpinyStellate')
+        self.cell = SpinyStellate()
         
 # test main --
 from simulation import Simulation
