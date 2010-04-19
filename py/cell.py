@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 24 10:04:47 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Apr 14 19:52:22 2010 (+0530)
+# Last-Updated: Mon Apr 19 06:33:15 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 254
+#     Update #: 385
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -80,44 +80,109 @@ def nameindex(comp):
     else:
         return -1
 
+def get_comp(cell, index):
+    """Return a wrapper over compartment specified by index. None if
+    no such compartment exists."""
+    path = cell.path + '/comp_' + str(index)
+    if config.context.exists(path):
+        return MyCompartment(path)
+    else:
+        return None
+
+
 class TraubCell(moose.Cell):
     channel_lib = init_channel_lib()
                      
-    def __init__(self, *args):
-	moose.Cell.__init__(self, *args)
-	self.comp = [None]
+    def __init__(self, objpath_or_src, destpath_or_parent=None, parent=None):
+        copy = False
+        path = ''
+        # If the first arg is a string it is the path or name of the
+        # object to be created
+        if isinstance(objpath_or_src, str):
+            copy = False
+            path = objpath_or_src
+            config.LOGGER.debug('Create %s' % (path))
+        elif isinstance(objpath_or_src, moose.Id):
+            if destpath_or_parent is None:
+                path = objpath_or_src
+            else: # If first arg is Id and second is not None, copy
+                copy = True
+        elif isinstance(objpath_or_src, moose.PyMooseBase):
+            copy = True
+
+        if isinstance(destpath_or_parent, str):
+            path = destpath_or_parent + '/' + path
+        elif isinstance(destpath_or_parent, moose.Id):
+            path = destpath_or_parent.path() + '/' + path
+        if isinstance(parent, str):
+            path = parent + '/' + path
+        elif isinstance(parent, moose.PyMooseBase):
+            path = parent.path + '/' + path
+        elif isinstance(parent, moose.Id):
+            path = parent.path() + '/' + path
+        if path.endswith('/'):
+            path = path[:-1]
+        if copy:
+            src_path = None
+            if isinstance(objpath_or_src, moose.Id):
+                src_path = objpath_or_src.path()
+            else:
+                src_path = objpath_or_src.path
+            # print 'src:', src_path, 'dest:', path
+            config.LOGGER.debug('Copy %s to %s' % (src_path, path))
+            moose.Cell.__init__(self, objpath_or_src, path)
+        else:
+            config.LOGGER.debug('Creating object %s' % (path))
+            moose.Cell.__init__(self, path)
 	self.num_comp = 0
         self.level = defaultdict(set)
 	self.dendrites = set()
         self.presyn = 0
-        config.LOGGER.debug(self.name + ' going through the children')
-        for child in self.children():
-            config.LOGGER.debug(self.name + ' going through the children:' + child.path())
-            comp = MyCompartment(child)
-            if comp.className == "Compartment": # Ensure it is a compartment
-                self.comp.append(comp)
-        if len(self.comp) > 1:
-            self.comp.sort(key=nameindex)
-            self.soma = self.comp[1]
-            self._topology()
-            self._setup_passive()
-            self._setup_channels()
-        else:
-            raise Exception("No compartment in the cell.")
-        
+        return
+        # if len(self.comp) > 1:
+        #     self.comp.sort(key=nameindex)
+        #     self.soma = self.comp[1]
+        #     self._topology()
+        #     self._setup_passive()
+        #     self._setup_channels()
+        # else:
+        #     raise Exception("No compartment in the cell.")
+    
+    # Dynamic access to a compartment by index.  It mimics a python
+    # list 'comp' via underlying function call to get_comp(cell,
+    # index)
+    comp = moose.listproperty(get_comp)
+
+    @property
+    def soma(self):
+        return get_comp(self, 1)
+
     def pfile_name(self):
         """Each cell type subclass should implement this"""
         raise NotImplementedError, "function pfile_name not implemented"
 
     @classmethod
-    def read_proto(cls, filename, cellname):
-        """Read a prototype cell from .p file into library.  Each cell
-        type class should initialize its prototype with a call to this
-        function. with something like this within the class declaration:
+    def read_proto(cls, filename, cellname, params=None):
+        """Read a prototype cell from .p file into library.  
+
+        Each cell type class should initialize its prototype with a
+        call to this function. with something like this within the
+        class declaration:
 
         prototype = TraubCell.read_proto("MyCellType.p", "MyClassName")
+
+        filename -- path(relative/absolute) of the cell prototype file.
+
+        cellname -- path of the cell to be Created
+
+        params -- if specified, channels in /library are adjusted with
+        the parameters specified in this (via a call to
+        adjust_chanlib).
+
         """
-        config.LOGGER.debug('READING PROTO:%s' % (filename))
+        config.LOGGER.debug('Reading proto:%s' % (filename))
+        if params is not None:
+            TraubCell.adjust_chanlib(params)
         ret = None
         cellpath = config.lib.path + '/' + cellname
         if not config.context.exists(cellpath):
@@ -127,11 +192,39 @@ class TraubCell(moose.Cell):
             config.context.readCell(filename, cellpath)
         else:
             config.LOGGER.debug(__name__ + ' cell exists: ' + cellpath)
-	config.LOGGER.debug('returning cell %s' % (cellpath))
-        config.LOGGER.info('end reading prototype')
+	config.LOGGER.debug('Returning cell %s' % (cellpath))
         for handler in config.LOGGER.handlers:
             handler.flush()
         return moose.Cell(cellpath)
+
+    @classmethod
+    def adjust_chanlib(cls, chan_params):
+        """Set the properties of prototype channels in /library to fit
+        the channel properties of this cell type.
+
+        chan_params -- dict containing the channel parameters. The
+        following string keys should be there with float values:
+
+        ENa
+        EK
+        EAR
+        ECa
+        TauCa
+        
+        """
+        for channel in init_channel_lib():
+            if isinstance(channel, KChannel):
+                channel.Ek = chan_params['EK']
+            elif isinstance(channel, NaChannel):
+                channel.Ek = chan_params['ENa']
+            elif isinstance(channel, CaChannel):
+                channel.Ek = chan_params['ECa']
+            elif isinstance(channel, AR):
+                channel.Ek = chan_params['EAR']
+            elif isinstance(channel, CaPool):
+                channel.tau = chan_params['TauCa']
+                
+    
 
     def _ca_tau(self):
         raise NotImplementedError("You must set tau for [Ca2+] decay in the method _ca_tau() in subclass.")
