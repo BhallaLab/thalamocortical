@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Sep 29 11:43:22 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Apr 20 00:22:30 2010 (+0530)
+# Last-Updated: Wed Apr 21 11:18:00 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 291
+#     Update #: 421
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -36,111 +36,35 @@ from capool import CaPool
 # from cellview import MyCellView
 
 class SpinyStellate(TraubCell):
-    channel_params = {
+    chan_params = {
         'ENa': 50e-3,
         'EK': -100e-3,
         'EAR': -40e-3,
         'ECa': 100e-3,
-        'EGABA': -75e-3 # Sanchez-Vives et al. 1997 
+        'EGABA': -75e-3, # Sanchez-Vives et al. 1997 
+        'TauCa': 20e-3,
+        'X_AR': 0.0
         }
-    prototype = TraubCell.read_proto("SpinyStellate.p", "SpinyStellate", channel_params)
-    def __init__(self, objpath_or_src, destpath_or_parent=None, parent=None):
-	TraubCell.__init__(self, objpath_or_src, destpath_or_parent, parent)
-        self.presyn = 57
-        obj = moose.CaConc(self.soma.path + '/CaPool')
-        obj.tau = 50e-3
+    ca_dep_chans = ['KAHP_SLOWER', 'KC_FAST']
+    presyn = 57
+    num_comp = 59
+    proto_file = 'SpinyStellate.p'
+    prototype = TraubCell.read_proto("SpinyStellate.p", "SpinyStellate", chan_params)
+    def __init__(self, *args):
+	TraubCell.__init__(self, *args)
+        soma_ca_pool = moose.CaConc(self.soma.path + '/CaPool')
+        soma_ca_pool.tau = 50e-3
 
     def _topology(self):
         raise Exception, 'Deprecated method.'
-	self.presyn = 57
-        self.level[1].add(self.comp[1])
-        for i in range(2, 42, 13):
-            self.level[2].add(self.comp[i])
-        for i in range(3, 43, 13):
-            self.level[3].add(self.comp[i])
-            self.level[3].add(self.comp[i+1])
-        for i in range(5, 45, 13):
-            self.level[4].add(self.comp[i])
-            self.level[4].add(self.comp[i+1])
-            self.level[4].add(self.comp[i+2])
-        for i in range(8, 48, 13):
-            self.level[5].add(self.comp[i])
-            self.level[5].add(self.comp[i+1])
-            self.level[5].add(self.comp[i+2])
-        for i in range(11, 51, 13):
-            self.level[6].add(self.comp[i])
-            self.level[7].add(self.comp[i+1])
-            self.level[8].add(self.comp[i+2])
-            self.level[9].add(self.comp[i+3])
-
-        for i in range(54, 60):
-            self.level[0].add(self.comp[i])
-            
-        # Skipping the categorization into levels for the time being
 
     def _setup_passive(self):
         raise Exception, 'Deprecated. All passive properties including initVm and Em are set in .p file.'
-	for comp in self.comp[1:]:
-	    comp.initVm = -65e-3
     
 
     def _setup_channels(self):
         """Set up connection between CaPool, Ca channels, Ca dependnet channels."""
-        # raise Exception, 'Deprecated.'
-        # return # The explicit connection is unnecessary after addmsg1 in CaPool and CaConc dependent channels.
-        for comp in self.comp[1:]:
-            ca_pool = None
-            ca_dep_chans = []
-            ca_chans = []
-            for child in comp.children():
-                obj = moose.Neutral(child)
-                if obj.name == 'CaPool':
-                    ca_pool = moose.CaConc(child)
-                    ca_pool.tau = 20e-3
-                elif obj.className == 'HHChannel':
-                    obj = moose.HHChannel(child)
-                    pyclass = eval(obj.name)
-                    if issubclass(pyclass, KChannel):
-                        obj.Ek = -100e-3
-                        if issubclass(pyclass, KCaChannel):
-                            ca_dep_chans.append(obj)
-                    elif issubclass(pyclass, NaChannel):
-                        obj.Ek = 50e-3
-                    elif issubclass(pyclass, CaChannel):
-                        obj.Ek = 125e-3
-                        if issubclass(pyclass, CaL):
-                            ca_chans.append(obj)
-                    elif issubclass(pyclass, AR):
-                        obj.Ek = -40e-3
-                        obj.X = 0.0
-                if ca_pool:
-                    print ca_pool.path, ca_pool.getField('addmsg1')
-                    print self.path, ': MESSAGES - START'
-                    for msg in ca_pool.inMessages():
-                        print msg
-                    for msg in ca_pool.outMessages():
-                        print msg
-                    print self.path, ': MESSAGES - END'
-                    print '-------------------------------------'
-
-                #     neighbours = []
-                #     for chan in  ca_pool.neighbours():
-                #         neighbours.append(chan.path())
-                #     print 'Neighbours:', neighbours
-                #     for channel in ca_chans:
-                #         if not channel.path in neighbours:
-                #             raise Exception, '%s not connected to CaPool' % (channel.path)
-                #         channel.connect('IkSrc', ca_pool, 'current')
-                #         config.LOGGER.debug( comp.name + ' : ' + channel.name + ' connected to ' + ca_pool.name)
-                #     for channel in ca_dep_chans:
-                #         if not channel.path in neighbours:
-                #             raise Exception, '%s not connected to CaPool' % (channel.path)
-                #         channel.useConcentration = 1
-                #         ca_pool.connect("concSrc", channel, "concen")
-                #         config.LOGGER.debug(comp.name + ' : ' + ca_pool.name + ' connected to ' + channel.name)
-                    
-        obj = moose.CaConc(self.soma.path + '/CaPool')
-        obj.tau = 50e-3
+        raise Exception, 'Deprecated.'
 
     @classmethod
     def test_single_cell(cls):
@@ -153,7 +77,7 @@ class SpinyStellate(TraubCell):
         config.LOGGER.info(" *")
         config.LOGGER.info(" **************************************************************************/")
         sim = Simulation(cls.__name__)
-        mycell = SpinyStellate(SpinyStellate.prototype, sim.model.path + "/SpinyStellate")
+        mycell = SpinyStellate(sim.model.path + "/SpinyStellate", SpinyStellate.proto_file)
         for handler in config.LOGGER.handlers:
             handler.flush()
 
@@ -202,13 +126,67 @@ class SpinyStellate(TraubCell):
         pylab.legend()
         pylab.show()
 
-from unittest import TestCase
+import unittest
 
-class SpinyStellateTestCase(TestCase):
+class SpinyStellateTestCase(unittest.TestCase):
     def setUp(self):
         self.sim = Simulation('SpinyStellate')
-        self.cell = SpinyStellate()
-        
+        path = self.sim.model.path + '/' + 'TestSpinyStellate'
+        config.LOGGER.debug('Creating cell %s' % (path))
+        TraubCell.adjust_chanlib(SpinyStellate.chan_params)
+        self.cell = SpinyStellate(path, SpinyStellate.proto_file)
+        config.LOGGER.debug('Cell created')
+        for handler in config.LOGGER.handlers:
+            handler.flush()
+        self.sim.schedule()
+
+    def test_compartment_count(self):
+        for comp_no in range(SpinyStellate.num_comp):
+            path = '%s/comp_%d' % (self.cell.path, comp_no + 1)
+            self.assertTrue(config.context.exists(path))
+    
+    def test_initVm(self):
+        for comp_no in range(SpinyStellate.num_comp):
+            self.assertAlmostEqual(self.cell.comp[comp_no + 1].initVm, -65e-3)
+
+    def test_Em(self):
+        for comp_no in range(SpinyStellate.num_comp):
+            self.assertAlmostEqual(self.cell.comp[comp_no + 1].Em, -65e-3)
+
+    def test_Ca_connections(self):
+        for comp_no in range(SpinyStellate.num_comp):
+            ca_path = self.cell.comp[comp_no + 1].path + '/CaPool'
+            if not config.context.exists(ca_path):
+                continue
+            caPool = moose.CaConc(ca_path)
+            for chan in SpinyStellate.ca_dep_chans:
+                pass
+            sources = caPool.neighbours('current')
+            self.failIfEqual(len(src), 0)
+            for chan in sources:
+                self.assertTrue(chan.path().endswith('CaL'))
+                    
+    def test_reversal_potentials(self):
+        for num in range(SpinyStellate.num_comp):
+            comp = self.cell.comp[num + 1]
+            for chan_id in comp.neighbours('channel'):
+                chan = moose.HHChannel(chan_id)
+                chan_class = eval(chan.name)
+                key = None
+                if issubclass(chan_class, NaChannel):
+                    key = 'ENa'
+                elif issubclass(chan_class, KChannel):
+                    key = 'EK'
+                elif issubclass(chan_class, CaChannel):
+                    key = 'ECa'
+                elif issubclass(chan_class, AR):
+                    key = 'EAR'
+                else:
+                    pass
+                self.assertAlmostEqual(chan.Ek, SpinyStellate.chan_params[key])
+                    
+                
+
 # test main --
 from simulation import Simulation
 import pylab
@@ -216,7 +194,7 @@ from subprocess import call
 if __name__ == "__main__":
 #     call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_spinstell.hoc'], cwd='../nrn')
     SpinyStellate.test_single_cell()
-    
+    # unittest.main()
 
 
 # 

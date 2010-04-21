@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 24 10:04:47 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 19 06:33:15 2010 (+0530)
+# Last-Updated: Wed Apr 21 10:25:32 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 385
+#     Update #: 401
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -93,60 +93,10 @@ def get_comp(cell, index):
 class TraubCell(moose.Cell):
     channel_lib = init_channel_lib()
                      
-    def __init__(self, objpath_or_src, destpath_or_parent=None, parent=None):
-        copy = False
-        path = ''
-        # If the first arg is a string it is the path or name of the
-        # object to be created
-        if isinstance(objpath_or_src, str):
-            copy = False
-            path = objpath_or_src
-            config.LOGGER.debug('Create %s' % (path))
-        elif isinstance(objpath_or_src, moose.Id):
-            if destpath_or_parent is None:
-                path = objpath_or_src
-            else: # If first arg is Id and second is not None, copy
-                copy = True
-        elif isinstance(objpath_or_src, moose.PyMooseBase):
-            copy = True
-
-        if isinstance(destpath_or_parent, str):
-            path = destpath_or_parent + '/' + path
-        elif isinstance(destpath_or_parent, moose.Id):
-            path = destpath_or_parent.path() + '/' + path
-        if isinstance(parent, str):
-            path = parent + '/' + path
-        elif isinstance(parent, moose.PyMooseBase):
-            path = parent.path + '/' + path
-        elif isinstance(parent, moose.Id):
-            path = parent.path() + '/' + path
-        if path.endswith('/'):
-            path = path[:-1]
-        if copy:
-            src_path = None
-            if isinstance(objpath_or_src, moose.Id):
-                src_path = objpath_or_src.path()
-            else:
-                src_path = objpath_or_src.path
-            # print 'src:', src_path, 'dest:', path
-            config.LOGGER.debug('Copy %s to %s' % (src_path, path))
-            moose.Cell.__init__(self, objpath_or_src, path)
-        else:
-            config.LOGGER.debug('Creating object %s' % (path))
-            moose.Cell.__init__(self, path)
-	self.num_comp = 0
-        self.level = defaultdict(set)
-	self.dendrites = set()
-        self.presyn = 0
-        return
-        # if len(self.comp) > 1:
-        #     self.comp.sort(key=nameindex)
-        #     self.soma = self.comp[1]
-        #     self._topology()
-        #     self._setup_passive()
-        #     self._setup_channels()
-        # else:
-        #     raise Exception("No compartment in the cell.")
+    def __init__(self, *args):
+        print args
+        moose.Cell.__init__(self, *args)
+        
     
     # Dynamic access to a compartment by index.  It mimics a python
     # list 'comp' via underlying function call to get_comp(cell,
@@ -212,7 +162,8 @@ class TraubCell(moose.Cell):
         TauCa
         
         """
-        for channel in init_channel_lib():
+        config.LOGGER.debug('Adjusting channel properties.')
+        for key, channel in init_channel_lib().items():
             if isinstance(channel, KChannel):
                 channel.Ek = chan_params['EK']
             elif isinstance(channel, NaChannel):
@@ -221,9 +172,13 @@ class TraubCell(moose.Cell):
                 channel.Ek = chan_params['ECa']
             elif isinstance(channel, AR):
                 channel.Ek = chan_params['EAR']
+                try:
+                    channel.X = chan_params['X_AR']
+                except KeyError:
+                    channel.X = 0.25
             elif isinstance(channel, CaPool):
                 channel.tau = chan_params['TauCa']
-                
+
     
 
     def _ca_tau(self):
