@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Sep 29 11:43:22 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Apr 22 15:16:30 2010 (+0530)
+# Last-Updated: Thu Apr 22 16:18:35 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 469
+#     Update #: 472
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -69,21 +69,6 @@ class SpinyStellate(TraubCell):
     def _setup_channels(self):
         """Set up connection between CaPool, Ca channels, Ca dependnet channels."""
         raise Exception, 'Deprecated.'
-
-    @classmethod
-    def get_cell_array(cls, prefix, count):
-        """Create count no. of cells and return.
-
-        prefix -- common prefix of all cell names, the n-th cell will be {prefix}_{n}
-        count -- no. of cells to create.
-        """
-        cell_array = []
-        for ii in range(count):
-            cell_path = '%s_%d' % (prefix, ii)
-            cell = SpinyStellate(cell_path, SpinyStellate.proto_file)
-            cell_array.append(cell)
-
-        return cell_array
 
     @classmethod
     def test_single_cell(cls):
@@ -229,7 +214,7 @@ if __name__ == "__main__":
 #     call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_spinstell.hoc'], cwd='../nrn')
     # SpinyStellate.test_single_cell()
     # unittest.main()
-    # test_creation_time(20)
+    test_creation_time(20)
 
 # 
 # spinystellate.py ends here
