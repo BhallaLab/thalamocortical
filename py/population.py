@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 18 22:00:46 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Apr  8 11:50:16 2010 (+0530)
+# Last-Updated: Wed Apr 21 12:14:50 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 684
+#     Update #: 702
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -39,7 +39,7 @@ import allowedcomp
 import synapse
 import config
 from simulation import Simulation
-
+from cell import TraubCell
 
 class Population(moose.Neutral):
     """Homogeneous cell population - handles setting up connections
@@ -95,12 +95,16 @@ class Population(moose.Neutral):
 	self.cell_type = cell_class.__name__
         self.cell_class = cell_class
         self.syncount = defaultdict(lambda: defaultdict(lambda: 0))
+        TraubCell.adjust_chanlib(cell_class.chan_params)
 	if prefix is None:
 	    prefix = self.cell_type
 	for number in range(cell_count):
 	    cell_name = '%s_%d' % (prefix, number)
-            config.LOGGER.debug('Creating cell: %s' % (cell_name))
-	    cell_instance = cell_class(cell_class.prototype, self.path + '/' + cell_name)
+            start = datetime.now()
+	    cell_instance = cell_class(self.path + '/' + cell_name, cell_class.proto_file)
+            end = datetime.now()
+            delta = end - start
+            config.BENCHMARK_LOGGER.debug('Created cell: %s in %f s' % (cell_name, delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
 	    self.cell_list.append(cell_instance)
         self.conn_map = {}
         self.glView = None
@@ -156,7 +160,7 @@ class Population(moose.Neutral):
                 precell = self.cell_list[precell_index]
                 post_syn_comp_index = target_comp_list[jj]
                 post_syn_comp = postcell.comp[post_syn_comp_index]
-                pre_syn_comp = precell.comp[precell.presyn]
+                pre_syn_comp = precell.comp[self.cell_class.presyn]
                 config.LOGGER.debug('connecting: \t%s \tto \t%s' % (pre_syn_comp.path, post_syn_comp.path))
                 
                 if tau_GABA_fast is not None:
@@ -406,6 +410,7 @@ class Population(moose.Neutral):
                 
     
     def setup_visualization(self, glviewname, parent, host='localhost', port='9999'):
+        return
         self.glView = moose.GLview(glviewname, parent)
         self.glView.vizpath = self.path + '/#/comp_1'
         self.glView.port = port
@@ -427,8 +432,10 @@ def start_test_client():
     testclient = GLClient(exe='/home/subha/src/moose/gl/src/glclient', mode='v', colormap='/home/subha/src/moose/gl/colormaps/rainbow2', save_directory='/tmp')
     return testclient
 
-def test_main():
-    client = start_test_client()
+def test_main(do_glview=False):
+    if do_glview:
+        client = start_test_client()
+
     # time.sleep(3)
     sim = Simulation('/sim')
     cellcount = 40
@@ -451,13 +458,14 @@ def test_main():
     preVmTable = precomp.insertRecorder('preVmTable', 'Vm', sim.data)
     postVmTable = postcomp.insertRecorder('postVmTable', 'Vm', sim.data)
     sim.schedule()
-    sim.run()
-    preVmTable.dumpFile('preVm.txt')
-    postVmTable.dumpFile('postVmTable.txt')
-    print 'Synapse count from ', pre.cell_type, 'to', post.cell_type, ':'
-    for key, value in pre.syncount[post].items():
-        print key, value
-    client.stop()
+    # sim.run()
+    # preVmTable.dumpFile('preVm.txt')
+    # postVmTable.dumpFile('postVmTable.txt')
+    # print 'Synapse count from ', pre.cell_type, 'to', post.cell_type, ':'
+    # for key, value in pre.syncount[post].items():
+    #     print key, value
+    # if do_glview:
+    #     client.stop()
 
 if __name__ == '__main__':
     test_main()
