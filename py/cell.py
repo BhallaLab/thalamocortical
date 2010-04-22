@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 24 10:04:47 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Apr 21 10:25:32 2010 (+0530)
+# Last-Updated: Wed Apr 21 11:54:23 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 401
+#     Update #: 402
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -87,6 +87,7 @@ def get_comp(cell, index):
     if config.context.exists(path):
         return MyCompartment(path)
     else:
+        print 'No compartment with index:', index
         return None
 
 

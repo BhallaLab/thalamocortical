@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Sep 29 11:43:22 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Apr 21 11:18:00 2010 (+0530)
+# Last-Updated: Thu Apr 22 15:16:30 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 421
+#     Update #: 469
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -51,9 +51,13 @@ class SpinyStellate(TraubCell):
     proto_file = 'SpinyStellate.p'
     prototype = TraubCell.read_proto("SpinyStellate.p", "SpinyStellate", chan_params)
     def __init__(self, *args):
+        start = datetime.now()
 	TraubCell.__init__(self, *args)
         soma_ca_pool = moose.CaConc(self.soma.path + '/CaPool')
         soma_ca_pool.tau = 50e-3
+        end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('created cell in: %g s' % (delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
 
     def _topology(self):
         raise Exception, 'Deprecated method.'
@@ -65,6 +69,21 @@ class SpinyStellate(TraubCell):
     def _setup_channels(self):
         """Set up connection between CaPool, Ca channels, Ca dependnet channels."""
         raise Exception, 'Deprecated.'
+
+    @classmethod
+    def get_cell_array(cls, prefix, count):
+        """Create count no. of cells and return.
+
+        prefix -- common prefix of all cell names, the n-th cell will be {prefix}_{n}
+        count -- no. of cells to create.
+        """
+        cell_array = []
+        for ii in range(count):
+            cell_path = '%s_%d' % (prefix, ii)
+            cell = SpinyStellate(cell_path, SpinyStellate.proto_file)
+            cell_array.append(cell)
+
+        return cell_array
 
     @classmethod
     def test_single_cell(cls):
@@ -185,7 +204,22 @@ class SpinyStellateTestCase(unittest.TestCase):
                     pass
                 self.assertAlmostEqual(chan.Ek, SpinyStellate.chan_params[key])
                     
-                
+def test_creation_time(count=10):
+    cells = []
+    for ii in range(count):
+        start = datetime.now()
+        cells.append(SpinyStellate('cell_%d' % (ii), SpinyStellate.proto_file))
+        end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('created fresh cell %s in: %g s' % (cells[-1].name, delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
+
+    for ii in range(count):
+        start = datetime.now()
+        cells.append(SpinyStellate(SpinyStellate.prototype, 'copy_of_cell_%d' % (ii)))
+        end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('created copy %s in: %g s' % (cells[-1].name, delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
+        
 
 # test main --
 from simulation import Simulation
@@ -193,9 +227,9 @@ import pylab
 from subprocess import call
 if __name__ == "__main__":
 #     call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_spinstell.hoc'], cwd='../nrn')
-    SpinyStellate.test_single_cell()
+    # SpinyStellate.test_single_cell()
     # unittest.main()
-
+    # test_creation_time(20)
 
 # 
 # spinystellate.py ends here
