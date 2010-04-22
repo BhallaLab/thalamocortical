@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 18 22:00:46 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Apr 22 16:18:00 2010 (+0530)
+# Last-Updated: Thu Apr 22 16:45:06 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 706
+#     Update #: 711
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -450,18 +450,18 @@ def test_main(do_glview=False):
     precell = pre.cell_list[precell_index]
     precomp = precell.comp[precell.presyn]
     postcomp = post.cell_list[0].comp[post_comp_index]
-    # precell.soma.insertPulseGen('inject', sim.model, firstLevel=0.0)
+    precell.soma.insertPulseGen('inject', sim.model, firstLevel=0.0)
     preVmTable = precomp.insertRecorder('preVmTable', 'Vm', sim.data)
     postVmTable = postcomp.insertRecorder('postVmTable', 'Vm', sim.data)
     sim.schedule()
-    # sim.run()
-    # preVmTable.dumpFile('preVm.txt')
-    # postVmTable.dumpFile('postVmTable.txt')
-    # print 'Synapse count from ', pre.cell_type, 'to', post.cell_type, ':'
-    # for key, value in pre.syncount[post].items():
-    #     print key, value
-    # if do_glview:
-    #     client.stop()
+    sim.run()
+    preVmTable.dumpFile('preVm.txt')
+    postVmTable.dumpFile('postVmTable.txt')
+    config.LOGGER.debug('Synapse count from %s to %s.' % (pre.cell_type, post.cell_type))
+    for key, value in pre.syncount[post].items():
+        config.LOGGER.debug('%s -- %d' % (key, value))
+    if do_glview:
+        client.stop()
 
 if __name__ == '__main__':
     test_main()
