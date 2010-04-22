@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 18 22:00:46 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Apr 21 12:14:50 2010 (+0530)
+# Last-Updated: Thu Apr 22 16:18:00 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 702
+#     Update #: 706
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -100,11 +100,7 @@ class Population(moose.Neutral):
 	    prefix = self.cell_type
 	for number in range(cell_count):
 	    cell_name = '%s_%d' % (prefix, number)
-            start = datetime.now()
-	    cell_instance = cell_class(self.path + '/' + cell_name, cell_class.proto_file)
-            end = datetime.now()
-            delta = end - start
-            config.BENCHMARK_LOGGER.debug('Created cell: %s in %f s' % (cell_name, delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
+	    cell_instance = cell_class(cell_class.prototype, self.path + '/' + cell_name)
 	    self.cell_list.append(cell_instance)
         self.conn_map = {}
         self.glView = None
@@ -441,7 +437,7 @@ def test_main(do_glview=False):
     cellcount = 40
     start = datetime.now()
     pre = Population(sim.model.path + '/ss', SpinyStellate, cellcount)
-    pre.setup_visualization('gl_' + pre.name, sim.data)
+    # pre.setup_visualization('gl_' + pre.name, sim.data)
     end = datetime.now()
     delta = end - start
     config.BENCHMARK_LOGGER.info('time to create population of %d cells: %g' % (cellcount, delta.seconds + 1e-6 * delta.microseconds))
