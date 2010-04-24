@@ -1854,3 +1854,14 @@ NET_RECEIVE(weight (uS)) {
   never happenning.
   
      
+* <2010-04-24 Sat 11:29> Transformed SpinyStellate
+  I made changes in the TraubCell class in cell.py to avoid creating wrappers
+  for all objects and accessing compartments on demand.
+
+  Also the adding Ca2+ messages bit has been moved to prototype files by
+  adding field addmsg1 to CaConc and KCaChan objects.
+
+  The autoscheduling has been disabled (made changes in moose code for this) -
+  which rescues the cell-creation performance bottleneck.
+  
+  I am going to run it on ghevar.
