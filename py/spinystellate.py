@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Sep 29 11:43:22 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Apr 22 16:18:35 2010 (+0530)
+# Last-Updated: Sat Apr 24 11:32:52 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 472
+#     Update #: 473
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -212,9 +212,9 @@ import pylab
 from subprocess import call
 if __name__ == "__main__":
 #     call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_spinstell.hoc'], cwd='../nrn')
-    # SpinyStellate.test_single_cell()
+    SpinyStellate.test_single_cell()
     # unittest.main()
-    test_creation_time(20)
+    test_creation_time(1000)
 
 # 
 # spinystellate.py ends here
