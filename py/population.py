@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 18 22:00:46 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Apr 22 16:45:06 2010 (+0530)
+# Last-Updated: Sat Apr 24 11:38:40 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 711
+#     Update #: 716
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -434,7 +434,7 @@ def test_main(do_glview=False):
 
     # time.sleep(3)
     sim = Simulation('/sim')
-    cellcount = 40
+    cellcount = 1000
     start = datetime.now()
     pre = Population(sim.model.path + '/ss', SpinyStellate, cellcount)
     # pre.setup_visualization('gl_' + pre.name, sim.data)
@@ -446,7 +446,7 @@ def test_main(do_glview=False):
     pre.connect(post)
     precell_index = pre.conn_map[post][0][0][0]
     post_comp_index = pre.conn_map[post][0][0][1]
-    print precell_index, post_comp_index
+    # print precell_index, post_comp_index
     precell = pre.cell_list[precell_index]
     precomp = precell.comp[precell.presyn]
     postcomp = post.cell_list[0].comp[post_comp_index]
@@ -455,8 +455,8 @@ def test_main(do_glview=False):
     postVmTable = postcomp.insertRecorder('postVmTable', 'Vm', sim.data)
     sim.schedule()
     sim.run()
-    preVmTable.dumpFile('preVm.txt')
-    postVmTable.dumpFile('postVmTable.txt')
+    preVmTable.dumpFile('preVm.dat')
+    postVmTable.dumpFile('postVmTable.dat')
     config.LOGGER.debug('Synapse count from %s to %s.' % (pre.cell_type, post.cell_type))
     for key, value in pre.syncount[post].items():
         config.LOGGER.debug('%s -- %d' % (key, value))
