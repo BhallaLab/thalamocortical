@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Apr 24 17:52:44 2010 (+0530)
+# Last-Updated: Mon Apr 26 17:55:49 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 649
+#     Update #: 661
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -62,7 +62,7 @@ class SupPyrRS(TraubCell):
         'EGABA': -81e-3,
         'TauCa': 20e-3
         }
-    ca_dep_chans = ['KAHP', 'KAHP_DP', 'KC']
+    ca_dep_chans = ['KAHP', 'KC']
     num_comp = 74
     presyn = 72
     proto_file = "SupPyrRS.p"
@@ -75,6 +75,7 @@ class SupPyrRS(TraubCell):
         end = datetime.now()
         delta = end - start
         config.BENCHMARK_LOGGER.info('created cell in: %g s' % (delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
+        # self._setup_channels()
 	
     def _topology(self):
         raise Exception, 'Deprecated'
@@ -110,42 +111,42 @@ class SupPyrRS(TraubCell):
     def _setup_channels(self):
         """Set up connections between compartment and channels, and Ca pool"""
         raise Exception, 'Deprecated'
-        for i in range(len(self.level)):
-            for comp in self.level[i]:
-                ca_pool = None
-                ca_dep_chans = []
-                ca_chans = []
-                for child in comp.children():
-                    obj = moose.Neutral(child)
-                    if obj.name == 'CaPool':
-                        ca_pool = moose.CaConc(child)
-                        ca_pool.B = ca_pool.B * 1e3
-                        ca_pool.tau = 1e-3/0.05
-                    else:
-                        obj_class = obj.className
-                        if obj_class == "HHChannel":
-                            obj = moose.HHChannel(child)
-                            pyclass = eval(obj.name)                            
-                            
-                            if issubclass(pyclass, KChannel):
-                                obj.Ek = -95e-3
-                                if issubclass(pyclass, KCaChannel):
-                                    ca_dep_chans.append(obj)
-                            elif issubclass(pyclass, NaChannel):
-                                obj.Ek = 50e-3
-                            elif issubclass(pyclass, CaChannel):
-                                obj.Ek = 125e-3
-                                if issubclass(pyclass, CaL):
-                                    ca_chans.append(obj)
-                            elif issubclass(pyclass, AR):
-                                obj.Ek = -35e-3
-                if ca_pool: # Setup connections for CaPool : from CaL, to KAHP and KC
-                    for channel in ca_chans:
-                        channel.connect('IkSrc', ca_pool, 'current')
+        for ii in range(SupPyrRS.num_comp):
+            comp = self.comp[ii+1]
+            ca_pool = None
+            ca_dep_chans = []
+            ca_chans = []
+            for child in comp.children():
+                obj = moose.Neutral(child)
+                if obj.name == 'CaPool':
+                    ca_pool = moose.CaConc(child)
+                    ca_pool.B = ca_pool.B * 1e3
+                    ca_pool.tau = 1e-3/0.05
+                else:
+                    obj_class = obj.className
+                    if obj_class == "HHChannel":
+                        obj = moose.HHChannel(child)
+                        pyclass = eval(obj.name)                            
 
-                    for channel in ca_dep_chans:
-                        channel.useConcentration = 1
-                        ca_pool.connect("concSrc", channel, "concen")
+                        if issubclass(pyclass, KChannel):
+                            obj.Ek = -95e-3
+                            if issubclass(pyclass, KCaChannel):
+                                ca_dep_chans.append(obj)
+                        elif issubclass(pyclass, NaChannel):
+                            obj.Ek = 50e-3
+                        elif issubclass(pyclass, CaChannel):
+                            obj.Ek = 125e-3
+                            if issubclass(pyclass, CaL):
+                                ca_chans.append(obj)
+                        elif issubclass(pyclass, AR):
+                            obj.Ek = -35e-3
+                # if ca_pool: # Setup connections for CaPool : from CaL, to KAHP and KC
+                #     for channel in ca_chans:
+                #         channel.connect('IkSrc', ca_pool, 'current')
+
+                #     for channel in ca_dep_chans:
+                #         channel.useConcentration = 1
+                #         ca_pool.connect("concSrc", channel, "concen")
 
 
 
@@ -218,7 +219,7 @@ class SupPyrRSTestCase(unittest.TestCase):
 
     def test_initVm(self):
         for comp_no in range(SupPyrRS.num_comp):
-            self.assertAlmostEqual(self.cell.comp[comp_no + 1].initVm, -70e-3)
+            self.assertAlmostEqual(self.cell.comp[comp_no + 1].initVm, -65e-3)
 
     def test_Em(self):
         for comp_no in range(SupPyrRS.num_comp):
