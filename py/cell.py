@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 24 10:04:47 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Apr 21 11:54:23 2010 (+0530)
+# Last-Updated: Sat Apr 24 14:49:16 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 402
+#     Update #: 407
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -95,7 +95,6 @@ class TraubCell(moose.Cell):
     channel_lib = init_channel_lib()
                      
     def __init__(self, *args):
-        print args
         moose.Cell.__init__(self, *args)
         
     
@@ -233,7 +232,8 @@ class TraubCell(moose.Cell):
         dump_file.write(",e_napf_spinstell,gbar_napf_spinstell")
         dump_file.write(",e_napf_tcr,gbar_napf_tcr")
         dump_file.write("\n")
-        for comp in self.comp[1:]:
+        for ii in range(self.num_comp):
+            comp = self.comp[ii+1]
             dump_file.write('%s,%g,%g,%g,%g,%g,%g,%g,%g' % (comp.name, comp.length, comp.diameter, comp.sarea(), comp.xarea(), comp.Em, comp.Cm, comp.Rm, comp.Ra))
             for channel_name in config.channel_name_list:
                 path = comp.path + '/' + channel_name

@@ -1865,3 +1865,40 @@ NET_RECEIVE(weight (uS)) {
   which rescues the cell-creation performance bottleneck.
   
   I am going to run it on ghevar.
+* <2010-04-26 Mon 00:03> Bogged down by MOOSE issues
+  Compilation of the system on ghevar was a pain (had to compile and install
+  swig, python2.6.5, numpy. failed to install pylab (the compilation failed
+  because of absence of the font libraries - I am unwilling to do a whole
+  GNOME rebuild to satisfy all the requirements). Managed gsl from
+  kb.centos.org.
+
+  But latest updates on HSOlve has broken something. Yesterday I tried without
+  a proper update - so the clocks were not being assigned properly. Today
+  after updating and recompiling pymoose, running spinystellate.py aborts with
+  the following message just after reset:
+
+  python: HSolveInterface.cpp:100: void HSolveActive::addInject(unsigned int, double): Assertion `index < inject_.size()' failed.
+..Aborted
+
+
+ I had not registered Niraj's mail about HSOlve scheduling being changed. Now
+ I have to check if following his way of scheduling avoids this issue.
+
+ - did not help. And this is independent of autoscheduling.
+
+ 
+* <2010-04-26 Mon 16:32> HSolve problem fixed
+  I discussed the assertion failure with Niraj and he figured that this the
+  result of fixing a bug that did not exist. Once he reverted this bit of
+  code, the program ran fine.
+
+  The next point I had been missing was that HSolve gets created only at
+  reset(). So when I was calling useClock on HSolve on the scheduling code,
+  the targets were non-existent. Once I moved the HSolve scheduling beyond the
+  reset call, SpinyStellate output became similar to that with autoscheduling
+  on.
+
+  Now with SupPyrRS I am facing problem - there are periodic rather long
+  bursts compared to a few spikes close togetehr.
+
+  Need to see if there is something with the ion channels.
