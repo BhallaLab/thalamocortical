@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 26 17:55:49 2010 (+0530)
+# Last-Updated: Mon Apr 26 22:03:41 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 661
+#     Update #: 667
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -75,84 +75,16 @@ class SupPyrRS(TraubCell):
         end = datetime.now()
         delta = end - start
         config.BENCHMARK_LOGGER.info('created cell in: %g s' % (delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
-        # self._setup_channels()
 	
     def _topology(self):
         raise Exception, 'Deprecated'
-        self.presyn = 72
-	self.level[1].add(self.comp[1])
-	for ii in range(2,14):
-	    self.level[2].add(self.comp[ii])
-	for ii in range(14, 26):
-	    self.level[3].add(self.comp[ii])
-	for ii in range(26, 38):
-	    self.level[4].add(self.comp[ii])
-	self.level[5].add(self.comp[38])
-	self.level[6].add(self.comp[39])
-	self.level[7].add(self.comp[40])
-	self.level[8].add(self.comp[41])
-	self.level[8].add(self.comp[42])
-	self.level[9].add(self.comp[43])
-	self.level[9].add(self.comp[44])
-	for ii in range(45, 53):
-	    self.level[10].add(self.comp[ii])
-	for ii in range(53, 61):
-	    self.level[11].add(self.comp[ii])
-	for ii in range(61, 69):
-	    self.level[12].add(self.comp[ii])
-	for ii in range(69, 75):
-	    self.level[0].add(self.comp[ii])
     
     def _setup_passive(self):
         raise Exception, 'Deprecated'
-        for comp in self.comp[1:]:
-            comp.Em = -70e-3
 
     def _setup_channels(self):
         """Set up connections between compartment and channels, and Ca pool"""
         raise Exception, 'Deprecated'
-        for ii in range(SupPyrRS.num_comp):
-            comp = self.comp[ii+1]
-            ca_pool = None
-            ca_dep_chans = []
-            ca_chans = []
-            for child in comp.children():
-                obj = moose.Neutral(child)
-                if obj.name == 'CaPool':
-                    ca_pool = moose.CaConc(child)
-                    ca_pool.B = ca_pool.B * 1e3
-                    ca_pool.tau = 1e-3/0.05
-                else:
-                    obj_class = obj.className
-                    if obj_class == "HHChannel":
-                        obj = moose.HHChannel(child)
-                        pyclass = eval(obj.name)                            
-
-                        if issubclass(pyclass, KChannel):
-                            obj.Ek = -95e-3
-                            if issubclass(pyclass, KCaChannel):
-                                ca_dep_chans.append(obj)
-                        elif issubclass(pyclass, NaChannel):
-                            obj.Ek = 50e-3
-                        elif issubclass(pyclass, CaChannel):
-                            obj.Ek = 125e-3
-                            if issubclass(pyclass, CaL):
-                                ca_chans.append(obj)
-                        elif issubclass(pyclass, AR):
-                            obj.Ek = -35e-3
-                # if ca_pool: # Setup connections for CaPool : from CaL, to KAHP and KC
-                #     for channel in ca_chans:
-                #         channel.connect('IkSrc', ca_pool, 'current')
-
-                #     for channel in ca_dep_chans:
-                #         channel.useConcentration = 1
-                #         ca_pool.connect("concSrc", channel, "concen")
-
-
-
-        obj = moose.CaConc(self.soma.path + '/CaPool')
-        obj.tau = 1e-3 / 0.01
-        config.LOGGER.debug(obj.path + 'set tau to %g' % (obj.tau))
 
     @classmethod
     def test_single_cell(cls):
@@ -169,7 +101,6 @@ class SupPyrRS(TraubCell):
         config.LOGGER.info('Created cell: %s' % (mycell.path))
         vm_table = mycell.comp[SupPyrRS.presyn].insertRecorder('Vm_suppyrrs', 'Vm', sim.data)
         pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=50e-3, firstWidth=50e-3)
-#         pulsegen1 = mycell.soma.insertPulseGen('pulsegen1', sim.model, firstLevel=3e-7, firstDelay=150e-3, firstWidth=10e-3)
 
         sim.schedule()
         if mycell.has_cycle():
@@ -179,8 +110,6 @@ class SupPyrRS(TraubCell):
         t2 = datetime.now()
         delta = t2 - t1
         config.BENCHMARK_LOGGER.info('simulation time: %g' % (delta.seconds + 1e-6 * delta.microseconds))
-        # sim.dump_data('data')
-        # mycell.dump_cell('suppyrrs.txt')
         
         mus_vm = pylab.array(vm_table) * 1e3
         nrn_vm = pylab.loadtxt('../nrn/mydata/Vm_suppyrrs.plot')
