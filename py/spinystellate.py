@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Sep 29 11:43:22 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Apr 24 11:32:52 2010 (+0530)
+# Last-Updated: Sat Apr 24 20:24:05 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 473
+#     Update #: 495
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -46,8 +46,8 @@ class SpinyStellate(TraubCell):
         'X_AR': 0.0
         }
     ca_dep_chans = ['KAHP_SLOWER', 'KC_FAST']
-    presyn = 57
     num_comp = 59
+    presyn = 57
     proto_file = 'SpinyStellate.p'
     prototype = TraubCell.read_proto("SpinyStellate.p", "SpinyStellate", chan_params)
     def __init__(self, *args):
@@ -104,12 +104,16 @@ class SpinyStellate(TraubCell):
 
         sim.schedule()
         if mycell.has_cycle():
-            print "WARNING!! CYCLE PRESENT IN CICRUIT."
+            config.LOGGER.warning("WARNING!! CYCLE PRESENT IN CICRUIT.")
         t1 = datetime.now()
         sim.run(200e-3)
         t2 = datetime.now()
         delta = t2 - t1
-        print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
+        config.BENCHMARK_LOGGER.info('simulation time: %g' % (delta.seconds + 1e-6 * delta.microseconds))
+        for msg in moose.Neutral('/model/SpinyStellate/solve').inMessages():
+            print msg
+        for msg in moose.Neutral('/model/SpinyStellate/solve').outMessages():
+            print msg
         # sim.dump_data('data')
         # mycell.dump_cell('spinstell.txt')
         
@@ -164,9 +168,13 @@ class SpinyStellateTestCase(unittest.TestCase):
                 continue
             caPool = moose.CaConc(ca_path)
             for chan in SpinyStellate.ca_dep_chans:
-                pass
+                chan_path = self.cell.comp[comp_no + 1].path + '/' + chan
+                if not config.context.exists(chan_path):
+                    continue
+                chan_obj = moose.HHChannel(chan_path)
+                self.assertTrue(len(chan_obj.neighbours('concen')) > 0)
             sources = caPool.neighbours('current')
-            self.failIfEqual(len(src), 0)
+            self.failIfEqual(len(sources), 0)
             for chan in sources:
                 self.assertTrue(chan.path().endswith('CaL'))
                     
@@ -214,7 +222,7 @@ if __name__ == "__main__":
 #     call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_spinstell.hoc'], cwd='../nrn')
     SpinyStellate.test_single_cell()
     # unittest.main()
-    test_creation_time(1000)
+    # test_creation_time(1000)
 
 # 
 # spinystellate.py ends here
