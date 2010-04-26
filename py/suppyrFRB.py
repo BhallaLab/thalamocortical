@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Sep 21 01:45:00 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 12 16:51:28 2010 (+0530)
+# Last-Updated: Mon Apr 26 22:23:32 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 113
+#     Update #: 134
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -53,24 +53,36 @@ from cell import *
 from capool import CaPool
 
 class SupPyrFRB(TraubCell):
-    ENa = 50e-3
-    EK = -95e-3
-    EAR = -35e-3
-    ECa = 125e-3
-    EGABA = -81e-3
-    prototype = TraubCell.read_proto("SupPyrFRB.p", "SupPyrFRB")
+    chan_params = {
+    'ENa': 50e-3,
+    'EK': -95e-3,
+    'EAR': -35e-3,
+    'ECa': 125e-3,
+    'EGABA': -81e-3,
+    'TauCa': 20e-3
+    }
+    ca_dep_chans = ['KAHP', 'KC']
+    num_comp = 74
+    presyn = 72
+    proto_file = 'SupPyrFRB.p'
+    prototype = TraubCell.read_proto(proto_file, "SupPyrFRB", chan_params)
+
     def __init__(self, *args):
 	TraubCell.__init__(self, *args)
-
+        soma_ca_pool = moose.CaConc(self.soma.path + '/CaPool')
+        soma_ca_pool.tau = 100e-3
 
     def _topology(self):
+        raise Exception, 'Deprecated'
 	self.presyn = 72
 
     def _setup_passive(self):
+        raise Exception, 'Deprecated'
 	for comp in self.comp[1:]:
 	    comp.initVm = -70e-3
 
     def _setup_channels(self):
+        raise Exception, 'Deprecated'
 	for comp in self.comp[1:]:
 	    ca_pool = None
 	    ca_dep_chans = []
@@ -152,8 +164,8 @@ class SupPyrFRB(TraubCell):
         t2 = datetime.now()
         delta = t2 - t1
         print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
-        sim.dump_data('data')
-        mycell.dump_cell('suppyrFRB.txt')
+        # sim.dump_data('data')
+        # mycell.dump_cell('suppyrFRB.txt')
         
         mus_vm = pylab.array(vm_table) * 1e3
         nrn_vm = pylab.loadtxt('../nrn/mydata/Vm_suppyrFRB.plot')
@@ -162,7 +174,7 @@ class SupPyrFRB(TraubCell):
         nrn_vm = nrn_vm[:, 1]
         nrn_ca = pylab.loadtxt('../nrn/mydata/Ca_suppyrFRB.plot')
         nrn_ca = nrn_ca[:,1]
-        title = 'SupPyrFRB:' + string.join(mycell.chan_list,',')
+        title = 'SupPyrFRB cell'
         pylab.title(title)
         pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
         pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
