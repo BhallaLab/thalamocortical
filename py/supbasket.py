@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Oct  6 16:52:28 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Apr  8 11:53:57 2010 (+0530)
+# Last-Updated: Mon Apr 26 23:51:09 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 26
+#     Update #: 44
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -53,59 +53,38 @@ from cell import *
 from capool import CaPool
 
 class SupBasket(TraubCell):
-    ENa = 50e-3
-    EK = -100e-3
-    EAR = -40e-3
-    ECa = 125e-3
-    EGABA = -75e-3 # Sanchez-Vives et al. 1997 
-    prototype = TraubCell.read_proto('SupBasket.p', 'SupBasket')
+    chan_params = {
+        'ENa': 50e-3,
+        'EK': -100e-3,
+        'EAR': -40e-3,
+        'ECa': 125e-3,
+        'EGABA': -75e-3, # Sanchez-Vives et al. 1997 
+        'TauCa': 20e-3,
+        'X_AR': 0.0
+        }
+
+    ca_dep_chans = ['KC_FAST']
+    num_comp = 59
+    presyn = 59
+    proto_file = 'SupBasket.p'
+    prototype = TraubCell.read_proto(proto_file, 'SupBasket', chan_params)
     def __init__(self, *args):
+        start = datetime.now()
 	TraubCell.__init__(self, *args)
+        soma_ca_pool = moose.CaConc(self.soma.path + '/CaPool')
+        soma_ca_pool.tau = 50e-3
+        end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('created cell in: %g s' % (delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
 	
     def _topology(self):
-	self.presyn = 59
+        raise Exception, 'Deprecated'
 	
     def _setup_passive(self):
-	for comp in self.comp[1:]:
-	    comp.Em = -65e-3
+        raise Exception, 'Deprecated'
 
     def _setup_channels(self):
-	for comp in self.comp[1:]:
-	    ca_pool = None
-            ca_dep_chans = []
-            ca_chans = []
-            for child in comp.children():
-                obj = moose.Neutral(child)
-                if obj.name == 'CaPool':
-                    ca_pool = moose.CaConc(child)
-                    ca_pool.tau = 20e-3
-                elif obj.className == 'HHChannel':
-                    obj = moose.HHChannel(child)
-                    pyclass = eval(obj.name)
-                    if issubclass(pyclass, KChannel):
-                        obj.Ek = -100e-3
-                        if issubclass(pyclass, KCaChannel):
-                            ca_dep_chans.append(obj)
-                    elif issubclass(pyclass, NaChannel):
-                        obj.Ek = 50e-3
-                    elif issubclass(pyclass, CaChannel):
-                        obj.Ek = 125e-3
-                        if issubclass(pyclass, CaL):
-                            ca_chans.append(obj)
-                    elif issubclass(pyclass, AR):
-                        obj.Ek = -40e-3
-                        obj.X = 0.0
-                if ca_pool:
-                    for channel in ca_chans:
-                        channel.connect('IkSrc', ca_pool, 'current')
-                        print comp.name, ':', channel.name, 'connected to', ca_pool.name
-                    for channel in ca_dep_chans:
-                        channel.useConcentration = 1
-                        ca_pool.connect("concSrc", channel, "concen")
-                        print comp.name, ':', ca_pool.name, 'connected to', channel.name
-                    
-        obj = moose.CaConc(self.soma.path + '/CaPool')
-        obj.tau = 50e-3
+        raise Exception, 'Depreacted'
 
     @classmethod
     def test_single_cell(cls):
