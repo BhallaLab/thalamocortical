@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Oct  6 16:52:28 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Feb 17 17:24:49 2010 (+0530)
+# Last-Updated: Tue Apr 27 00:17:49 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 6
+#     Update #: 31
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -53,18 +53,40 @@ from cell import *
 from capool import CaPool
 
 class SupAxoaxonic(TraubCell):
-    prototype = TraubCell.read_proto('SupAxoaxonic.p', 'SupAxoaxonic')
+    chan_params = {
+        'ENa': 50e-3,
+        'EK': -100e-3,
+        'ECa': 125e-3,
+        'EAR': -40e-3,
+        'EGABA': -75e-3,
+        'X_AR': 0.0,
+        'TauCa': 20e-3
+        }
+    ca_dep_chans = ['KC_FAST']
+    num_comp = 59
+    presyn = 59
+    proto_file = 'SupAxoaxonic.p'
+    prototype = TraubCell.read_proto(proto_file, 'SupAxoaxonic', chan_params)
     def __init__(self, *args):
+        start = datetime.now()
 	TraubCell.__init__(self, *args)
-	
+	caPool = moose.CaPool(self.soma.path + '/CaPool')
+        caPool.tau = 50e-3
+        end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('created cell in: %g s' % (delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
+
     def _topology(self):
+        raise Exception, 'Deprecated'
 	self.presyn = 59
 	
     def _setup_passive(self):
+        raise Exception, 'Deprecated'
 	for comp in self.comp[1:]:
 	    comp.Em = -65e-3
 
     def _setup_channels(self):
+        raise Exception, 'Deprecated'
 	for comp in self.comp[1:]:
 	    ca_pool = None
             ca_dep_chans = []
