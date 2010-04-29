@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Oct  6 16:52:28 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Apr 27 00:17:49 2010 (+0530)
+# Last-Updated: Thu Apr 29 10:59:42 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 31
+#     Update #: 32
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -70,7 +70,7 @@ class SupAxoaxonic(TraubCell):
     def __init__(self, *args):
         start = datetime.now()
 	TraubCell.__init__(self, *args)
-	caPool = moose.CaPool(self.soma.path + '/CaPool')
+	caPool = moose.CaConc(self.soma.path + '/CaPool')
         caPool.tau = 50e-3
         end = datetime.now()
         delta = end - start
