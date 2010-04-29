@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Oct  6 16:52:28 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Apr 29 10:59:42 2010 (+0530)
+# Last-Updated: Thu Apr 29 11:01:20 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 32
+#     Update #: 34
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -78,51 +78,12 @@ class SupAxoaxonic(TraubCell):
 
     def _topology(self):
         raise Exception, 'Deprecated'
-	self.presyn = 59
 	
     def _setup_passive(self):
         raise Exception, 'Deprecated'
-	for comp in self.comp[1:]:
-	    comp.Em = -65e-3
 
     def _setup_channels(self):
         raise Exception, 'Deprecated'
-	for comp in self.comp[1:]:
-	    ca_pool = None
-            ca_dep_chans = []
-            ca_chans = []
-            for child in comp.children():
-                obj = moose.Neutral(child)
-                if obj.name == 'CaPool':
-                    ca_pool = moose.CaConc(child)
-                    ca_pool.tau = 20e-3
-                elif obj.className == 'HHChannel':
-                    obj = moose.HHChannel(child)
-                    pyclass = eval(obj.name)
-                    if issubclass(pyclass, KChannel):
-                        obj.Ek = -100e-3
-                        if issubclass(pyclass, KCaChannel):
-                            ca_dep_chans.append(obj)
-                    elif issubclass(pyclass, NaChannel):
-                        obj.Ek = 50e-3
-                    elif issubclass(pyclass, CaChannel):
-                        obj.Ek = 125e-3
-                        if issubclass(pyclass, CaL):
-                            ca_chans.append(obj)
-                    elif issubclass(pyclass, AR):
-                        obj.Ek = -40e-3
-                        obj.X = 0.0
-                if ca_pool:
-                    for channel in ca_chans:
-                        channel.connect('IkSrc', ca_pool, 'current')
-                        print comp.name, ':', channel.name, 'connected to', ca_pool.name
-                    for channel in ca_dep_chans:
-                        channel.useConcentration = 1
-                        ca_pool.connect("concSrc", channel, "concen")
-                        print comp.name, ':', ca_pool.name, 'connected to', channel.name
-                    
-        obj = moose.CaConc(self.soma.path + '/CaPool')
-        obj.tau = 50e-3
 
     @classmethod
     def test_single_cell(cls):
