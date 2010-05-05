@@ -1,0 +1,515 @@
+begintemplate spinstell
+public init, topol, basic_shape, subsets
+public geom, biophys
+public comp, level, soma, dendrites
+public soma_dendrites, axon, all
+public presyn_comp, top_level
+external traub_connect
+
+objref this, all
+
+create comp[59 + 1]
+
+objref level[9 + 1], soma, dendrites, soma_dendrites, axon
+
+proc init(){
+    traub_connect( 59+1)
+    comp[0] delete_section()
+    presyn_comp = 57
+    objref soma, axon, dendrites, soma_dendrites
+    objref level
+    topol()
+    shape()
+    geom()
+    subsets()
+    biophys()
+    forsec all if (ismembrane("ar")){ m0_ar = 0 }
+    set_doubler()
+    if (doubler){ double_dend_cond()}
+    more_adjustments()
+}
+
+proc set_doubler(){
+    doubler = 1
+}
+
+proc topol() {
+    // create comp[ 60] // note one greater than numcomp due to fortran indicies
+    // last argument, parent locat_aion for connection
+    // is overwritten to 1 for parents with connected children 
+    // in below traub_connect proc calls
+    traub_connect(this,  1,  54,   0.0610434081, 0)
+    traub_connect(this,  1,  2,   0.0698996835, 1)
+    traub_connect(this,  1,  15,   0.0698996835, 1)
+    traub_connect(this,  1,  28,   0.0698996835, 1)
+    traub_connect(this,  1,  41,   0.0698996835, 1)
+    traub_connect(this,  2,  3,   0.0200101501, 1)
+    traub_connect(this,  2,  4,   0.0200101501, 1)
+    traub_connect(this,  3,  4,   0.0139626222, 1)
+    traub_connect(this,  3,  5,   0.00790657526, 1)
+    traub_connect(this,  3,  6,   0.00790657526, 1)
+    traub_connect(this,  4,  7,   0.0139626222,  1.)
+    traub_connect(this,  5,  6,   0.00551467844, 1)
+    traub_connect(this,  5,  8,   0.00551467844,  1.)
+    traub_connect(this,  6,  9,   0.00551467844,  1.)
+    traub_connect(this,  7,  10,   0.0139626222,  1.)
+    traub_connect(this,  8,  11,   0.00551467844,  1.)
+    traub_connect(this,  11,  12,   0.00551467844,  1.)
+    traub_connect(this,  12,  13,   0.00551467844,  1.)
+    traub_connect(this,  13,  14,   0.00551467844,  1.)
+    traub_connect(this,  15,  16,   0.0200101501, 1)
+    traub_connect(this,  15,  17,   0.0200101501, 1)
+    traub_connect(this,  16,  17,   0.0139626222, 1)
+    traub_connect(this,  16,  18,   0.00790657526, 1)
+    traub_connect(this,  16,  19,   0.00790657526, 1)
+    traub_connect(this,  17,  20,   0.0139626222,  1.)
+    traub_connect(this,  18,  19,   0.00551467844, 1)
+    traub_connect(this,  18,  21,   0.00551467844,  1.)
+    traub_connect(this,  19,  22,   0.00551467844,  1.)
+    traub_connect(this,  20,  23,   0.0139626222,  1.)
+    traub_connect(this,  21,  24,   0.00551467844,  1.)
+    traub_connect(this,  24,  25,   0.00551467844,  1.)
+    traub_connect(this,  25,  26,   0.00551467844,  1.)
+    traub_connect(this,  26,  27,   0.00551467844,  1.)
+    traub_connect(this,  28,  29,   0.0200101501, 1)
+    traub_connect(this,  28,  30,   0.0200101501, 1)
+    traub_connect(this,  29,  30,   0.0139626222, 1)
+    traub_connect(this,  29,  31,   0.00790657526, 1)
+    traub_connect(this,  29,  32,   0.00790657526, 1)
+    traub_connect(this,  30,  33,   0.0139626222,  1.)
+    traub_connect(this,  31,  32,   0.00551467844, 1)
+    traub_connect(this,  31,  34,   0.00551467844,  1.)
+    traub_connect(this,  32,  35,   0.00551467844,  1.)
+    traub_connect(this,  33,  36,   0.0139626222,  1.)
+    traub_connect(this,  34,  37,   0.00551467844,  1.)
+    traub_connect(this,  37,  38,   0.00551467844,  1.)
+    traub_connect(this,  38,  39,   0.00551467844,  1.)
+    traub_connect(this,  39,  40,   0.00551467844,  1.)
+    traub_connect(this,  41,  42,   0.0200101501, 1)
+    traub_connect(this,  41,  43,   0.0200101501, 1)
+    traub_connect(this,  42,  43,   0.0139626222, 1)
+    traub_connect(this,  42,  44,   0.00790657526, 1)
+    traub_connect(this,  42,  45,   0.00790657526, 1)
+    traub_connect(this,  43,  46,   0.0139626222,  1.)
+    traub_connect(this,  44,  45,   0.00551467844, 1)
+    traub_connect(this,  44,  47,   0.00551467844,  1.)
+    traub_connect(this,  45,  48,   0.00551467844,  1.)
+    traub_connect(this,  46,  49,   0.0139626222,  1.)
+    traub_connect(this,  47,  50,   0.00551467844,  1.)
+    traub_connect(this,  50,  51,   0.00551467844,  1.)
+    traub_connect(this,  51,  52,   0.00551467844,  1.)
+    traub_connect(this,  52,  53,   0.00551467844,  1.)
+    traub_connect(this,  54,  55,   0.026078893,  1.)
+    traub_connect(this,  55,  56,   0.0185405311, 1)
+    traub_connect(this,  55,  58,   0.0185405311, 1)
+    traub_connect(this,  56,  57,   0.01570795,  1.)
+    traub_connect(this,  56,  58,   0.01570795, 1)
+    traub_connect(this,  58,  59,   0.01570795,  1.)
+    access comp[1] // handy statement if want to start gui's from nrnmainmenu
+}
+
+proc geom() {
+    top_level = 9
+    objref level[top_level+1]
+    for i = 0, top_level { level[i] = new SectionList() }
+    
+     comp[ 1] { level[ 1].append() L=  20. diam = 2*  7.5 }
+     comp[ 2] { level[ 2].append() L=  40. diam = 2*  1.06 }
+     comp[ 3] { level[ 3].append() L=  40. diam = 2*  0.666666667 }
+     comp[ 4] { level[ 3].append() L=  40. diam = 2*  0.666666667 }
+     comp[ 5] { level[ 4].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 6] { level[ 4].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 7] { level[ 4].append() L=  40. diam = 2*  0.666666667 }
+     comp[ 8] { level[ 5].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 9] { level[ 5].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 10] { level[ 5].append() L=  40. diam = 2*  0.666666667 }
+     comp[ 11] { level[ 6].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 12] { level[ 7].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 13] { level[ 8].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 14] { level[ 9].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 15] { level[ 2].append() L=  40. diam = 2*  1.06 }
+     comp[ 16] { level[ 3].append() L=  40. diam = 2*  0.666666667 }
+     comp[ 17] { level[ 3].append() L=  40. diam = 2*  0.666666667 }
+     comp[ 18] { level[ 4].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 19] { level[ 4].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 20] { level[ 4].append() L=  40. diam = 2*  0.666666667 }
+     comp[ 21] { level[ 5].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 22] { level[ 5].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 23] { level[ 5].append() L=  40. diam = 2*  0.666666667 }
+     comp[ 24] { level[ 6].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 25] { level[ 7].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 26] { level[ 8].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 27] { level[ 9].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 28] { level[ 2].append() L=  40. diam = 2*  1.06 }
+     comp[ 29] { level[ 3].append() L=  40. diam = 2*  0.666666667 }
+     comp[ 30] { level[ 3].append() L=  40. diam = 2*  0.666666667 }
+     comp[ 31] { level[ 4].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 32] { level[ 4].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 33] { level[ 4].append() L=  40. diam = 2*  0.666666667 }
+     comp[ 34] { level[ 5].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 35] { level[ 5].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 36] { level[ 5].append() L=  40. diam = 2*  0.666666667 }
+     comp[ 37] { level[ 6].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 38] { level[ 7].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 39] { level[ 8].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 40] { level[ 9].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 41] { level[ 2].append() L=  40. diam = 2*  1.06 }
+     comp[ 42] { level[ 3].append() L=  40. diam = 2*  0.666666667 }
+     comp[ 43] { level[ 3].append() L=  40. diam = 2*  0.666666667 }
+     comp[ 44] { level[ 4].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 45] { level[ 4].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 46] { level[ 4].append() L=  40. diam = 2*  0.666666667 }
+     comp[ 47] { level[ 5].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 48] { level[ 5].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 49] { level[ 5].append() L=  40. diam = 2*  0.666666667 }
+     comp[ 50] { level[ 6].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 51] { level[ 7].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 52] { level[ 8].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 53] { level[ 9].append() L=  40. diam = 2*  0.418972332 }
+     comp[ 54] { level[ 0].append() L=  50. diam = 2*  0.7 }
+     comp[ 55] { level[ 0].append() L=  50. diam = 2*  0.6 }
+     comp[ 56] { level[ 0].append() L=  50. diam = 2*  0.5 }
+     comp[ 57] { level[ 0].append() L=  50. diam = 2*  0.5 }
+     comp[ 58] { level[ 0].append() L=  50. diam = 2*  0.5 }
+     comp[ 59] { level[ 0].append() L=  50. diam = 2*  0.5 }
+ } 
+ 
+objref all
+ proc subsets() { local i
+     objref soma, dendrites, soma_dendrites, axon
+     objref all
+     soma = new SectionList()     
+     dendrites = new SectionList()     
+     soma_dendrites = new SectionList()
+     axon = new SectionList()
+     for i=1,top_level {
+         forsec level[i] { // recall level 0 is axon, 1 is soma, higher are dends
+             soma_dendrites.append()
+             if (i>1) {dendrites.append()}
+         }
+     }
+     forsec level[1] {
+         soma.append()
+     }
+     forsec level[0] { axon.append() }
+     all = new SectionList()
+     for i=1, 59 comp[i] all.append()
+ }
+ 
+ proc shape(){}
+ 
+ proc biophys() {
+     // 
+     //       insert the mechanisms and assign max conductances
+     // 
+     forsec all { insert pas }   // g_pas has two values; soma-dend,axon
+    
+     forsec level[ 0] {
+	 insert naf2
+	 gbar_naf2 =   0.4
+	 insert kdr_fs
+	 gbar_kdr_fs =   0.4
+	 insert ka
+	 gbar_ka =   0.002
+	 insert k2
+	 gbar_k2 =   0.0001
+     }
+    forsec level[ 1] {
+	 insert naf2
+	 gbar_naf2 =   0.15
+	 insert napf_spinstell
+	 gbar_napf_spinstell =   0.00015
+	 insert kdr_fs
+	 gbar_kdr_fs =   0.1
+	 insert kc_fast
+	 gbar_kc_fast =   0.01
+	 insert ka
+	 gbar_ka =   0.03
+	 insert km
+	 gbar_km =   0.00375
+	 insert k2
+	 gbar_k2 =   0.0001
+	 insert kahp_slower
+	 gbar_kahp_slower =   0.0001
+	 insert cal
+	 gbar_cal =   0.0005
+	 insert cat_a
+	 gbar_cat_a =   0.0001
+	 insert ar
+	 gbar_ar =   0.00025
+	 insert cad
+	 // *** ca diffusion: beta=1/tau
+	 beta_cad  =   0.02
+	 // cafor(I) (FORTRAN) converted to phi (NEURON)
+	 phi_cad =   260000.
+     }
+     forsec level[ 2] {
+	 insert naf2
+	 gbar_naf2 =   0.075
+	 insert napf_spinstell
+	 gbar_napf_spinstell =   7.5E-05
+	 insert kdr_fs
+	 gbar_kdr_fs =   0.075
+	 insert kc_fast
+	 gbar_kc_fast =   0.01
+	 insert ka
+	 gbar_ka =   0.03
+	 insert km
+	 gbar_km =   0.00375
+	 insert k2
+	 gbar_k2 =   0.0001
+	 insert kahp_slower
+	 gbar_kahp_slower =   0.0001
+	 insert cal
+	 gbar_cal =   0.0005
+	 insert cat_a
+	 gbar_cat_a =   0.0001
+	 insert ar
+	 gbar_ar =   0.00025
+	 insert cad
+	 // *** ca diffusion: beta=1/tau
+	 beta_cad  =   0.05
+	 // cafor(I) (FORTRAN) converted to phi (NEURON)
+	 phi_cad =   260000.
+     } 
+     forsec level[ 3] {
+	 insert naf2
+	 gbar_naf2 =   0.075
+	 insert napf_spinstell
+	 gbar_napf_spinstell =   7.5E-05
+	 insert kdr_fs
+	 gbar_kdr_fs =   0.075
+	 insert kc_fast
+	 gbar_kc_fast =   0.01
+	 insert ka
+	 gbar_ka =   0.002
+	 insert km
+	 gbar_km =   0.00375
+	 insert k2
+	 gbar_k2 =   0.0001
+	 insert kahp_slower
+	 gbar_kahp_slower =   0.0001
+	 insert cal
+	 gbar_cal =   0.0005
+	 insert cat_a
+	 gbar_cat_a =   0.0001
+	 insert ar
+	 gbar_ar =   0.00025
+	 insert cad
+	 // *** ca diffusion: beta=1/tau
+	 beta_cad  =   0.05
+	 // cafor(I) (FORTRAN) converted to phi (NEURON)
+	 phi_cad =   260000.
+     }
+     forsec level[ 4] {
+	 insert naf2
+	 gbar_naf2 =   0.005
+	 insert napf_spinstell
+	 gbar_napf_spinstell =   5.E-06
+	 insert kc_fast
+	 gbar_kc_fast =   0.01
+	 insert ka
+	 gbar_ka =   0.002
+	 insert km
+	 gbar_km =   0.00375
+	 insert k2
+	 gbar_k2 =   0.0001
+	 insert kahp_slower
+	 gbar_kahp_slower =   0.0001
+	 insert cal
+	 gbar_cal =   0.0005
+	 insert cat_a
+	 gbar_cat_a =   0.0001
+	 insert ar
+	 gbar_ar =   0.00025
+	 insert cad
+	 // *** ca diffusion: beta=1/tau
+	 beta_cad  =   0.05
+	 // cafor(I) (FORTRAN) converted to phi (NEURON)
+	 phi_cad =   260000.
+     }
+     forsec level[ 5] {
+	 insert naf2
+	 gbar_naf2 =   0.005
+	 insert napf_spinstell
+	 gbar_napf_spinstell =   5.E-06
+	 insert ka
+	 gbar_ka =   0.002
+	 insert km
+	 gbar_km =   0.00375
+	 insert k2
+	 gbar_k2 =   0.0001
+	 insert kahp_slower
+	 gbar_kahp_slower =   0.0001
+	 insert cal
+	 gbar_cal =   0.0005
+	 insert cat_a
+	 gbar_cat_a =   0.0001
+	 insert ar
+	 gbar_ar =   0.00025
+	 insert cad
+	 // *** ca diffusion: beta=1/tau
+	 beta_cad  =   0.05
+	 // cafor(I) (FORTRAN) converted to phi (NEURON)
+	 phi_cad =   260000.
+     }
+     forsec level[ 6] {
+	 insert naf2
+	 gbar_naf2 =   0.005
+	 insert napf_spinstell
+	 gbar_napf_spinstell =   5.E-06
+	 insert ka
+	 gbar_ka =   0.002
+	 insert km
+	 gbar_km =   0.00375
+	 insert k2
+	 gbar_k2 =   0.0001
+	 insert kahp_slower
+	 gbar_kahp_slower =   0.0001
+	 insert cal
+	 gbar_cal =   0.0005
+	 insert cat_a
+	 gbar_cat_a =   0.0001
+	 insert ar
+	 gbar_ar =   0.00025
+	 insert cad
+	 // *** ca diffusion: beta=1/tau
+	 beta_cad  =   0.05
+	 // cafor(I) (FORTRAN) converted to phi (NEURON)
+	 phi_cad =   260000.
+     }
+     forsec level[ 7] {
+	 insert naf2
+	 gbar_naf2 =   0.005
+	 insert napf_spinstell
+	 gbar_napf_spinstell =   5.E-06
+	 insert ka
+	 gbar_ka =   0.002
+	 insert km
+	 gbar_km =   0.00375
+	 insert k2
+	 gbar_k2 =   0.0001
+	 insert kahp_slower
+	 gbar_kahp_slower =   0.0001
+	 insert cal
+	 gbar_cal =   0.003
+	 insert cat_a
+	 gbar_cat_a =   0.0001
+	 insert ar
+	 gbar_ar =   0.00025
+	 insert cad
+	 // *** ca diffusion: beta=1/tau
+	 beta_cad  =   0.05
+	 // cafor(I) (FORTRAN) converted to phi (NEURON)
+	 phi_cad =   260000.
+     }
+     forsec level[ 8] {
+	 insert naf2
+	 gbar_naf2 =   0.005
+	 insert napf_spinstell
+	 gbar_napf_spinstell =   5.E-06
+	 insert ka
+	 gbar_ka =   0.002
+	 insert km
+	 gbar_km =   0.00375
+	 insert k2
+	 gbar_k2 =   0.0001
+	 insert kahp_slower
+	 gbar_kahp_slower =   0.0001
+	 insert cal
+	 gbar_cal =   0.003
+	 insert cat_a
+	 gbar_cat_a =   0.0001
+	 insert ar
+	 gbar_ar =   0.00025
+	 insert cad
+	 // *** ca diffusion: beta=1/tau
+	 beta_cad  =   0.05
+	 // cafor(I) (FORTRAN) converted to phi (NEURON)
+	 phi_cad =   260000.
+     }
+     forsec level[ 9] {
+	 insert naf2
+	 gbar_naf2 =   0.005
+	 insert napf_spinstell
+	 gbar_napf_spinstell =   5.E-06
+	 insert ka
+	 gbar_ka =   0.002
+	 insert km
+	 gbar_km =   0.00375
+	 insert k2
+	 gbar_k2 =   0.0001
+	 insert kahp_slower
+	 gbar_kahp_slower =   0.0001
+	 insert cal
+	 gbar_cal =   0.003
+	 insert cat_a
+	 gbar_cat_a =   0.0001
+	 insert ar
+	 gbar_ar =   0.00025
+	 insert cad
+	 // *** ca diffusion: beta=1/tau
+	 beta_cad  =   0.05
+	 // cafor(I) (FORTRAN) converted to phi (NEURON)
+	 phi_cad =   260000.
+     }
+     forsec all {
+	 cm =   0.9  // assign global specific capac.
+     }
+     // 
+     //  passive membrane resistance (leak) and axial resistance
+     // 
+     forsec soma_dendrites {
+	 g_pas =   2.E-05
+	 Ra =   250.
+     }
+     forsec axon {
+	 g_pas =   0.001
+	 Ra =   100.
+     }
+     ceiling_cad = 1e6 //  nearly unlimited Ca concentration
+     // print "made it to end of initialization from SCORTMAJ_FRB()"
+ }  // end of biophys
+ 
+ proc double_dend_cond() {
+     spine_area_multiplier = 2.0
+     forsec dendrites {
+         if (ismembrane("napf_spinstell")) { gbar_napf_spinstell *= spine_area_multiplier }
+         if (ismembrane("napf_spinstellf")) { gbar_napf_spinstellf *= spine_area_multiplier }
+         if (ismembrane("napf_spinstellf_tcr")) { gbar_napf_spinstellf_tcr *= spine_area_multiplier }
+         if (ismembrane("naf2")) { gbar_naf2 *= spine_area_multiplier }
+         if (ismembrane("naf2_tcr")) { gbar_naf2_tcr *= spine_area_multiplier }
+         if (ismembrane("naf22")) { gbar_naf22 *= spine_area_multiplier }
+         if (ismembrane("kc_fast")) { gbar_kc_fast *= spine_area_multiplier }
+         if (ismembrane("kc_fast_fast")) { gbar_kc_fast_fast *= spine_area_multiplier }
+         if (ismembrane("kahp")) { gbar_kahp *= spine_area_multiplier }
+         if (ismembrane("kahp_slower")) { gbar_kahp_slower *= spine_area_multiplier }
+         if (ismembrane("km")) { gbar_km *= spine_area_multiplier }
+         if (ismembrane("kdr_fs")) { gbar_kdr_fs *= spine_area_multiplier }
+         if (ismembrane("kdr_fs_fs")) { gbar_kdr_fs_fs *= spine_area_multiplier }
+         if (ismembrane("ka")) { gbar_ka *= spine_area_multiplier }
+         if (ismembrane("ka_ib")) { gbar_ka_ib *= spine_area_multiplier }
+         if (ismembrane("k2")) { gbar_k2 *= spine_area_multiplier }
+         if (ismembrane("cal")) { gbar_cal *= spine_area_multiplier }
+         if (ismembrane("cat_a")) { gbar_cat_a *= spine_area_multiplier }
+         if (ismembrane("cat_a_a")) { gbar_cat_a_a *= spine_area_multiplier }
+         if (ismembrane("ar")) { gbar_ar *= spine_area_multiplier }
+         if (ismembrane("pas")) { g_pas *= spine_area_multiplier }
+         cm = cm * spine_area_multiplier
+     }
+ }
+ 
+ proc more_adjustments() {
+     forsec all {
+         if (ismembrane("naf2")) {fastNa_shift_naf2=-2.5}
+	 if (ismembrane("napf_spinstell")) {fastNa_shift_napf_spinstell=-2.5}
+	 // global reversal potentials
+	 if (ismembrane("kdr_fs") || ismembrane("ka") || ismembrane("kahp_slower") || ismembrane("kc_fast") || ismembrane("km") || ismembrane("k2")){ ek =  -100.}
+	 e_pas =  -65.
+	 if (ismembrane("naf2") || ismembrane("napf_ss")) {ena =   50.}
+	 if (ismembrane("cal") || ismembrane("cat_a")){vca =   125.}
+	 if (ismembrane("ar")) erev_ar =  -40.
+	 e_gaba_a =  -75.
+     }
+ }
+ endtemplate spinstell

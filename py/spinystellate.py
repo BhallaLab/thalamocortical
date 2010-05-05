@@ -4,11 +4,11 @@
 # Description: 
 # Author: subhasis ray
 # Maintainer: 
-# Created: Wed Apr 29 10:24:37 2009 (+0530)
+# Created: Tue Sep 29 11:43:22 2009 (+0530)
 # Version: 
-# Last-Updated: Sun May  3 00:25:04 2009 (+0530)
-#           By: subhasis ray
-#     Update #: 428
+# Last-Updated: Thu Apr 29 17:07:25 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 497
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -17,9 +17,7 @@
 
 # Commentary: 
 # 
-# Initial version of a SpinyStellate cell implementation. Will
-# refactor into a base class for Cell and then subclass here once I
-# get the hang of the commonalities.
+# 
 # 
 # 
 
@@ -27,349 +25,204 @@
 # 
 # 
 # 
-# 
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as
-# published by the Free Software Foundation; either version 3, or
-# (at your option) any later version.
-# 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License
-# along with this program; see the file COPYING.  If not, write to
-# the Free Software Foundation, Inc., 51 Franklin Street, Fifth
-# Floor, Boston, MA 02110-1301, USA.
-# 
-# 
-
 # Code:
-from collections import deque, defaultdict
-import moose
 
-from kchans import *
-from nachans import *
-from cachans import *
-from capool import *
-from archan import *
-
-from compartment import MyCompartment
-
-
-class SpinyStellate(moose.Cell):
-    spine_area_mult = 2.0 # accomodates apine area
-    #
-    #     The dendritic structure is like this:
-    #
-    # level:    2  3  4  5   6  7   8    9
-    #           c1-c2-c4-c7
-    #            \
-    #              c3-c5-c8
-    #               \
-    #                 c6-c9-c10-c11-c12-c13
-    #
-    # The compartments are numbered 1 to 13 and then we traverse the
-    # tree in a breadth first manner.
-    #
-    # The following list captures the structure of the dendrites.
-    # it is like:
-    # subtree ::= [ node, child_subtree1, child_subtree2, child_subtree3, ...]
-    dendritic_tree = [1, [2, [ 4, [7] ] ], 
-                      [3, [5, [8]], 
-                       [6, [9, [10, [11, [12, [13]]]]]]]]
-    
-    # radius in microns - the keys are the dendritic compartment
-    # identities in dendritic_tree
-    radius = {0: 7.5, # soma - actually this will be compartment no. 1
-	      1: 1.06, 
-	      2: 0.666666667,
-	      3: 0.666666667, 
-	      4: 0.666666667, 
-	      5: 0.418972332, 
-	      6: 0.418972332, 
-	      7: 0.666666667, 
-	      8: 0.418972332, 
-	      9: 0.418972332, 
-	      10: 0.418972332, 
-	      11: 0.418972332, 
-	      12: 0.418972332, 
-	      13: 0.418972332} 
-    ENa = 50e-3
-    EK = -100e-3
-    ECa = 125e-3
-    Em = -65e-3
-    EAR = -40e-3
-    channel_density = {0: {'NaF2':     4000.0,
-                           'KDR_FS':   4000.0,
-                           'KA':       20.0,
-                           'K2':       1.0},
-
-                       1: {'NaF2':     1500.0,
-                           'NaPF_SS':  1.5,
-                           'KDR_FS':   1000.0,
-                           'KC_FAST':  100.0,
-                           'KA':       300.0,
-                           'KM':       37.5,
-                           'K2':       1.0,
-                           'KAHP_SLOWER':      1.0,
-                           'CaL':      5.0,
-                           'CaT_A':    1.0,
-                           'AR':       2.5},
-
-                       2:{'NaF2':      750.0,
-                          'NaPF_SS':   0.75,
-                          'KDR_FS':    750.0,
-                          'KC_FAST':   100.0,
-                          'KA':        300.0,
-                          'KM':        37.5,
-                          'K2':        1.0,
-                          'KAHP_SLOWER':       1.0,
-                          'CaL':       5.0,
-                          'CaT_A':     1.0,
-                          'AR':        2.5},
-
-                       3: {'NaF2':     750.0,
-                           'NaPF_SS':  0.75,
-                           'KDR_FS':   750.0,
-                           'KC_FAST':  100.0,
-                           'KA':       20.0,
-                           'KM':       37.5,
-                           'K2':       1.0,
-                           'KAHP_SLOWER': 1.0,
-                           'CaL':      5.0,
-                           'CaT_A':    1.0,
-                           'AR':       2.5},
-                       
-                       4: {'NaF2': 0.005 * 1e4,
-                           'NaPF_SS': 5.E-06 * 1e4,
-                           'KC_FAST': 0.01 * 1e4,
-                           'KA': 0.002 * 1e4,
-                           'KM': 0.00375 * 1e4,
-                           'K2': 0.0001 * 1e4,
-                           'KAHP_SLOWER': 0.0001 * 1e4,
-                           'CaL': 0.0005 * 1e4,
-                           'CaT_A': 0.0001 * 1e4,
-                           'AR': 0.00025 * 1e4},
-                       
-                       5: {'NaF2': 0.005 * 1e4,
-                           'NaPF_SS': 5.E-06 * 1e4,
-                           'KA': 0.002 * 1e4,
-                           'KM': 0.00375 * 1e4,
-                           'K2': 0.0001 * 1e4,
-                           'KAHP_SLOWER': 0.0001 * 1e4,
-                           'CaL': 0.0005 * 1e4,
-                           'CaT_A': 0.0001 * 1e4,
-                           'AR': 0.00025 * 1e4},
-
-                       6: {'NaF2': 0.005 * 1e4,
-                           'NaPF_SS': 5.E-06 * 1e4,
-                           'KA': 0.002 * 1e4,
-                           'KM': 0.00375 * 1e4,
-                           'K2': 0.0001 * 1e4,
-                           'KAHP_SLOWER': 0.0001 * 1e4,
-                           'CaL': 0.0005 * 1e4,
-                           'CaT_A': 0.0001 * 1e4,
-                           'AR': 0.00025 * 1e4},
-
-                       7: {'NaF2': 0.005 * 1e4, 
-                           'NaPF_SS': 5.E-06 * 1e4, 
-                           'KA': 0.002 * 1e4, 
-                           'KM': 0.00375 * 1e4, 
-                           'K2': 0.0001 * 1e4, 
-                           'KAHP_SLOWER': 0.0001 * 1e4, 
-                           'CaL': 0.003 * 1e4, 
-                           'CaT_A': 0.0001 * 1e4, 
-                           'AR': 0.00025 * 1e4},
-
-                       8: {'NaF2': 0.005 * 1e4, 
-                           'NaPF_SS': 5.E-06 * 1e4, 
-                           'KA': 0.002 * 1e4, 
-                           'KM': 0.00375 * 1e4, 
-                           'K2': 0.0001 * 1e4, 
-                           'KAHP_SLOWER': 0.0001 * 1e4, 
-                           'CaL': 0.003 * 1e4, 
-                           'CaT_A': 0.0001 * 1e4, 
-                           'AR': 0.00025 * 1e4},
-
-                       9: {'NaF2': 0.005 * 1e4,
-                           'NaPF_SS': 5.E-06 * 1e4,
-                           'KA': 0.002 * 1e4,
-                           'KM': 0.00375 * 1e4,
-                           'K2': 0.0001 * 1e4,
-                           'KAHP_SLOWER': 0.0001 * 1e4,
-                           'CaL': 0.003 * 1e4,
-                           'CaT_A': 0.0001 * 1e4,
-                           'AR': 0.00025 * 1e4}}
-    
-    def __init__(self, *args):
-	moose.Cell.__init__(self, *args)
-	self.levels = defaultdict(set) # Python >= 2.5 
-	self.dendrites = set() # List of compartments that are not
-				 # part of axon
-	self.axon = []
-        self._create_cell()
-        self._set_passiveprops()
-        self._connect_axial(self.soma)
-        self._insert_channels()
-        self.soma.insertCaPool(5.2e-6 / 2e-10, 50e-3)
-        for comp in self.dendrites:
-            comp.insertCaPool(5.2e-6 / 2e-10, 20e-3)
-
-    def _create_axon(self):
-        """Create the axonal structure.
-
-        It is like:       
-                          a_0_0 -- a_0_1
-                         /
-                        /
-        soma -- a_0 -- a_1
-                       \
-                        \
-                         a_1_0 --  a_1_1
-        """
-        self.axon.append(MyCompartment('a_0', self.soma))
-        self.axon[-1].diameter = 0.7 * 2e-6
-        self.axon.append(MyCompartment('a_1', self.axon[0]))
-        self.axon[-1].diameter = 0.6 *  2e-6
-        self.axon.append(MyCompartment('a_0_0', self.axon[1]))
-        self.axon.append(MyCompartment('a_1_0', self.axon[1]))
-        self.axon.append(MyCompartment('a_0_1', self.axon[2]))
-        self.axon.append(MyCompartment('a_1_1', self.axon[3]))
-        for comp in self.axon[2:]: comp.diameter = 0.5 * 2e-6
-        for comp in self.axon: 
-            self.levels[0].add(comp)
-            comp.length = 50e-6
-        
-    def _create_dtree(self, name_prefix, parent, tree, level, default_length=40e-6, radius_dict=radius):
-	"""Create the dendritic tree structure with compartments.
-
-	Returns the root."""
-        if not tree:
-            return
-        comp = MyCompartment(name_prefix + str(tree[0]), parent)
-        comp.length = default_length
-        comp.diameter = radius_dict[tree[0]] * 2e-6
-        self.levels[level].add(comp)
-        self.dendrites.add(comp)
-        for subtree in tree[1:]:
-            self._create_dtree(name_prefix, comp, subtree, level+1, default_length, radius_dict)
-        
-
-    def _create_cell(self):
-        """Create the compartmental structure and set the geometry."""
-	if not hasattr(self, 'levels'):
-	    self.levels = defaultdict(set)
-	comp = MyCompartment('soma', self)
-	comp.length = 20e-6
-	comp.diameter = 7.5 * 2e-6
-	self.soma = comp
-	self.levels[1].add(comp)
-        t1 = datetime.now()
-	for i in range(4):
-	   self. _create_dtree('d_' + str(i) + '_', comp, SpinyStellate.dendritic_tree, 2)
-        t2 = datetime.now()
-        delta = t2 - t1
-        print 'create_dtree took: ', delta.seconds + 1e-6 * delta.microseconds
-        self._create_axon()
-
-    def _set_passiveprops(self):
-        """Set the passive properties of the cells."""
-        self.soma.setSpecificCm(9e-3)
-        self.soma.setSpecificRm(5.0)
-        self.soma.setSpecificRa(2.5)
-        self.soma.Em = SpinyStellate.Em
-        self.soma.initVm = SpinyStellate.Em
-        for comp in self.dendrites:
-            comp.setSpecificCm(9e-3 * SpinyStellate.spine_area_mult)
-            comp.setSpecificRm(5.0/SpinyStellate.spine_area_mult)
-            comp.setSpecificRa(2.5)
-            comp.Em = SpinyStellate.Em
-            comp.initVm = SpinyStellate.Em
-        for comp in self.axon:
-            comp.setSpecificCm(9e-3)
-            comp.setSpecificRm(0.1)
-            comp.setSpecificRa(1.0)
-            comp.Em = SpinyStellate.Em
-            comp.initVm = SpinyStellate.Em
-
-    def _connect_axial(self, root):
-        """Connect parent-child compartments via axial-raxial
-        messages."""
-        parent = moose.Neutral(root.parent)
-        if parent.className == 'Compartment' and not hasattr(root, 'axial_connected'):
-            root.connect('raxial', parent, 'axial')
-            root.axial_connected = True
-        
-        for child in root.children():
-            obj = moose.Neutral(child)
-            if obj.className == 'Compartment':
-                self._connect_axial(obj)
-
-    def _insert_channels(self):
-        t1 = datetime.now()
-        for level in range(10):
-            comp_set = self.levels[level]
-            mult = 1.0
-            if level > 1:
-                mult = SpinyStellate.spine_area_mult
-                
-            for comp in comp_set:
-                for channel, density in SpinyStellate.channel_density[level].items():
-                    chan = comp.insertChannel(channel, mult * density)
-                    if  isinstance(chan, KChannel):
-                        chan.Ek = SpinyStellate.EK
-                    elif isinstance(chan, NaChannel):
-                        chan.Ek = SpinyStellate.ENa
-                    elif isinstance(chan, CaChannel):
-                        chan.Ek = SpinyStellate.ECa
-                    elif isinstance(chan, AR):
-                        chan.Ek = -SpinyStellate.EAR
-                        chan.X = 0.0
-                    else:
-                        print 'ERROR: Unknown channel type:', channel
-        t2 = datetime.now()
-        delta = t2 - t1
-        print 'insert channels: ', delta.seconds + 1e-6 * delta.microseconds
-
-def dump_cell(cell, filename):
-    file_obj = open(filename, 'w')
-    for lvl in cell.levels:
-        for comp in cell.levels[lvl]:
-            file_obj.write(str(lvl) + ' ' + comp.get_props() + '\n')
-    file_obj.close()
-
-
-#import pylab
-import pymoose
-from simulation import Simulation
-
-#import timeit
 from datetime import datetime
-import pylab
-if __name__ == '__main__':
-    sim = Simulation()
-    t1 = datetime.now()
-    s = SpinyStellate('ss', sim.model)
-    t2 = datetime.now()
-    delta_t = t2 - t1
-    print '### TIME SPENT IN CELL CREATION: ', delta_t.seconds + delta_t.microseconds * 1e-6
-#    pymoose.printtree(s.soma)
-    dump_cell(s, 'spinystellate.p')
-    path = s.soma.path + '/a_0/a_1/a_0_0/a_0_1'
-    a2 = MyCompartment(path)
-    vm_table = s.soma.insertRecorder('Vm', sim.data)
-    s.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=0.0, firstWidth=50e-3)
-    sim.schedule()
-    t1 = datetime.now()
-    sim.run(50e-3)
-    t2 = datetime.now()
-    delta_t = t2 - t1
-    print '#### TIME TO SIMULATE:', delta_t.seconds + delta_t.microseconds * 1e-6
-    sim.dump_data('data')
-    pylab.plot(vm_table)
-    pylab.show()
+import config
+import trbutil
+import moose
+from cell import *
+from capool import CaPool
+# from cellview import MyCellView
+
+class SpinyStellate(TraubCell):
+    chan_params = {
+        'ENa': 50e-3,
+        'EK': -100e-3,
+        'EAR': -40e-3,
+        'ECa': 100e-3,
+        'EGABA': -75e-3, # Sanchez-Vives et al. 1997 
+        'TauCa': 20e-3,
+        'X_AR': 0.0
+        }
+    ca_dep_chans = ['KAHP_SLOWER', 'KC_FAST']
+    num_comp = 59
+    presyn = 57
+    proto_file = 'SpinyStellate.p'
+    prototype = TraubCell.read_proto("SpinyStellate.p", "SpinyStellate", chan_params)
+    def __init__(self, *args):
+        start = datetime.now()
+	TraubCell.__init__(self, *args)
+        soma_ca_pool = moose.CaConc(self.soma.path + '/CaPool')
+        soma_ca_pool.tau = 50e-3
+        end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('created cell in: %g s' % (delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
+
+    def _topology(self):
+        raise Exception, 'Deprecated method.'
+
+    def _setup_passive(self):
+        raise Exception, 'Deprecated. All passive properties including initVm and Em are set in .p file.'
     
+
+    def _setup_channels(self):
+        """Set up connection between CaPool, Ca channels, Ca dependnet channels."""
+        raise Exception, 'Deprecated.'
+
+    @classmethod
+    def test_single_cell(cls):
+        """Simulates a single spiny stellate cell and plots the Vm and
+        [Ca2+]"""
+
+        config.LOGGER.info("/**************************************************************************")
+        config.LOGGER.info(" *")
+        config.LOGGER.info(" * Simulating a single cell: %s" % (cls.__name__))
+        config.LOGGER.info(" *")
+        config.LOGGER.info(" **************************************************************************/")
+        sim = Simulation(cls.__name__)
+        mycell = SpinyStellate(sim.model.path + "/SpinyStellate", SpinyStellate.proto_file)
+        for handler in config.LOGGER.handlers:
+            handler.flush()
+
+
+        mycell.soma.x0 = 0.0
+        mycell.soma.y0 = 0.0
+        mycell.soma.z0 = 0.0
+        mycell.soma.x = 0.0
+        mycell.soma.y = 0.0
+        mycell.soma.z = mycell.soma.length
+        # mycellview = MyCellView(mycell)
+        config.LOGGER.debug('Created cell: %s' % (mycell.path))
+        # for neighbour in mycell.soma.neighbours('raxial'):
+        #     print 'RAXIAL', neighbours.path()
+        # for neighbour in mycell.soma.neighbours('axial'):
+        #     print 'AXIAL', neighbour.path()
+        vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_spinstell', 'Vm', sim.data)
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=50e-3, firstWidth=50e-3)
+#         pulsegen1 = mycell.soma.insertPulseGen('pulsegen1', sim.model, firstLevel=3e-7, firstDelay=150e-3, firstWidth=10e-3)
+
+        sim.schedule()
+        if mycell.has_cycle():
+            config.LOGGER.warning("WARNING!! CYCLE PRESENT IN CICRUIT.")
+        t1 = datetime.now()
+        sim.run(200e-3)
+        t2 = datetime.now()
+        delta = t2 - t1
+        config.BENCHMARK_LOGGER.info('simulation time: %g' % (delta.seconds + 1e-6 * delta.microseconds))
+        for msg in moose.Neutral('/model/SpinyStellate/solve').inMessages():
+            print msg
+        for msg in moose.Neutral('/model/SpinyStellate/solve').outMessages():
+            print msg
+        # sim.dump_data('data')
+        # mycell.dump_cell('spinstell.txt')
+        
+        mus_vm = pylab.array(vm_table) * 1e3
+        nrn_vm = pylab.loadtxt('../nrn/mydata/Vm_spinstell.plot')
+        nrn_t = nrn_vm[:, 0]
+        mus_t = linspace(0, nrn_t[-1], len(mus_vm))
+        nrn_vm = nrn_vm[:, 1]
+        nrn_ca = pylab.loadtxt('../nrn/mydata/Ca_spinstell.plot')
+        nrn_ca = nrn_ca[:,1]
+        pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
+        pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
+#         if ca_table:
+#             ca_array = pylab.array(ca_table)
+#             pylab.plot(nrn_t, -nrn_ca, 'r-', label='nrn (-)ca')
+#             pylab.plot(mus_t, -ca_array, 'b-.', label='mus (-)ca')
+#             print pylab.amax(ca_table)
+        pylab.legend()
+        pylab.show()
+
+import unittest
+
+class SpinyStellateTestCase(unittest.TestCase):
+    def setUp(self):
+        self.sim = Simulation('SpinyStellate')
+        path = self.sim.model.path + '/' + 'TestSpinyStellate'
+        config.LOGGER.debug('Creating cell %s' % (path))
+        TraubCell.adjust_chanlib(SpinyStellate.chan_params)
+        self.cell = SpinyStellate(path, SpinyStellate.proto_file)
+        config.LOGGER.debug('Cell created')
+        for handler in config.LOGGER.handlers:
+            handler.flush()
+        self.sim.schedule()
+
+    def test_compartment_count(self):
+        for comp_no in range(SpinyStellate.num_comp):
+            path = '%s/comp_%d' % (self.cell.path, comp_no + 1)
+            self.assertTrue(config.context.exists(path))
+    
+    def test_initVm(self):
+        for comp_no in range(SpinyStellate.num_comp):
+            self.assertAlmostEqual(self.cell.comp[comp_no + 1].initVm, -65e-3)
+
+    def test_Em(self):
+        for comp_no in range(SpinyStellate.num_comp):
+            self.assertAlmostEqual(self.cell.comp[comp_no + 1].Em, -65e-3)
+
+    def test_Ca_connections(self):
+        for comp_no in range(SpinyStellate.num_comp):
+            ca_path = self.cell.comp[comp_no + 1].path + '/CaPool'
+            if not config.context.exists(ca_path):
+                continue
+            caPool = moose.CaConc(ca_path)
+            for chan in SpinyStellate.ca_dep_chans:
+                chan_path = self.cell.comp[comp_no + 1].path + '/' + chan
+                if not config.context.exists(chan_path):
+                    continue
+                chan_obj = moose.HHChannel(chan_path)
+                self.assertTrue(len(chan_obj.neighbours('concen')) > 0)
+            sources = caPool.neighbours('current')
+            self.failIfEqual(len(sources), 0)
+            for chan in sources:
+                self.assertTrue(chan.path().endswith('CaL'))
+                    
+    def test_reversal_potentials(self):
+        for num in range(SpinyStellate.num_comp):
+            comp = self.cell.comp[num + 1]
+            for chan_id in comp.neighbours('channel'):
+                chan = moose.HHChannel(chan_id)
+                chan_class = eval(chan.name)
+                key = None
+                if issubclass(chan_class, NaChannel):
+                    key = 'ENa'
+                elif issubclass(chan_class, KChannel):
+                    key = 'EK'
+                elif issubclass(chan_class, CaChannel):
+                    key = 'ECa'
+                elif issubclass(chan_class, AR):
+                    key = 'EAR'
+                else:
+                    pass
+                self.assertAlmostEqual(chan.Ek, SpinyStellate.chan_params[key])
+                    
+def test_creation_time(count=10):
+    cells = []
+    for ii in range(count):
+        start = datetime.now()
+        cells.append(SpinyStellate('cell_%d' % (ii), SpinyStellate.proto_file))
+        end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('created fresh cell %s in: %g s' % (cells[-1].name, delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
+
+    for ii in range(count):
+        start = datetime.now()
+        cells.append(SpinyStellate(SpinyStellate.prototype, 'copy_of_cell_%d' % (ii)))
+        end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('created copy %s in: %g s' % (cells[-1].name, delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
+        
+
+# test main --
+from simulation import Simulation
+import pylab
+from subprocess import call
+if __name__ == "__main__":
+#     call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_spinstell.hoc'], cwd='../nrn')
+    SpinyStellate.test_single_cell()
+    # unittest.main()
+    # test_creation_time(1000)
+
 # 
 # spinystellate.py ends here

@@ -1,0 +1,56 @@
+objectvar vecT, vecV, stim1, outfile
+objref child
+outfile = new File()
+vecV = new Vector()
+vecT = new Vector()
+FARADAY=96485
+PI=3.141592
+secondorder=2
+dt=1e-3
+celsius=30
+spine_area_mult = 2.
+create soma
+access soma
+v_init=-65
+soma{
+    nseg = 1
+    diam = 2 * 7.5
+    L = 20    
+    insert pas
+    e_pas = -65
+    v = -65.
+    g_pas = 2e-5
+    Ra = 250
+    cm = 0.9
+}
+create dend
+dend{
+    nseg = 1
+    diam = 2 * 1.06
+    L = 40.
+    insert pas
+    e_pas = -65.
+    v = -65.
+    g_pas = 2e-5 * spine_area_mult
+    Ra = 250
+    cm = 0.9 * spine_area_mult
+}
+
+dend child = new SectionRef()
+soma connect child.sec(0), 0
+access dend    
+stim1 = new IClamp(0.5)
+stim1.amp = 0.3
+stim1.dur = 100
+stim1.del = 20
+
+tstop = 100
+vecV.record(&dend.v(0.5))
+vecT.record(&t)
+run()
+outfile.wopen("mydata/Vm.plot")
+for ii = 0, vecV.size() - 1 {
+	outfile.printf("%g %g\n", vecT.x(ii), vecV.x(ii))
+}
+outfile.close()
+

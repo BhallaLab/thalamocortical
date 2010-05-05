@@ -1,5 +1,6 @@
 load_file("nrngui.hoc")
 load_file("hoc/traubcon.hoc")
+load_file("hoc/utility.hoc")
 load_file("fortmap.hoc")
 load_file("cell_templates.hoc")
 
@@ -106,6 +107,13 @@ proc runcell() {local i, t1,a1,t2,a2  localobj vvec, tvec, f, g
 	sprint(tstr2, "cell.comp[%d].v(.5)", cell.presyn_comp)
 	g.addvar(tstr2)
 	if (exact_) { traubexact(cell, tci) }
+	print tstr1
+	// The following are by Subha
+	print "### ", tstr1, ": stim1 delay:", stim1.del, "duration:", stim1.dur, "amplitude:", stim1.amp 
+	print "### ", tstr1, ": stim2 delay:", stim2.del, "duration:", stim2.dur, "amplitude:", stim2.amp 
+	print_cell(cell, tstr1)
+	print_readcell(cell, tstr1)
+	// Subha - till here
 }
 
 runcell(0)
@@ -133,6 +141,7 @@ proc finit0() { local ix
 	if (cell != nil) {
 		ix = cell.type()
 		forsec cell.all { v = type_vinit.x[ix] }
+		printf("initVm = %f\n", type_vinit.x[ix])
 		if (ix == TCRtype) {
 			forsec cell.all { v = -85 }
 		}
@@ -158,7 +167,9 @@ proc finit1() { local ix
 		forsec cell2.all { v = type_vinit.x[ix] }
 		if (ix == TCRtype) {
 			forsec cell2.all { v = type_vinit.x[ix] }
+		    }
 		}
-	}
+		printf("initVm = %f\n", type_vinit.x[ix])
+
 }
 

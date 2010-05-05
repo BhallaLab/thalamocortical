@@ -1,0 +1,76 @@
+load_file("nrngui.hoc")
+load_file("hoc/traubcon.hoc")
+// load_file("fortmap.hoc")
+load_file("cells/spinstell_template.hoc")
+strdef tstr
+objref vm_vecs[60], stim[60], files[60]
+PI=3.141592
+FARADAY=96485
+secondorder=2
+dt = 1e-3
+celsius=30
+//till the shift bug in the mod files are fixed (table depends on range variable)
+// usetable_naf2 = 0
+// usetable_naf = 0
+// usetable_napf_spinstell = 0
+// usetable_napf_tcr = 0
+
+define_shape()
+//objref runinfo_, choice_, cell, nil, stim1, stim2, mchoice_
+objref cell, stim1
+/* runcell(runtime, delay) */
+proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g
+    tstop = $1
+    t1 = $2
+    printf("Run for: %g ms, stim at: %g\n", tstop, t1)
+    t2 = 1e9 a2 = 0
+    cell = new spinstell()
+    // for ii = 1, 59 {
+    // 	access cell.comp[ii]
+    // 	stim[ii] = new IClamp(0.5)
+    // 	stim[ii].amp = 0.3
+    // 	stim[ii].del = t1
+    // 	stim[ii].dur = $1 - $2
+    // 	vm_vecs[ii] = new Vector()
+    // 	vm_vecs[ii].record(&cell.comp[ii].v(0.5))
+    // 	}
+    access cell.comp[1]
+    f = new File()
+    tvec = new Vector()
+    vvec = new Vector()
+    tvec.record(&t)
+    vvec.record(&cell.comp[cell.presyn_comp].v(0.5))
+    
+    stim1 = new IClamp(0.5) 
+    stim1.amp = 0.3
+    stim1.del = t1
+    stim1.dur = $1 - $2
+    run()
+    // forsec cell.all{
+    // 	printf("EK = %g\tENa = %g\t", ena, ek)
+    // 	if (ismembrane("ar")){printf("%g\t", erev_ar)}
+    // 	printf("\n")
+    // }
+    /* for testing the comprtments individually */
+    // for ii = 1, 59 {
+    // 	files[ii] = new File()
+    // 	sprint(tstr, "mydata/Vm_comp_%d.plot", ii) 
+    // 	files[ii].wopen(tstr)
+    // 	for jj = 0, tvec.size() - 1{
+    // 	    files[ii].printf("%g %g\n", tvec.x(jj), vm_vecs[ii].x(jj))
+    // 	}
+    // 	files[ii].close()	    
+    // }
+    f.wopen("mydata/Vm_ss.plot")
+    for ii = 0, vvec.size() - 1{
+    	f.printf("%g %g\n", tvec.x(ii), vvec.x(ii))
+    }
+    f.close()
+}
+
+proc finit0(){
+    forsec cell.all { v = -65 }
+}
+
+runcell(100, 0.0)
+quit()
