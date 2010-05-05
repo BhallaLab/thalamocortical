@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Sep 23 00:18:00 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Apr  8 11:47:55 2010 (+0530)
+# Last-Updated: Fri Apr 30 17:33:01 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 52
+#     Update #: 128
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -37,25 +37,44 @@ from cell import *
 from capool import CaPool
 
 class SupLTS(TraubCell):
-    ENa = 50e-3
-    EK = -100e-3
-    EAR = -40e-3
-    ECa = 125e-3
-    EGABA = -75e-3 # Sanchez-Vives et al. 1997 
-    prototype = TraubCell.read_proto("SupLTS.p", "SupLTS")
+    chan_params = {
+        'ENa': 50e-3,
+        'EK': -100e-3,
+        'EAR': -40e-3,
+        'ECa': 125e-3,
+        'EGABA': -75e-3, # Sanchez-Vives et al. 1997 
+        'TauCa': 20e-3,
+        'X_AR': 0.25
+    }
+    ca_dep_chans = ['KAHP_SLOWER', 'KC_FAST']
+    num_comp = 59
+    presyn = 59
+    proto_file = 'SupLTS.p'
+    prototype = TraubCell.read_proto(proto_file, "SupLTS", chan_params)
     def __init__(self, *args):
-        self.chan_list = ['all channels']
+        start = datetime.now()
 	TraubCell.__init__(self, *args)
+	caPool = moose.CaConc(self.soma.path + '/CaPool')
+        caPool.tau = 50e-3
+        end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('created cell in: %g s' % (delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
+        
 
     def _topology(self):
+        raise Exception, 'Deprecated'
 	self.presyn = 59
 
     def _setup_passive(self):
-	for comp in self.comp[1:]:
+        raise Exception, 'Deprecated'
+	for ii in range(SupLTS.num_comp):
+            comp = self.comp[1 + ii]
 	    comp.initVm = -65e-3
 
     def _setup_channels(self):
-	for comp in self.comp[1:]:
+        raise Exception, 'Deprecated'
+        for ii in range(SupLTS.num_comp):
+            comp = self.comp[1 + ii]
 	    ca_pool = None
 	    ca_dep_chans = []
 	    ca_chans = []
@@ -92,7 +111,64 @@ class SupLTS(TraubCell):
 
 	obj = moose.CaConc(self.soma.path + '/CaPool')
         obj.tau = 50e-3
+        
+    def check_model(self):
+        self.check_compartment_count()
+        self.check_initVm()
+        self.check_Em()
+        self.check_Ca_connection()
+        self.check_reversal_potentials()
 
+    def check_compartment_count(self):
+        for comp_no in range(SupLTS.num_comp):
+            path = '%s/comp_%d' % (self.path, comp_no + 1)
+            assert (config.context.exists(path))
+
+    def check_initVm(self):
+        for comp_no in range(SupLTS.num_comp):
+            assert trbutil.almost_equal(self.cell.comp[comp_no + 1].initVm, -65e-3)
+    
+    def check_Em(self):
+        for comp_no in range(SupLTS.num_comp):
+            assert trbutil.almost_equal(self.cell.comp[comp_no + 1].Em, -65e-3)
+        
+    def check_Ca_connection(self):
+        for comp_no in range(SupLTS.num_comp):
+            ca_path = self.comp[comp_no + 1].path + '/CaPool'
+            if not config.context.exists(ca_path):
+                continue
+            caPool = moose.CaConc(ca_path)
+            for chan in SupLTS.ca_dep_chans:
+                chan_path = self.comp[comp_no + 1].path + '/' + chan
+                if not config.context.exists(chan_path):
+                    continue
+                chan_obj = moose.HHChannel(chan_path)
+                assert (len(chan_obj.neighbours('concen')) > 0)
+            sources = caPool.neighbours('current')
+            assert (len(sources) > 0)
+            for chan in sources:
+                assert (chan.path().endswith('CaL'))
+        
+    def check_reversal_potentials(self):
+        for num in range(SupLTS.num_comp):
+            comp = self.comp[num + 1]
+            for chan_id in comp.neighbours('channel'):
+                chan = moose.HHChannel(chan_id)
+                chan_class = eval(chan.name)
+                key = None
+                if issubclass(chan_class, NaChannel):
+                    key = 'ENa'
+                elif issubclass(chan_class, KChannel):
+                    key = 'EK'
+                elif issubclass(chan_class, CaChannel):
+                    key = 'ECa'
+                elif issubclass(chan_class, AR):
+                    key = 'EAR'
+                else:
+                    pass
+                assert trbutil.almost_equal(chan.Ek, SupLTS.chan_params[key])
+        
+        
 
     @classmethod
     def test_single_cell(cls):
@@ -142,12 +218,77 @@ class SupLTS(TraubCell):
         nrn_vm = nrn_vm[:, 1]
         nrn_ca = pylab.loadtxt('../nrn/mydata/Ca_supLTS.plot')
         nrn_ca = nrn_ca[:,1]
-        title = 'SupLTS:' + string.join(mycell.chan_list,',')
+        title = 'SupLTS:'
         pylab.title(title)
         pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
         pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
         pylab.legend()
         pylab.show()
+
+
+import unittest
+
+class SupLTSTestCase(unittest.TestCase):
+    def setUp(self):
+        self.sim = Simulation('SupLTS')
+        path = self.sim.model.path + '/' + 'TestSupLTS'
+        config.LOGGER.debug('Creating cell %s' % (path))
+        TraubCell.adjust_chanlib(SupLTS.chan_params)
+        self.cell = SupLTS(path, SupLTS.proto_file)
+        config.LOGGER.debug('Cell created')
+        for handler in config.LOGGER.handlers:
+            handler.flush()
+        self.sim.schedule()
+
+    def test_compartment_count(self):
+        for comp_no in range(SupLTS.num_comp):
+            path = '%s/comp_%d' % (self.cell.path, comp_no + 1)
+            self.assertTrue(config.context.exists(path))
+    
+    def test_initVm(self):
+        for comp_no in range(SupLTS.num_comp):
+            self.assertAlmostEqual(self.cell.comp[comp_no + 1].initVm, -65e-3)
+
+    def test_Em(self):
+        for comp_no in range(SupLTS.num_comp):
+            self.assertAlmostEqual(self.cell.comp[comp_no + 1].Em, -65e-3)
+
+    def test_Ca_connections(self):
+        for comp_no in range(SupLTS.num_comp):
+            ca_path = self.cell.comp[comp_no + 1].path + '/CaPool'
+            if not config.context.exists(ca_path):
+                continue
+            caPool = moose.CaConc(ca_path)
+            for chan in SupLTS.ca_dep_chans:
+                chan_path = self.cell.comp[comp_no + 1].path + '/' + chan
+                if not config.context.exists(chan_path):
+                    continue
+                chan_obj = moose.HHChannel(chan_path)
+                self.assertTrue(len(chan_obj.neighbours('concen')) > 0)
+            sources = caPool.neighbours('current')
+            self.failIfEqual(len(sources), 0)
+            for chan in sources:
+                self.assertTrue(chan.path().endswith('CaL'))
+                    
+    def test_reversal_potentials(self):
+        for num in range(SupLTS.num_comp):
+            comp = self.cell.comp[num + 1]
+            for chan_id in comp.neighbours('channel'):
+                chan = moose.HHChannel(chan_id)
+                chan_class = eval(chan.name)
+                key = None
+                if issubclass(chan_class, NaChannel):
+                    key = 'ENa'
+                elif issubclass(chan_class, KChannel):
+                    key = 'EK'
+                elif issubclass(chan_class, CaChannel):
+                    key = 'ECa'
+                elif issubclass(chan_class, AR):
+                    key = 'EAR'
+                else:
+                    pass
+                self.assertAlmostEqual(chan.Ek, SupLTS.chan_params[key])
+                    
         
         
 # test main --
@@ -156,9 +297,9 @@ import pylab
 from subprocess import call
 
 if __name__ == "__main__":
-    call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_supLTS.hoc'], cwd='../nrn')
+    # call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_supLTS.hoc'], cwd='../nrn')
     SupLTS.test_single_cell()
-    
+    # unittest.main()
 
 
 
