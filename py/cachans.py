@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Apr 18 00:18:24 2009 (+0530)
 # Version: 
-# Last-Updated: Sun May  3 17:09:19 2009 (+0530)
-#           By: subhasis ray
-#     Update #: 173
+# Last-Updated: Mon Apr 12 17:11:22 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 191
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -50,8 +50,12 @@ from numpy import where, linspace, exp, array
 import config
 class CaChannel(ChannelBase):
     """This is just a place holder to maintain type information"""
-    def __init__(self, name, parent, xpower=1, ypower=0):
+    def __init__(self, name, parent, xpower=1.0, ypower=0.0, Ek=125e-3):
+        if config.context.exists(parent.path + '/' + name):
+            ChannelBase.__init__(self, name, parent, xpower, ypower)
+            return
 	ChannelBase.__init__(self, name, parent, xpower, ypower)
+        self.Ek = Ek
         self.connected_to_pool = False
 
 #import pylab
@@ -64,13 +68,15 @@ class CaL(CaChannel):
                   1e3 * 0.02 * v * 1e3 / (exp(v / 5e-3) - 1))
 
     def __init__(self, name, parent):
-        CaChannel.__init__(self, name, parent, 2)
-	self.Ek = 125e-3
-        self.X = 0.0
+        if config.context.exists(parent.path + '/' + name):
+            CaChannel.__init__(self, name, parent, xpower=2.0, Ek=125e-3)
+            return
+        CaChannel.__init__(self, name, parent, xpower=2.0, Ek=125e-3)
 	for i in range(config.ndivs + 1):
 	    self.xGate.A[i] = CaL.alpha[i]
 	    self.xGate.B[i] = CaL.beta[i]
         self.xGate.tweakAlpha()
+        self.X = 0.0
 
 class CaT(CaChannel):
     v = ChannelBase.v_array
@@ -83,7 +89,10 @@ class CaT(CaChannel):
                    1e-3 * (9.32 + 0.333 * exp( ( -v - 21e-3 ) / 10.5e-3 )))
 
     def __init__(self, name, parent):
-	CaChannel.__init__(self, name, parent, 2, 1)
+        if config.context.exists(parent.path + '/' + name):
+            CaChannel.__init__(self, name, parent, xpower=2.0, ypower=1.0)
+            return
+	CaChannel.__init__(self, name, parent, xpower=2.0, ypower=1.0)
 	self.Ek = 125e-3
         self.X = 0.0
 	for i in range(config.ndivs + 1):
@@ -104,17 +113,25 @@ class CaT_A(CaChannel):
     tau_h = 1e-3 * (28.30 + 0.33 / (exp(( v * 1e3 + 48.0)/ 4.0) + exp( ( -v * 1e3 - 407.0) / 50.0 ) ))
 
     def __init__(self, name, parent):
-        CaChannel.__init__(self, name, parent, 2, 1)
+        if config.context.exists(parent.path + '/' + name):
+            CaChannel.__init__(self, name, parent, xpower=2.0, ypower=1.0, Ek=125e-3)
+            return
+        CaChannel.__init__(self, name, parent, xpower=2.0, ypower=1.0, Ek=125e-3)
         self.Ek = 125e-3
-        self.X = 0
 	for i in range(config.ndivs + 1):
-	    self.xGate.A[i] = CaT.tau_m[i]
-	    self.xGate.B[i] = CaT.m_inf[i]
-	    self.yGate.A[i] = CaT.tau_h[i]
-	    self.yGate.B[i] = CaT.h_inf[i]
+	    self.xGate.A[i] = CaT_A.tau_m[i]
+	    self.xGate.B[i] = CaT_A.m_inf[i]
+	    self.yGate.A[i] = CaT_A.tau_h[i]
+	    self.yGate.B[i] = CaT_A.h_inf[i]
 
         self.xGate.tweakTau()
         self.yGate.tweakTau()
+	# self.xGate.A.dumpFile('cata_xa.plot')
+        # self.xGate.B.dumpFile('cata_xb.plot')
+	# self.yGate.A.dumpFile('cata_ya.plot')
+        # self.yGate.B.dumpFile('cata_yb.plot')
+        
+        self.X = 0
 
 
 # 
