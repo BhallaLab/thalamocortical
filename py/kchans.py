@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Sun May  3 23:56:22 2009 (+0530)
-#           By: subhasis ray
-#     Update #: 481
+# Last-Updated: Wed Apr 14 22:07:51 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 683
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -47,13 +47,16 @@
 
 import moose
 from channel import ChannelBase
-from numpy import where, linspace, exp, arange, ones, zeros
+from numpy import where, linspace, exp, arange, ones, zeros, savetxt
 import config
 
 
 class KChannel(ChannelBase):
     """This is a dummy base class to keep type information."""
     def __init__(self, name, parent, xpower=1, ypower=0, Ek=-95e-3):
+        if config.context.exists(parent.path + '/' + name):
+            ChannelBase.__init__(self, name, parent, xpower, ypower)
+            return
         ChannelBase.__init__(self, name, parent, xpower, ypower)
         self.Ek = Ek
 
@@ -79,11 +82,17 @@ class KDR(KChannel):
     m_inf = 1.0 / (1.0 + exp((- v - 29.5e-3) / 10e-3))
     
     def __init__(self, name, parent, Ek=-95e-3):
-	KChannel.__init__(self, name, parent, 4, Ek=Ek)
+        if config.context.exists(parent.path + '/' + name):
+            KChannel.__init__(self, name, parent, xpower, ypower)
+            return
+	KChannel.__init__(self, name, parent, xpower=4.0, Ek=Ek)
 	for i in range(config.ndivs + 1):
             self.xGate.A[i] = KDR.tau_m[i]
             self.xGate.B[i] = KDR.m_inf[i]
 	self.xGate.tweakTau()
+        self.X = 0.0
+	# self.xGate.A.dumpFile('kdr_xa.plot')
+        # self.xGate.B.dumpFile('kdr_xb.plot')
 
 
 class KDR_FS(KChannel):
@@ -95,12 +104,17 @@ class KDR_FS(KChannel):
                        1e-3 * (0.25 + 4.35 * exp((- v - 10.0e-3) / 10.0e-3)))
 
     def __init__(self, name, parent, Ek=-95e-3):
+        if config.context.exists(parent.path + '/' + name):
+            KChannel.__init__(self, name, parent, 4, Ek=Ek)
+            return
 	KChannel.__init__(self, name, parent, 4, Ek=Ek)
 	for i in range(config.ndivs + 1):
             self.xGate.A[i] = KDR_FS.tau_m[i]
             self.xGate.B[i] = KDR_FS.m_inf[i]
         self.xGate.tweakTau()
-	
+        self.X = 0.0
+	# self.xGate.A.dumpFile('kdrfs_xa.plot')
+        # self.xGate.B.dumpFile('kdrfs_xb.plot')
 
 class KA(KChannel):
     """A type K+ channel"""
@@ -113,8 +127,10 @@ class KA(KChannel):
                        9.5e-3)
 
     def __init__(self, name, parent, Ek=-95e-3):
+        if config.context.exists(parent.path + '/' + name):
+            KChannel.__init__(self, name, parent, 4, 1)
+            return
 	KChannel.__init__(self, name, parent, 4, 1)
-        self.X = 0.0
 	for i in range(config.ndivs + 1):
             self.xGate.A[i] = KA.tau_m[i]
             self.xGate.B[i] = KA.m_inf[i]
@@ -122,7 +138,7 @@ class KA(KChannel):
             self.yGate.B[i] = KA.h_inf[i]
         self.xGate.tweakTau()
 	self.yGate.tweakTau()
-
+        self.X = 0.0
 
 class KA_IB(KChannel):
     """A type K+ channel for tufted intrinsically bursting cells -
@@ -136,6 +152,9 @@ class KA_IB(KChannel):
                              9.5e-3)
 
     def __init__(self, name, parent, Ek=-95e-3):
+        if config.context.exists(parent.path + '/' + name):
+            KChannel.__init__(self, name, parent, 4, 1)
+            return
 	KChannel.__init__(self, name, parent, 4, 1, Ek=Ek)
         self.X = 0.0
 
@@ -159,7 +178,10 @@ class K2(KChannel):
 					exp((-v - 130e-3) / 7.1e-3)))
 
     def __init__(self, name, parent, Ek=-95e-3):
-	KChannel.__init__(self, name, parent, 1, 1, Ek=Ek)
+        if config.context.exists(parent.path + '/' + name):
+            KChannel.__init__(self, name, parent, 4, 1)
+            return
+	KChannel.__init__(self, name, parent, xpower=1.0, ypower=1.0, Ek=Ek)
 	for i in range(config.ndivs + 1):
             self.xGate.A[i] = K2.tau_m[i]
             self.xGate.B[i] = K2.m_inf[i]
@@ -167,91 +189,124 @@ class K2(KChannel):
             self.yGate.B[i] = K2.h_inf[i]
         self.xGate.tweakTau()
 	self.yGate.tweakTau()
+        self.X = 0.0
+	# self.xGate.A.dumpFile('k2_xa.plot')
+        # self.xGate.B.dumpFile('k2_xb.plot')
+	# self.yGate.A.dumpFile('k2_ya.plot')
+        # self.yGate.B.dumpFile('k2_yb.plot')
 	
 
 class KM(KChannel):
     v = ChannelBase.v_array
     a =  1e3 * 0.02 / ( 1 + exp((-v - 20e-3 ) / 5e-3))
     b = 1e3 * 0.01 * exp((-v - 43e-3) / 18e-3)
-
+    minf = a / (a + b)
+    mtau = 1 / (a + b)
     def __init__(self, name, parent, Ek=-95e-3):
+        if config.context.exists(parent.path + '/' + name):
+            KChannel.__init__(self, name, parent, 4, 1)
+            return
 	KChannel.__init__(self, name, parent, 1, Ek=Ek)
 	for i in range(config.ndivs + 1):
             self.xGate.A[i] = KM.a[i]
             self.xGate.B[i] = KM.b[i]
 	self.xGate.tweakAlpha()
-
-
+        self.X = 0.0
+        
 class KCaChannel(KChannel):
     """[Ca+2] dependent K+ channel base class."""
-    xmin = 0.0
-    xmax = 1.0
-    xdivs = 1000
-    ca_conc = linspace(xmin, xmax, xdivs + 1)
+    ca_min = 0.0
+    ca_max = 1000.0
+    ca_divs = 1000
+    ca_conc = linspace(ca_min, ca_max, ca_divs + 1)
 
-    def __init__(self, name, parent, xpower=0, ypower=0, zpower=1, Ek=-95e-3):
+    def __init__(self, name, parent, xpower=0.0, ypower=0.0, zpower=1.0, Ek=-95e-3):
+        if config.context.exists(parent.path + '/' + name):
+            KChannel.__init__(self, name, parent, xpower, ypower, Ek=Ek)
+            return
         KChannel.__init__(self, name, parent, xpower, ypower, Ek=Ek)
         self.connected_to_ca = False
         self.Zpower = zpower
         self.zGate = moose.HHGate('zGate', self)
-        self.zGate.A.xmin = KCaChannel.xmin
-        self.zGate.A.xdivs = KCaChannel.xdivs
-        self.zGate.A.xmax = KCaChannel.xmax
-        self.zGate.B.xmin = KCaChannel.xmin
-        self.zGate.B.xdivs = KCaChannel.xdivs        
-        self.zGate.B.xmax = KCaChannel.xmax
+        self.zGate.A.xmin = KCaChannel.ca_min
+        self.zGate.A.xdivs = KCaChannel.ca_divs
+        self.zGate.A.xmax = KCaChannel.ca_max
+        self.zGate.B.xmin = KCaChannel.ca_min
+        self.zGate.B.xdivs = KCaChannel.ca_divs        
+        self.zGate.B.xmax = KCaChannel.ca_max
         self.zGate.A.calcMode = 1
         self.zGate.B.calcMode = 1
         self.useConcentration = True
+        self.addField('addmsg1')
+        self.setField('addmsg1', '../CaPool . CONCEN Ca')
+        config.LOGGER.debug('%s.addmsg1: %s' % (self.path,  self.getField('addmsg1')))
+        for handler in config.LOGGER.handlers:
+            handler.flush()
 
 
 class KAHPBase(KCaChannel):
     def __init__(self, name, parent, Ek=-95e-3):
+        if config.context.exists(parent.path + '/' + name):
+            KCaChannel.__init__(self, name, parent)
+            return
         KCaChannel.__init__(self, name, parent)
+        self.Z = 0.0
         
 
 class KAHP(KAHPBase):
     """AHP type K+ current"""
 
-    alpha = where(KCaChannel.ca_conc < 100.0 * 1e-3 , 0.1 * KCaChannel.ca_conc, 10.0)
-    beta =  ones(KCaChannel.xdivs + 1) * 10.0
+    alpha = where(KCaChannel.ca_conc < 100.0, 0.1 * KCaChannel.ca_conc, 10.0)
+    beta =  ones(KCaChannel.ca_divs + 1) * 10.0
 
-    def __init__(self, name, parent, Ek=-95e-3):
+    def __init__(self, name, parent, xpower=0.0, ypower=0.0, zpower=1.0, Ek=-95e-3):
+        if config.context.exists(parent.path + '/' + name):
+            KAHPBase.__init__(self, name, parent, Ek=Ek)
+            return
         KAHPBase.__init__(self, name, parent, Ek=Ek)
-        for i in range(len(alpha)):
+        for i in range(len(KAHP.alpha)):
             self.zGate.A[i] = KAHP.alpha[i]
             self.zGate.B[i] = KAHP.beta[i]
         self.zGate.tweakAlpha()
-
+#         self.zGate.A.calcMode = 1
+#         self.zGate.B.calcMode = 1
 
 
 class KAHP_SLOWER(KAHPBase):
 
-    alpha = where(KCaChannel.ca_conc < 500.0e-3, 1e6 * KCaChannel.ca_conc / 50000, 10.0)
-    beta =  ones(KCaChannel.xdivs + 1) * 1.0
+    alpha = where(KCaChannel.ca_conc < 500.0, 1e3 * KCaChannel.ca_conc / 50000, 10.0)
+    beta =  ones(KCaChannel.ca_divs + 1) * 1.0
 
     def __init__(self, name, parent, Ek=-95e-3):
+        if config.context.exists(parent.path + '/' + name):
+            KAHPBase.__init__(self, name, parent, Ek=Ek)
+            return
         KAHPBase.__init__(self, name, parent, Ek=Ek)
-        for i in range(KCaChannel.xdivs + 1):
+        for i in range(KCaChannel.ca_divs + 1):
             self.zGate.A[i] = KAHP_SLOWER.alpha[i]
             self.zGate.B[i] = KAHP_SLOWER.beta[i]
         self.zGate.tweakAlpha()
+        self.zGate.A.calcMode = 1
+        self.zGate.B.calcMode = 1
 
 
 class KAHP_DP(KAHPBase):
     """KAHP for deep pyramidal cell"""
-    alpha = where(KCaChannel.ca_conc < 100.0 * 1e-3, 1e-4 * KCaChannel.ca_conc, 0.01)
-    beta =  ones(KCaChannel.xdivs + 1) * 0.001 
+    alpha = where(KCaChannel.ca_conc < 100.0, 1e-1 * KCaChannel.ca_conc, 10.0)
+    beta =  ones(KCaChannel.ca_divs + 1)
     def __init__(self, name, parent, Ek=-95e-3):
+        if config.context.exists(parent.path + '/' + name):
+            KAHPBase.__init__(self, name, parent, Ek=Ek)
+            return
         KAHPBase.__init__(self, name, parent, Ek=Ek)
-        for i in range(KCaChannel.xdivs + 1):
+        for i in range(KCaChannel.ca_divs + 1):
             self.zGate.A[i] = KAHP_DP.alpha[i]
             self.zGate.B[i] = KAHP_DP.beta[i]
         self.zGate.tweakAlpha()
 
 class KC(KCaChannel):
     """C type K+ channel"""
-    alpha_ca = where(KCaChannel.ca_conc < 250e-3, KCaChannel.ca_conc / 250e-3, 1.0)
+    alpha_ca = where(KCaChannel.ca_conc < 250.0, KCaChannel.ca_conc / 250.0, 1.0)
     v = ChannelBase.v_array
     alpha = where(v < -10e-3, 
                       2e3 / 37.95 * ( exp( ( v * 1e3 + 50 ) / 11 - ( v * 1e3 + 53.5 ) / 27 ) ),
@@ -261,28 +316,35 @@ class KC(KCaChannel):
                   0.0)
 
     def __init__(self, name, parent, Ek=-95e-3):
-        KCaChannel.__init__(self, name, parent, 1, 0, 1, Ek=Ek)
-        for i in range(KCaChannel.xdivs + 1):
+        if config.context.exists(parent.path + '/' + name):
+            KCaChannel.__init__(self, name, parent, Ek=Ek)
+            return
+        KCaChannel.__init__(self, name, parent, xpower=1.0, ypower=0.0, zpower=1.0, Ek=Ek)
+        for i in range(KCaChannel.ca_divs + 1):
             self.zGate.A[i] = KC.alpha_ca[i]
             self.zGate.B[i] = 1.0
-        self.instant = 4 # Zgate m is instantaneous: m = A/B
-        self.X = 0.0
         for i in range(config.ndivs + 1):
-            self.xGate.A[i] = KC.alpha[i]
+            self.xGate.A[i] = KC.alpha[i] 
             self.xGate.B[i] = KC.beta[i]
         self.xGate.tweakAlpha()
+        self.instant = 4
         self.X = 0.0
-
         
 class KC_FAST(KC):
     """Fast KC channel"""
     def __init__(self, name, parent, Ek=-95e-3):
+        if config.context.exists(parent.path + '/' + name):
+            KC.__init__(self, name, parent, Ek=Ek)
+            return
         KC.__init__(self, name, parent, Ek=Ek)
         for i in range(config.ndivs + 1):
             self.xGate.A[i] = 2 * self.xGate.A[i]
             self.xGate.B[i] = 2 * self.xGate.B[i]
         
 if __name__ == "__main__":
-    a = KC_FAST('kc', moose.Neutral('/'))
+#    a = KC_FAST('kc', moose.Neutral('/'))
+#     b = KDR('KDR', moose.Neutral('/'))
+    c = K2('K2', moose.Neutral('/'))
+
 # 
 # kchans.py ends here

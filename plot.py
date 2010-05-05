@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 15:51:57 2009 (+0530)
 # Version: 
-# Last-Updated: Sun May  3 15:56:49 2009 (+0530)
+# Last-Updated: Mon Jun  1 20:44:09 2009 (+0530)
 #           By: subhasis ray
-#     Update #: 158
+#     Update #: 236
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -18,7 +18,7 @@
 
 # Commentary: 
 # 
-# 
+#  The scaling of MOOSE time must be done with reference to simdt in config.py
 # 
 # 
 
@@ -52,41 +52,25 @@ import datetime
 working_dir = '/home/subha/src/sim/cortical/'
 os.chdir(working_dir)
 mus_data_dir = 'py/data/'+datetime.datetime.now().strftime('%Y_%m_%d') + '/'
-#mus_data_dir = 'py/data/2009_04_24/'
-mus_Vm = pylab.loadtxt(mus_data_dir + 'Vm.plot') * 1e3
-# mus_Ca = pylab.loadtxt(mus_data_dir + 'Ca.plot') * 1e3
-# mus_m = pylab.loadtxt(mus_data_dir + 'm_kahp.plot')
-mus_t = pylab.linspace(0, 50, len(mus_Vm))
-
-indices = pylab.array(range(len(mus_Vm)), dtype=int)
-mus_indices = indices
-nrn_indices = indices * 10
 nrn_data_dir = 'nrn/mydata/'
 
-nrn_data = pylab.loadtxt(nrn_data_dir + 'Vm.plot')
-# nrn_Ca = pylab.loadtxt(nrn_data_dir + 'Ca.plot')[:, 1]
+nrn_data = pylab.loadtxt(nrn_data_dir + 'Vm_ss.plot')
 nrn_Vm = nrn_data[:, 1]
-# nrn_m = nrn_data[:, 2]
 nrn_t = nrn_data[:, 0]
-# pylab.savetxt('nrn_m.txt', pylab.transpose(( indices, nrn_m[nrn_indices])))
-# pylab.savetxt('mus_m.txt', pylab.transpose((mus_indices, mus_m/9.42e-6)))
-# pylab.plot(nrn_m[nrn_indices[3:]] , (mus_m[mus_indices[3:]]/9.42e-6))
-# pylab.plot( nrn_t, 1/(nrn_m/nrn_Ca), 'bx', label='nrn')
-# pylab.plot(mus_t, 1/((mus_m/9.42e-10)/mus_Ca), 'r+', label='mus')
+mus_Vm = pylab.loadtxt(mus_data_dir + "Vm_ss.plot") * 1e3
+mus_t = pylab.linspace(0, len(mus_Vm) * 1e-2, len(mus_Vm))
 
-# pylab.plot(mus_t, mus_Ca, 'gx')
-# pylab.plot(nrn_t, nrn_Ca*1e2, 'r-')
-
-# pylab.plot(mus_Ca, mus_m/9.42e-6, label='mus')
-# pylab.plot(nrn_Ca, nrn_m, label='nrn')
-# pylab.plot(nrn_Ca, nrn_t, label='t')
-# pylab.plot(mus_t, mus_m/9.42e-6, label='mus')
-# pylab.plot(nrn_t, nrn_m, label='nrn')
-#pylab.plot(mus_indices[3:], pylab.log(nrn_m[nrn_indices[3:]] / mus_m[mus_indices[3:]]))
-#-----
-# pylab.plot(mus_t[mus_indices[10:]], pylab.log(mus_m[mus_indices[10:]]), label='mus')
-# pylab.plot(nrn_t[nrn_indices[10:]], pylab.log(nrn_m[nrn_indices[10:]]), label='nrn')
-#----
+# for ii in range(1,60):    
+#     mus_Vm = pylab.loadtxt(mus_data_dir + "/Vm_comp_" + str(ii) + ".plot") * 1e3
+#     mus_t = pylab.linspace(0, len(mus_Vm) * 1e-3, len(mus_Vm))
+#     nrn_data = pylab.loadtxt(nrn_data_dir + "/Vm_comp_" + str(ii) + ".plot")
+#     nrn_t = nrn_data[:, 0]
+#     nrn_Vm = nrn_data[:, 1]
+#     pylab.title("Vm_comp_" + str(ii))
+#     pylab.plot(nrn_t, nrn_Vm, 'r_', label='nrn_Vm')
+#     pylab.plot(mus_t, mus_Vm, 'g.-', label='mus_Vm')
+#     pylab.legend()
+#     pylab.show()
 
 # from scipy.interpolate import splrep, splev
 # smoothness = 3
@@ -103,14 +87,20 @@ nrn_t = nrn_data[:, 0]
 # # pylab.legend()
 # # pylab.show()
 
-# # pylab.subplot(2, 1, 1)
-pylab.plot(nrn_t, nrn_Vm, label='nrn')
-pylab.plot(mus_t, mus_Vm, label='mus')
+# pylab.subplot(2, 1, 1)
+pylab.plot(nrn_t, nrn_Vm, 'r-', label='nrn_Vm')
+pylab.plot(mus_t, mus_Vm, 'g--', label='mus_Vm')
 pylab.legend()
-# # pylab.subplot(2,1,2)
-# # pylab.plot(nrn_t, nrn_Ca, label='nrn')
-# # pylab.plot(mus_t, mus_Ca, label='mus')
-# # pylab.legend()
+# pylab.subplot(2,1,2)
+# pylab.plot(nrn_t, nrn_Ca, label='nrn')
+# pylab.plot(mus_t, mus_Ca, label='mus')
+# pylab.legend()
+# pylab.subplot(2,1,2)
+# ratio = mus_gk[2:]*1e-4 / nrn_gk[2:]
+# pylab.plot(nrn_t[2:], ratio, 'bx', label='Gk_mus / Gk_nrn')
+# pylab.plot(nrn_t, nrn_gk, label='nrn')
+# pylab.plot(mus_t, mus_gk, label='mus')
+# pylab.legend()
 pylab.show()
 
 

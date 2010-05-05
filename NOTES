@@ -436,10 +436,11 @@
   conc. I don't see how to incorporate this in MOOSE Ca_conc object.
 
 * <2008-12-13 Sat 12:37> Looking at channel behaviour
-  After almost completing the single compartment model with GENESIS Ca_concen object from my old implementation I see that
-  the frequency has increased drastically. Actually there is no structure in
-  the spikes. To understand the contribution of each channel I am commenting
-  out most of them and incrementally enabling a few channels.
+  After almost completing the single compartment model with GENESIS Ca_concen
+  object from my old implementation I see that the frequency has increased
+  drastically. Actually there is no structure in the spikes. To understand the
+  contribution of each channel I am commenting out most of them and
+  incrementally enabling a few channels.
 
   NaF2 on SS gives a typical spike at the start of simulation due to the
   difference between the cell's resting Vm and Ek of the channel, which slowly
@@ -554,6 +555,7 @@
   
   spcific membrane capacitance: uF/cm^2
   cytoplasimic resistivity: ohm-cm
+  membrane conductance density: S/cm^2
   
 * <2009-04-20 Mon 11:47> Reset is not so safe
   I subclassed Compartment to allow nicer ways to insert channel conductances
@@ -765,7 +767,7 @@
   
 * <2009-05-03 Sun 16:05> Trying Spiny stellate
   KDR_FS - identical
-  NaF2 - the spike is delayed - could be something with fastNaf_shoft
+  NaF2 - the spike is delayed - could be something with fastNaf_shift
 
   NaPF_SS - does not seem to have any effect
 
@@ -788,32 +790,1115 @@
 * <2009-05-03 Sun 23:31> KC is making problem
   Looking through the code again - comparing channels one by one.
   KC turns out to be the culprit.
+* <2009-05-04 Mon 23:11> Todays commits are gone!
+
+  Not that it was a lot of code - but git-emacs did something silly and that
+  screwed up the whole system. I am losing faith in Linus. git is
+  annoying. When branches are cheap, one ends up with many branches and then
+  forget what is what.
+* <2009-05-05 Tue 14:42> Bad design
+  I did not think about the duplication of the gate tables in all the
+  channels. Ideally the channels of the same class should share gates. But
+  although PyMOOSE has provision for copy constructor that just does that, I
+  did not design my channel subclasses for that. As I tried to derive a way
+  to create a copy for all but the first instance, I realized that I shall
+  need to change the signature of all the classes for that (in my python
+  code). Now the way is to explicitly create channel objects in the library
+  and then copy them in compartment code. 
+  Also, the channels varying only by shift will need to be created separately.
+
+
+  I had to set the Ek values based on prefix of the channel names - something
+  I had tried to avoid by creating a whole class hierarchy in python. I feel
+  we are doomed to string based decisions in this kind of system. The kind of
+  friction I am going through in Python is perhaps due to a fundamental
+  difference in the way of thinking. Things might have been smoother if I just
+  wrote genesis script using python syntax.
+* <2009-05-06 Wed 17:25> Spiny stellate - more fun
+  In order to track the strange behaviour of ss cells, I tried removing the
+  dendritic arbour level by level. 
+  soma with axon - three spikes at the beginning
+  soma, axon, first level of dendritic compartments - spike count reduced to 2
+  (?)
+  soma, axon, second level of dendritic comp - 1 spike
+  soma axon, third level dendritic comps  - no spike.
+
+  It turns out that the Gk of NaF2 goes 4 orders of magnitude down when
+  shift=-2.5 mV.
+
   
-  After tweaking here and there suddenly the discrepancy in test.hoc and
-  test.py is gone.
+* <2009-05-08 Fri 21:33> Added a brute force version 
+  - mostly copy - paste - regex_replace in emacs from spinstell_template.hoc -
+    to minimize typos. No help.
 
-  But as I look closely with NaF2 alone in test_ss_soma.py/hoc I see almost
-  invisible difference. - Depolarization due to NaF2 happens slightly faster
-  in MOOSE than in NRN. It is about 0.04 ms ahead. I do not whether this can
-  be attributed to integration errors: integration time step is 1 us = 0.001
-  ms.
+* <2009-05-13 Wed 11:28> Switching to TCR
+  As the spiny stellate cell is not working, I am going to move to TCR which
+  is more symmetric. Also neuroConstruct has the cell morphology working.
 
-  Testing AR alone on test_ss_soma. It is causing major difference in initial
-  depolarization.
+  This time I should move incrementally - just adding one compartent at a time.
+* <2009-05-15 Fri 15:59> Back to spiny stellate
+  Trying to do it incrementally. Now testing just soma, axon and the dendritic
+  compartments adjacent to soma.
+* <2009-05-18 Mon 02:19> Soma Vm does not match
+  Tested the non-brute spinstell with just soma with neuron - not a perfect
+  match any more. Will start over.
+* <2009-05-18 Mon 03:59> KDR_FS mismatch 
+  I resorted to the painful technique of removing all channels and then adding
+  them back one by one  - NaF2 and NaPF_SS give identical results. KDR_FS
+  causes problem.
 
-  This was due to initial value of m.
+  When I put KDR alone, they behave more or less same.
+* <2009-05-21 Thu 00:07> Compartmentalization problem?
+  Just out of frustration I added one extra compartment at the end of the
+  axon, and voila, the results are almost identical - looks like there is a
+  compartmentalization problem. - <2009-05-21 Thu 02:18> I tried again now
+  after putting and removing the dendritic tree - that extra spike is missing
+  now. Mat be I am too sleepy.
+
+  With that part working I switched to the full tree - but strangely the Vm 
+  plot remains same - something is not getting updated.
+
+  Found it: the length in the levelno-length map was in microns, but I was not
+  converting it to SI. 
+
+  Now the outputs are quite far apart. When I try only the dendritic
+  compartments adjacent to the soma, the outputs are pretty close, and now the
+  extra axonal compartment is not making much difference.
+* <2009-05-23 Sat 15:25> Upi's suggestion
+  Upi suggested I should change the axial resistance of the extra branch to
+  very high (so that it becomes practically disconnected) and see if the
+  solver is handling it correctly.
+* <2009-05-25 Mon 23:13> Checked connectivity
+  I printed out the connectivity in python and neuron models - and they are
+  identical (brutespinstell.py and mycell.hoc). So the error is happening
+  somewhere else.
+* <2009-05-26 Tue 15:53> Compared brutespinstell
+  I did a comparison of all single compartments in neuron and python - the
+  compartments are isolated and injection and recording happen on the same
+  compartment. The plots are identical.
+* <2009-05-26 Tue 23:58> Axial-Raxial problem
+  I just switched the direction of connection [soma.raxial->axon.axial to
+  soma.axial->axon.raxial] and that did the trick.
+  
+  Silly me!
+
+  But but but ... after this correction, brutespinstell encounters the same
+  problem - one extra spike before current injection as I add all the axonal
+  compartments.
+
+  MOOSE is badly affected by dt - 1e-4 gives quite different results from
+  1e-6. 1e-5 is reasonable. 1e-4 is problematic because each ms of simulation
+  is done with only 10 time points, but comparatively neuron simulation is
+  much faster. Adaptive time steps??
+
+  Problem with spontaneous second spike: the branching does not really
+  matter - even if I add the extra axonal comp at the end or as a branch the
+  output matches. But if I increase the Ra for compartments upstream, the
+  firing does not happen.
+* <2009-06-01 Mon 22:22> Shameful mistake
+  I realized that I was using diameter as radious for calculating cross
+  section of compartments - after correcting for that the outputs are decent. 
+
+  But there is some problem with KDR_FS and NaF2 - if I try these two channels
+  only on the soma, the outputs don't match. Given that I was getting perfect
+  match in singlecompartment test, this should not happen.
+
+  The problem is KDR_FS alone is giving identical results in the
+  compartment. So is NaF2 alone.
+* <2009-06-02 Tue 14:35> Single compartment match
+  The problem factors were dt and secondorder statements in NEURON.
+  once I added:
+  secondorder=2
+  dt=1e-3
+  
+  single compartment soma outputs were matching nicely.
+  
+  But as I restored the connectivity to all the compartments, the outputs are
+  differing as before. ALso, when I removed the injection current the outputs
+  seem to be highly different. Need to check once I come back from animal house.
+
+* <2009-06-02 Tue 19:46> Dendritic compartments cause problem
+  As I add a dendritic compartment the outputs start differing. Just soma and
+  one denritic compartment also differs.
+  When I switch the direction of axial-raxial connection - the output of MOOSE
+  goes haywire.
+  But single compartment test works on the dendritic compartment.
+  Things to check: 
+   spine area multiplication is correct.    
+   Ra is correct
+   Dimensions are correct
+
+ I tested the passive soma - d1 pair - and they are differing : something is
+ wrong with Raxial
+
+ No! there is a problem with passive properties. I switched the 
+  
+* <2009-06-02 Tue 23:32> Problem in passive properties
+  brutespinstell.py has some problem with passive properties: because when I
+  create a separate two compartment passive model with soma and first
+  dendritic compartment settings, it matches with the neuron Vm.
+
+  Just checked the passive properties of brutespinstell compartments (soma and
+  comp[2]) and test_twocomp - identical. 
+
+* <2009-06-05 Fri 10:47> HSolve not present
+  I realized by showmsg() that the brutespinstell is not getting a
+  solver. This is strange - the class is derived from moose.Cell and all the
+  compartments are under this object.
+* <2009-06-06 Sat 12:28> HSolve present but hub not connected
+  pymoose.showmsg(moose.Neutral('/model/cell/solve/hub'))
+Info: PyMooseBase::PyMooseBase(Neutral, /model/cell/solve/hub) - Returning already existing object.
+INCOMING:
+[/model/cell/solve/hub].child <- [/model/cell/solve].childSrc
+[/model/cell/solve/hub].integ-hub <- [/model/cell/solve/integ].integ-hub
+[/model/cell/solve/hub].child <- [/model/cell/solve].childSrc
+OUTGOING:
+[/model/cell/solve/hub].compartmentSolve -> [/model/cell/comp_59].process
+>>> 
+
+So solver is getting created but only compartment 59 is connected to the
+hub. Why?
+
+- Niraj told me that the solver starts with the last created compartment and
+  traces the whole cell by tracing connectivity between compartments. Thus a
+  forest of compartments is not handled correctly by the solver.
+
+  So I have to remove all other compartments and do the simulation. So I guess
+  my full cell model is the best I can get with the solver ( because all the
+  compartments are connected).
+* <2009-06-09 Tue 02:37> Three compartments 
+  Soma, comp[2], comp[3] where comp[3] does not have any ion channels works
+  fine. But when I add ion channels, it deviates slightly. I am going to
+  accept it and move on with the other cells.
+* <2009-06-09 Tue 23:30> Regular expression 
+  Some useful regular expressions for this particular case:
+
+  To replace all occurrences like:
+
+  comp[ 1] { level[ 1].append() L=  20. diam = 2*  7.5 }
+
+  by the corresponding python statements:
+
+	level[1].append(comp[1])
+	comp[1].length = 20.
+	comp[1].diameter = 2 * 7.5
+
+  use following regexp search:
+
+  comp\[ *\([0-9]+\)\] *{ level\[ *\([0-9]+\)].append() L= *\([0-9]*.[0-9]*\) *diam = 2\* *\([0-9]*.[0-9]*\) *}
+
+  and replace by:
+
+  level[\2].add(comp[\1])
+  comp[\1].length = \3
+  comp[\1].diameter = \4
+
+  Another alternative that reduces typing in the replacement string is:
 
 
-  Going back to all channels: as soon as I introduce Ca pool, the outputs
-  diverge. Now, moose without Ca pool matches nrn with ca pool. 
-  - I had forgotton to set ceiling_cad in nrn. After setting it, the
-    no-injection outputs match.
+\(comp\[ *[0-9]+\]\) *{ *\(level\[ *[0-9]+\]\)\.append() *L *= *\([0-9]*.[0-9]*\) *diam *= *\(2\* *[0-9]*.[0-9]*\) *}
+  replaced by:
 
-  Now with injection they match till the first two spikes after injection
-  start, but the divergence becomes discernible from the third. Also, zooming
-  in reveals very small difference in the earlier part also.
-  Given the perfect match I had obtained on the test compartment, something is
-  slighly wrong. may be the initial values for m of some channel..
+  \2.add(\1)
+  \1.length = \3
+  \1.diameter = \4
 
-* <2009-05-04 Mon 12:13> Back to spinystellate
+  Then select the whole region, replace ]. with ]. (to make the
+  length/diameter/add/ as 3rd field) and select area again use C-u 3 M-x
+  sort-fields. It will separate out the level.add(), comp.length = xyz and
+  comp.diameter = uvw into three separate blocks. Then kill rectangle and yank
+  rectangle will do the trick.
+* <2009-06-29 Mon 16:12> Restarting 
+  - there was a break of a couple of weeks since TCM (15 June
+    2009). Restarting this work.
+* <2009-07-16 Thu 23:57> Another restart
+  Drifted away by MOOSE release and optogenetics course - another trial .. now
+  I seriously doubt the fate of this project.
+* <2009-07-23 Thu 23:46> TCR - automate comparison
+  Now I finally managed to put together some code for automatically dumping
+  the cell parameters and comparing them. Code for dumping teh parameters in
+  neuron is in hoc/utility.hoc and that for TCR cell in pymoose is in tcr.py
+  (dump_cell). The comparison program is compare.py. Parameterwise I am
+  getting an exact match to 1e-3 error, but plots are very diffrent. Could be
+  due to stimulation difference. Also, I should check the same code against
+  spinystellate to verify that the code indeed works.
+* <2009-07-24 Fri 14:29> TCR - some match finally
+  My comparison code yesterday had epsilon=1e3 instead of 1e-3 - hence
+  everything was matching. After correcting that today, I took spinystellate
+  as the model and scaled all parameters so that spinystellate cells
+  match. Then comparison code showed that I was making a mistake of one
+  decimal place for Ca2+ B. After correcting this, the two are pretty
+  close. But funny thing is that the neuron gui shows several spikes whereas
+  my version shows only two spikes.
+* <2009-07-27 Mon 00:30> NeuroConstruct generated code
+  While trying to load NeuroConstruct genenrated GENESIS code for TCR in
+  MOOSE, there were errors on tab2Dchannel - it turned out to be due to some
+  constant not defined in MOOSE:VOLT_C1_INDEX - I am not sure why this is
+  being used. Another thing I noted was that the kahp_slower channel is only
+  [Ca2+] dependent, not voltage dependent - so there is no real need for
+  tab2Dchannel.
+* <2009-08-04 Tue 04:00> NeuroConstruct generated code - can mostly read now
+  I fixed the Interpol2D class and str2val for getting indices. This solved
+  the problem of loading a HHChannel2D using GENESIS script. And added the
+  Leakage channel type.
 
+  Also added more code to dump neuron info in NEURON - so should be easier
+  now - but it is getting uglier at the same time - equivalent to doing a
+  readcell.
+
+* <2009-08-04 Tue 22:20> Readcell
+  Finally I switch to printing the NEURON parameters in readcell format and
+  then using readcell to read it in.
+* <2009-08-06 Thu 15:14> Readcell - todo
+  Some parameters are not accounted for in readcell format: tau for
+  CaPool. Erev for channels - which varies from cell type to cell type. 
+* <2009-08-12 Wed 00:24> Further changes using readcell
+  Refined the TraubCell class to set the channel reversal potentials.
+  Also added something to set Rm and Ra, but then realized that they can be
+  put in .p file.
+  Switched call to readcell_scrambled in TraubCell to PyMooseContext.readCell
+  as readcell scrambled cannot preserve the position of compartment specific
+  parameters. So using readcell_scrambled to sort out the sequence of
+  compartments. Then inserting the compartment parameter statements at correct
+  place manually.
+* <2009-08-12 Wed 13:50> A better way to debug Python module _moose.so
+  http://book.opensourceproject.org.cn/lamp/python/pythoncook2/opensource/0596007973/pythoncook2-chp-17-sect-9.html
+  Break on _PyImport_LoadDynamicModule
+
+  This will stop at every module being loaded, after which we can put a
+  breakpoint on any symbol in _moose.so.
+* <2009-08-28 Fri 12:40> Ca concentration issues
+  The B parameter for Ca pool in .p file I generate is half that in the
+  neuroconstruct generated stuff. 
+  I found that the reason is that NeuroConstruct makes compartments half the
+  size of those in the model. As B is calculated as phi/A, my version gives a
+  different result.
+
+  Still the results are far off from NEURON.
+* <2009-08-31 Mon 21:49> Far higher frequency 
+  I am getting far higher frequency than NEURON model and my model spikes
+  spontaneously whereas the NEURON model spikes only at current injection.
+* <2009-09-07 Mon 18:49> Ca was the culprit
+  Not yet solved - but as I started recording [Ca2+] it was all 0. Then I
+  figured that the readcell was not able to tell Ca dependent channels from
+  others. So I put code to explicitly connect the CaPool to the CaL channel
+  for Ca2+ source and to KCa channels as source of concentration - and this
+  changed the firing behaviour drastically. Now it fires 3 times in first 4
+  milliseconds (too high) and stops after that - not sure why.
+* <2009-09-08 Tue 11:00> Passive properties - OK
+  Only difference was Em - which was set to -65 mV in my code and -70 in
+  neuron - after changing passive cell behaves OK.
+** Blocked Ca channels and Ca dependent channels - differ
+** Only Na channels - the high happens early in moose - likely culprit
+* <2009-09-09 Wed 18:08> Fixed SupPyrRS  - almost
+  Now within 10 ms window behaviour is identical - earlier problem was because
+  NaF shift was missing. Change utility.hoc to write scaled value of B for [Ca2+].
+* <2009-09-11 Fri 01:31> Checking for 100ms run time
+  There was significant discrepenacy in time for the second spike when I ran the
+  simulation - now I am trying the channels one by one again.
+** Na channels - passed
+** Na + KDR - hyperpolarization of neuron model is more than mus - Ek of K channels?
+   I had forgotten to uncomment ek for neuron model.
+   After correction - first spike matches exactly - but then they start going
+   out of sync...
+** KDR Alone - after 30 ms mus and nrn plots start diverging
+** KA Alone - good match - now I have serious doubt about KDR
+** KDR, KC and KAHP blocked - slight variation
+** KC enabled, KDR and KAHP blocked - significant variation
+** KAHP enabled, KDR and KC blocked - significant variation after the first spike..
+* <2009-09-11 Fri 14:18> Now KDR works!
+  As I retried to compare KDR only models - voila - the plots are
+  identical. Looks like I was missing some compartments when
+  enabling/disabling channels. Effect of wee-hour programming!!
+** NaF, NaP and KDR work together
+** KC - causes serious discrepancy from second spike
+** checked [Ca2+] :: moose * 1e3 = neuron
+   It is getting built up according to the formula:
+   [Ca2+]' = B * I - [Ca2+]/tau   
+   Now I is in mA in neuron and A in moose - so B * I will be scaled up by
+   1000. Also tau is ms in neuron and s in moose - so this too, ... no the
+   dimensions are messed up! So let us assume everything else is fine except
+   the scale factor for [Ca2+] - as shown bu the plots - so how to rescale KC
+   Zgate tables to behave properly?
+
+   
+* <2009-09-12 Sat 22:13> KC and KAHP only hardles
+  Now all other channels are behaving properly - only KC and KAHP - the Ca
+  dependent channels have to be fixed. Now I will try brute force approach -
+  plot Gk (or Ik) / (v - ek) against [Ca2+] and reverse calculate the
+  appropriate function for MOOSE.
+* <2009-09-14 Mon 09:43> KC ....
+  The neuron formula for ik_kc is:
+  if 0.004 * cai < 1
+	ik_kc = gbar * m * 0.004 * cai * (v - ek)
+  else
+	ik_kc = gbar * m * (v - ek)
+
+
+  So, since moose cai is 10^-3 times that in neuron, the formula should be
+  
+  if 4 * cai < 1:
+	ik_kc = gbar * m * 4 * cai
+  else
+	ik_kc = gbar * m * (v - ek)
+
+  But this does not help.
+  I tried plotting g_kc for neuron against moose - initial part is
+  non-linear. Now removed the Ca dependency from both versions and checking if
+  m parameter is ok.
+* <2009-09-16 Wed 00:41> Some crazy behaviour explained?
+  Fortunately I had backed up 12 Sept. code in magaj home. After copying the
+  older code I am getting good match. It seems that the gbar_xyz = 0.0 was not
+  equivalent to commenting out 'insert xyz' statement.
+* <2009-09-16 Wed 10:22> Now OK it seems 
+  The current version is kind of working ... for the enabled
+  channels. committing to git for back up.
+  Now the KC channel is matching up nicely. Cannot believe that computer
+  simulations could be so temperamental - varying from day to day with no
+  apparent reason. It won't be surprising if I become superstitious like
+  biologists. Hopefully these variations only reflect my sleep deprivation
+  levels.
+
+  Even KAHP and CaL together are matching after the scaling.
+  Now I am going to put back all the channels. Good luck!!
+
+  kc, kahp, cal, cat - OK
+
+  kc, kahp, cal, cat, naf - NO
+
+  naf - OK
+
+  cal, cat, naf - OK
+
+  cal, cat, naf, nap - OK
+
+  
+  cal, cat, naf, nap, kc - NO
+
+  - looks like naf and kc together messes up
+
+    naf, cal, cat - slight difference in [Ca2+] - which worries me.
+* <2009-09-17 Thu 00:22> CaConc is the trouble
+  I spent the most part of this evening trying to find the source of the
+  problem. And with KC and CaConc enabled and with a high depolarizing current
+  injection it became obvious that the [Ca2+] is the culprit. The neuron model
+  sets floor and ceiling values on [Ca2+] and the floor(0.0) is reached - in
+  MOOSE it goes negative.
+
+** MOOSE code change
+   I added floor and ceiling sttings in MOOSE and that made the plots much more
+   similar. Yet, with KM present the MOOSE [Ca2+] goes up from 0 earlier than
+   the NEURON model.
+
+   Without KC the discrepancy is much smaller and comes very slowly.
+
+** Finally - this small discrepancy turned out to be due to KC - I was putting 
+   xGate.A = alpha
+   xGate.B = alpha + beta
+   and calcMode = 1 for each as well as making them instantaneous. After
+   putting beta in B and doing a tweakAlpha and unsetting the instant property
+   of xGate, it is working with KC and CaL.
+
+
+** KAHP - 
+   Now I added KAHP and there was little difference. Then to verify that KAHP
+   was really working I disabled KC. It showed a small difference at the
+   peak of Vm as well as a slow deviation of [Ca2+]. I don't know when it is
+   going to bite.
+
+** All channels
+   for 200 ms the Vm plots match nicely. But the [Ca2+] plots deviate from the
+   Ca2+ peak onwards - much like the earlier issue with KC.
+   
+** KAHP blocked
+   Still the deviation in [Ca2+] is present.
+
+* <2009-09-17 Thu 09:52> More shock
+  Now that [Ca2+] is matching for high injection current, when I put KC and
+  CaL together it does not work anymore. There must be something in the
+  scripts themselves - because even after reverting back to older version of
+  pymoose library, it remains the same.
+** KAHP solved 
+   The KAHP issue came because I had made the instantaneous calculation
+   on. AFter correcting that I got exact match for KAHP.
+   -- Now the protocol is:
+   50 ms - start 0.3nA injection
+   100 ms - stop injection
+   150 ms - start 0.3mA injection
+   160 ms - stop injection
+   200 ms - end simulation
+** KAHP + KC - working
+   but the mus peak at 0.3mA injection is slightly (mus: 1370mV, nrn: 1385mV)
+   for lower.
+** KAHP + KC + CaL + NaF 
+   glitches - towards 150 ms
+* <2009-09-17 Thu 16:28> All channels
+  Almost good match with all channels enabled : only glitch is the last spike
+  in moose repoloalizes to a lower Vm than nrn.
+
+  
+** Disable KDR - more discrepancy 
+   - so KDR was actually balancing the discrepancy.
+** Disabled KDR, CaL, CaT, KC, KAHP
+   - I have checked the last four to some extent and expect the culprit to be
+     some other channel.
+   - not much good - the moose plot is very slightly delayed ~0.22 ms
+** Naf & ka enabled
+   Much less difference: 0.05 ms
+** NaF, KC, CaL
+   Bad .. after the first bunch of spikes there is silence ~20ms. Then another
+   bunch of spikes .. the discrepancy going higher and higher.  Last peaks are
+   almost 2 ms apart.
+** NaF, KC - CaL blocked
+   Not much difference, yet moose has a very slight lag.
+** NaF, CaL
+   Back to the same stage as exp. 6 yesterday. [Ca2+] does not match. Now I am
+   going to check the analytical expressions for these two and compare
+   successive [Ca2+] values based on Vm. Using difference formulae I should be
+   able to tease out the problem source.
+* <2009-09-21 Mon 02:35> Refined utility.hoc
+  Now prints compartments in root->leaf sorted order and with EK, RM, CM and
+  RA as compartment parameters in .p file. Still have to set channel reversal
+  potentials in python code.
+* <2009-09-22 Tue 23:46> Retracted modification in Ca2+
+  As Upi suggested - in order to avoid performance issue in hsolve I made
+  Niraj retract the changes I made in hsolve (floor and ceiling for [Ca2+]). And I checked that the behaviour
+  did not change when all channels are enabled. 
+
+  But there was some serious bug in hsolve in that it did not use the xmin and
+  xmax values set by the user on an interpolation table but used default
+  constant values. We found this from a problem Padraig was facing when trying
+  to use physiological units. This might well have caused me some headache -
+  as I was using.
+* <2009-09-22 Tue 23:56> Looks like hsolve bug was the culprit
+  Now after Niraj did the bugfix, I am getting exact match with all channels
+  enabled in SupPyrFRB.
+* <2009-09-24 Thu 17:55> SupLTS - CaT_A not matching
+  NaF2 missed the shift. Fixed that. Now CaT_A is not matching. Checked the
+  m_inf, m_tau, h_inf and h_tau calculations - allright.
+* <2009-09-25 Fri 21:25> CaT_A : mus = genesis
+  Just tested the same test script with MOOSE and GENESIS - identical.
+  Genesis and Neuron give almost identical result. PyMoose output is less.
+
+** Finally found the bug when comparing the gate tables
+   I happened to use the tauh, taum, minf and hinf from CaT in CaT_A: this
+   happenned because I had copy pasted the CaT class and edited it to make
+   CaT_A - forgetting to change the CaT.minf to CaT_A.minf.
+   
+* <2009-10-06 Tue 16:49> Superficial Layer 2/3 Basket Cells
+* <2009-10-07 Wed 14:13> Fixed Padraig's code
+  Padraig's code for NaP channel of Traub model had a silly mistake - vmin and
+  vmax were swapped - fixed.
+  RandomSpike was not working for him. Turned out the it did not have default
+  scheduling: However useclock solves it, I updated moose RandomSpike class to
+  enable default scheduling. Not yet sure which clock should be scheduled to.
+  Printing channels twice: he was trying to print hh_channel and tabchannel
+  separately - but they are the same class in MOOSE - so I advised him to wrap
+  one with a version check for moose.
+* <2009-10-07 Wed 14:17> SpinyStellate - new version
+  Not working - initially I had not set cartesian, asymmetric and relative
+  options in the .p file. After fixing that the HHChannel Ek were not set
+  properly - I was setting Ek without casting the object to an HHChannel. Now
+  the cell comparison gives exact match.
+  Still it is nowhere close to the neuron output.
+
+** Testing individual channels
+   - [X] passive
+   - [X] NaF2
+   - [X] NaPF + NaF2
+   - [ ] NaPF + NaF2 + KDR_FS  - NO
+	 after 20 ms the spike times drift off.
+   - [X] KDR_FS
+   - [ ] KDR_FS + NaF2 
+	 After 20 ms spike times drift off - may be initial value of m and h
+         gates.
+	 I fixed the initial values for m gate in the channel codes - still
+         same problem.
+   - [X] NaF2 + NaPF_SS + KA + K2 + AR 
+	 NO
+	 not exactly matching
+	 <2009-10-07 Wed 16:43> after I set initial value of m table to 0.0 it matches.
+   - [X] NaF2 + NaPF_SS + KA + K2 
+   - [X] NaF2 + NaPF_SS + KA + K2 + AR + KM
+   - [X] NaF2 + NaPF_SS + KA + K2 + AR + KM + CaT_A
+   - [X] NaF2 + NaPF_SS + KA + K2 + AR + KM + CaT_A + KDR_FS
+   - [ ] NaF2 + NaPF_SS + KA + K2 + AR + KM + CaT_A + KDR_FS + CaL
+	 NO
+   - [X] CaL
+   - [X] CaL + NaF2
+   - [ ] CaL + NaF2 + KDR_FS
+	 difference spike timing by < 1 ms
+   - [ ] CaL + NaF2 + KDR_FS + KA + K2
+	 Same for 30 ms, goes out of sync after that.
+   - [ ]  NaF2 + KDR_FS + KA + K2 + KM + AR
+	 Same for ~40 ms, goes out of sync after that.
+   - [ ] WIth all channels in and setting m0 = 0 for AR, it almost works (the
+     spike time goes out of sync at ~100ms. But shape is very similar.
+
+* <2009-10-08 Thu 11:19> Complete layer 4 -> layer 2/3
+  Now I have the following set of cells functioning:
+  - Spiny Stellate (L 4)
+  - LTS (L 2/3)
+  - Pyramidal FRB (L 2/3)
+  - Pyramidal RS (L 2/3)
+  
+  TODO:
+  - Basket cells (L 2/3)
+  - Chandelier/axo-axonic cells (L 2/3)
+  - Some cell types are lacking in Traub model 
+    1. L 4 Interneurons
+    2. L 4 star pyramidal
+       Not sure if 'superficial' basket cells are in L4 or L2/3
+* <2009-10-08 Thu 19:01> Basket cell - done
+  I finished the basket cell and it matched in the first go!
+* <2009-10-16 Fri 10:06> Release it!
+  I'll add this as a demo to the MOOSE subversion repo. For that I want to do
+  all the cells - which is a no-brainer now.
+  The list of cells:
+- [X] deepaxax_template.hoc
+- [X] nontuftRS_template.hoc
+- [X] supaxax_template.hoc
+- [X] suppyrFRB_template.hoc
+- [X] tuftIB_template.hoc
+      -- this is not matching
+      -- The CaCon tau was set specific for each compartment in level2 - after
+      fixing it matches.
+      -- But No spike when current injection is applied at 50 ms for 50
+      ms. Spikes come when current is injected right at the start of the
+      simulation and stays on for the duration of the current injection.
+- [X] deepbask_template.hoc - the last spike is slightly off
+- [X] nRT_template.hoc - not matching
+      - only passive - matching
+      - only noticed that NaF2 did not have -2.5mV shift in this case -
+        created another specialized channel - much closer
+      - only NaF2 - matching
+      - only KDR - matching
+      - NaF2 + KDR - matching
+      - NaPF - matching
+      - NaF2 + KDR + NaPF + K2 - matching
+      - NaF2 + KDR + NaPF + K2 + KM - goes out of sync after some time
+      - KM alone - matching at 0.3 nA, matching at 10 nA
+      - KM + NaF2 - match
+      - KM + NaF2 + KA - match
+      - K2 + KM + NaF2 + KA - match
+      - K2 + KM + NaF2 + KA - match
+      - K2 + KM + NaF2 + KA + NaPF - match
+      - K2 + KM + NaF2 + KA + NaPF + CaT_A - match
+      - K2 + KM + NaF2 + KA + NaPF + CaT_A + - slight mis-match
+      - AR alone - not matching - m0_ar is set to 0 for this cell - in others
+        it is -2.5 mV
+	- after correcting this all spikes except the last one are matching.
+      - ['NaPF', 'NaF2_nRT', 'KM', 'KA', 'K2', 'CaL', 'CaT_A', 'AR',
+        'KDR_FS'] - match
+      - ['NaPF', 'NaF2_nRT', 'KM', 'KA', 'K2', 'CaL', 'CaT_A', 'AR',,
+        'KDR_FS', 'KC' ] - match
+
+      - Added KAHP_SLOWER to above - last spike out of sync - looks fishy -
+        many other cells have the same problem : KAHP_SLOWER is culprit?
+	
+      - Set calcMode = 1 for KAHP_SLOWER and it works!!
+	
+- [X] supbask_template.hoc
+- [X] suppyrRS_template.hoc
+- [X] tuftRS_template.hoc
+- [ ] deepLTS_template.hoc
+- [X] spinstell_template.hoc
+- [X] supLTS_template.hoc
+- [X] TCR_template.hoc
+* <2009-10-22 Thu 14:36> Visualization
+  I have been googling around and reading mailing lists / documentations in
+  search for a good 3D visualization library in Python. What Karan has been
+  doing is great: but I am not sure how it will integrate with Python. Because
+  he has a stand-alone app for visualization, the number of processes to be
+  handled in Python increase. Also, I suspect that this standalone application
+  will need some wrapper code to integrate with PyQt. 
+
+  On the other hand, if I can make a 3D visualization widget using existing
+  python-opengl libraries, it can utilize Karan's class that writes out data
+  from MOOSE for the visualization application and seemlessly integrate with
+  PyQt gui.
+
+  Regarding this I am considering the following:
+
+  1. VPython - small (2.4 MB), object oriented, high-level (has basic solids
+     like cylinder built-in - so I just need to put the compartment x,y,z and
+     diameter into it), interactive, easy to learn for novice programmars.
+     - Though it seems sufficient for MOOSE, I am not sure how far it can go
+       if we need more sophisticated 3D rendering in future.
+
+  2. MayaVi2 / VTK - big (~10 MB), targeted at scientific data
+     visualization,comes with built-in gui. renders 3D surfaces. 
+     - Does not look easy. Seems to be oriented more towards 3D data rather
+       than standard shapes. Release version requires wx threads. PyQt support
+       incomplete and not well documented, available as source code only.
+     - Some lists said it is easier to use VTK directly and that resolves the
+       blockage with PyQt.
+
+  4. Panda3D - huge (~60 MB). Targeted at industry quality 3D animation and
+     gaming. Portable between mac/linux/windows. Has lots of extra
+     functinoality (like utilities for online multiplayer gaming). Well
+     supported by Disney and CMU.
+     
+* <2010-01-13 Wed 17:46> Starting after another break
+  Restarting the work again after coming back from home. The listing for
+  connectivity is below (embarassed by questions about connectivity from
+  Elisha Moses: but I realized why I could not remember the connection
+  probability - there was none precisely: it was just the number of
+  pre-synaptic neurons for each type of neuron):
+
+  Superficial RS 50 -> 1 Superficial RS 
+  Superficial RS 50 -> 1 Superficial FRB
+  SuperficialRS 50 -> 1 Superficial Basket 
+  SuperficialRS 90 -> 1 Superficial Axoaxonic 
+  SuperficialRS 90 -> 1 Superficial LTS Interneuron 
+  SuperficialRS 3 ->  1 SpinyStellate 
+  SuperficialRS 60 -> 1 Tufted IB Pyramid 
+  SuperficialRS 60 -> 1 Tufted RS Pyramid 
+  SuperficialRS 30 -> 1 deep basket
+  SuperficialRS 30 -> 1 deep axoaxonic
+  SuperficialRS 30 -> 1 deep LTS
+  SuperficialRS 3 -> 1 nontufted RS pyramid
+  SuperficialRS 0 -> 1 TCR
+  SuperficialRS 0 -> 1 nRT
+
+  Superficial FRB Pyramids
+  5 -> Superficial RS
+  5 -> Superficial FRB
+  5 -> Superficial Basket
+  5 -> Superficial Axoaxonic
+  5 -> Superficial LTS
+  1 -> Spiny Stellate
+  3 -> tufted IB
+  3 -> tufted RS
+  3 -> deep basket
+  3 -> deep axoaxonic
+  3 -> deep LTS
+  1 -> nontufted RS
+  0 -> TCR
+  0 -> nRT                      
+
+
+-- I realize that this is basically a matrix with cell types as rows and
+columns. How to represent this in NeuroML?
+
+|               | supRS | supFRB | supBasket | supAxoaxonic | SupLTS | SpinyStellate | tuftedIB | tuftedRS | deepBasket | deepAxoaxonic | deepLTS | nontuftedRS | TCR | nRT |
+|---------------+-------+--------+-----------+--------------+--------+---------------+----------+----------+------------+---------------+---------+-------------+-----+-----|
+| SupRS         |    50 |     50 |        90 |           90 |     90 |             3 |       60 |       60 |         30 |            30 |      30 |           3 |   0 |   0 |
+| SupFRB        |     5 |      5 |         5 |            5 |      5 |             1 |        3 |        3 |          3 |             3 |       3 |           1 |   0 |   0 |
+| SupBasket     |    20 |     20 |        20 |           20 |     20 |            20 |        0 |        0 |          0 |             0 |       0 |           0 |   0 |   0 |
+| SupAxoaxonic  |    20 |     20 |         0 |            0 |      0 |             5 |        5 |        5 |          0 |             0 |       0 |           5 |   0 |   0 |
+| SupLTS        |    20 |     20 |        20 |           20 |     20 |            20 |       20 |       20 |         20 |            20 |      20 |          20 |   0 |   0 |
+| SpinyStellate |    20 |     20 |        20 |           20 |     20 |            30 |       20 |       20 |         20 |            20 |      20 |          20 |   0 |   0 |
+| tuftedIB      |     2 |      2 |        20 |           20 |     20 |            20 |       50 |       20 |         20 |            20 |      20 |          20 |   0 |   0 |
+| tuftedRS      |     2 |      2 |        20 |           20 |     20 |            20 |       20 |       10 |         20 |            20 |      20 |          20 |   0 |   0 |
+| deepBasket    |     0 |      0 |         0 |            0 |      0 |            20 |       20 |       20 |         20 |            20 |      20 |          20 |   0 |   0 |
+| deepAxoaxonic |     5 |      5 |         0 |            0 |      0 |             5 |        5 |        5 |          0 |             0 |       0 |           5 |   0 |   0 |
+| deepLTS       |    10 |     10 |        10 |           10 |     10 |            20 |       20 |       20 |         20 |            20 |      20 |          20 |   0 |   0 |
+| nontuftedRS   |    10 |     10 |        10 |           10 |     10 |            10 |       10 |       10 |         10 |            10 |      10 |          20 |  20 |  20 |
+| TCR           |    10 |     10 |        10 |           10 |      0 |             0 |       10 |       10 |         20 |            10 |       0 |          10 |   0 |  25 |
+| nRT           |     0 |      0 |         0 |            0 |      0 |             0 |        0 |        0 |          0 |             0 |       0 |           0 |  15 |  10 |
+|               |       |        |           |              |        |               |          |          |            |               |         |             |     |     |
+
+
+
+
+
+
+
+
+
+* <2010-01-19 Tue 13:53> Create the Spiny Stellate cells
+  There are 240 of them.
+* <2010-02-19 Fri 02:17> Trouble with read_proto
+  In the current version, I am using read_proto() - class method in TraubCell
+  to read the prototype into a class level variable before getting into
+  __init__ method of subclass.
+  It turns out that when I import the derived class and use it, the __init__
+  of TraubCell throws an error saying that prototype does not exist.
+
+  - realized that I was not making copies of the prototype cell in the
+    constructor.
+
+  - fixed. 
+  - Benchmark: 40 spinystellates connecting to each other
+
+     innerRead: 59 compartments, 539 channels, 53 others
+
+    real	0m10.557s
+    user	0m10.390s
+    sys		0m0.150s
+
+* <2010-02-19 Fri 23:47> GLview with the model
+  I had put a bug report on GLview - the client was crashing.
+  It turned out to be my mistake - I was starting the client in glcell mode,
+  whereas it should have been glview mode.
+
+  After correcting that, and setting the tick interval for glview to rather
+  large value (gldt = 1e-2, plotdt = 1e-3, simdt = 0.025), it shows the
+  compartments. 
+
+  But I cannot separate out the cells here: so need some other way to view
+  them. Need to investigate how vizpath works: may be I can just see the
+  somas?
+* <2010-02-27 Sat 01:33> Mg_block with NMDA
+  In the model NMDA channel conductance is calculated according to Jahr and
+  Stevens, 1990: the same code as Traub et al 1994.
+
+  The conductance is = c * g(V, [Mg2+]) * S(t)
+
+  where c is scaling constant, g is a function specified in Jahr and Stevens,
+  1990 and S(t) is time dependent: linearly rises for 5 ms and decays with a
+  time constant = 150 ms( Traub et al 1994) [ specified for each cell type in
+  Traub et al 2005 ]. I tried to match it with Mg_block implementation in
+  MOOSE - but does not seem to have as many terms. 
+
+  Today I got the synaptic channel code / data specification done. I was
+  considering netCDF4-python and hdf5 for storing the model data - but they
+  seemed too complicated for a simple 2-D dictionary. My code is having a lot
+  of data. 
+
+  synapse.py contains the tau and gbar values for each pair of pre- and
+  post-synaptic cell types.
+
+  In population.py I enhanced the Population class to lookup the tau and gbar
+  and use that for setting up all three kinds of synapses in the same connect
+  method.
+
+  With this the spontaneous oscillation with 40 spiny stellate cells is gone -
+  which was present with default excitatory synapse I used for the demo.
+
+* <2010-03-08 Mon 17:58> NMDA Channel
+  I have been struggling with NMDA channel. The two versions in FORTRAN and
+  NEURON look rather different in terms of handling the linear component.
+
+! NMDA part
+        if (delta.le.5.d0) then
+       gNMDA_suppyrRS(k,L) = gNMDA_suppyrRS(k,L) +
+     &  gNMDA_suppyrRS_to_suppyrRS * delta * 0.2d0
+        else
+       dexparg = (delta - 5.d0)/tauNMDA_suppyrRS_to_suppyrRS
+          if (dexparg.le.5.d0) then
+          z = dexptablesmall (int(dexparg*1000.d0))
+         else if (dexparg.le.100.d0) then
+          z = dexptablebig (int(dexparg*10.d0))
+         else
+          z = 0.d0
+         endif
+       gNMDA_suppyrRS(k,L) = gNMDA_suppyrRS(k,L) +
+     &  gNMDA_suppyrRS_to_suppyrRS * z
+        endif
+c Test for NMDA saturation
+       z = NMDA_saturation_fact * gNMDA_suppyrRS_to_suppyrRS
+       if (gNMDA_suppyrRS(k,L).gt.z)
+     &  gNMDA_suppyrRS(k,L) = z
+! end NMDA part
+
+  NEURON code:
+
+NET_RECEIVE(weight (uS)) {
+	if (flag>=1) {
+		: self event arrived, terminate ramp up
+	: remove one event's contribution to the slope, k
+		k = k - weight/time_interval
+	: Transfer the conductance over from A to B
+		B = B + weight
+		A = A - weight
+	} else {
+		: stimulus arrived, make or continue ramp
+		net_send(time_interval, 1) : self event to terminate ramp
+	: add one event ramp to slope k:
+		k = k + weight/time_interval
+:	note there are no state discontinuities at event start since the begining of a ramp
+:	only has a discontinuous change in derivative
+	}
+}
+
+
+   So I understand that the NEURON code puts a self event for end of linear
+   rise of legand gated component (at time = tau1 = time_interval). When this
+   event happens, i.e., the exponential decay of the legand gated component
+   starts, the weight(conductance) is transferred from A to B.
+
+   The FORTRAN code has no sense of events. So it checks if current time is
+   within the linear rise period (5 ms) and if so, it calculates:
+
+   g += g_cell1_cell2 * delta  / tau1 [tau1 = 5 ms]
+
+   Otherwise, it calculates the decay as:
+
+   g += g_cell1_cell2 *exp((tau1 - delta) / tau2) where tau2 is the decay time
+   constant.
+
+   Looks like the FORTRAN code is using Forward Euler method, but I am not
+   clear about NEURON.
+
+   MOOSE SynChan uses exponential Euler method, but again I am not clear about
+   how it is coming to the difference relation from the double exponential
+   formula.
+
+
+   - My implementation simulates self-events in NEURON by maintaining a
+     separate queue of old events, which pop out when they are ripe and
+     transfer the conductance from A (x_ in my code) to B_ (y_ in my code).
+
+     I am assuming gNMDA_suppyrRS_to_suppyrRS is weight of the synapse from
+     SupPyrRS to SupPyrRS and gNMDA_suppyrRS is the Gk_ for the channel.
+
+* <2010-03-19 Fri 16:57> Busy with NMDAChannel
+  I have implemenetd the NMDAChan class in MOOSE to emulate the NMDAChannel by
+  Jahr and Stevens, 1990 and as implemented by Traub et al. Did not do a
+  proper test/comparison with NEURON.
+
+  Upi advised me to leave this out and use the regular SynChan with regular
+  MgBlock as this much detail may not be relevant.
+
+  I also found a paper by Destexhe, Mainen and Sejnowski (1994) and chapter 1
+  of Methods in Neuronal Modleing (2nd ed) edited by Koch and Segev, which was
+  written by the same three authors in 1998. This model solves the issue of
+  quick succession of incoming pulses to synapse.
+
+  No matter whether I use NMDAChan or SynChan with MgBlock, I'll have to
+  compare the behaviour with the NEURON model.
+
+* <2010-03-22 Mon 19:59> Testing NMDAChan
+  - py/test_nmda.py
+  - nrn/test_nmda.hoc
+
+  I suspect the weight factor might pose some problem.
+  Once this is done I'll be fully ready to start the network. 
+  
+  The issues: 
+  - whether to test the network against neuron or just go ahead.
+  - gap junctions - I have not done anything about them.
+  - ectopic current injection: not sure what this means physiologically.
+
+    
+* <2010-03-25 Thu 10:53> NMDAChan done
+  Finally fixed the NMDAChan class - I had mixed up the terms in the equation
+  for unblocked Mg, also I had confused dt with tau - (in the neuron code they
+  cryptically call it time_interval).
+
+  Now everything works and I committed the fix and the test scripts - both in
+  hoc and python.
+
+* <2010-03-29 Mon 09:30> Setting up the connections
+  SynChan has this awkward behaviour that the synaptic connections don't get
+  updated until reset call. This forces one to set up the connections while
+  creating the model, make a reset call and then set the delays and weights
+  later. But delays and weights are easiest and most intuitive to access when
+  I am looping through different cells/populations.
+
+  The other way will be fortran-like programming, where one does all of the
+  setup except setting delays and weights, then going through all the
+  populations once again and setting the weights and delays. This also
+  requires me to maintain a list of all the SynChan objects and pre and post
+  synaptic cell type information.
+
+  - Turns out the setDelay and setWeight methods do updateSynapse. Only
+    getNumSynapse does not return the latest synapse count. So using it one
+    incremented works.
+
+  - I just fixed getNumSynapse to call updateSynapse so that we get a value
+    consistent with the actual number of connections.
+
+  - Now, one funny thing about the synaptic connections is all the synapses
+    are between the same pair of compartments.
+
+    The code is like:
+    pre = pre_synaptic_compartment
+    post = post_synaptic_compartment
+    make_AMPA_synapse(pre, post)
+    make_GABA_synapse(pre, post)
+    make_NMDA_synapse(pre, post)
+
+    Which is something I do not expect physiologically.
+
+* <2010-03-29 Mon 19:36> Created a test for AMPA synapse
+  In the process I learnt that Traub uses the alpha function
+
+  (t-t0) * exp(-(t-t0)/tau)
+
+  for which the peak conductance becomes: tau * exp(-1)
+  
+  After set Gbar to this value, it works fine.
+
+  I was initially breaking my head over a square pulse appearing as gAMPA -
+  but turned out that I forgot to set clock 1 to simdt, while I did that for
+  clock 0.
+
+* <2010-03-30 Tue 11:42> GABA channel
+  Just like AMPA synapse, GABA_A channel for all the synapses, except for
+  those made by nRT cells, have the time course:
+
+  g = c * exp(-t/tau)
+
+  For nRT neurons:
+
+  g = c1 * exp(-t/tau_fast) + c2 * exp(-t/tau_slow)
+
+  So, if we set tau_slow = 0, then MOOSE SynChan can handle this. But it
+  cannot actually handle 0 values for tau, so I modified SynChan to take care
+  of that (without breaking the regular behaviour).
+
+  Also, the double exponential is implemented as two synchans with tau1 =
+  tau_fast and tau2 = tau_slow respectively (the regular GENESIS/MOOSE synchan
+  does not allow for arbitrary c1, c2 and tau1, tau2, c1 and c2 are tied with
+  tau). This is same approach as the NEURON model.
+
+  
+
+* <2010-03-31 Wed 10:14> Small network of SpinyStellate cells
+  I think Spiny Stellate cells are worthy of studying by themselves.
+
+  I am setting the reversal potential for GABAergic synapses: I was not clear
+  about what are the GABAergic cells. Although the text does not list them
+  explicitly, I worked backward from the code and figured this: All cells have
+  an e_gaba_a in the cell template of neuron version of the model:
+  - nRT:		-75e-3 V
+  - SupBasket:		-75e-3 V
+  - SupAxoaxonic:	-75e-3 V
+  - SupLTS:		-75e-3 V
+  - SupBasket:		-75e-3 V
+  - SupPyrFRB:		-81e-3 V
+  - SupPyrRS:		-81e-3 V
+  - DeepBasket:		-75e-3 V
+  - DeepAxoaxonic:	-75e-3 V
+  - DeepLTS:		-75e-3 V
+  - SpinyStellate:	-75e-3 V
+  - NontuftedRS:	-75e-3 V
+  - TuftedIB:		-75e-3 V
+  - TuftedRS:		-75e-3 V
+  - TCR:		-81e-3 V
+
+  From the list of time constants in the paper:
+  FS, basket, LTS, nRT are sources of GABAergic synapse.
+
+  From the connection set-up in groucho.hoc, these are the pre-synaptic cell
+  types for GABA synapse: 
+  - Superficial Axoaxonic
+  - Superficial Basket
+  - Superficial LTS
+  - Deep Axoaxonic
+  - Deep Basket
+  - Deep LTS 
+  - nRT
+
+    - This is also confirmed by the list of g_gaba values.
+
+* <2010-04-05 Mon 17:26> Info on population-to-population connectivity
+  For debugging purposes and for understanding the syatem from a biological
+  point of view it will be useful to have a gross estimate of various kinds of
+  synapses. So I have put in a field called syncount in Population which is a dict of dicts
+  maintaining, for each kind of post-synaptic cell, count of each kind of
+  synapse.
+
+  It is like :
+  
+  pre.syncount[post][synapse_type] = count
+* <2010-04-08 Thu 12:12> Setting up for big network
+  I fixed quite a few minor mistakes (like forgetting to set EGABA for LTS
+  and Basket cells). Now I am setting up chikki for a big simulation.
+* <2010-04-10 Sat 14:07> Bottleneck with copy
+  As posted in blog, Niraj pointed out that making copies of cells slows down
+  as number of cells increase. The following code snippette:
+  \begin{verbatim*}
+
+    for ii in range(cellcount):
+        start = datetime.now()
+        cell = moose.Cell(proto, 'cell' + str(ii))
+        end = datetime.now()
+        delta = end - start
+
+   \end{verbatim*}  
+
+   Creates 100 copies of a cell and on my laptop, the first copy takes 17 ms
+   whereas the 100-th copy takes 1.32 s. I checked that my python code only
+   adds an overhead: 
+   just copy takes 5 minutes for 100 spiny stellate cells.
+   SpinyStellate constructor takes 17 minutes for the same.
+
+
+   One solution I can think of is avoiding creating wrappers except for the
+   necessary components - pre and postsynaptic compartments, Ca and
+   Ca-dependent channels.
+
+
+   Niraj also suggested that I can avoid the Ca - Ca-dep-chan wrapping if I
+   create an additional message (the GENESIS way) which both I and Upi agree
+   that is not an elegant solution.
+
+
+  Upi said we should discuss this later - as it seems to be a common problem
+  we are facing.
+
+* <2010-04-12 Mon 10:14> Updating code to reduce python-loops.
+  I am going to update the cell models to avoid loops in python. Also avoid
+  copy and use readcell for all cells.
+
+  This will involve:
+  1. addmsg1 for Ca_conc objects and Ca_conc depenednet channels.
+  2. adding a spike element in the cell prototype file for the presynaptic compartment.
+  3. no wrapper for compartments unless required absolutely. It will be mostly
+     coded in strings. CON: this can make the code really ugly, defeating the
+     purpose of using python.
+
+  1. It did not work - although addField adds a field, addmsg1 does not seem
+     to work for setting up connection.
+
+* <2010-04-14 Wed 19:58> Fixed the issue for (1) 
+  of <2010-04-12 Mon 10:14>
+
+  This turned out to be due to a dependency on GenesisParser
+  (Shell->ReadCell->GenesisParser) which is disconnected from Shell, so the
+  message to call Shell.addMessage() was getting lost - the actual addmsg
+  never happenning.
+  
+     
+* <2010-04-24 Sat 11:29> Transformed SpinyStellate
+  I made changes in the TraubCell class in cell.py to avoid creating wrappers
+  for all objects and accessing compartments on demand.
+
+  Also the adding Ca2+ messages bit has been moved to prototype files by
+  adding field addmsg1 to CaConc and KCaChan objects.
+
+  The autoscheduling has been disabled (made changes in moose code for this) -
+  which rescues the cell-creation performance bottleneck.
+  
+  I am going to run it on ghevar.
+* <2010-04-26 Mon 00:03> Bogged down by MOOSE issues
+  Compilation of the system on ghevar was a pain (had to compile and install
+  swig, python2.6.5, numpy. failed to install pylab (the compilation failed
+  because of absence of the font libraries - I am unwilling to do a whole
+  GNOME rebuild to satisfy all the requirements). Managed gsl from
+  kb.centos.org.
+
+  But latest updates on HSOlve has broken something. Yesterday I tried without
+  a proper update - so the clocks were not being assigned properly. Today
+  after updating and recompiling pymoose, running spinystellate.py aborts with
+  the following message just after reset:
+
+  python: HSolveInterface.cpp:100: void HSolveActive::addInject(unsigned int, double): Assertion `index < inject_.size()' failed.
+..Aborted
+
+
+ I had not registered Niraj's mail about HSOlve scheduling being changed. Now
+ I have to check if following his way of scheduling avoids this issue.
+
+ - did not help. And this is independent of autoscheduling.
+
+ 
+* <2010-04-26 Mon 16:32> HSolve problem fixed
+  I discussed the assertion failure with Niraj and he figured that this the
+  result of fixing a bug that did not exist. Once he reverted this bit of
+  code, the program ran fine.
+
+  The next point I had been missing was that HSolve gets created only at
+  reset(). So when I was calling useClock on HSolve on the scheduling code,
+  the targets were non-existent. Once I moved the HSolve scheduling beyond the
+  reset call, SpinyStellate output became similar to that with autoscheduling
+  on.
+
+  Now with SupPyrRS I am facing problem - there are periodic rather long
+  bursts compared to a few spikes close togetehr.
+
+  Need to see if there is something with the ion channels.

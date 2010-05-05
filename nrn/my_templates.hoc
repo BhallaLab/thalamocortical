@@ -1,0 +1,6 @@
+// cell_templates.hoc
+// loads all the cell templates
+
+{
+load_file("cells/spinstell_template.hoc")
+}
