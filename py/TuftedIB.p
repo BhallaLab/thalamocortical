@@ -18,9 +18,11 @@
  * J. Neurophysiol. 93, 2194-2232, 2005
  * Pubmed: http://www.ncbi.nlm.nih.gov/pubmed/15525801?dopt=Abstract
  ***********************************************************************/
+  
 *cartesian
 *relative
 *asymmetric
+*set_global EREST_ACT -0.07  
 *set_compt_param ELEAK -0.07
 *set_compt_param RM 5
 *set_compt_param CM 0.009

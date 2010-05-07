@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 11:11:39 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Feb 17 17:19:50 2010 (+0530)
+# Last-Updated: Fri May  7 17:37:15 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 28
+#     Update #: 40
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -54,77 +54,35 @@ from capool import CaPool
 
 
 class DeepAxoaxonic(TraubCell):
-    prototype = TraubCell.read_proto("DeepAxoaxonic.p", "DeepAxoaxonic")
-    ca_dep_chans = ['KAHP','KAHP_SLOWER', 'KAHP_DP', 'KC', 'KC_FAST']
+    chan_params = {
+        'ENa': 50e-3,
+        'EK': -100e-3,
+        'ECa': 125e-3,
+        'EAR': -40e-3,
+        'EGABA': -75e-3,
+        'X_AR': 0.0,
+        'TauCa': 20e-3
+        }
+    ca_dep_chans = ['KC_FAST']
+    num_comp = 59
+    presyn = 59
+    proto_file = "DeepAxoaxonic.p"
+    prototype = TraubCell.read_proto(proto_file, "DeepAxoaxonic", chan_params)
+    ca_dep_chans = ['KC_FAST']
     def __init__(self, *args):
 	TraubCell.__init__(self, *args)
+        moose.CaConc(self.soma.path + '/CaPool').tau = 50e-3
 	
     def _topology(self):
-        self.presyn = 59
-        self.level[1].add(self.comp[1])
-        for ii in range(2, 42, 13):
-            self.level[2].add(self.comp[ii])
-        for ii in range(3, 43, 13):
-            self.level[3].add(self.comp[ii])
-            self.level[3].add(self.comp[ii+1])
-        for ii in range(5, 45, 13):
-            self.level[4].add(self.comp[ii])
-            self.level[4].add(self.comp[ii+1])
-            self.level[4].add(self.comp[ii+2])
-        for ii in range(8, 48, 13):
-            self.level[5].add(self.comp[ii])
-            self.level[5].add(self.comp[ii+1])
-            self.level[5].add(self.comp[ii+2])
-        for ii in range(11, 51, 13):
-            self.level[6].add(self.comp[ii])
-            self.level[7].add(self.comp[ii+1])
-            self.level[8].add(self.comp[ii+2])
-            self.level[9].add(self.comp[ii+3])
-        for ii in range(54, 60):
-            self.level[0].add(self.comp[ii])
+        raise Exception, 'Deprecated'
 
     
     def _setup_passive(self):
-        for comp in self.comp[1:]:
-	    comp.initVm = -65e-3
+        raise Exception, 'Deprecated'
 
     def _setup_channels(self):
         """Set up connections between compartment and channels, and Ca pool"""
-	for comp in self.comp[1:]:
-	    ca_pool = None
-	    ca_dep_chans = []
-	    ca_chans = []
-	    for child in comp.children():
-		obj = moose.Neutral(child)
-		if obj.name == 'CaPool':
-		    ca_pool = moose.CaConc(child)
-		    ca_pool.tau = 20e-3
-		else:
-		    obj_class = obj.className
-		    if obj_class == 'HHChannel':
-			obj = moose.HHChannel(child)
-			pyclass = eval(obj.name)
-			if issubclass(pyclass, KChannel):
-			    obj.Ek = -100e-3
-			    if issubclass(pyclass, KCaChannel):
-				ca_dep_chans.append(obj)
-			elif issubclass(pyclass, NaChannel):
-			    obj.Ek = 50e-3
-			elif issubclass(pyclass, CaChannel):
-			    obj.Ek = 125e-3
-			    if issubclass(pyclass, CaL):
-				ca_chans.append(obj)
-			elif issubclass(pyclass, AR):
-			    obj.Ek = -40e-3
-	    if ca_pool:
-		for channel in ca_chans:
-		    channel.connect('IkSrc', ca_pool, 'current')
-		for channel in ca_dep_chans:
-		    channel.useConcentration = 1
-		    ca_pool.connect("concSrc", channel, "concen")
-
-	obj = moose.CaConc(self.soma.path + '/CaPool')
-        obj.tau = 50e-3
+        raise Exception, 'Deprecated'
 
     @classmethod
     def test_single_cell(cls):
@@ -190,7 +148,7 @@ from simulation import Simulation
 import pylab
 from subprocess import call
 if __name__ == "__main__":
-    call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_deepaxax.hoc'], cwd='../nrn')
+    # call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_deepaxax.hoc'], cwd='../nrn')
     DeepAxoaxonic.test_single_cell()
 
 
