@@ -1911,3 +1911,12 @@ NET_RECEIVE(weight (uS)) {
   into the compartments instead of Cat_A. The CaPool is supplied by CaL and
   not CaT, so my worry was baseless. Now after changing it back to CaT_A, all
   is well.
+* <2010-05-07 Fri 16:50> TuftedIB working but problem with TuftedRS
+  TuftedIB started working after fixing X value for AR channel. 
+
+  But TuftedRS is slightly off. I went back to the original plots with
+  MOOSE. And there also it is not exact match.
+
+  -- SOLVED : When I zoomed into the beginning of the plots I realized the
+  initVm was deviating. The problem is I have set ELEAK instead of EREST_ACT
+  in the .p files.

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 11:44:48 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Feb 17 17:27:21 2010 (+0530)
+# Last-Updated: Fri May  7 15:57:23 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 22
+#     Update #: 50
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -54,71 +54,38 @@ from capool import CaPool
 
 
 class TuftedIB(TraubCell):
-    prototype = TraubCell.read_proto("TuftedIB.p", "TuftedIB")
-    ca_dep_chans = ['KAHP','KAHP_SLOWER', 'KAHP_DP', 'KC', 'KC_FAST']
+    chan_params = {
+        'ENa': 50e-3,
+        'EK': -95e-3,
+        'EAR': -35e-3,
+        'ECa': 125e-3,
+        'EGABA': -75e-3, # Sanchez-Vives et al. 1997 
+        'TauCa': 1e-3/0.075,
+        'X_AR': 0.25
+        }
+    ca_dep_chans = ['KAHP_DP', 'KC']
+    num_comp = 61
+    presyn = 60
+    proto_file = 'TuftedIB.p'
+    prototype = TraubCell.read_proto(proto_file, "TuftedIB", chan_params)
     def __init__(self, *args):
 	TraubCell.__init__(self, *args)
+        soma_ca_pool = moose.CaConc(self.soma.path + '/CaPool')
+        soma_ca_pool.tau = 100e-3
+	# Special case: individually specified beta_cad's in level  2
+	moose.CaConc(self.comp[2].path + '/CaPool').tau  =   1e-3/0.02
+        moose.CaConc(self.comp[ 5].path + '/CaPool' ).tau = 1e-3 /  0.02
+        moose.CaConc(self.comp[ 6].path + '/CaPool' ).tau = 1e-3 /  0.02
 	
     def _topology(self):
-        self.presyn = 60
+        raise Exception, 'Deprecated'
     
     def _setup_passive(self):
-        for comp in self.comp[1:]:
-	    comp.initVm = -70e-3
+        raise Exception, 'Deprecated'
 
     def _setup_channels(self):
         """Set up connections between compartment and channels, and Ca pool"""
-	for comp in self.comp[1:]:
-	    ca_pool = None
-	    ca_dep_chans = []
-	    ca_chans = []
-	    for child in comp.children():
-		obj = moose.Neutral(child)
-		if obj.name == 'CaPool':
-		    ca_pool = moose.CaConc(child)
-		    ca_pool.tau = 1e-3/0.075
-		else:
-		    obj_class = obj.className
-		    if obj_class == 'HHChannel':
-			obj = moose.HHChannel(child)
-#                         if not obj.name in self.chan_list:
-#                             obj.Gbar = 0.0
-			pyclass = eval(obj.name)
-			if issubclass(pyclass, KChannel):
-			    obj.Ek = -95e-3
-			    if issubclass(pyclass, KCaChannel):
-				ca_dep_chans.append(obj)
-			elif issubclass(pyclass, NaChannel):
-			    obj.Ek = 50e-3
-			elif issubclass(pyclass, CaChannel):
-			    obj.Ek = 125e-3
-			    if issubclass(pyclass, CaL):
-				ca_chans.append(obj)
-			elif issubclass(pyclass, AR):
-			    obj.Ek = -35e-3
-	    if ca_pool:
-		for channel in ca_chans:
-		    channel.connect('IkSrc', ca_pool, 'current')
-		    print comp.name, ':', channel.name, 'connected to', ca_pool.name
-		for channel in ca_dep_chans:
-		    channel.useConcentration = 1
-		    ca_pool.connect("concSrc", channel, "concen")
-		    print comp.name, ':', ca_pool.name, 'connected to', channel.name
-
-	obj = moose.CaConc(self.soma.path + '/CaPool')
-        obj.tau = 100e-3
-	# Special case: individually specified beta_cad's in level  2
-	moose.CaConc(self.comp[2].path + '/CaPool').tau  =   1e-3/0.02
-        moose.CaConc(self.comp[ 3].path + '/CaPool' ).tau = 1e-3 /  0.075
-        moose.CaConc(self.comp[ 4].path + '/CaPool' ).tau = 1e-3 /  0.075
-        moose.CaConc(self.comp[ 5].path + '/CaPool' ).tau = 1e-3 /  0.02
-        moose.CaConc(self.comp[ 6].path + '/CaPool' ).tau = 1e-3 /  0.02
-        moose.CaConc(self.comp[ 7].path + '/CaPool' ).tau = 1e-3 /  0.075
-        moose.CaConc(self.comp[ 8].path + '/CaPool' ).tau = 1e-3 /  0.075
-        moose.CaConc(self.comp[ 9].path + '/CaPool' ).tau = 1e-3 /  0.075
-        moose.CaConc(self.comp[ 10].path + '/CaPool' ).tau = 1e-3 / 0.075
-        moose.CaConc(self.comp[ 11].path + '/CaPool' ).tau = 1e-3 / 0.075
-        moose.CaConc(self.comp[ 12].path + '/CaPool' ).tau = 1e-3 / 0.075
+        raise Exception, 'Deprecated'
 
 
     @classmethod
@@ -187,7 +154,7 @@ from simulation import Simulation
 import pylab
 from subprocess import call
 if __name__ == "__main__":
-    call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_tuftIB.hoc'], cwd='../nrn')
+    # call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_tuftIB.hoc'], cwd='../nrn')
     TuftedIB.test_single_cell()
 
 

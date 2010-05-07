@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 24 10:04:47 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Apr 24 14:49:16 2010 (+0530)
+# Last-Updated: Fri May  7 16:41:47 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 407
+#     Update #: 413
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -155,12 +155,12 @@ class TraubCell(moose.Cell):
         chan_params -- dict containing the channel parameters. The
         following string keys should be there with float values:
 
-        ENa
-        EK
-        EAR
-        ECa
-        TauCa
-        
+        ENa -- Na channle reversal potential
+        EK -- K+ channel reversal potential
+        EAR -- AR channel reversal potential
+        ECa -- Ca+2 channel reversal potential
+        TauCa -- CaPool decay time constant 
+        X_AR -- AR channel's initial X value.
         """
         config.LOGGER.debug('Adjusting channel properties.')
         for key, channel in init_channel_lib().items():
