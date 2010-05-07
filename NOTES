@@ -1902,3 +1902,12 @@ NET_RECEIVE(weight (uS)) {
   bursts compared to a few spikes close togetehr.
 
   Need to see if there is something with the ion channels.
+
+
+* <2010-05-07 Fri 12:09> SupLTS fixed
+  I had renamed CaT_A in all the files having it into CaT thinking that the
+  CaPool has to have the correct value for addmsg1 field in order to connect
+  to the Ca2+ current. This caused CaT channel from /library being inserted
+  into the compartments instead of Cat_A. The CaPool is supplied by CaL and
+  not CaT, so my worry was baseless. Now after changing it back to CaT_A, all
+  is well.
