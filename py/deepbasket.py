@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 14:30:33 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Apr  8 11:56:31 2010 (+0530)
+# Last-Updated: Fri May  7 17:32:06 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 41
+#     Update #: 53
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -54,15 +54,23 @@ from capool import CaPool
 
 
 class DeepBasket(TraubCell):
-    ENa = 50e-3
-    EK = -100e-3
-    EAR = -40e-3
-    ECa = 125e-3
-    EGABA = -75e-3 # Sanchez-Vives et al. 1997 
-    prototype = TraubCell.read_proto("DeepBasket.p", "DeepBasket")
-    ca_dep_chans = ['KAHP','KAHP_SLOWER', 'KAHP_DP', 'KC', 'KC_FAST']
+    chan_params = {
+        'ENa': 50e-3,
+        'EK': -100e-3,
+        'EAR': -40e-3,
+        'ECa': 125e-3,
+        'EGABA': -75e-3, # Sanchez-Vives et al. 1997 
+        'TauCa': 20e-3,
+        'X_AR': 0.25
+        }
+    ca_dep_chans = ['KC_FAST']
+    num_comp = 59
+    presyn = 59
+    proto_file = 'DeepBasket.p'
+    prototype = TraubCell.read_proto(proto_file, "DeepBasket", chan_params)
     def __init__(self, *args):
 	TraubCell.__init__(self, *args)
+	moose.CaConc(self.soma.path + '/CaPool').tau = 50e-3
 	
     def _topology(self):
         self.presyn = 59
@@ -201,7 +209,7 @@ from simulation import Simulation
 import pylab
 from subprocess import call
 if __name__ == "__main__":
-    call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_deepbask.hoc'], cwd='../nrn')
+    # call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_deepbask.hoc'], cwd='../nrn')
     DeepBasket.test_single_cell()
 
 

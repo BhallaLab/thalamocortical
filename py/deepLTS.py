@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 19:32:34 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Apr  8 11:46:24 2010 (+0530)
+# Last-Updated: Fri May  7 17:45:08 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 22
+#     Update #: 41
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -54,17 +54,26 @@ from capool import CaPool
 
 
 class DeepLTS(TraubCell):
-    ENa = 50e-3
-    EK = -100e-3
-    EAR = -40e-3
-    ECa = 125e-3
-    EGABA = -75e-3 # Sanchez-Vives et al. 1997 
-    prototype = TraubCell.read_proto("DeepLTS.p", "DeepLTS")
-    ca_dep_chans = ['KAHP','KAHP_SLOWER', 'KAHP_DP', 'KC', 'KC_FAST']
+    chan_params = {
+        'ENa': 50e-3,
+        'EK': -100e-3,
+        'EAR': -40e-3,
+        'ECa': 125e-3,
+        'EGABA': -75e-3, # Sanchez-Vives et al. 1997 
+        'TauCa': 20e-3,
+        'X_AR': 0.25
+    }
+    ca_dep_chans = ['KAHP_SLOWER', 'KC_FAST']
+    num_comp = 59
+    presyn = 59
+    proto_file = 'DeepLTS.p'
+    prototype = TraubCell.read_proto(proto_file, "DeepLTS", chan_params)
     def __init__(self, *args):
 	TraubCell.__init__(self, *args)
+        moose.CaConc(self.soma.path + '/CaPool').tau = 50e-3
 	
     def _topology(self):
+        raise Exception, 'Deprecated'
         self.presyn = 59
         self.level[1].add(self.comp[1])
         for ii in range(2, 42, 13):
@@ -89,48 +98,11 @@ class DeepLTS(TraubCell):
             self.level[0].add(self.comp[ii])
     
     def _setup_passive(self):
-        for comp in self.comp[1:]:
-	    comp.initVm = -65e-3
+        raise Exception, 'Deprecated'
 
     def _setup_channels(self):
         """Set up connections between compartment and channels, and Ca pool"""
-	for comp in self.comp[1:]:
-	    ca_pool = None
-	    ca_dep_chans = []
-	    ca_chans = []
-	    for child in comp.children():
-		obj = moose.Neutral(child)
-		if obj.name == 'CaPool':
-		    ca_pool = moose.CaConc(child)
-		    ca_pool.tau = 20e-3
-		else:
-		    obj_class = obj.className
-		    if obj_class == 'HHChannel':
-			obj = moose.HHChannel(child)
-			pyclass = eval(obj.name)
-			if issubclass(pyclass, KChannel):
-			    obj.Ek = -100e-3
-			    if issubclass(pyclass, KCaChannel):
-				ca_dep_chans.append(obj)
-			elif issubclass(pyclass, NaChannel):
-			    obj.Ek = 50e-3
-			elif issubclass(pyclass, CaChannel):
-			    obj.Ek = 125e-3
-			    if issubclass(pyclass, CaL):
-				ca_chans.append(obj)
-			elif issubclass(pyclass, AR):
-			    obj.Ek = -40e-3
-	    if ca_pool:
-		for channel in ca_chans:
-		    channel.connect('IkSrc', ca_pool, 'current')
-		    config.LOGGER.debug(comp.name + ' : ' + channel.name + ' connected to ' + ca_pool.name)
-		for channel in ca_dep_chans:
-		    channel.useConcentration = 1
-		    ca_pool.connect("concSrc", channel, "concen")
-		    config.LOGGER.debug(comp.name + ' : ' + ca_pool.name + ' connected to ' + channel.name)
-
-	obj = moose.CaConc(self.soma.path + '/CaPool')
-        obj.tau = 50e-3
+        raise Exception, 'Deprecated'
 
 
     @classmethod
@@ -146,21 +118,6 @@ class DeepLTS(TraubCell):
         
         config.LOGGER.debug(('Created cell: %s' % mycell.path))
         vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_deepLTS', 'Vm', sim.data)
-        ca_conc_path = mycell.soma.path + '/CaPool'
-        ca_table = None
-        if config.context.exists(ca_conc_path):
-            ca_conc = moose.CaConc(ca_conc_path)
-            ca_table = moose.Table('Ca_deepLTS', sim.data)
-            ca_table.stepMode = 3
-            ca_conc.connect('Ca', ca_table, 'inputRequest')
-        kc_path = mycell.soma.path + '/KC'
-        gk_table = None
-        if config.context.exists(kc_path):
-            gk_table = moose.Table('gkc', sim.data)
-            gk_table.stepMode = 3
-            kc = moose.HHChannel(kc_path)
-            kc.connect('Gk', gk_table, 'inputRequest')
-            pymoose.showmsg(ca_conc)
         pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=50e-3, firstWidth=50e-3)
 #         pulsegen1 = mycell.soma.insertPulseGen('pulsegen1', sim.model, firstLevel=3e-7, firstDelay=150e-3, firstWidth=10e-3)
 
@@ -175,14 +132,13 @@ class DeepLTS(TraubCell):
         mus_vm = pylab.array(vm_table) * 1e3
         mus_t = linspace(0, sim.simtime * 1e3, len(mus_vm))
         mus_ca = pylab.array(ca_table)
-        nrn_vm = trbutil.read_nrn_data('Vm_deepLTS.plot', 'test_deepLTS.hoc')
-        nrn_ca = trbutil.read_nrn_data('Ca_deepLTS.plot', 'test_deepLTS.hoc')
-        if len(nrn_vm) > 0:
-            nrn_t = nrn_vm[:, 0]
-            nrn_vm = nrn_vm[:, 1]
-            nrn_ca = nrn_ca[:,1]
-
-        trbutil.do_plot(cls.__name__, mus_t, mus_ca, mus_vm, nrn_t, nrn_ca, nrn_vm)
+        nrn_vm = pylab.loadtxt('../nrn/mydata/Vm_supLTS.plot')
+        nrn_t = nrn_vm[:, 0]
+        nrn_vm = nrn_vm[:, 1]
+        pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
+        pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
+        pylab.legend()
+        pylab.show()
 
         
 # test main --
