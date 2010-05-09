@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Sep 23 00:18:00 2009 (+0530)
 # Version: 
-# Last-Updated: Fri May  7 11:37:26 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 129
+# Last-Updated: Mon May 10 05:20:07 2010 (+0530)
+#           By: subha
+#     Update #: 130
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -212,7 +212,7 @@ class SupLTS(TraubCell):
         mycell.dump_cell('supLTS.txt')
         
         mus_vm = pylab.array(vm_table) * 1e3
-        nrn_vm = pylab.loadtxt('../nrn/mydata/Vm_supLTS.plot')
+        nrn_vm = pylab.loadtxt('../nrn/mydata/Vm_supLTS.plot.gz')
         nrn_t = nrn_vm[:, 0]
         mus_t = linspace(0, sim.simtime*1e3, len(mus_vm))
         nrn_vm = nrn_vm[:, 1]
