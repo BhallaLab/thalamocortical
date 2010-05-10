@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 18 22:00:46 2010 (+0530)
 # Version: 
-# Last-Updated: Mon May 10 08:37:27 2010 (+0530)
+# Last-Updated: Mon May 10 11:22:09 2010 (+0530)
 #           By: subha
-#     Update #: 718
+#     Update #: 722
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -169,7 +169,7 @@ class Population(moose.Neutral):
                             gbar_GABA = numpy.random.random_sample() * (2.1e-9 -0.7e-9) + 0.7e-9
                         pre_syn_comp.makeSynapse(post_syn_comp, 
                                                  name='GABA_FAST', 
-                                                 Ek=self.cell_class.EGABA, 
+                                                 Ek=self.cell_class.chan_params['EGABA'], 
                                                  Gbar=1.0, 
                                                  tau1=tau_GABA_fast, 
                                                  tau2=0.0, 
@@ -178,7 +178,7 @@ class Population(moose.Neutral):
                                                  delay=delay)
                         pre_syn_comp.makeSynapse(post_syn_comp, 
                                                  name='GABA_SLOW', 
-                                                 Ek=self.cell_class.EGABA, 
+                                                 Ek=self.cell_class.chan_params['EGABA'], 
                                                  Gbar=1.0, 
                                                  tau1=tau_GABA_slow, 
                                                  tau2=0.0, 
@@ -188,7 +188,7 @@ class Population(moose.Neutral):
                     else:
                         pre_syn_comp.makeSynapse(post_syn_comp, 
                                                  name='GABA', 
-                                                 Ek=self.cell_class.EGABA, 
+                                                 Ek=self.cell_class.chan_params['EGABA'], 
                                                  Gbar=gbar_GABA, 
                                                  tau1=tau_GABA_fast, 
                                                  tau2=0.0, 
@@ -422,45 +422,45 @@ from spinystellate import SpinyStellate
 # from suppyrRS import SupPyrRS
 
 import time
-from glclient import GLClient
-def start_test_client():
-    testclient = GLClient(exe='/home/subha/src/moose/gl/src/glclient', mode='v', colormap='/home/subha/src/moose/gl/colormaps/rainbow2', save_directory='/tmp')
-    return testclient
+# from glclient import GLClient
+# def start_test_client():
+#     testclient = GLClient(exe='/home/subha/src/moose/gl/src/glclient', mode='v', colormap='/home/subha/src/moose/gl/colormaps/rainbow2', save_directory='/tmp')
+#     return testclient
 
-def test_main(do_glview=False):
-    if do_glview:
-        client = start_test_client()
+# def test_main(do_glview=False):
+#     if do_glview:
+#         client = start_test_client()
 
-    # time.sleep(3)
-    sim = Simulation('/sim')
-    cellcount = 1000
-    start = datetime.now()
-    pre = Population(sim.model.path + '/ss', SpinyStellate, cellcount)
-    # pre.setup_visualization('gl_' + pre.name, sim.data)
-    end = datetime.now()
-    delta = end - start
-    config.BENCHMARK_LOGGER.info('time to create population of %d cells: %g' % (cellcount, delta.seconds + 1e-6 * delta.microseconds))
+#     # time.sleep(3)
+#     sim = Simulation('/sim')
+#     cellcount = 1000
+#     start = datetime.now()
+#     pre = Population(sim.model.path + '/ss', SpinyStellate, cellcount)
+#     # pre.setup_visualization('gl_' + pre.name, sim.data)
+#     end = datetime.now()
+#     delta = end - start
+#     config.BENCHMARK_LOGGER.info('time to create population of %d cells: %g' % (cellcount, delta.seconds + 1e-6 * delta.microseconds))
     
-    post = pre
-    pre.connect(post)
-    precell_index = pre.conn_map[post][0][0][0]
-    post_comp_index = pre.conn_map[post][0][0][1]
-    # print precell_index, post_comp_index
-    precell = pre.cell_list[precell_index]
-    precomp = precell.comp[precell.presyn]
-    postcomp = post.cell_list[0].comp[post_comp_index]
-    precell.soma.insertPulseGen('inject', sim.model, firstLevel=0.0)
-    preVmTable = precomp.insertRecorder('preVmTable', 'Vm', sim.data)
-    postVmTable = postcomp.insertRecorder('postVmTable', 'Vm', sim.data)
-    sim.schedule()
-    sim.run()
-    preVmTable.dumpFile('preVm.dat')
-    postVmTable.dumpFile('postVmTable.dat')
-    config.LOGGER.debug('Synapse count from %s to %s.' % (pre.cell_type, post.cell_type))
-    for key, value in pre.syncount[post].items():
-        config.LOGGER.debug('%s -- %d' % (key, value))
-    if do_glview:
-        client.stop()
+#     post = pre
+#     pre.connect(post)
+#     precell_index = pre.conn_map[post][0][0][0]
+#     post_comp_index = pre.conn_map[post][0][0][1]
+#     # print precell_index, post_comp_index
+#     precell = pre.cell_list[precell_index]
+#     precomp = precell.comp[precell.presyn]
+#     postcomp = post.cell_list[0].comp[post_comp_index]
+#     precell.soma.insertPulseGen('inject', sim.model, firstLevel=0.0)
+#     preVmTable = precomp.insertRecorder('preVmTable', 'Vm', sim.data)
+#     postVmTable = postcomp.insertRecorder('postVmTable', 'Vm', sim.data)
+#     sim.schedule()
+#     sim.run()
+#     preVmTable.dumpFile('preVm.dat')
+#     postVmTable.dumpFile('postVmTable.dat')
+#     config.LOGGER.debug('Synapse count from %s to %s.' % (pre.cell_type, post.cell_type))
+#     for key, value in pre.syncount[post].items():
+#         config.LOGGER.debug('%s -- %d' % (key, value))
+#     if do_glview:
+#         client.stop()
 
 if __name__ == '__main__':
     test_main()
