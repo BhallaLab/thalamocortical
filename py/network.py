@@ -105,8 +105,8 @@ def test_all_cell_type():
 
 
 if __name__ == '__main__':
-    test_all_cell_type()
-    # test_full_model(50e-3)
+    # test_all_cell_type()
+    test_full_model(50e-3)
     config.LOGGER.info('Finished simulation')
 
 
