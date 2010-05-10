@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Jan 13 22:33:35 2010 (+0530)
 # Version: 
-# Last-Updated: Mon May 10 09:12:40 2010 (+0530)
+# Last-Updated: Mon May 10 11:28:58 2010 (+0530)
 #           By: subha
-#     Update #: 452
+#     Update #: 471
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -36,6 +36,8 @@
 
 from numpy import *
 from datetime import datetime
+
+import moose
 import config
 
 from spinystellate import SpinyStellate
@@ -73,43 +75,45 @@ CELL_COUNT = {
     'nRT': 100
 }
               
-def setup_random_recording(self, simulation, pop_list, n=1):
+def setup_random_recording(simulation, pop_list, n=1):
         """Setup a bunch of tables to record from random cells in each population.
 
         Select some cells from each population and record the Vm.
-
+        
         pop_list -- list of Population instances.
-
+        
         n -- number/proportion of cells to be recorded from. If n is
         an integer then it is the absolute number of cells from which
         the Vm will be recorded. If it is a float <= 1 in abosulte
         value, it represents the proportion of cells from which the
         recording should be done.
-
+        
         """
         
-        if isinstance(n, float) and (abs(n) <= 1.0):
-            for pop in pop_list:
-                presyn = pop.cell_class.presyn
-                count = n * len(pop.cell_list)
-                cell_list = random.randint(count)
-                for cell_no in cell_list:
-                    cell = cell_list[cell_no]
-                    comp = cell.comp[presyn]
-                    recorder_name = '%s/%s__%d' % (simulation.data.path, cell.name, presyn)
-                    recorder = moose.Table(recorder_name)
-                    recorder.stepMode = 3
-                    recorder.connect('inputRequest', comp, 'Vm')
+        if isinstance(n, float) and abs(n) <= 1.0:
+                for pop in pop_list:
+                        presyn = pop.cell_class.presyn
+                        count = n * len(pop.cell_list)
+                        cell_no_list = random.randint(count)
+                        for cell_no in cell_no_list:
+                                cell = pop.cell_list[cell_no]
+                                comp = cell.comp[presyn]
+                                recorder_name = '%s/%s__%d' % (simulation.data.path, cell.name, presyn)
+                                recorder = moose.Table(recorder_name)
+                                recorder.stepMode = 3
+                                recorder.connect('inputRequest', comp, 'Vm')
         elif isinstance(n, int):
-            count = n
-            cell_list = random.randint(count)
-            for cell_no in cell_list:
-                cell = cell_list[cell_no]
-                comp = cell.comp[presyn]
-                recorder_name = '%s/%s__%d' % (simulation.data.path, cell.name, presyn)
-                recorder = moose.Table(recorder_name)
-                recorder.stepMode = 3
-                recorder.connect('inputRequest', comp, 'Vm')
+                for pop in pop_list:
+                        presyn = pop.cell_class.presyn
+                        count = n
+                        cell_no_list = random.randint(0, high=count, size=count)
+                        for cell_no in cell_no_list:
+                                cell = pop.cell_list[cell_no]
+                                comp = cell.comp[presyn]
+                                recorder_name = '%s/%s__%d' % (simulation.data.path, cell.name, presyn)
+                                recorder = moose.Table(recorder_name)
+                                recorder.stepMode = 3
+                                recorder.connect('inputRequest', comp, 'Vm')
 
             
 
@@ -122,8 +126,7 @@ def test_full_model(simtime, simdt=1e-4, plotdt=1e-3):
  
     for cell_type, count in CELL_COUNT.items():
         cell_class = eval(cell_type)
-        # net.append(Population(sim.model.path + '/' + cell_type, cell_class, count))
-        net.append(Population(sim.model.path + '/' + cell_type, cell_class, 1))
+        net.append(Population(sim.model.path + '/' + cell_type, cell_class, count))
     for pre_population in net:
         for post_population in net:
             pre_population.connect(post_population)
