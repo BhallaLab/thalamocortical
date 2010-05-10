@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Jan 13 22:33:35 2010 (+0530)
 # Version: 
-# Last-Updated: Fri May  7 18:07:13 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 397
+# Last-Updated: Mon May 10 09:12:40 2010 (+0530)
+#           By: subha
+#     Update #: 452
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -34,6 +34,7 @@
 
 # Code:
 
+from numpy import *
 from datetime import datetime
 import config
 
@@ -72,6 +73,45 @@ CELL_COUNT = {
     'nRT': 100
 }
               
+def setup_random_recording(self, simulation, pop_list, n=1):
+        """Setup a bunch of tables to record from random cells in each population.
+
+        Select some cells from each population and record the Vm.
+
+        pop_list -- list of Population instances.
+
+        n -- number/proportion of cells to be recorded from. If n is
+        an integer then it is the absolute number of cells from which
+        the Vm will be recorded. If it is a float <= 1 in abosulte
+        value, it represents the proportion of cells from which the
+        recording should be done.
+
+        """
+        
+        if isinstance(n, float) and (abs(n) <= 1.0):
+            for pop in pop_list:
+                presyn = pop.cell_class.presyn
+                count = n * len(pop.cell_list)
+                cell_list = random.randint(count)
+                for cell_no in cell_list:
+                    cell = cell_list[cell_no]
+                    comp = cell.comp[presyn]
+                    recorder_name = '%s/%s__%d' % (simulation.data.path, cell.name, presyn)
+                    recorder = moose.Table(recorder_name)
+                    recorder.stepMode = 3
+                    recorder.connect('inputRequest', comp, 'Vm')
+        elif isinstance(n, int):
+            count = n
+            cell_list = random.randint(count)
+            for cell_no in cell_list:
+                cell = cell_list[cell_no]
+                comp = cell.comp[presyn]
+                recorder_name = '%s/%s__%d' % (simulation.data.path, cell.name, presyn)
+                recorder = moose.Table(recorder_name)
+                recorder.stepMode = 3
+                recorder.connect('inputRequest', comp, 'Vm')
+
+            
 
 def test_full_model(simtime, simdt=1e-4, plotdt=1e-3):
     """Setup and run the full Traub model"""
@@ -91,8 +131,10 @@ def test_full_model(simtime, simdt=1e-4, plotdt=1e-3):
     end = datetime.now()
     delta = end - start
     config.LOGGER.info('time to create all the population: %g' % (delta.seconds + 1e-6 * delta.microseconds))
+    setup_random_recording(sim, net)
     sim.schedule(simdt=simdt, plotdt=plotdt, gldt=1e10)
     sim.run(time=simtime)
+    sim.dump_data('data')
 
 def test_all_cell_type():
     """test-load all different cell type. this is for debugging - as test_full_model is crashing silently after reading nRT cell"""

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 18 22:00:46 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Apr 24 11:38:40 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 716
+# Last-Updated: Mon May 10 08:37:27 2010 (+0530)
+#           By: subha
+#     Update #: 718
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -403,7 +403,6 @@ class Population(moose.Neutral):
         else:
             return synapse.SYNAPTIC_DELAY_DEFAULT
 
-                
     
     def setup_visualization(self, glviewname, parent, host='localhost', port='9999'):
         return
