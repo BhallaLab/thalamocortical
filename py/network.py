@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Jan 13 22:33:35 2010 (+0530)
 # Version: 
-# Last-Updated: Wed May 12 15:54:25 2010 (+0530)
+# Last-Updated: Thu May 13 11:46:14 2010 (+0530)
 #           By: subha
-#     Update #: 476
+#     Update #: 482
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -74,7 +74,11 @@ CELL_COUNT = {
     'TCR': 100,
     'nRT': 100
 }
-              
+
+def setup_random_inject(simulation, cells_list, n=1):
+	"""Set-up current injection."""
+	pass
+
 def setup_random_recording(simulation, pop_list, n=1):
         """Setup a bunch of tables to record from random cells in each population.
 
