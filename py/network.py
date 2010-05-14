@@ -6,21 +6,9 @@
 # Maintainer: 
 # Created: Wed Jan 13 22:33:35 2010 (+0530)
 # Version: 
-<<<<<<< HEAD:py/network.py
-<<<<<<< HEAD:py/network.py
-# Last-Updated: Thu May 13 11:46:14 2010 (+0530)
-#           By: subha
-#     Update #: 482
-=======
 # Last-Updated: Mon May 10 11:28:58 2010 (+0530)
 #           By: subha
 #     Update #: 471
->>>>>>> 10e5f490fd90d554b63029bcb6e2eb2ddfcac36c:py/network.py
-=======
-# Last-Updated: Mon May 10 11:28:58 2010 (+0530)
-#           By: subha
-#     Update #: 471
->>>>>>> 10e5f490fd90d554b63029bcb6e2eb2ddfcac36c:py/network.py
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -86,11 +74,7 @@ CELL_COUNT = {
     'TCR': 100,
     'nRT': 100
 }
-
-def setup_random_inject(simulation, cells_list, n=1):
-	"""Set-up current injection."""
-	pass
-
+              
 def setup_random_recording(simulation, pop_list, n=1):
         """Setup a bunch of tables to record from random cells in each population.
 
