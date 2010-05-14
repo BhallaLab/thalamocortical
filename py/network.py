@@ -6,9 +6,15 @@
 # Maintainer: 
 # Created: Wed Jan 13 22:33:35 2010 (+0530)
 # Version: 
+<<<<<<< HEAD:py/network.py
 # Last-Updated: Thu May 13 11:46:14 2010 (+0530)
 #           By: subha
 #     Update #: 482
+=======
+# Last-Updated: Mon May 10 11:28:58 2010 (+0530)
+#           By: subha
+#     Update #: 471
+>>>>>>> 10e5f490fd90d554b63029bcb6e2eb2ddfcac36c:py/network.py
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -98,7 +104,7 @@ def setup_random_recording(simulation, pop_list, n=1):
                 for pop in pop_list:
                         presyn = pop.cell_class.presyn
                         count = n * len(pop.cell_list)
-                        cell_no_list = random.randint(0, high=len(pop.cell_list), size=count)
+                        cell_no_list = random.randint(count)
                         for cell_no in cell_no_list:
                                 cell = pop.cell_list[cell_no]
                                 comp = cell.comp[presyn]
@@ -110,7 +116,7 @@ def setup_random_recording(simulation, pop_list, n=1):
                 for pop in pop_list:
                         presyn = pop.cell_class.presyn
                         count = n
-                        cell_no_list = random.randint(0, high=len(pop.cell_list), size=count)
+                        cell_no_list = random.randint(0, high=count, size=count)
                         for cell_no in cell_no_list:
                                 cell = pop.cell_list[cell_no]
                                 comp = cell.comp[presyn]
@@ -141,7 +147,7 @@ def test_full_model(simtime, simdt=1e-4, plotdt=1e-3):
     setup_random_recording(sim, net)
     sim.schedule(simdt=simdt, plotdt=plotdt, gldt=1e10)
     sim.run(time=simtime)
-    sim.dump_data('data', True)
+    sim.dump_data('data')
 
 def test_all_cell_type():
     """test-load all different cell type. this is for debugging - as test_full_model is crashing silently after reading nRT cell"""
