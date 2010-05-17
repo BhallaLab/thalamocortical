@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Jan 13 22:33:35 2010 (+0530)
 # Version: 
-# Last-Updated: Mon May 17 11:43:10 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 472
+# Last-Updated: Mon May 17 15:36:59 2010 (+0530)
+#           By: subha
+#     Update #: 515
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -74,46 +74,74 @@ CELL_COUNT = {
     'TCR': 100,
     'nRT': 100
 }
-              
-def setup_random_recording(simulation, pop_list, n=1):
-	"""Setup a bunch of tables to record from random cells in each population.
-	
-        Select some cells from each population and record the Vm.
+
+class Network:
+	"""A network of cell-populations of different kinds"""
+	def __init__(simulation, pop_counts):
+		"""init method of the network class.
+
+		simulation -- simulation object giving handle to the containers.
+
+		pops -- a dictionary containing each cell class and its population size.
+
+		This is a rather specific way of designing it. Each
+		population will have the same name as the cell class.		
+
+		"""
+		self.population_count = pop_counts
+		self.sim = simulation
+		self.population_list = []
+		start = datetime.now()
+ 
+		for cell_type, count in pop_counts.items():
+			cell_class = eval(cell_type)
+			self.population_list.append(Population(sim.model.path + '/' + cell_type, cell_class, count))
+            for pre_population in self.population_list:
+				for post_population in self.population_list:
+					pre_population.connect(post_population)
+ 
+        end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('time to create all the population: %g' % (delta.seconds + 1e-6 * delta.microseconds))
+
+
+    def setup_random_recording(self, n=1):
+        """Setup a bunch of tables to record from random cells in each population.
         
-        pop_list -- list of Population instances.
+        Select some cells from each population and record the Vm.
         
         n -- number/proportion of cells to be recorded from. If n is
         an integer then it is the absolute number of cells from which
         the Vm will be recorded. If it is a float <= 1 in abosulte
         value, it represents the proportion of cells from which the
         recording should be done.
-        
+
         """
         
         if isinstance(n, float) and abs(n) <= 1.0:
-                for pop in pop_list:
-                        presyn = pop.cell_class.presyn
-                        count = n * len(pop.cell_list)
-                        cell_no_list = random.randint(count)
-                        for cell_no in cell_no_list:
-                                cell = pop.cell_list[cell_no]
-                                comp = cell.comp[presyn]
-                                recorder_name = '%s/%s__%d' % (simulation.data.path, cell.name, presyn)
-                                recorder = moose.Table(recorder_name)
-                                recorder.stepMode = 3
-                                recorder.connect('inputRequest', comp, 'Vm')
+            for pop in self.population_list:
+                presyn = pop.cell_class.presyn
+                count = n * len(pop.cell_list)
+                cell_no_list = random.randint(count)
+                for cell_no in cell_no_list:
+                    cell = pop.cell_list[cell_no]
+                    comp = cell.comp[presyn]
+                    recorder_name = '%s/%s__%d' % (self.sim.data.path, cell.name, presyn)
+                    recorder = moose.Table(recorder_name)
+                    recorder.stepMode = 3
+                    recorder.connect('inputRequest', comp, 'Vm')
         elif isinstance(n, int):
-                for pop in pop_list:
-                        presyn = pop.cell_class.presyn
-                        count = n
-                        cell_no_list = random.randint(0, high=count, size=count)
-                        for cell_no in cell_no_list:
-                                cell = pop.cell_list[cell_no]
-                                comp = cell.comp[presyn]
-                                recorder_name = '%s/%s__%d' % (simulation.data.path, cell.name, presyn)
-                                recorder = moose.Table(recorder_name)
-                                recorder.stepMode = 3
-                                recorder.connect('inputRequest', comp, 'Vm')
+            for pop in self.population_list:
+                presyn = pop.cell_class.presyn
+                count = n
+                cell_no_list = random.randint(0, high=count, size=count)
+                for cell_no in cell_no_list:
+                    cell = pop.cell_list[cell_no]
+                    comp = cell.comp[presyn]
+                    recorder_name = '%s/%s__%d' % (self.sim.data.path, cell.name, presyn)
+                    recorder = moose.Table(recorder_name)
+                    recorder.stepMode = 3
+                    recorder.connect('inputRequest', comp, 'Vm')
 
             
 
@@ -122,22 +150,12 @@ def test_full_model(simtime, simdt=1e-4, plotdt=1e-3):
     sim = Simulation('traub')
     net = []
     scale = 10
-    start = datetime.now()
- 
-    for cell_type, count in CELL_COUNT.items():
-        cell_class = eval(cell_type)
-        net.append(Population(sim.model.path + '/' + cell_type, cell_class, count))
-    for pre_population in net:
-        for post_population in net:
-            pre_population.connect(post_population)
- 
-    end = datetime.now()
-    delta = end - start
-    config.LOGGER.info('time to create all the population: %g' % (delta.seconds + 1e-6 * delta.microseconds))
-    setup_random_recording(sim, net)
+    
+    network = Network(sim, CELL_COUNT)
+    network.setup_random_recording(0.05) # record from 5% of cells
     sim.schedule(simdt=simdt, plotdt=plotdt, gldt=1e10)
     sim.run(time=simtime)
-    sim.dump_data('data')
+    sim.dump_data('data', True)
 
 def test_all_cell_type():
     """test-load all different cell type. this is for debugging - as test_full_model is crashing silently after reading nRT cell"""
@@ -151,7 +169,7 @@ def test_all_cell_type():
 
 if __name__ == '__main__':
     # test_all_cell_type()
-    test_full_model(50e-3)
+    test_full_model(1000e-3)
     config.LOGGER.info('Finished simulation')
 
 
