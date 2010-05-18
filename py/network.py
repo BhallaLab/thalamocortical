@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Jan 13 22:33:35 2010 (+0530)
 # Version: 
-# Last-Updated: Mon May 17 15:36:59 2010 (+0530)
-#           By: subha
-#     Update #: 515
+# Last-Updated: Tue May 18 05:44:45 2010 (+0530)
+#         By: subha
+#    Update #: 602
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -29,8 +29,8 @@
 # 2010-01-14 added cell count for the original model
 # 
 # 2010-03-29 12:15:20 (+0530) -- shifted the original file to network_spec.py
-#                                the current file will be used for creating 
-#                                the complete network - more as a driver program.
+#                          the current file will be used for creating 
+#                          the complete network - more as a driver program.
 
 # Code:
 
@@ -73,33 +73,35 @@ CELL_COUNT = {
     'DeepLTS': 100,
     'TCR': 100,
     'nRT': 100
-}
+    }
 
 class Network:
-	"""A network of cell-populations of different kinds"""
-	def __init__(simulation, pop_counts):
-		"""init method of the network class.
-
-		simulation -- simulation object giving handle to the containers.
-
-		pops -- a dictionary containing each cell class and its population size.
-
-		This is a rather specific way of designing it. Each
-		population will have the same name as the cell class.		
-
+    """A network of cell-populations of different kinds"""
+    def __init__(self, simulation, pop_counts):
+        """init method of the network class.
+        
+        simulation -- simulation object giving handle to the containers.
+        
+        pops -- a dictionary containing each cell class and its population size.
+        
+        This is a rather specific way of designing it. Each population
+        will have the same name as the cell class.
+        
 		"""
-		self.population_count = pop_counts
-		self.sim = simulation
-		self.population_list = []
-		start = datetime.now()
- 
-		for cell_type, count in pop_counts.items():
-			cell_class = eval(cell_type)
-			self.population_list.append(Population(sim.model.path + '/' + cell_type, cell_class, count))
-            for pre_population in self.population_list:
-				for post_population in self.population_list:
-					pre_population.connect(post_population)
- 
+        self.population_count = pop_counts
+        self.sim = simulation
+        self.population_list = []
+        start = datetime.now()    
+        for cell_type, count in self.population_count.items():
+            cell_class = eval(cell_type)
+            path = self.sim.model.path + '/' + cell_type
+            pop = Population(path, cell_class, count)
+            self.population_list.append(pop)
+        
+        for pre_population in self.population_list:
+            for post_population in self.population_list:
+                pre_population.connect(post_population)
+                
         end = datetime.now()
         delta = end - start
         config.BENCHMARK_LOGGER.info('time to create all the population: %g' % (delta.seconds + 1e-6 * delta.microseconds))
@@ -107,9 +109,9 @@ class Network:
 
     def setup_random_recording(self, n=1):
         """Setup a bunch of tables to record from random cells in each population.
-        
+    
         Select some cells from each population and record the Vm.
-        
+       
         n -- number/proportion of cells to be recorded from. If n is
         an integer then it is the absolute number of cells from which
         the Vm will be recorded. If it is a float <= 1 in abosulte
@@ -117,12 +119,12 @@ class Network:
         recording should be done.
 
         """
-        
+       
         if isinstance(n, float) and abs(n) <= 1.0:
             for pop in self.population_list:
                 presyn = pop.cell_class.presyn
                 count = n * len(pop.cell_list)
-                cell_no_list = random.randint(count)
+                cell_no_list = random.randint(0, high=len(pop.cell_list), size=count)
                 for cell_no in cell_no_list:
                     cell = pop.cell_list[cell_no]
                     comp = cell.comp[presyn]
@@ -131,10 +133,10 @@ class Network:
                     recorder.stepMode = 3
                     recorder.connect('inputRequest', comp, 'Vm')
         elif isinstance(n, int):
+            count = n
             for pop in self.population_list:
                 presyn = pop.cell_class.presyn
-                count = n
-                cell_no_list = random.randint(0, high=count, size=count)
+                cell_no_list = random.randint(0, high=len(pop.cell_list), size=count)
                 for cell_no in cell_no_list:
                     cell = pop.cell_list[cell_no]
                     comp = cell.comp[presyn]
@@ -143,33 +145,47 @@ class Network:
                     recorder.stepMode = 3
                     recorder.connect('inputRequest', comp, 'Vm')
 
-            
+       
 
-def test_full_model(simtime, simdt=1e-4, plotdt=1e-3):
+def test_full_model(simtime, simdt=1e-4, plotdt=1e-3, cell_count=None):
     """Setup and run the full Traub model"""
     sim = Simulation('traub')
     net = []
     scale = 10
-    
-    network = Network(sim, CELL_COUNT)
+    if cell_count is None:
+        cell_count = CELL_COUNT
+    network = Network(sim, cell_count)
     network.setup_random_recording(0.05) # record from 5% of cells
     sim.schedule(simdt=simdt, plotdt=plotdt, gldt=1e10)
     sim.run(time=simtime)
     sim.dump_data('data', True)
 
 def test_all_cell_type():
-    """test-load all different cell type. this is for debugging - as test_full_model is crashing silently after reading nRT cell"""
+    """test-load all different cell type. this is for debugging - as
+    test_full_model is crashing silently after reading nRT cell"""
     cells = []
     for cell_type in CELL_COUNT.keys():
         print '####', cell_type
         cell_class = eval(cell_type)
-	cells.append(cell_class(cell_class.prototype, cell_type))
-	config.LOGGER.debug('Created cell %s' % (cell_type))
+        cells.append(cell_class(cell_class.prototype, cell_type))
+        config.LOGGER.debug('Created cell %s' % (cell_type))
 
+
+import sys
 
 if __name__ == '__main__':
-    # test_all_cell_type()
-    test_full_model(1000e-3)
+    simtime = 50e-3
+    if len(sys.argv) > 1:
+        simtime = float(sys.argv[1])
+        config.LOGGER.debug('Simulating for %g' % (simtime))
+    scale = 1
+    if len(sys.argv) > 2:
+        scale = float(sys.argv[2])
+    cell_count = {}
+    for key, value in CELL_COUNT.items():
+        cell_count[key] = ceil(value * scale)
+        print key, cell_count[key]
+    test_full_model(simtime, cell_count=cell_count)
     config.LOGGER.info('Finished simulation')
 
 
