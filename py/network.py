@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Jan 13 22:33:35 2010 (+0530)
 # Version: 
-# Last-Updated: Tue May 18 05:44:45 2010 (+0530)
+# Last-Updated: Thu May 20 03:24:01 2010 (+0530)
 #         By: subha
-#    Update #: 602
+#    Update #: 604
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -185,7 +185,7 @@ if __name__ == '__main__':
     for key, value in CELL_COUNT.items():
         cell_count[key] = ceil(value * scale)
         print key, cell_count[key]
-    test_full_model(simtime, cell_count=cell_count)
+    test_full_model(simtime, simdt=1e-5, plotdt=1e-4, cell_count=cell_count)
     config.LOGGER.info('Finished simulation')
 
 
