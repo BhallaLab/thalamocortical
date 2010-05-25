@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed May 19 08:45:03 2010 (+0530)
 # Version: 
-# Last-Updated: Tue May 25 10:26:31 2010 (+0530)
+# Last-Updated: Wed May 26 03:23:42 2010 (+0530)
 #           By: subha
-#     Update #: 244
+#     Update #: 248
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -60,22 +60,6 @@ import config
 
 def destroy(e):
     sys.exit()
-
-
-def plot_data(infilename, outfilename, title=None, xlabel=None, ylabel=None):
-    if xlabel is None:
-        xlabel = 'time (s)'
-    if ylabel is None:
-        ylabel = 'Membrane potential (V)'
-    if title is None:
-        title = infilename
-    data = pylab.loadtxt(infilename)
-    time_list = pylab.linspace(0,  len(data) * config.plotdt, len(data))
-    pylab.plot(time_list, data)
-    pylab.xlabel(xlabel)
-    pylab.ylabel(ylabel)
-    pylab.title(title)
-    pylab.savefig(outfilename)
 
 class PlotApp:
     """Class to create a little plotter using Tk and matplotlib"""
@@ -162,7 +146,6 @@ class PlotApp:
         elif event.keysym == 'Next':
             self.plot_next(self.jump_step)
             
-        # print 'keysym : %s, keysym_num: %s' % (event.keysym, event.keysym_num)
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
@@ -176,35 +159,6 @@ if __name__ == '__main__':
     root.bind('<KeyPress>', app.handle_leftright_keys)
     root.mainloop()
 
-# directory = 'data/20100517'
-# filenames = [
-#     'DeepAxoaxonic_0__59.plot',
-#     'NontuftedRS_0__48.plot',
-#     'SupAxoaxonic_0__59.plot',
-#     'SupPyrFRB_0__72.plot',
-#     'TuftedIB_0__60.plot',
-#     'DeepBasket_0__59.plot',
-#     'nRT_0__59.plot',
-#     'SupBasket_0__59.plot',
-#     'SupPyrRS_0__72.plot',
-#     'TuftedRS_0__60.plot',
-#     'DeepLTS_0__59.plot',
-#     'SpinyStellate_0__57.plot',
-#     'SupLTS_0__59.plot',
-#     'TCR_0__135.plot']
-
-
-# import Tkinter
-
-# if __name__ == '__main__':
-#     root = Tkinter.Tk()
-#     root.mainloop()
-    # pylab.hold(False)
-    # for filename in filenames:
-    #     filename_parts = filename.partition('_')
-    #     outfilename = filename_parts[0] + '.png'
-    #     title = filename_parts[0]
-    #     plot_data(directory + '/' + filename, outfilename, title)
 
 # 
 # plot.py ends here
