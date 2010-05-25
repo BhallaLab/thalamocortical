@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed May 19 08:45:03 2010 (+0530)
 # Version: 
-# Last-Updated: Mon May 24 11:13:41 2010 (+0530)
-#           By: subha
-#     Update #: 46
+# Last-Updated: Tue May 25 11:01:19 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 47
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -87,6 +87,6 @@ if __name__ == '__main__':
         outfilename = filename_parts[0] + '.png'
         title = filename_parts[0]
         plot_data(directory + '/' + filename, outfilename, title)
-    print 'This is a test change'
+        #print 'This is a test change'
 # 
 # plot.py ends here
