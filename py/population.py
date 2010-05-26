@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 18 22:00:46 2010 (+0530)
 # Version: 
-# Last-Updated: Mon May 10 11:22:09 2010 (+0530)
+# Last-Updated: Wed May 26 10:48:50 2010 (+0530)
 #           By: subha
-#     Update #: 722
+#     Update #: 767
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -50,21 +50,21 @@ class Population(moose.Neutral):
     cell_list -- cells contained in this population
 
     conn_map -- a dictionary of actual connection map for each post-synaptic population.
-                the key is the target Population object, value is an n X m x 2 array where n
-                is the number of cells in the postsynaptic population, m is the number of 
-                presynaptic cells from this population per postsynaptic cell in the target 
-                population.
+    the key is the target Population object, value is an n x m x 2 array where n
+    is the number of cells in the postsynaptic population, m is the number of 
+    presynaptic cells from this population per postsynaptic cell in the target 
+    population.
 
-                conn_map[target][i][j][0] is
-                for the i-th cell in 'target' population, the index of the j-th presynaptic 
-                cell in this population.
+    conn_map[target][i][j][0] is
+    for the i-th cell in 'target' population, the index of the j-th presynaptic 
+    cell in this population.
 
-                conn_map[target][i][j][1] is 
-                for the i-th cell in 'target' population, the index of the postsynaptic 
-                compartment for j-th presynaptic cell in this population.
+    conn_map[target][i][j][1] is 
+    for the i-th cell in 'target' population, the index of the postsynaptic 
+    compartment for j-th presynaptic cell in this population.
 
-                This is rather convoluted - but there is no clear workaround because of the
-                way the connectivity is specified (number of pre-cells per post-cell).
+    This is rather convoluted - but there is no clear workaround because of the
+    way the connectivity is specified (number of pre-cells per post-cell).
 
     """
     
@@ -74,34 +74,34 @@ class Population(moose.Neutral):
     THALAMIC_CELLS = ['TCR', 'nRT']
 
     def __init__(self, path, cell_class, cell_count, prefix=None):
-	"""Initialze the population by creating the cells.
+        """Initialze the population by creating the cells.
 
-	path -- path of this element as a container
+        path -- path of this element as a container
 
-	cell_class -- classobject for the cell type to be contained in
-                      this element.
+        cell_class -- classobject for the cell type to be contained in
+        this element.
 
-	cell_count -- number of cells in this population
+        cell_count -- number of cells in this population
 
-	prefix -- the n-th cell in this population gets the name
-                  {prefix}_{n}
+        prefix -- the n-th cell in this population gets the name
+        {prefix}_{n}
 
-	"""
-	moose.Neutral.__init__(self, path)
+        """
+        moose.Neutral.__init__(self, path)
         config.BENCHMARK_LOGGER.debug('Starting creation of population %s' % (cell_class.__name__))
         self.get_allowed_comp_map()
         self.get_connection_map()
-	self.cell_list = []
-	self.cell_type = cell_class.__name__
+        self.cell_list = []
+        self.cell_type = cell_class.__name__
         self.cell_class = cell_class
         self.syncount = defaultdict(lambda: defaultdict(lambda: 0))
         TraubCell.adjust_chanlib(cell_class.chan_params)
-	if prefix is None:
-	    prefix = self.cell_type
-	for number in range(cell_count):
-	    cell_name = '%s_%d' % (prefix, number)
-	    cell_instance = cell_class(cell_class.prototype, self.path + '/' + cell_name)
-	    self.cell_list.append(cell_instance)
+        if prefix is None:
+            prefix = self.cell_type
+        for number in range(cell_count):
+            cell_name = '%s_%d' % (prefix, number)
+            cell_instance = cell_class(cell_class.prototype, self.path + '/' + cell_name)
+            self.cell_list.append(cell_instance)
         self.conn_map = {}
         self.glView = None
         config.LOGGER.debug('Finished creating population %s' % (self.cell_type))
@@ -238,13 +238,13 @@ class Population(moose.Neutral):
                                                                       delta.seconds + 1e-6 * delta.microseconds))
 
     def get_connection_map(self, filename='connmatrix.txt'):
-	"""Load the celltype-to-celltype connectivity map from file
-	and return a nested dictionary dict where dict[X][Y] is the
-	number of presynaptic cells of type X connecting to each
-	postsynaptic cell of type Y.
+        """Load the celltype-to-celltype connectivity map from file
+        and return a nested dictionary dict where dict[X][Y] is the
+        number of presynaptic cells of type X connecting to each
+        postsynaptic cell of type Y.
 
-	filename -- the path of a csv file containing the connectivity
-	matrix.
+        filename -- the path of a csv file containing the connectivity
+        matrix.
 
         The first row in the file should be the column headers - which
         are the cell types. The connection matrix itself is a square
@@ -253,44 +253,44 @@ class Population(moose.Neutral):
         of type header[i] and the postsynaptic cell is of type
         header[j]
 
-	"""
+        """
         if Population.CELL_CONNECTION_MAP is not None:
             return Population.CELL_CONNECTION_MAP
-	config.LOGGER.debug('load_connection_map - loading connection matrix from ' + filename)
-	connection_map = defaultdict(dict)
-	reader = csv.reader(file(filename))
-	header = reader.next()
-	row = 0
-	for line in reader:
-	    if len(line) <= 0:
-		continue
-	    pre = header[row]  
-	    row += 1
-	    col = 0
-	    for entry in line:
-		post = header[col]
-		value = int(entry)
-		connection_map[pre][post] = value
-		col += 1
-        Population.CELL_CONNECTION_MAP = connection_map
-	config.LOGGER.debug('load_connection_map - finished loading.')
-	return connection_map
-    
+        config.LOGGER.debug('load_connection_map - loading connection matrix from ' + filename)
+        connection_map = defaultdict(dict)
+        reader = csv.reader(file(filename))
+        header = reader.next()
+        row = 0
+        for line in reader:
+            if len(line) <= 0:
+                continue
+            pre = header[row]  
+            row += 1
+            col = 0
+            for entry in line:
+                post = header[col]
+            value = int(entry)
+            connection_map[pre][post] = value
+            col += 1
+            Population.CELL_CONNECTION_MAP = connection_map
+        config.LOGGER.debug('load_connection_map - finished loading.')
+        return connection_map
+
     def get_allowed_comp_map(self, filename=None):
-	"""Load the tables for allowed compartment list for synapses
-	between each types of cells. 
-	
-	Return a nested dictionary with entries like:
-	entry["X"]["Y"] = [n1, n2, n3, n4, ...]
-
-	where only compartments with index n1, n2, n3, .... are
-	allowed as postsynaptic compartment for synapses from cells of
-	type X to cells of type Y.
-
-	filename -- the source of the map. A netcdf-4 file?
-
-	"""
-	# netCDF4 seems to be too complicated for simple things like a
+        """Load the tables for allowed compartment list for synapses
+        between each types of cells. 
+        
+        Return a nested dictionary with entries like:
+        entry["X"]["Y"] = [n1, n2, n3, n4, ...]
+        
+        where only compartments with index n1, n2, n3, .... are
+        allowed as postsynaptic compartment for synapses from cells of
+        type X to cells of type Y.
+        
+        filename -- the source of the map. A netcdf-4 file?
+        
+        """
+        # netCDF4 seems to be too complicated for simple things like a
         # map. So just using the dict objects
         if Population.ALLOWED_COMP_MAP is not None:
             return Population.ALLOWED_COMP_MAP
@@ -302,7 +302,7 @@ class Population(moose.Neutral):
 
     def get_tauGABA(self, post, fast=True):
         """Get the time constant for GABAergic synapses. 
-
+        
         Just look-up the TAU_GABA dictionary in synapse.py for the
         pre- and post-synaptic cell pair.  nRT cells are special in
         that their GABAergic synaptic conductance has two components:
@@ -350,15 +350,15 @@ class Population(moose.Neutral):
 
     def get_GbarAMPA(self, post):
         """Lookup the peak conductance for AMPA synapse.
-
+        
         post -- post synaptic population.
-
+        
         """
         try:
             return synapse.G_AMPA[self.cell_type][post.cell_type]
         except KeyError:
             return None
-    
+        
     def get_GbarNMDA(self, post):
         """Get the peak conductance of NMDA synapses.
 
@@ -376,18 +376,18 @@ class Population(moose.Neutral):
             return synapse.G_NMDA[self.cell_type][post.cell_type]
         except KeyError:
             return None
-
+        
     def get_GbarGABA(self, post):
         """Get peak conductance of GABAergic synapses.
-
+        
         post -- post synaptic population.
-
+        
         """
         try:
             return synapse.G_GABA[self.cell_type][post.cell_type]
         except KeyError:
             return None
-    
+        
     def get_delay(self, post):
         """Get delay for the synaptic connection.
 
@@ -398,12 +398,12 @@ class Population(moose.Neutral):
                 and (post.cell_type not in Population.THALAMIC_CELLS)):
             return synapse.SYNAPTIC_DELAY_THALAMOCORTICAL
         elif ((self.cell_type not in Population.THALAMIC_CELLS) \
-                and (post.cell_type in Population.THALAMIC_CELLS)):
+                  and (post.cell_type in Population.THALAMIC_CELLS)):
             return synapse.SYNAPTIC_DELAY_CORTICOTHALAMIC
         else:
             return synapse.SYNAPTIC_DELAY_DEFAULT
 
-    
+        
     def setup_visualization(self, glviewname, parent, host='localhost', port='9999'):
         return
         self.glView = moose.GLview(glviewname, parent)
@@ -418,6 +418,17 @@ class Population(moose.Neutral):
         self.glView.sync = 'off'
         self.glView.grid = 'on'
 
+    def dump_map(self, filename):
+        """Dump the connection map to a specified file."""
+        outfile = open(filename, 'w')
+        for target_pop in self.conn_map:
+            for ii in range(len( self.conn_map[target_pop])):
+                pre_cell_no = self.conn_map[target_pop][ii][0]
+                post_comp_no = self.conn_map[target_pop][ii][1]
+                pre_comp = '%s/comp_%d' % (self.cell_list[pre_cell_no].path, self.cell_class.presyn )
+                post_comp = '%s/comp_%d' % (target.cell_list[ii].path, post_comp_no)
+                outfile.write('%s %s\n' % (pre_comp, post_comp)
+        outfile.close()
 from spinystellate import SpinyStellate
 # from suppyrRS import SupPyrRS
 
@@ -440,7 +451,7 @@ import time
 #     end = datetime.now()
 #     delta = end - start
 #     config.BENCHMARK_LOGGER.info('time to create population of %d cells: %g' % (cellcount, delta.seconds + 1e-6 * delta.microseconds))
-    
+        
 #     post = pre
 #     pre.connect(post)
 #     precell_index = pre.conn_map[post][0][0][0]
@@ -462,7 +473,7 @@ import time
 #     if do_glview:
 #         client.stop()
 
-if __name__ == '__main__':
-    test_main()
+# if __name__ == '__main__':
+#     test_main()
 # 
 # population.py ends here
