@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 18 22:00:46 2010 (+0530)
 # Version: 
-# Last-Updated: Wed May 26 10:48:50 2010 (+0530)
+# Last-Updated: Sat Jun 19 07:16:55 2010 (+0530)
 #           By: subha
-#     Update #: 767
+#     Update #: 771
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -119,6 +119,7 @@ class Population(moose.Neutral):
         config.LOGGER.debug(__name__ + ' starting')
         start = datetime.now()
         connection_map = self.get_connection_map()
+        config.LOGGER.debug('Connecting %s to %s' % (self.cell_type, target.cell_type)) 
         num_pre_per_post = connection_map[self.cell_type][target.cell_type]
         self.conn_map[target] = numpy.zeros((len(target.cell_list), num_pre_per_post, 2), dtype=int)
         # This gets a 2_D matrix whose row[i] is the array of indices
@@ -269,9 +270,9 @@ class Population(moose.Neutral):
             col = 0
             for entry in line:
                 post = header[col]
-            value = int(entry)
-            connection_map[pre][post] = value
-            col += 1
+                value = int(entry)
+                connection_map[pre][post] = value
+                col += 1
             Population.CELL_CONNECTION_MAP = connection_map
         config.LOGGER.debug('load_connection_map - finished loading.')
         return connection_map
@@ -427,7 +428,7 @@ class Population(moose.Neutral):
                 post_comp_no = self.conn_map[target_pop][ii][1]
                 pre_comp = '%s/comp_%d' % (self.cell_list[pre_cell_no].path, self.cell_class.presyn )
                 post_comp = '%s/comp_%d' % (target.cell_list[ii].path, post_comp_no)
-                outfile.write('%s %s\n' % (pre_comp, post_comp)
+                outfile.write('%s %s\n' % (pre_comp, post_comp))
         outfile.close()
 from spinystellate import SpinyStellate
 # from suppyrRS import SupPyrRS
