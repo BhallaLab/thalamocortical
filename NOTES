@@ -1920,3 +1920,24 @@ NET_RECEIVE(weight (uS)) {
   -- SOLVED : When I zoomed into the beginning of the plots I realized the
   initVm was deviating. The problem is I have set ELEAK instead of EREST_ACT
   in the .p files.
+* <2010-05-27 Thu 15:12> Some statistics for Upi's presentation:
+
+  | CellType                  | cell count | compartments/cell | channels/cell |
+  |---------------------------+------------+-------------------+---------------|
+  | spiny stellate            |        240 |                59 |           539 |
+  | deep axoaxonic            |        100 |                59 |           283 |
+  | deep basket               |        100 |                59 |           283 |
+  | deep LTS                  |        100 |                59 |           501 |
+  | nontufted RS              |        500 |                50 |           448 |
+  | nRT                       |        100 |                59 |           607 |
+  | superficial axoaxonic     |         90 |                59 |           283 |
+  | superficial basket        |         90 |                59 |           283 |
+  | superficial LTS           |         90 |                59 |           607 |
+  | superficial pyramidal FRB |         50 |                74 |           772 |
+  | superficial pyramidal RS  |       1000 |                74 |           772 |
+  | thalamocortical relay     |        100 |               137 |          1345 |
+  | tufted IB                 |        800 |                61 |           594 |
+  | tufted RS                 |        200 |                61 |           594 |
+  |---------------------------+------------+-------------------+---------------|
+  |                           |            |                   |               |
+  
