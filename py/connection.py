@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Jun 26 17:22:01 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Jun 29 10:06:41 2010 (+0530)
+# Last-Updated: Tue Jun 29 16:35:49 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 138
+#     Update #: 233
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -53,51 +53,69 @@ from datetime import datetime
 import os
 import csv
 import numpy
-import allowedcomp
+from networkx as nx
+
 import synapse
 import config
+
+
 class TraubNet:
     """
     Network information as strings and maps.
 
-    population -- dictionary with cell-type as key and cell-count as
+    cellcount -- dictionary with cell-type as key and cell-count as
     value.
 
     presynaptic -- dictionary of cell types and presynaptic
     compartment no.
 
-    forward -- presynaptic compartment mapped to set of synchans on
-    the postsynaptic compartment.
+    forward -- presynaptic cell no. mapped to set of synchans on
+    postsynaptic compartment.
 
     backward -- postsynaptic synchans mapped to set of presynaptic
     cells.
     
     weight -- dictionary of dictionaries:
     weight[precell][post_synchan] = value of gbar for this connection.
+
+    celltype -- list of cell types - lexicographically sorted
+
+    cellnet -- a graph containing cell-to cell connectivity.
+
+    compnet -- a graph containing compartment level connectivity.
+
+    synnet -- a graph containing synchan level connectivity
     """
-    def __init__(self, connmatrix='connmatrix.txt', allowedcomp='allowedcomp.txt', cells='cells.txt'):
+    def __init__(self, connmatrix_file='connmatrix.txt', allowedcomp_file='allowedcomp.txt', cellcount_file='cells.txt'):
         """
-        connmatrix -- filename of the text file containing
+        connmatrix_file -- filename of the text file containing
         connectivity matrix. This should be a csv file with header
         containining the cell types followed by rows of
         integers. row[i][j] is the number of presynaptic cells of type
         header[i] that connect to each cell of type header[j].
 
-        allowedcomp -- filename of csv file containing the list of
-        allowed postsynaptic compartment numbers for each cell type
+        allowedcomp_file -- filename of csv file containing the list
+        of allowed postsynaptic compartment numbers for each cell type
         pair. A row of this file should be of the form:
         presynaptic_celltype, postsynaptic_celltype, n1, n2, ...
 
+        cellcount_file -- filename of a text file containing all the
+        cell types along with the size of their population.
+
         """
         self.__connmap = None
-        self.__allowedcompmap = None
+        self.__allowedcompmap = None        
+        self.__population = None
+        self.__celltype = None
+        self.cellcount_file = cellcount_file
         self.connmap_file = connmatrix
         self.allowedcompmap_file = allowedcomp
-        self.population = {}
         self.presynaptic = {}
         self.forward = defaultdict(set)
         self.backward = defaultdict(set)
         self.weight = defaultdict(dict)
+        self.cellnet = nx.MultiDiGraph()
+        raise NotImplementedError('TODO: incorporate networkx module\'s MultiDiGraph class to implement cell to cell/comp/synchan connectivity.')
         self._expand()
 
     def _get_connmap(self):
@@ -166,16 +184,21 @@ class TraubNet:
         """
         if self.__allowedcompmap is not None:
             return self.__allowedcompmap
-        self.__allowedcompmap = defaultdict(dict)
-        reader = csv.reader(file(self.allowedcompmap_file))
-        row = 0
-        for line in reader:
-            if len(line) <= 0:
-                continue
-            self.__allowedcompmap[line[0]][line[1]] = []
-            for entry in line[2:]:
-                self.__allowedcompmap[line[0]][line[1]].append(int(entry))
-        
+        with open(self.allowedcompmap_file, 'r') as cmpmap_file:
+            try:
+                reader = csv.reader(cmpmap_file)
+                self.__allowedcompmap = defaultdict(dict)
+                row = 0
+                for line in reader:
+                    if len(line) <= 0:
+                        continue
+                    self.__allowedcompmap[line[0]][line[1]] = []
+                    for entry in line[2:]:
+                        self.__allowedcompmap[line[0]][line[1]].append(int(entry))
+            except csv.Error, e:
+                print 'file %s, line %d: %s' % (filename, reader.line_num, e)
+                raise 
+
         return self.__allowedcompmap
 
     def _set_allowedcompmap(self, filename):
@@ -189,11 +212,41 @@ class TraubNet:
     # Define allowedcompmap as a property
     allowedcompmap = property(_get_allowedcompmap, _set_allowedcompmap)
 
+    @property
+    def cellcount(self):
+        if self.__cellcount:
+            return self.__cellcount
+        self.__cellcount = {}
+        with open(self.cellcount_file, 'r') as popfile:
+            reader = csv.reader(popfile)
+            for line in reader:
+                if len(line) > 0:
+                    self.__cellcount[line[0]] = int(line[1])
+        return self.__cellcount
+
+    @property
+    def celltype(self):
+        """A list of cell types. It is sorted alphabetically."""
+        if self.__celltype is not None:
+            return self.__celltype
+        self.__celltype = sorted(self.cellcount.keys())
+        return self.__celltype
+
     def _expand(self):
         """
         expand the network into the maps.
         """
-        raise NotImplementedError
+        config.LOGGER.debug(__name__ + ': starting.')
+        cells = self.cellcount.keys()
+        
+        for pretype in self.celltype:
+            for posttype in self.celltype:
+                precell_count = self.connmap[pretype][posttype]
+        
+            
+            
+        config.LOGGER.debug(__name__ + ': finished.')
+
         
 # 
 # connection.py ends here
