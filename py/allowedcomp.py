@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Feb 17 22:14:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Feb 19 16:08:55 2010 (+0530)
+# Last-Updated: Mon Jun 28 19:03:06 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 26
+#     Update #: 43
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -367,6 +367,17 @@ ALLOWED_COMP['NontuftedRS']['NontuftedRS'] = [2,3,4,5,6,7,8,9,10,11,12,13,14,15,
 # def write_to_netcdf(filename):
 #     dataset = netcdf.Dataset('allowedcompmap.nc', 'w')
 #     celltype = numpy.dtype([()])
+
+import csv
+if __name__ == '__main__':
+    filename = 'allowedcomp.txt'
+    outfile = open(filename, 'w')
+    output = csv.writer(outfile)
+    for pre, entry in ALLOWED_COMP.items():
+        for post, comps in entry.items():
+            row = [pre, post] + comps
+            output.writerow(row)
+    outfile.close()
 
 #
 # allowedcomp.py ends here
