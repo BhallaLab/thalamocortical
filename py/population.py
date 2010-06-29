@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 18 22:00:46 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Jun 19 07:16:55 2010 (+0530)
-#           By: subha
-#     Update #: 771
+# Last-Updated: Mon Jun 28 12:19:17 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 772
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -273,7 +273,7 @@ class Population(moose.Neutral):
                 value = int(entry)
                 connection_map[pre][post] = value
                 col += 1
-            Population.CELL_CONNECTION_MAP = connection_map
+        Population.CELL_CONNECTION_MAP = connection_map
         config.LOGGER.debug('load_connection_map - finished loading.')
         return connection_map
 
