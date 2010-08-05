@@ -1949,4 +1949,5 @@ NET_RECEIVE(weight (uS)) {
   This can be used to select cells to record data from.
   It will be useful to expand the model without actually creating the objects
   and making a string based model structure.
- 
+* <2010-08-05 Thu> Another restart
+  Getting back to science after five weeks of MOOSE GUI.
