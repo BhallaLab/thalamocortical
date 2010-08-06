@@ -23,6 +23,9 @@ py
 
  - test.py: code for running the simulation
 
+ - connection.py: network information in the form of graphs using
+   networkX module.
+
 nrn
 
  - test.hoc: code for running the simulation rest of the files are

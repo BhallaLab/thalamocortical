@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Jun 26 17:22:01 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Jun 29 16:35:49 2010 (+0530)
+# Last-Updated: Thu Aug  5 19:19:12 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 233
+#     Update #: 234
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -61,7 +61,7 @@ import config
 
 class TraubNet:
     """
-    Network information as strings and maps.
+    Store network information as strings and maps.
 
     cellcount -- dictionary with cell-type as key and cell-count as
     value.
