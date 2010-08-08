@@ -1951,3 +1951,19 @@ NET_RECEIVE(weight (uS)) {
   and making a string based model structure.
 * <2010-08-05 Thu> Another restart
   Getting back to science after five weeks of MOOSE GUI.
+* <2010-08-08 Sun 23:01> Support for network
+  I decided to use networkX (http://networkx.lanl.gov) for easy handling of
+  the network. There several candidate graph libraries: pygraph, networkx,
+  igraph. I saw recommendations for all of these in the Python Graph API
+  (PEP-like) page, but it seems not only networkx is one of the most popular
+  packages with good support, but it is also recommended by the developers of
+  several discontinued python-graph-module projects. Its winning point is good
+  documentation and ease of use. Although I saw complaints about speed, the
+  latest version seems to have improved a lot.
+  
+
+  For using networkX, I installed python-graphviz and libgv-python which
+  allows one to visualize the graphs in graphviz. It can also utilize
+  matplotlib to directly display the graphs.
+
+  
