@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Jun 26 17:22:01 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Aug  5 19:19:12 2010 (+0530)
+# Last-Updated: Mon Aug  9 00:49:51 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 234
+#     Update #: 326
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -53,7 +53,8 @@ from datetime import datetime
 import os
 import csv
 import numpy
-from networkx as nx
+import networkx as nx
+import matplotlib.pyplot as plt
 
 import synapse
 import config
@@ -107,15 +108,18 @@ class TraubNet:
         self.__allowedcompmap = None        
         self.__population = None
         self.__celltype = None
+        self.__cellcount = {}
         self.cellcount_file = cellcount_file
-        self.connmap_file = connmatrix
-        self.allowedcompmap_file = allowedcomp
+        self.__connmap_file = connmatrix_file
+        self.allowedcompmap_file = allowedcomp_file
         self.presynaptic = {}
         self.forward = defaultdict(set)
         self.backward = defaultdict(set)
         self.weight = defaultdict(dict)
         self.cellnet = nx.MultiDiGraph()
-        raise NotImplementedError('TODO: incorporate networkx module\'s MultiDiGraph class to implement cell to cell/comp/synchan connectivity.')
+        self.cellclassnet = nx.DiGraph()
+#        raise NotImplementedError('TODO: incorporate networkx module\'s MultiDiGraph class to implement cell to cell/comp/synchan connectivity.')
+        
         self._expand()
 
     def _get_connmap(self):
@@ -138,7 +142,7 @@ class TraubNet:
         if self.__connmap is not None:
             return self.__connmap
         self.__connmap = defaultdict(dict)
-        reader = csv.reader(file(self.connmap_file))
+        reader = csv.reader(file(self.__connmap_file))
         header = reader.next()
         row = 0
         for line in reader:
@@ -153,14 +157,14 @@ class TraubNet:
                 self.__connmap[pre][post] = value
                 col = col + 1
                 
-       return self.__connmap
+        return self.__connmap
 
     def _set_connmap(self, filename):
-        if filename == self.connmap_file:
+        if filename == self.__connmap_file:
             return
         if not os.path.exists(filename):
             raise Exception('%s does not exist.' % (filename))
-        self.connmap_file = filename
+        self.__connmap_file = filename
         self.__connmap = None
 
     # Define connmap as a property
@@ -216,7 +220,6 @@ class TraubNet:
     def cellcount(self):
         if self.__cellcount:
             return self.__cellcount
-        self.__cellcount = {}
         with open(self.cellcount_file, 'r') as popfile:
             reader = csv.reader(popfile)
             for line in reader:
@@ -238,15 +241,59 @@ class TraubNet:
         """
         config.LOGGER.debug(__name__ + ': starting.')
         cells = self.cellcount.keys()
-        
+        self.min_prepost_count = 1000000
+        self.max_prepost_count = 0
         for pretype in self.celltype:
             for posttype in self.celltype:
                 precell_count = self.connmap[pretype][posttype]
+                self.cellclassnet.add_node(pretype, count=self.cellcount[pretype])
+                if precell_count > 0:
+                    if precell_count > self.max_prepost_count:
+                        self.max_prepost_count = precell_count
+                    if precell_count < self.min_prepost_count:
+                        self.min_prepost_count = precell_count
+                    self.cellclassnet.add_edge(pretype, posttype, weight=precell_count, prepost_ratio=precell_count)
+                print '##', pretype, ':', precell_count, posttype
+            
         
-            
-            
         config.LOGGER.debug(__name__ + ': finished.')
 
+    def draw_cellclassnet(self):
+        pos = nx.spring_layout(self.cellclassnet, iterations=20)
+        # try:
+        #     pos = nx.graphviz_layout(self.cellclassnet)
+        # except:
+        #     pass
+        edge_widths = [edata['prepost_ratio']*1.0/self.min_prepost_count for u, v, edata in self.cellclassnet.edges(data=True)]
+        print edge_widths
+        node_sizes = [self.cellclassnet.node[v]['count'] for v in self.cellclassnet]
         
+        nx.draw_networkx_nodes(self.cellclassnet, pos, node_size=node_sizes, with_labels=True)
+        nx.draw_networkx_edges(self.cellclassnet, pos, 
+                               alpha=0.4, 
+                               width=edge_widths,
+                               edge_color=edge_widths, 
+                               edge_cmap=plt.cm.jet, 
+                               edge_vmin=min(edge_widths), 
+                               edge_vmax=max(edge_widths))
+
+        # nx.draw(self.cellclassnet, pos, 
+        #         alpha=0.4,
+        #         with_labels=True, 
+        #         node_size=node_sizes,
+        #         width=edge_widths,
+        #         edge_color=edge_widths,
+        #         edge_cmap=plt.cm.jet,
+        #         edge_vmin=1.0,
+        #         edge_vmax=1.0*self.max_prepost_count/self.min_prepost_count)
+        plt.show()
+
+
+def test():
+    net = TraubNet()
+    net.draw_cellclassnet()
+
+if __name__ == '__main__':
+    test()
 # 
 # connection.py ends here
