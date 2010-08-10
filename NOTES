@@ -1991,3 +1991,9 @@ NET_RECEIVE(weight (uS)) {
 
   These are rather inconvenient in Python. But I guess they reflect the c-ness
   of the underlying library.
+
+* <2010-08-10 Tue 13:42> Cleaning up igraph code
+  Decided to clean up the code by removing the test code for igraph.
+  Converting TraubNet class in connections.py into networkx based code in
+  traubnet.py
+  
