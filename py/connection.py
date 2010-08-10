@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Jun 26 17:22:01 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Aug  9 17:54:07 2010 (+0530)
+# Last-Updated: Tue Aug 10 13:46:10 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 417
+#     Update #: 428
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -120,10 +120,6 @@ class TraubNet:
         self.weight = defaultdict(dict)
         self.cellnet = nx.MultiDiGraph()
         self.cellclassnet = nx.DiGraph()
-        self.i_cellclassnet = igraph.Graph(n=len(self.cellcount), directed=True) # igraph version of the cellclassnet
-        self.cellclass_vertex_map = {}
-        self.vertex_cellclass_map = {}
-#        raise NotImplementedError('TODO: incorporate networkx module\'s MultiDiGraph class to implement cell to cell/comp/synchan connectivity.')
         
         self._expand()
 
@@ -245,18 +241,6 @@ class TraubNet:
         expand the network into the maps.
         """
         config.LOGGER.debug(__name__ + ': starting.')
-        index = 0
-        min_count = min(self.cellcount.values())
-        for cell in self.cellcount.keys():
-            print '$$', cell
-            self.cellclass_vertex_map[cell] = index
-            self.vertex_cellclass_map[index] = cell
-            self.i_cellclassnet.vs[index]['label'] = cell
-            self.i_cellclassnet.vs[index]['size'] = self.cellcount[cell]*1.0/min_count
-            index += 1
-        for v in self.i_cellclassnet.vs:
-            print '???', v
-        print self.i_cellclassnet.vs
         self.min_prepost_count = 1000000
         self.max_prepost_count = 0
         for pretype in self.celltype:
@@ -270,17 +254,7 @@ class TraubNet:
                         self.min_prepost_count = precell_count
                     self.cellclassnet.add_edge(pretype, posttype, weight=precell_count, prepost_ratio=precell_count)
                     edge = (self.cellclass_vertex_map[pretype], self.cellclass_vertex_map[posttype])
-                    self.i_cellclassnet.add_edges([edge])
                 print '##', pretype, ':', precell_count, posttype
-        # This is the unfriendly bit of igraph - edges have their own
-        # existence, we cannot just set attribute on a pair of
-        # vertices.
-        for edge in self.i_cellclassnet.es:
-            source_cell = self.vertex_cellclass_map[edge.source]
-            target_cell = self.vertex_cellclass_map[edge.target]
-            edge['prepost_ratio'] = self.connmap[source_cell][target_cell]
-            # edge['arrow_size'] = self.connmap[source_cell][target_cell]*1.0/(10.0*self.min_prepost_count)
-        
         config.LOGGER.debug(__name__ + ': finished.')
 
     def draw_cellclassnet(self):
@@ -291,43 +265,20 @@ class TraubNet:
         edge_widths = [edata['prepost_ratio']*1.0/self.min_prepost_count for u, v, edata in self.cellclassnet.edges(data=True)]
         print edge_widths
         node_sizes = [self.cellclassnet.node[v]['count']*10 for v in self.cellclassnet]
-        
-        # nx.draw_networkx_nodes(self.cellclassnet, pos, node_size=node_sizes, with_labels=True)
-        # nx.draw_networkx_edges(self.cellclassnet, pos, 
-        #                        alpha=0.4, 
-        #                        width=edge_widths,
-        #                        edge_color=edge_widths, 
-        #                        edge_cmap=plt.cm.jet, 
-        #                        edge_vmin=min(edge_widths), 
-        #                        edge_vmax=max(edge_widths))
-
         nx.draw(self.cellclassnet, pos, 
                 alpha=0.4,
                 with_labels=True, 
                 node_size=node_sizes,
-                # width=5,
-                # width=edge_widths,
                 edge_color=edge_widths,
                 edge_cmap=plt.cm.jet,
                 edge_vmin=1.0,
                 edge_vmax=1.0*self.max_prepost_count/self.min_prepost_count)
-        # nx.draw_graphviz(self.cellclassnet, pos, alpha=0.4, with_labels=True, node_size=node_sizes, edge_color=edge_widths, edge_cmap=plt.cm.jet, edge_vmin=1.0, edge_vmax=1.0*self.max_prepost_count/self.min_prepost_count)
         plt.show()
 
-    def i_draw_cellclassnet(self):
-        print self.i_cellclassnet.vs['label']
-        igraph.plot(self.i_cellclassnet, layout='fr', edge_color='blue')
-
-    def gv_draw_cellclassnet(self):
-        print 'Saving as a dot file.'
-        # A_graph = nx.to_agraph(self.cellclassnet)
-        nx.write_dot(self.cellclassnet, 'cellclassnet.dot')
-        print 'Saved cellclassnet.dot'
                               
 
 def test():
     net = TraubNet()
-    net.i_draw_cellclassnet()
     net.draw_cellclassnet()
     net.gv_draw_cellclassnet()
 
