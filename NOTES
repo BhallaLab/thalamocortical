@@ -1967,3 +1967,27 @@ NET_RECEIVE(weight (uS)) {
   matplotlib to directly display the graphs.
 
   
+* <2010-08-09 Mon 12:26> igraph -- idiosyncrasies
+  As the display of arrow heads is ugly (just a thicker end of the edge) in
+  networkX I decided to experiment with igraph a bit. It is a C library with
+  Python and R interfaces. Also, display is done via python-cairo bindings.
+
+  I stumbled around a bit before getting started - it lacks in
+  documentation. The best I found for the Python wrapper was this:
+
+  http://www.cs.rhul.ac.uk/home/tamas/development/igraph/tutorial/tutorial.html
+
+  The auto-generated API reference is not of much use for a beginner. Things
+  are slightly unintuitive. For example, you cannot directly access an edge by
+  specifying the vertices: you have to go via select() method for selecting a
+  set of edges based on criteria. Also, there is only one graph class which
+  incorporates digraph and undirected graphs as well  as multigraphs. 
+  
+  I was expecting that an empty constructor will create an empty graph, but in
+  fact it creates a graph with a single node. The nodes are just integer
+  labels and one has to add sepearate attrributes. One cannot add attributes
+  when adding an edge - at least there is nothing like that in the docs. The
+  add_edge function returns the whole graph and not the newly created edge.
+
+  These are rather inconvenient in Python. But I guess they reflect the c-ness
+  of the underlying library.
