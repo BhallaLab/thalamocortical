@@ -5,71 +5,85 @@ graph [
     id 0
     label "SupBasket"
     count 90
+    index 0
   ]
   node [
     id 1
     label "DeepBasket"
     count 100
+    index 0
   ]
   node [
     id 2
     label "TuftedIB"
     count 800
+    index 0
   ]
   node [
     id 3
     label "TCR"
     count 100
+    index 0
   ]
   node [
     id 4
     label "SupPyrRS"
     count 1000
+    index 0
   ]
   node [
     id 5
     label "TuftedRS"
     count 200
+    index 0
   ]
   node [
     id 6
     label "SupAxoaxonic"
     count 90
+    index 0
   ]
   node [
     id 7
     label "SupPyrFRB"
     count 50
+    index 0
   ]
   node [
     id 8
     label "DeepAxoaxonic"
     count 100
+    index 0
   ]
   node [
     id 9
     label "DeepLTS"
     count 100
+    index 0
   ]
   node [
     id 10
     label "SpinyStellate"
     count 240
+    index 0
   ]
   node [
     id 11
     label "SupLTS"
     count 90
+    index 0
   ]
   node [
     id 12
     label "NontuftedRS"
     count 500
+    index 0
   ]
   node [
     id 13
     label "nRT"
     count 100
+    index 0
   ]
   edge [
     source 0
