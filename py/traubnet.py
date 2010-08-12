@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Aug 10 15:45:05 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Aug 10 22:24:04 2010 (+0530)
+# Last-Updated: Wed Aug 11 12:10:58 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 125
+#     Update #: 241
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -84,7 +84,7 @@ class TraubNet(object):
 
         """
         self.__celltype_graph = self._read_celltype_graph(connmatrix_file, format='csv', cellcount_file=cellcount_file)
-        self.__cell_graph = None
+        self.__cell_graph = self._make_cell_graph(filename='cell_graph.gml')
         
     def _read_celltype_graph(self, 
                              connmatrix_file, 
@@ -120,9 +120,10 @@ class TraubNet(object):
 
         if format == 'csv':
             celltype_graph = nx.DiGraph()
+            index = 0
             for key, value in cellcount_dict.items():
                 print key, value
-                celltype_graph.add_node(key, count=value)
+                celltype_graph.add_node(key, count=value, index=index)
             reader = csv.reader(file(connmatrix_file))
             header = reader.next()
             row = 0
@@ -139,7 +140,13 @@ class TraubNet(object):
                     col += 1
         elif format == 'gml':
             celltype_graph = nx.read_gml(connmatrix_file)
-        celltype_graph.graph['doc'] = 'Celltype-based connectivity data. count of node *n* is the number of cells of type *n* that are present in the model. weight of edge (a, b) is the number of cells of type *a* that connect to each cell of type *b*.'
+
+        celltype_graph.graph['doc'] = 'Celltype-based connectivity data. \
+count of node *n* is the number of cells of type *n* \
+that are present in the model. weight of edge (a, b) \
+is the number of cells of type *a* that connect to \
+each cell of type *b*.'
+
         return celltype_graph
 
     def plot_celltype_graph(self):
@@ -180,10 +187,74 @@ class TraubNet(object):
             raise Exception('Only format supported is gml. Received: %s' % (format))
         print 'Saved celltype connectivity graph in', filename
 
+    def _make_cell_graph(self, filename=None):
+        """Expand the celltype-to-celltype connectivity information
+        and make a graph representing the network of the individual
+        cells.
+
+        Each cell is identified by the string {celltype}_{index}
+
+        """
+        if filename:
+            try:
+                start = datetime.now()
+                cell_graph = nx.read_gml(filename)
+                end = datetime.now()
+                delta = end - start
+                config.BENCHMARK_LOGGER.info('Read cell_graph - time: %g s' % (delta.seconds + 1e-6 * delta.microseconds))
+            except Exception, e:
+                print e
+                'Creating the cell_graph from scratch'
+        start = datetime.now()
+        cell_graph = nx.MultiDiGraph()
+        for celltype in self.__celltype_graph:
+            for index in range(self.__celltype_graph.node[celltype]['count']):
+                cell_graph.add_node('%s_%d' % (celltype, index), type_index=self.__celltype_graph.node[celltype]['index'])
+
+        for pre, post, edata in self.__celltype_graph.edges(data=True):
+            pre_count = self.__celltype_graph.node[pre]['count']
+            post_count = self.__celltype_graph.node[post]['count']            
+            pre_post_ratio = edata['weight']
+            # 
+            # randint returns unifrom random integers in [low, high)
+            # interval. i-th row of pre_indices = list of indices of
+            # presynaptic cells of type pre connected to i-th cell of
+            # type post.
+            pre_indices = numpy.random.randint(low=0, high=pre_count, size=(post_count, pre_post_ratio)) 
+            for ii in range(post_count):
+                for jj in pre_indices[ii]:
+                    cell_graph.add_edge('%s_%d' % (pre, jj), '%s_%d' % (post, ii))
+        end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('Built cell_graph programmatically - time: %g s' % (delta.seconds + 1e-6 * delta.microseconds))
+        return cell_graph
+
+    def plot_cell_graph(self):
+        """Display the cell-to-cell connection graph.
+
+        """
+        nx.draw(self.__cell_graph,
+                alpha=0.4,
+                with_labels = False,
+                node_color = [self.__cell_graph.node[vertex]['type_index'] for vertex in self.__cell_graph],
+                cmap=plt.cm.jet,
+                vmin=0,
+                vmax=len(self.__celltype_graph))
+        plt.show()
+
+    def save_cell_graph(self, filename='cell_graph.gml'):
+        """Save the cell to cell connectivity graph in a GML file.
+
+        """
+        nx.write_gml(self.__cell_graph, filename)
+        print 'Saved cell-to-cell connectivity datat in', filename
+    
 def test():
     net = TraubNet()
-    net.plot_celltype_graph()
-    net.save_celltype_graph()
+    # net.plot_celltype_graph()
+    # net.save_celltype_graph()
+    net.plot_cell_graph()
+    net.save_cell_graph()
 
 if __name__ == '__main__':
     test()
