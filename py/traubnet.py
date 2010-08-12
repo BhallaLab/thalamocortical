@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Aug 10 15:45:05 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Aug 11 12:10:58 2010 (+0530)
+# Last-Updated: Thu Aug 12 17:20:54 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 241
+#     Update #: 246
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -124,6 +124,7 @@ class TraubNet(object):
             for key, value in cellcount_dict.items():
                 print key, value
                 celltype_graph.add_node(key, count=value, index=index)
+                index += 1
             reader = csv.reader(file(connmatrix_file))
             header = reader.next()
             row = 0
@@ -233,6 +234,9 @@ each cell of type *b*.'
         """Display the cell-to-cell connection graph.
 
         """
+        for vertex in  self.__cell_graph:
+            config.LOGGER.debug('%s: %d' % (vertex, self.__cell_graph.node[vertex]['type_index']))
+
         nx.draw(self.__cell_graph,
                 alpha=0.4,
                 with_labels = False,
