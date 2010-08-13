@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Aug 12 23:29:34 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Aug 13 16:10:06 2010 (+0530)
+# Last-Updated: Sat Aug 14 00:18:32 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 209
+#     Update #: 217
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -60,8 +60,11 @@ class TraubNet(object):
                  connmatrix_file='connmatrix.txt', 
                  allowedcomp_file='allowedcomp.txt', 
                  cellcount_file='cells.txt'):
-        self.__celltype_graph = self._read_celltype_graph(connmatrix_file, format='csv', cellcount_file=cellcount_file)
-        self.__cell_graph = self._make_cell_graph()
+        self.__celltype_graph = self._read_celltype_graph(connmatrix_file, 
+                                                          format='csv', 
+                                                          cellcount_file=cellcount_file)
+        self.__cell_graph = self._make_cell_graph('cell_graph.gml')
+        print self.__cell_graph.summary()
 
     def _read_celltype_graph(self, 
                              connmatrix_file, 
@@ -152,7 +155,8 @@ each cell of type *b*.'
                 cell_graph = igraph.read(filename, format='gml')
                 end = datetime.now()
                 delta = end - start
-                config.BENCHMARK_LOGGER.info('Read cell_graph - time: %g s' % (delta.seconds + 1e-6 * delta.microseconds))
+                config.BENCHMARK_LOGGER.info('Read cell_graph - time: %g s' 
+                                             % (delta.seconds + 1e-6 * delta.microseconds))
                 return cell_graph
             except Exception, e:
                 print e, 'Now creating the cell_graph from scratch'
@@ -178,7 +182,9 @@ each cell of type *b*.'
             # interval. i-th row of pre_indices = list of indices of
             # presynaptic cells of type pre connected to i-th cell of
             # type post.
-            pre_indices = numpy.random.randint(low=0, high=pre_count, size=(post_count, pre_post_ratio))
+            pre_indices = numpy.random.randint(low=0, 
+                                               high=pre_count, 
+                                               size=(post_count, pre_post_ratio))
             edge_list = []
             for ii in range(post_count):
                 post = post_cells[ii]    
@@ -189,7 +195,8 @@ each cell of type *b*.'
 
         end = datetime.now()
         delta = end - start
-        config.BENCHMARK_LOGGER.info('Built cell_graph programmatically - time: %g s' % (delta.seconds + 1e-6 * delta.microseconds))
+        config.BENCHMARK_LOGGER.info('Built cell_graph programmatically - time: %g s' 
+                                     % (delta.seconds + 1e-6 * delta.microseconds))
         return cell_graph
 
     def plot_cell_graph(self):
@@ -211,7 +218,7 @@ def test():
     # net.save_celltype_graph()
     # net.plot_cell_graph()
     net.save_cell_graph()
-
+    
 if __name__ == '__main__':
     test()
                  
