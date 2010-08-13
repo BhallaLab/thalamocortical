@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Aug 10 15:45:05 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Aug 12 17:20:54 2010 (+0530)
+# Last-Updated: Fri Aug 13 11:20:49 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 246
+#     Update #: 251
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -51,6 +51,10 @@ from datetime import datetime
 import os
 import csv
 import numpy
+import matplotlib
+
+matplotlib.use('SVG')
+
 import matplotlib.pyplot as plt
 
 import networkx as nx
@@ -171,6 +175,7 @@ each cell of type *b*.'
                 edge_vmin=min(edge_weights),
                 edge_vmax=max(edge_weights))
         plt.show()
+        plt.savefig('celltype_graph')
 
     def save_celltype_graph(self, filename='celltype_conn.gml', format='gml'):
         """
@@ -245,6 +250,7 @@ each cell of type *b*.'
                 vmin=0,
                 vmax=len(self.__celltype_graph))
         plt.show()
+        plt.savefig('cell_graph')
 
     def save_cell_graph(self, filename='cell_graph.gml'):
         """Save the cell to cell connectivity graph in a GML file.
