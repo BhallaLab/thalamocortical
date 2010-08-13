@@ -1997,3 +1997,9 @@ NET_RECEIVE(weight (uS)) {
   Converting TraubNet class in connections.py into networkx based code in
   traubnet.py
   
+* <2010-08-13 Fri 16:16> networkx better than igraph.
+  Added a version of traubnet using igraph. Performance is slightly better in
+  networkx (~12 s to build the cell_graph compared to ~16s in igraph).
+
+  I think this is because of extra complexity in Python code to access
+  vertices and edges by integer ids instead of vertex labels.
