@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Aug 10 15:45:05 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Aug 13 11:20:49 2010 (+0530)
+# Last-Updated: Fri Aug 13 11:23:33 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 251
+#     Update #: 253
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -239,8 +239,8 @@ each cell of type *b*.'
         """Display the cell-to-cell connection graph.
 
         """
-        for vertex in  self.__cell_graph:
-            config.LOGGER.debug('%s: %d' % (vertex, self.__cell_graph.node[vertex]['type_index']))
+        # for vertex in  self.__cell_graph:
+            # config.LOGGER.debug('%s: %d' % (vertex, self.__cell_graph.node[vertex]['type_index']))
 
         nx.draw(self.__cell_graph,
                 alpha=0.4,
