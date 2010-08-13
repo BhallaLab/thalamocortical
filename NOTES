@@ -2003,3 +2003,93 @@ NET_RECEIVE(weight (uS)) {
 
   I think this is because of extra complexity in Python code to access
   vertices and edges by integer ids instead of vertex labels.
+
+* <2010-08-13 Fri 23:13> Confused about performance
+  When I tried using the info() method of networkx to print graph properties
+  it took for ever and threw an error: turned out to be a bug in networkx
+  (needed to modify:
+  /usr/local/lib/python2.6/dist-packages/networkx/classes/function.py
+
+  in line 267: info+="Average out degree: %8.4f\n"%\
+                    sum(G.out_degree().values())/nnodes
+
+  changed to (parentheses around format string):		    
+
+  info+="Average out degree: %8.4f\n"%\
+                    (sum(G.out_degree().values())/nnodes)
+
+  After this correction, the running traubnet.py to get info tool ~19
+  minutes. This shocked me. In earlier runs I had igraph and networkx both
+  performing at ~15 seconds.
+
+  Later when I ran it again now, the run time is back to few secods, in stead
+  of minutes. Might have been some strange slowdown of my laptop. The printed
+  info from traubnet.py:
+
+Name: 
+Type: MultiDiGraph
+Number of nodes: 3560
+Number of edges: 662210
+Average in degree: 186.0000
+Average out degree: 186.0000
+
+Saved cell-to-cell connectivity datat in cell_graph.gml
+
+real	0m24.788s
+user	0m19.200s
+sys	0m0.750s
+
+The log file has bench mark data:
+
+2010-08-13 23:08:35,127 INFO traub2005.benchmark traubnet.py _make_cell_graph: Built cell_graph programmatically - time: 11.9645 s
+
+
+The info from igraph version:
+
+3560 nodes, 662210 edges, directed
+
+Number of components: 1
+Diameter: 3
+Density: 0.0523
+Reciprocity: 0.0266
+Average path length: 1.9966
+Saved cell-to-cell connectivity data in cell_graph.gml
+
+real	0m36.503s
+user	0m34.320s
+sys	0m1.650s
+
+
+Benchmark log:
+
+2010-08-13 23:22:25,009 INFO traub2005.benchmark igraph_traubnet.py _make_cell_graph: Built cell_graph programmatically - time: 15.4138 s
+
+
+It turns out that reading the gml file takes much longer than generating the
+graph in memory.
+
+2010-08-14 00:08:32,281 INFO traub2005.benchmark traubnet.py _make_cell_graph: Read cell_graph - time: 1226.49 s
+
+For reading gml file, igraph has much better performance:
+
+2010-08-14 00:19:08,712 INFO traub2005.benchmark igraph_traubnet.py
+_make_cell_graph: Read cell_graph - time: 4.41406 s
+
+And stdout:
+
+3560 nodes, 662210 edges, directed
+
+Number of components: 1
+Diameter: 3
+Density: 0.0523
+Reciprocity: 0.0273
+Average path length: 1.9965
+Saved cell-to-cell connectivity data in cell_graph.gml
+
+real	0m29.543s
+user	0m24.950s
+sys	0m0.620s
+
+
+Confirmed the issue to be the text reading in Python. If I use pickle format
+networkx works fast.
