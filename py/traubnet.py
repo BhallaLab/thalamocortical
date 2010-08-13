@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Aug 10 15:45:05 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Aug 13 16:12:11 2010 (+0530)
+# Last-Updated: Sat Aug 14 00:52:57 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 259
+#     Update #: 274
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -88,9 +88,9 @@ class TraubNet(object):
 
         """
         self.__celltype_graph = self._read_celltype_graph(connmatrix_file, format='csv', cellcount_file=cellcount_file)
-        self.__cell_graph = self._make_cell_graph()
-        # self.__cell_graph = self._make_cell_graph(filename='cell_graph.gml')
-        
+        self.__cell_graph = self._make_cell_graph(filename='cell_graph.gml')
+        print nx.info(self.__cell_graph)
+
     def _read_celltype_graph(self, 
                              connmatrix_file, 
                              format='gml', 
@@ -152,7 +152,7 @@ count of node *n* is the number of cells of type *n* \
 that are present in the model. weight of edge (a, b) \
 is the number of cells of type *a* that connect to \
 each cell of type *b*.'
-
+        celltype_graph.name = 'CellTypeGraph'
         return celltype_graph
 
     def plot_celltype_graph(self):
@@ -209,11 +209,13 @@ each cell of type *b*.'
                 end = datetime.now()
                 delta = end - start
                 config.BENCHMARK_LOGGER.info('Read cell_graph - time: %g s' % (delta.seconds + 1e-6 * delta.microseconds))
+                return cell_graph
             except Exception, e:
                 print e
-                'Creating the cell_graph from scratch'
+        print 'Creating the cell_graph from scratch'
         start = datetime.now()
         cell_graph = nx.MultiDiGraph()
+        cell_graph.name = 'CellGraph'
         for celltype in self.__celltype_graph:
             for index in range(self.__celltype_graph.node[celltype]['count']):
                 cell_graph.add_node('%s_%d' % (celltype, index), type_index=self.__celltype_graph.node[celltype]['index'])
@@ -250,11 +252,16 @@ each cell of type *b*.'
         plt.show()
         plt.savefig('cell_graph')
 
-    def save_cell_graph(self, filename='cell_graph.gml'):
-        """Save the cell to cell connectivity graph in a GML file.
+    def save_cell_graph(self, filename='cell_graph.gml', format='gml'):
+        """Save the cell to cell connectivity graph in a file.
 
         """
-        nx.write_gml(self.__cell_graph, filename)
+        if format == 'gml':
+            nx.write_gml(self.__cell_graph, filename)
+        elif format == 'pickle':
+            nx.write_gpickle(self.__cell_graph, filename)
+        else:
+            raise Error('Not supported: %s' % (format))
         print 'Saved cell-to-cell connectivity datat in', filename
     
 def test():
@@ -262,7 +269,7 @@ def test():
     # net.plot_celltype_graph()
     # net.save_celltype_graph()
     # net.plot_cell_graph()
-    net.save_cell_graph()
+    net.save_cell_graph('networkx_cell_graph.pickle', format='pickle')
 
 if __name__ == '__main__':
     test()
