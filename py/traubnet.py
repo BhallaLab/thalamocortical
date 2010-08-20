@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Aug 10 15:45:05 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Aug 14 00:52:57 2010 (+0530)
+# Last-Updated: Sat Aug 14 15:14:33 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 274
+#     Update #: 286
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -88,8 +88,12 @@ class TraubNet(object):
 
         """
         self.__celltype_graph = self._read_celltype_graph(connmatrix_file, format='csv', cellcount_file=cellcount_file)
-        self.__cell_graph = self._make_cell_graph(filename='cell_graph.gml')
+        self.__cell_graph = self._make_cell_graph(filename='networkx_cell_graph.pickle', format='pickle')
+        start = datetime.now()
         print nx.info(self.__cell_graph)
+        end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('Computed Graph info in: %g' % (delta.seconds + 1e-6 * delta.microseconds))
 
     def _read_celltype_graph(self, 
                              connmatrix_file, 
@@ -194,7 +198,7 @@ each cell of type *b*.'
             raise Exception('Only format supported is gml. Received: %s' % (format))
         print 'Saved celltype connectivity graph in', filename
 
-    def _make_cell_graph(self, filename=None):
+    def _make_cell_graph(self, filename=None, format=None):
         """Expand the celltype-to-celltype connectivity information
         and make a graph representing the network of the individual
         cells.
@@ -205,7 +209,10 @@ each cell of type *b*.'
         if filename:
             try:
                 start = datetime.now()
-                cell_graph = nx.read_gml(filename)
+                if format == 'gml':
+                    cell_graph = nx.read_gml(filename)
+                elif format == 'pickle':
+                    cell_graph = nx.read_gpickle(filename)
                 end = datetime.now()
                 delta = end - start
                 config.BENCHMARK_LOGGER.info('Read cell_graph - time: %g s' % (delta.seconds + 1e-6 * delta.microseconds))
@@ -256,12 +263,16 @@ each cell of type *b*.'
         """Save the cell to cell connectivity graph in a file.
 
         """
+        start = datetime.now()
         if format == 'gml':
             nx.write_gml(self.__cell_graph, filename)
         elif format == 'pickle':
             nx.write_gpickle(self.__cell_graph, filename)
         else:
-            raise Error('Not supported: %s' % (format))
+            raise Exception('Not supported: %s' % (format))
+        end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('Saved cell graph in %g s' %(delta.seconds + 1e-6 * delta.microseconds))
         print 'Saved cell-to-cell connectivity datat in', filename
     
 def test():
