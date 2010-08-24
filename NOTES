@@ -2093,3 +2093,10 @@ sys	0m0.620s
 
 Confirmed the issue to be the text reading in Python. If I use pickle format
 networkx works fast.
+
+* <2010-08-24 Tue 10:40> Virtual network
+  Aditya gave me the right word for what I am trying to do with networkx: I am
+  creating a virtual network. And yes, to some extent this reinventing the
+  wheel, as Upi says. But I cannot wait till the wheel is invented by the
+  community. Aditya is looking at possiblities of using neuroML/9ml for
+  network specification, but facing enough issues.
