@@ -1,0 +1,2427 @@
+<?xml version="1.0" encoding="utf-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns">
+	<key attr.name="count" attr.type="int" for="node" id="count"/>
+	<key attr.name="index" attr.type="int" for="node" id="index"/>
+	<key attr.name="ps_comps" attr.type="string" for="edge" id="ps_comps"/>
+	<key attr.name="gbar_gaba" attr.type="double" for="edge" id="gbar_gaba"/>
+	<key attr.name="weight" attr.type="int" for="edge" id="weight"/>
+	<key attr.name="tau_gaba_fast" attr.type="double" for="edge" id="tau_gaba_fast"/>
+	<graph edgedefault="directed" id="CellTypeGraph">
+		<node id="SupBasket">
+			<data key="count">
+				90
+			</data>
+			<data key="index">
+				12
+			</data>
+		</node>
+		<node id="DeepBasket">
+			<data key="count">
+				100
+			</data>
+			<data key="index">
+				1
+			</data>
+		</node>
+		<node id="TuftedIB">
+			<data key="count">
+				800
+			</data>
+			<data key="index">
+				8
+			</data>
+		</node>
+		<node id="TCR">
+			<data key="count">
+				100
+			</data>
+			<data key="index">
+				3
+			</data>
+		</node>
+		<node id="SupPyrRS">
+			<data key="count">
+				1000
+			</data>
+			<data key="index">
+				4
+			</data>
+		</node>
+		<node id="TuftedRS">
+			<data key="count">
+				200
+			</data>
+			<data key="index">
+				5
+			</data>
+		</node>
+		<node id="SupAxoaxonic">
+			<data key="count">
+				90
+			</data>
+			<data key="index">
+				6
+			</data>
+		</node>
+		<node id="SupPyrFRB">
+			<data key="count">
+				50
+			</data>
+			<data key="index">
+				7
+			</data>
+		</node>
+		<node id="DeepAxoaxonic">
+			<data key="count">
+				100
+			</data>
+			<data key="index">
+				2
+			</data>
+		</node>
+		<node id="DeepLTS">
+			<data key="count">
+				100
+			</data>
+			<data key="index">
+				9
+			</data>
+		</node>
+		<node id="SpinyStellate">
+			<data key="count">
+				240
+			</data>
+			<data key="index">
+				10
+			</data>
+		</node>
+		<node id="SupLTS">
+			<data key="count">
+				90
+			</data>
+			<data key="index">
+				11
+			</data>
+		</node>
+		<node id="NontuftedRS">
+			<data key="count">
+				500
+			</data>
+			<data key="index">
+				0
+			</data>
+		</node>
+		<node id="nRT">
+			<data key="count">
+				100
+			</data>
+			<data key="index">
+				13
+			</data>
+		</node>
+		<edge source="SupBasket" target="SupPyrRS">
+			<data key="ps_comps">
+				[1, 2, 3, 4, 5, 6, 7, 8, 9, 38, 39]
+			</data>
+			<data key="gbar_gaba">
+				1.2e-09
+			</data>
+			<data key="tau_gaba_fast">
+				0.006
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="SupBasket" target="SupAxoaxonic">
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+			<data key="gbar_gaba">
+				2e-10
+			</data>
+			<data key="tau_gaba_fast">
+				0.003
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="SupBasket" target="SupPyrFRB">
+			<data key="ps_comps">
+				[1, 2, 3, 4, 5, 6, 7, 8, 9, 38, 39]
+			</data>
+			<data key="gbar_gaba">
+				1.2e-09
+			</data>
+			<data key="tau_gaba_fast">
+				0.006
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="SupBasket" target="SpinyStellate">
+			<data key="ps_comps">
+				[1, 2, 15, 28, 41]
+			</data>
+			<data key="gbar_gaba">
+				1e-10
+			</data>
+			<data key="tau_gaba_fast">
+				0.006
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="SupBasket" target="SupLTS">
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+			<data key="gbar_gaba">
+				5e-10
+			</data>
+			<data key="tau_gaba_fast">
+				0.003
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="SupBasket" target="SupBasket">
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+			<data key="gbar_gaba">
+				2e-10
+			</data>
+			<data key="tau_gaba_fast">
+				0.003
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="DeepBasket" target="SupPyrRS">
+			<data key="ps_comps">
+				[]
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="DeepBasket" target="SupAxoaxonic">
+			<data key="ps_comps">
+				[]
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="DeepBasket" target="SupPyrFRB">
+			<data key="ps_comps">
+				[]
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="DeepBasket" target="TuftedIB">
+			<data key="ps_comps">
+				[1, 2, 3, 4, 5, 6, 35, 36]
+			</data>
+			<data key="gbar_gaba">
+				7e-10
+			</data>
+			<data key="tau_gaba_fast">
+				0.006
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="DeepBasket" target="SpinyStellate">
+			<data key="ps_comps">
+				[1, 2, 15, 28, 41]
+			</data>
+			<data key="gbar_gaba">
+				1.5e-09
+			</data>
+			<data key="tau_gaba_fast">
+				0.006
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="DeepBasket" target="SupLTS">
+			<data key="ps_comps">
+				[]
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="DeepBasket" target="SupBasket">
+			<data key="ps_comps">
+				[]
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="TuftedIB" target="NontuftedRS">
+			<data key="gbar_nmda">
+				2e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				2e-09
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44]
+			</data>
+		</edge>
+		<edge source="TuftedIB" target="DeepBasket">
+			<data key="gbar_nmda">
+				1.5e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				3e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.0008
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="TuftedIB" target="DeepAxoaxonic">
+			<data key="gbar_nmda">
+				1.5e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				3e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.0008
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="TuftedIB" target="SupPyrRS">
+			<data key="gbar_nmda">
+				5e-11
+			</data>
+			<data key="weight">
+				2
+			</data>
+			<data key="gbar_ampa">
+				5e-10
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52]
+			</data>
+		</edge>
+		<edge source="TuftedIB" target="TuftedRS">
+			<data key="gbar_nmda">
+				2e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				2e-09
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47]
+			</data>
+		</edge>
+		<edge source="TuftedIB" target="SupAxoaxonic">
+			<data key="gbar_nmda">
+				1.5e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.0008
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="TuftedIB" target="SupPyrFRB">
+			<data key="gbar_nmda">
+				5e-11
+			</data>
+			<data key="weight">
+				2
+			</data>
+			<data key="gbar_ampa">
+				5e-10
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52]
+			</data>
+		</edge>
+		<edge source="TuftedIB" target="TuftedIB">
+			<data key="gbar_nmda">
+				2e-10
+			</data>
+			<data key="weight">
+				50
+			</data>
+			<data key="gbar_ampa">
+				2e-09
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47]
+			</data>
+		</edge>
+		<edge source="TuftedIB" target="DeepLTS">
+			<data key="gbar_nmda">
+				1.5e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				2e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.001
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="TuftedIB" target="SpinyStellate">
+			<data key="gbar_nmda">
+				5e-11
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				5e-10
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="TuftedIB" target="SupLTS">
+			<data key="gbar_nmda">
+				1.5e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.001
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="TuftedIB" target="SupBasket">
+			<data key="gbar_nmda">
+				1.5e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.0008
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="TCR" target="DeepBasket">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				10
+			</data>
+			<data key="gbar_ampa">
+				1.5e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.001
+			</data>
+			<data key="ps_comps">
+				[2, 3, 4, 15, 16, 17, 28, 29, 30, 41, 42, 43]
+			</data>
+		</edge>
+		<edge source="TCR" target="DeepAxoaxonic">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				25
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.001
+			</data>
+			<data key="ps_comps">
+				[2, 3, 4, 15, 16, 17, 28, 29, 30, 41, 42, 43]
+			</data>
+		</edge>
+		<edge source="TCR" target="SupPyrRS">
+			<data key="gbar_nmda">
+				5e-11
+			</data>
+			<data key="weight">
+				10
+			</data>
+			<data key="gbar_ampa">
+				5e-10
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68]
+			</data>
+		</edge>
+		<edge source="TCR" target="TuftedRS">
+			<data key="gbar_nmda">
+				1.5e-10
+			</data>
+			<data key="weight">
+				10
+			</data>
+			<data key="gbar_ampa">
+				1.5e-09
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[47, 48, 49, 50, 51, 52, 53, 54, 55]
+			</data>
+		</edge>
+		<edge source="TCR" target="SupAxoaxonic">
+			<data key="gbar_nmda">
+				1e-11
+			</data>
+			<data key="weight">
+				10
+			</data>
+			<data key="gbar_ampa">
+				1e-10
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.001
+			</data>
+			<data key="ps_comps">
+				[2, 3, 4, 15, 16, 17, 28, 29, 30, 41, 42, 43]
+			</data>
+		</edge>
+		<edge source="TCR" target="SupPyrFRB">
+			<data key="gbar_nmda">
+				5e-11
+			</data>
+			<data key="weight">
+				10
+			</data>
+			<data key="gbar_ampa">
+				5e-10
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68]
+			</data>
+		</edge>
+		<edge source="TCR" target="TuftedIB">
+			<data key="gbar_nmda">
+				1.5e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				1.5e-09
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[47, 48, 49, 50, 51, 52, 53, 54, 55]
+			</data>
+		</edge>
+		<edge source="TCR" target="SpinyStellate">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				10
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53]
+			</data>
+		</edge>
+		<edge source="TCR" target="SupLTS">
+			<data key="ps_comps">
+				[]
+			</data>
+			<data key="weight">
+				10
+			</data>
+		</edge>
+		<edge source="TCR" target="SupBasket">
+			<data key="gbar_nmda">
+				1e-11
+			</data>
+			<data key="weight">
+				10
+			</data>
+			<data key="gbar_ampa">
+				1e-10
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.001
+			</data>
+			<data key="ps_comps">
+				[2, 3, 4, 15, 16, 17, 28, 29, 30, 41, 42, 43]
+			</data>
+		</edge>
+		<edge source="SupPyrRS" target="NontuftedRS">
+			<data key="gbar_nmda">
+				5e-11
+			</data>
+			<data key="weight">
+				3
+			</data>
+			<data key="gbar_ampa">
+				5e-10
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[38, 39, 40, 41, 42, 43, 44]
+			</data>
+		</edge>
+		<edge source="SupPyrRS" target="DeepBasket">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				30
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.0008
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="SupPyrRS" target="DeepAxoaxonic">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				30
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.0008
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="SupPyrRS" target="SupPyrRS">
+			<data key="gbar_nmda">
+				2.5e-11
+			</data>
+			<data key="weight">
+				50
+			</data>
+			<data key="gbar_ampa">
+				2.5e-10
+			</data>
+			<data key="tau_nmda">
+				0.1305
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[2, 3, 4, 5, 6, 7, 8, 9, 14, 15, 16, 17, 18, 19, 20, 21, 26, 27, 28, 29, 30, 31, 32, 33, 10, 11, 12, 13, 22, 23, 24, 25, 34, 35, 36, 37]
+			</data>
+		</edge>
+		<edge source="SupPyrRS" target="TuftedRS">
+			<data key="gbar_nmda">
+				1e-11
+			</data>
+			<data key="weight">
+				60
+			</data>
+			<data key="gbar_ampa">
+				1e-10
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[39, 40, 41, 42, 43, 44, 45, 46]
+			</data>
+		</edge>
+		<edge source="SupPyrRS" target="SupAxoaxonic">
+			<data key="gbar_nmda">
+				1.5e-10
+			</data>
+			<data key="weight">
+				90
+			</data>
+			<data key="gbar_ampa">
+				3e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.0008
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="SupPyrRS" target="SupPyrFRB">
+			<data key="gbar_nmda">
+				2.5e-11
+			</data>
+			<data key="weight">
+				50
+			</data>
+			<data key="gbar_ampa">
+				2.5e-10
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[2, 3, 4, 5, 6, 7, 8, 9, 14, 15, 16, 17, 18, 19, 20, 21, 26, 27, 28, 29, 30, 31, 32, 33, 10, 11, 12, 13, 22, 23, 24, 25, 34, 35, 36, 37]
+			</data>
+		</edge>
+		<edge source="SupPyrRS" target="TuftedIB">
+			<data key="gbar_nmda">
+				1e-11
+			</data>
+			<data key="weight">
+				60
+			</data>
+			<data key="gbar_ampa">
+				1e-10
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[39, 40, 41, 42, 43, 44, 45, 46]
+			</data>
+		</edge>
+		<edge source="SupPyrRS" target="DeepLTS">
+			<data key="gbar_nmda">
+				1.5e-10
+			</data>
+			<data key="weight">
+				30
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.001
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="SupPyrRS" target="SpinyStellate">
+			<data key="gbar_nmda">
+				1e-11
+			</data>
+			<data key="weight">
+				3
+			</data>
+			<data key="gbar_ampa">
+				1e-10
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="SupPyrRS" target="SupLTS">
+			<data key="gbar_nmda">
+				1.5e-10
+			</data>
+			<data key="weight">
+				90
+			</data>
+			<data key="gbar_ampa">
+				2e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.001
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="SupPyrRS" target="SupBasket">
+			<data key="gbar_nmda">
+				1.5e-10
+			</data>
+			<data key="weight">
+				90
+			</data>
+			<data key="gbar_ampa">
+				3e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.0008
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="TuftedRS" target="NontuftedRS">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44]
+			</data>
+		</edge>
+		<edge source="TuftedRS" target="DeepBasket">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				3e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.0008
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="TuftedRS" target="DeepAxoaxonic">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				3e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.0008
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="TuftedRS" target="SupPyrRS">
+			<data key="gbar_nmda">
+				5e-11
+			</data>
+			<data key="weight">
+				2
+			</data>
+			<data key="gbar_ampa">
+				5e-10
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52]
+			</data>
+		</edge>
+		<edge source="TuftedRS" target="TuftedRS">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				10
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47]
+			</data>
+		</edge>
+		<edge source="TuftedRS" target="SupAxoaxonic">
+			<data key="gbar_nmda">
+				1.5e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.0008
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="TuftedRS" target="SupPyrFRB">
+			<data key="gbar_nmda">
+				5e-11
+			</data>
+			<data key="weight">
+				2
+			</data>
+			<data key="gbar_ampa">
+				5e-10
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52]
+			</data>
+		</edge>
+		<edge source="TuftedRS" target="TuftedIB">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47]
+			</data>
+		</edge>
+		<edge source="TuftedRS" target="DeepLTS">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				2e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.001
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="TuftedRS" target="SpinyStellate">
+			<data key="gbar_nmda">
+				5e-11
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				5e-10
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="TuftedRS" target="SupLTS">
+			<data key="gbar_nmda">
+				1.5e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.001
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="TuftedRS" target="SupBasket">
+			<data key="gbar_nmda">
+				1.5e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.0008
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="SupAxoaxonic" target="SupPyrRS">
+			<data key="ps_comps">
+				[]
+			</data>
+			<data key="gbar_gaba">
+				1.2e-09
+			</data>
+			<data key="tau_gaba_fast">
+				0.006
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="SupAxoaxonic" target="SupAxoaxonic">
+			<data key="ps_comps">
+				[]
+			</data>
+			<data key="weight">
+				5
+			</data>
+		</edge>
+		<edge source="SupAxoaxonic" target="SupPyrFRB">
+			<data key="ps_comps">
+				[]
+			</data>
+			<data key="gbar_gaba">
+				1.2e-09
+			</data>
+			<data key="tau_gaba_fast">
+				0.006
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="SupAxoaxonic" target="SpinyStellate">
+			<data key="ps_comps">
+				[]
+			</data>
+			<data key="gbar_gaba">
+				1e-10
+			</data>
+			<data key="tau_gaba_fast">
+				0.006
+			</data>
+			<data key="weight">
+				5
+			</data>
+		</edge>
+		<edge source="SupAxoaxonic" target="SupLTS">
+			<data key="ps_comps">
+				[]
+			</data>
+			<data key="weight">
+				5
+			</data>
+		</edge>
+		<edge source="SupAxoaxonic" target="SupBasket">
+			<data key="ps_comps">
+				[]
+			</data>
+			<data key="weight">
+				5
+			</data>
+		</edge>
+		<edge source="SupPyrFRB" target="NontuftedRS">
+			<data key="gbar_nmda">
+				5e-11
+			</data>
+			<data key="weight">
+				1
+			</data>
+			<data key="gbar_ampa">
+				5e-10
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[38, 39, 40, 41, 42, 43, 44]
+			</data>
+		</edge>
+		<edge source="SupPyrFRB" target="DeepBasket">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				3
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.0008
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="SupPyrFRB" target="DeepAxoaxonic">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				3
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.0008
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="SupPyrFRB" target="SupPyrRS">
+			<data key="gbar_nmda">
+				2.5e-11
+			</data>
+			<data key="weight">
+				5
+			</data>
+			<data key="gbar_ampa">
+				2.5e-10
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[2, 3, 4, 5, 6, 7, 8, 9, 14, 15, 16, 17, 18, 19, 20, 21, 26, 27, 28, 29, 30, 31, 32, 33, 10, 11, 12, 13, 22, 23, 24, 25, 34, 35, 36, 37]
+			</data>
+		</edge>
+		<edge source="SupPyrFRB" target="TuftedRS">
+			<data key="gbar_nmda">
+				1e-11
+			</data>
+			<data key="weight">
+				3
+			</data>
+			<data key="gbar_ampa">
+				1e-10
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[39, 40, 41, 42, 43, 44, 45, 46]
+			</data>
+		</edge>
+		<edge source="SupPyrFRB" target="SupAxoaxonic">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				5
+			</data>
+			<data key="gbar_ampa">
+				3e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.0008
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="SupPyrFRB" target="SupPyrFRB">
+			<data key="gbar_nmda">
+				2.5e-11
+			</data>
+			<data key="weight">
+				5
+			</data>
+			<data key="gbar_ampa">
+				2.5e-10
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[2, 3, 4, 5, 6, 7, 8, 9, 14, 15, 16, 17, 18, 19, 20, 21, 26, 27, 28, 29, 30, 31, 32, 33, 10, 11, 12, 13, 22, 23, 24, 25, 34, 35, 36, 37]
+			</data>
+		</edge>
+		<edge source="SupPyrFRB" target="TuftedIB">
+			<data key="gbar_nmda">
+				1e-11
+			</data>
+			<data key="weight">
+				3
+			</data>
+			<data key="gbar_ampa">
+				1e-10
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[39, 40, 41, 42, 43, 44, 45, 46]
+			</data>
+		</edge>
+		<edge source="SupPyrFRB" target="DeepLTS">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				3
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.001
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="SupPyrFRB" target="SpinyStellate">
+			<data key="gbar_nmda">
+				1e-11
+			</data>
+			<data key="weight">
+				1
+			</data>
+			<data key="gbar_ampa">
+				1e-10
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="SupPyrFRB" target="SupLTS">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				5
+			</data>
+			<data key="gbar_ampa">
+				2e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.001
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="SupPyrFRB" target="SupBasket">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				5
+			</data>
+			<data key="gbar_ampa">
+				3e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.0008
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="DeepAxoaxonic" target="SupPyrRS">
+			<data key="ps_comps">
+				[]
+			</data>
+			<data key="gbar_gaba">
+				1e-09
+			</data>
+			<data key="tau_gaba_fast">
+				0.006
+			</data>
+			<data key="weight">
+				5
+			</data>
+		</edge>
+		<edge source="DeepAxoaxonic" target="SupAxoaxonic">
+			<data key="ps_comps">
+				[]
+			</data>
+			<data key="weight">
+				5
+			</data>
+		</edge>
+		<edge source="DeepAxoaxonic" target="SupPyrFRB">
+			<data key="ps_comps">
+				[]
+			</data>
+			<data key="gbar_gaba">
+				1e-09
+			</data>
+			<data key="tau_gaba_fast">
+				0.006
+			</data>
+			<data key="weight">
+				5
+			</data>
+		</edge>
+		<edge source="DeepAxoaxonic" target="SpinyStellate">
+			<data key="ps_comps">
+				[]
+			</data>
+			<data key="gbar_gaba">
+				1.5e-09
+			</data>
+			<data key="tau_gaba_fast">
+				0.006
+			</data>
+			<data key="weight">
+				5
+			</data>
+		</edge>
+		<edge source="DeepAxoaxonic" target="SupLTS">
+			<data key="ps_comps">
+				[]
+			</data>
+			<data key="weight">
+				5
+			</data>
+		</edge>
+		<edge source="DeepAxoaxonic" target="SupBasket">
+			<data key="ps_comps">
+				[]
+			</data>
+			<data key="weight">
+				5
+			</data>
+		</edge>
+		<edge source="DeepLTS" target="NontuftedRS">
+			<data key="ps_comps">
+				[13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 38, 39, 40, 41, 42, 43, 44]
+			</data>
+			<data key="gbar_gaba">
+				1e-11
+			</data>
+			<data key="tau_gaba_fast">
+				0.02
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="DeepLTS" target="DeepBasket">
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53]
+			</data>
+			<data key="gbar_gaba">
+				1e-11
+			</data>
+			<data key="tau_gaba_fast">
+				0.02
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="DeepLTS" target="DeepAxoaxonic">
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53]
+			</data>
+			<data key="gbar_gaba">
+				1e-11
+			</data>
+			<data key="tau_gaba_fast">
+				0.02
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="DeepLTS" target="SupPyrRS">
+			<data key="ps_comps">
+				[14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68]
+			</data>
+			<data key="gbar_gaba">
+				1e-11
+			</data>
+			<data key="tau_gaba_fast">
+				0.02
+			</data>
+			<data key="weight">
+				10
+			</data>
+		</edge>
+		<edge source="DeepLTS" target="TuftedRS">
+			<data key="ps_comps">
+				[13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55]
+			</data>
+			<data key="gbar_gaba">
+				2e-11
+			</data>
+			<data key="tau_gaba_fast">
+				0.02
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="DeepLTS" target="SupAxoaxonic">
+			<data key="ps_comps">
+				[8, 9, 10, 11, 12, 21, 22, 23, 24, 25, 34, 35, 36, 37, 38, 47, 48, 49, 50, 51]
+			</data>
+			<data key="gbar_gaba">
+				1e-11
+			</data>
+			<data key="tau_gaba_fast">
+				0.02
+			</data>
+			<data key="weight">
+				10
+			</data>
+		</edge>
+		<edge source="DeepLTS" target="SupPyrFRB">
+			<data key="ps_comps">
+				[14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68]
+			</data>
+			<data key="gbar_gaba">
+				1e-11
+			</data>
+			<data key="tau_gaba_fast">
+				0.02
+			</data>
+			<data key="weight">
+				10
+			</data>
+		</edge>
+		<edge source="DeepLTS" target="TuftedIB">
+			<data key="ps_comps">
+				[13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55]
+			</data>
+			<data key="gbar_gaba">
+				5e-11
+			</data>
+			<data key="tau_gaba_fast">
+				0.02
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="DeepLTS" target="DeepLTS">
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53]
+			</data>
+			<data key="gbar_gaba">
+				5e-11
+			</data>
+			<data key="tau_gaba_fast">
+				0.02
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="DeepLTS" target="SpinyStellate">
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53]
+			</data>
+			<data key="gbar_gaba">
+				1e-11
+			</data>
+			<data key="tau_gaba_fast">
+				0.02
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="DeepLTS" target="SupLTS">
+			<data key="ps_comps">
+				[8, 9, 10, 11, 12, 21, 22, 23, 24, 25, 34, 35, 36, 37, 38, 47, 48, 49, 50, 51]
+			</data>
+			<data key="gbar_gaba">
+				5e-11
+			</data>
+			<data key="tau_gaba_fast">
+				0.02
+			</data>
+			<data key="weight">
+				10
+			</data>
+		</edge>
+		<edge source="DeepLTS" target="SupBasket">
+			<data key="ps_comps">
+				[8, 9, 10, 11, 12, 21, 22, 23, 24, 25, 34, 35, 36, 37, 38, 47, 48, 49, 50, 51]
+			</data>
+			<data key="gbar_gaba">
+				1e-11
+			</data>
+			<data key="tau_gaba_fast">
+				0.02
+			</data>
+			<data key="weight">
+				10
+			</data>
+		</edge>
+		<edge source="SpinyStellate" target="NontuftedRS">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[37, 38, 39, 40, 41]
+			</data>
+		</edge>
+		<edge source="SpinyStellate" target="DeepBasket">
+			<data key="gbar_nmda">
+				1.5e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.0008
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="SpinyStellate" target="DeepAxoaxonic">
+			<data key="gbar_nmda">
+				1.5e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.0008
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="SpinyStellate" target="SupPyrRS">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[2, 3, 4, 5, 6, 7, 8, 9, 14, 15, 16, 17, 18, 19, 20, 21, 26, 27, 28, 29, 30, 31, 32, 33]
+			</data>
+		</edge>
+		<edge source="SpinyStellate" target="TuftedRS">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[7, 8, 9, 10, 11, 12, 36, 37, 38, 39, 40, 41]
+			</data>
+		</edge>
+		<edge source="SpinyStellate" target="SupAxoaxonic">
+			<data key="gbar_nmda">
+				1.5e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.0008
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="SpinyStellate" target="SupPyrFRB">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[2, 3, 4, 5, 6, 7, 8, 9, 14, 15, 16, 17, 18, 19, 20, 21, 26, 27, 28, 29, 30, 31, 32, 33]
+			</data>
+		</edge>
+		<edge source="SpinyStellate" target="TuftedIB">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[7, 8, 9, 10, 11, 12, 36, 37, 38, 39, 40, 41]
+			</data>
+		</edge>
+		<edge source="SpinyStellate" target="DeepLTS">
+			<data key="gbar_nmda">
+				1.5e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.001
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="SpinyStellate" target="SpinyStellate">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				30
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="SpinyStellate" target="SupLTS">
+			<data key="gbar_nmda">
+				1.5e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.001
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="SpinyStellate" target="SupBasket">
+			<data key="gbar_nmda">
+				1.5e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.0008
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="SupLTS" target="NontuftedRS">
+			<data key="ps_comps">
+				[13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 38, 39, 40, 41, 42, 43, 44]
+			</data>
+			<data key="gbar_gaba">
+				1e-11
+			</data>
+			<data key="tau_gaba_fast">
+				0.02
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="SupLTS" target="DeepBasket">
+			<data key="ps_comps">
+				[8, 9, 10, 11, 12, 21, 22, 23, 24, 25, 34, 35, 36, 37, 38, 47, 48, 49, 50, 51]
+			</data>
+			<data key="gbar_gaba">
+				1e-11
+			</data>
+			<data key="tau_gaba_fast">
+				0.02
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="SupLTS" target="DeepAxoaxonic">
+			<data key="ps_comps">
+				[8, 9, 10, 11, 12, 21, 22, 23, 24, 25, 34, 35, 36, 37, 38, 47, 48, 49, 50, 51]
+			</data>
+			<data key="gbar_gaba">
+				1e-11
+			</data>
+			<data key="tau_gaba_fast">
+				0.02
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="SupLTS" target="SupPyrRS">
+			<data key="ps_comps">
+				[14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68]
+			</data>
+			<data key="gbar_gaba">
+				1e-11
+			</data>
+			<data key="tau_gaba_fast">
+				0.02
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="SupLTS" target="TuftedRS">
+			<data key="ps_comps">
+				[13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55]
+			</data>
+			<data key="gbar_gaba">
+				2e-11
+			</data>
+			<data key="tau_gaba_fast">
+				0.02
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="SupLTS" target="SupAxoaxonic">
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53]
+			</data>
+			<data key="gbar_gaba">
+				1e-11
+			</data>
+			<data key="tau_gaba_fast">
+				0.02
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="SupLTS" target="SupPyrFRB">
+			<data key="ps_comps">
+				[14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68]
+			</data>
+			<data key="gbar_gaba">
+				1e-11
+			</data>
+			<data key="tau_gaba_fast">
+				0.02
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="SupLTS" target="TuftedIB">
+			<data key="ps_comps">
+				[13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55]
+			</data>
+			<data key="gbar_gaba">
+				2e-11
+			</data>
+			<data key="tau_gaba_fast">
+				0.02
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="SupLTS" target="DeepLTS">
+			<data key="ps_comps">
+				[8, 9, 10, 11, 12, 21, 22, 23, 24, 25, 34, 35, 36, 37, 38, 47, 48, 49, 50, 51]
+			</data>
+			<data key="gbar_gaba">
+				5e-11
+			</data>
+			<data key="tau_gaba_fast">
+				0.02
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="SupLTS" target="SpinyStellate">
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53]
+			</data>
+			<data key="gbar_gaba">
+				1e-11
+			</data>
+			<data key="tau_gaba_fast">
+				0.02
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="SupLTS" target="SupLTS">
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53]
+			</data>
+			<data key="gbar_gaba">
+				5e-11
+			</data>
+			<data key="tau_gaba_fast">
+				0.02
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="SupLTS" target="SupBasket">
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53]
+			</data>
+			<data key="gbar_gaba">
+				1e-11
+			</data>
+			<data key="tau_gaba_fast">
+				0.02
+			</data>
+			<data key="weight">
+				20
+			</data>
+		</edge>
+		<edge source="NontuftedRS" target="NontuftedRS">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44]
+			</data>
+		</edge>
+		<edge source="NontuftedRS" target="DeepBasket">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				10
+			</data>
+			<data key="gbar_ampa">
+				3e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.0008
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="NontuftedRS" target="DeepAxoaxonic">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				10
+			</data>
+			<data key="gbar_ampa">
+				3e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.0008
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="NontuftedRS" target="TCR">
+			<data key="gbar_nmda">
+				7.5e-11
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				7.5e-10
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[6, 7, 8, 9, 10, 11, 12, 13, 14, 19, 20, 21, 22, 23, 24, 25, 26, 27, 32, 33, 34, 35, 36, 37, 38, 39, 40, 45, 46, 47, 48, 49, 50, 51, 52, 53, 58, 59, 60, 61, 62, 63, 64, 65, 66, 71, 72, 73, 74, 75, 76, 77, 78, 79, 84, 85, 86, 87, 88, 89, 90, 91, 92, 97, 98, 99, 100, 101, 102, 103, 104, 105, 110, 111, 112, 113, 114, 115, 116, 117, 118, 123, 124, 125, 126, 127, 128, 129, 130, 131]
+			</data>
+		</edge>
+		<edge source="NontuftedRS" target="SupPyrRS">
+			<data key="gbar_nmda">
+				5e-11
+			</data>
+			<data key="weight">
+				10
+			</data>
+			<data key="gbar_ampa">
+				5e-10
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[41, 42, 43, 44]
+			</data>
+		</edge>
+		<edge source="NontuftedRS" target="TuftedRS">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				10
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47]
+			</data>
+		</edge>
+		<edge source="NontuftedRS" target="SupAxoaxonic">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				10
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.0008
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="NontuftedRS" target="SupPyrFRB">
+			<data key="gbar_nmda">
+				5e-11
+			</data>
+			<data key="weight">
+				10
+			</data>
+			<data key="gbar_ampa">
+				5e-10
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[41, 42, 43, 44]
+			</data>
+		</edge>
+		<edge source="NontuftedRS" target="TuftedIB">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				10
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47]
+			</data>
+		</edge>
+		<edge source="NontuftedRS" target="DeepLTS">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				10
+			</data>
+			<data key="gbar_ampa">
+				2e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.001
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="NontuftedRS" target="SpinyStellate">
+			<data key="gbar_nmda">
+				5e-11
+			</data>
+			<data key="weight">
+				10
+			</data>
+			<data key="gbar_ampa">
+				5e-10
+			</data>
+			<data key="tau_nmda">
+				0.13
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="NontuftedRS" target="SupLTS">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				10
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.001
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="NontuftedRS" target="SupBasket">
+			<data key="gbar_nmda">
+				1e-10
+			</data>
+			<data key="weight">
+				10
+			</data>
+			<data key="gbar_ampa">
+				1e-09
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.0008
+			</data>
+			<data key="ps_comps">
+				[5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 31, 32, 33, 34, 35, 36, 44, 45, 46, 47, 48, 49]
+			</data>
+		</edge>
+		<edge source="NontuftedRS" target="nRT">
+			<data key="gbar_nmda">
+				5e-11
+			</data>
+			<data key="weight">
+				20
+			</data>
+			<data key="gbar_ampa">
+				5e-10
+			</data>
+			<data key="tau_nmda">
+				0.1
+			</data>
+			<data key="tau_ampa">
+				0.002
+			</data>
+			<data key="ps_comps">
+				[2, 3, 4, 15, 16, 17, 28, 29, 30, 41, 42, 43]
+			</data>
+		</edge>
+		<edge source="nRT" target="SupPyrFRB">
+			<data key="ps_comps">
+				[]
+			</data>
+			<data key="weight">
+				10
+			</data>
+		</edge>
+		<edge source="nRT" target="SupPyrRS">
+			<data key="ps_comps">
+				[]
+			</data>
+			<data key="weight">
+				15
+			</data>
+		</edge>
+	</graph>
+</graphml>
