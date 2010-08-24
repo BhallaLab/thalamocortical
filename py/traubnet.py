@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Aug 10 15:45:05 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Aug 25 00:26:39 2010 (+0530)
+# Last-Updated: Wed Aug 25 00:42:52 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 373
+#     Update #: 377
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -89,7 +89,7 @@ class TraubNet(object):
 
         """
         self.__celltype_graph = self._read_celltype_graph(connmatrix_file, format='csv', cellcount_file=cellcount_file)
-        self.__cell_graph = self._read_cell_graph('networkx_cell_graph.pickle', 'pickle')
+        self.__cell_graph = self._read_cell_graph('networkx_cell_graph.txt', 'edgelist')
         if not self.__cell_graph:
             self.__cell_graph = self._make_cell_graph()
         start = datetime.now()
@@ -205,6 +205,8 @@ class TraubNet(object):
                     col += 1
         elif format == 'gml':
             celltype_graph = nx.read_gml(connmatrix_file)
+        elif format == 'edgelist':
+            celltype_graph = nx.read_edgelist(connmatrix_file)
 
         celltype_graph.graph['doc'] = 'Celltype-based connectivity data. \
 count of node *n* is the number of cells of type *n* \
@@ -272,6 +274,8 @@ each cell of type *b*.'
                     cell_graph = nx.read_gml(filename)
                 elif format == 'pickle':
                     cell_graph = nx.read_gpickle(filename)
+                elif format == 'edgelist':
+                    cell_graph = nx.read_edgelist(filename)
                 else:
                     print 'Unrecognized format:', format
                 end = datetime.now()
