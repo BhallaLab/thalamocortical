@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Aug 10 15:45:05 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Aug 14 15:14:33 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 286
+# Last-Updated: Tue Aug 24 11:36:42 2010 (+0530)
+#           By: subha
+#     Update #: 303
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -52,6 +52,7 @@ import os
 import csv
 import numpy
 import matplotlib
+import allowedcomp
 
 matplotlib.use('SVG')
 
@@ -88,7 +89,9 @@ class TraubNet(object):
 
         """
         self.__celltype_graph = self._read_celltype_graph(connmatrix_file, format='csv', cellcount_file=cellcount_file)
-        self.__cell_graph = self._make_cell_graph(filename='networkx_cell_graph.pickle', format='pickle')
+        self.__cell_graph = self._load_cell_graph('networkx_cell_graph.pickle', 'pickle')
+        if not self.__cell_graph:
+            self.__cell_graph = self._make_cell_graph()
         start = datetime.now()
         print nx.info(self.__cell_graph)
         end = datetime.now()
@@ -145,8 +148,12 @@ class TraubNet(object):
                 col = 0
                 for entry in line:
                     post = header[col]
+                    try:
+                        allowed_comps = allowedcomp.ALLOWED_COMP[pre][post]
+                    except KeyError:
+                        allowed_comps = []
                     value = int(entry)
-                    celltype_graph.add_edge(pre, post, weight=value)
+                    celltype_graph.add_edge(pre, post, weight=value, ps_comps=allowed_comps)
                     col += 1
         elif format == 'gml':
             celltype_graph = nx.read_gml(connmatrix_file)
@@ -198,14 +205,12 @@ each cell of type *b*.'
             raise Exception('Only format supported is gml. Received: %s' % (format))
         print 'Saved celltype connectivity graph in', filename
 
-    def _make_cell_graph(self, filename=None, format=None):
-        """Expand the celltype-to-celltype connectivity information
-        and make a graph representing the network of the individual
-        cells.
+    def _load_cell_graph(self, filename, format):
+        """Load the cell-to-cell connectivity graph from a
+        file. 
 
-        Each cell is identified by the string {celltype}_{index}
-
-        """
+        Returns None if any error happens."""
+        cell_graph = None
         if filename:
             try:
                 start = datetime.now()
@@ -213,12 +218,23 @@ each cell of type *b*.'
                     cell_graph = nx.read_gml(filename)
                 elif format == 'pickle':
                     cell_graph = nx.read_gpickle(filename)
+                else:
+                    print 'Unrecognized format:', format
                 end = datetime.now()
                 delta = end - start
                 config.BENCHMARK_LOGGER.info('Read cell_graph - time: %g s' % (delta.seconds + 1e-6 * delta.microseconds))
-                return cell_graph
             except Exception, e:
                 print e
+        return cell_graph
+
+    def _make_cell_graph(self):
+        """Expand the celltype-to-celltype connectivity information
+        and make a graph representing the network of the individual
+        cells.
+
+        Each cell is identified by the string {celltype}_{index}
+
+        """
         print 'Creating the cell_graph from scratch'
         start = datetime.now()
         cell_graph = nx.MultiDiGraph()
@@ -277,10 +293,10 @@ each cell of type *b*.'
     
 def test():
     net = TraubNet()
-    # net.plot_celltype_graph()
-    # net.save_celltype_graph()
+    net.plot_celltype_graph()
+    net.save_celltype_graph()
     # net.plot_cell_graph()
-    net.save_cell_graph('networkx_cell_graph.pickle', format='pickle')
+    # net.save_cell_graph('networkx_cell_graph.pickle', format='pickle')
 
 if __name__ == '__main__':
     test()
