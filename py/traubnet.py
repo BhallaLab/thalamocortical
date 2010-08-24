@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Aug 10 15:45:05 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Aug 24 11:36:42 2010 (+0530)
-#           By: subha
-#     Update #: 303
+# Last-Updated: Wed Aug 25 00:26:39 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 373
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -89,7 +89,7 @@ class TraubNet(object):
 
         """
         self.__celltype_graph = self._read_celltype_graph(connmatrix_file, format='csv', cellcount_file=cellcount_file)
-        self.__cell_graph = self._load_cell_graph('networkx_cell_graph.pickle', 'pickle')
+        self.__cell_graph = self._read_cell_graph('networkx_cell_graph.pickle', 'pickle')
         if not self.__cell_graph:
             self.__cell_graph = self._make_cell_graph()
         start = datetime.now()
@@ -148,12 +148,60 @@ class TraubNet(object):
                 col = 0
                 for entry in line:
                     post = header[col]
+                    value = int(entry)
+                    if value == 0:
+                        continue
+                    celltype_graph.add_edge(pre, post, 
+                                            weight=value)
+
                     try:
                         allowed_comps = allowedcomp.ALLOWED_COMP[pre][post]
                     except KeyError:
                         allowed_comps = []
-                    value = int(entry)
-                    celltype_graph.add_edge(pre, post, weight=value, ps_comps=allowed_comps)
+                    celltype_graph[pre][post]['ps_comps'] = str(allowed_comps)
+
+                    if pre != 'nRT':
+                        try:
+                            tau_gaba_fast = synapse.TAU_GABA[pre][post]                            
+                            celltype_graph[pre][post]['tau_gaba_fast'] = tau_gaba_fast
+                        except KeyError:
+                            config.LOGGER.info('No tau_gaba for synapse between %s and %s' % (pre, post))
+                    else:
+                        try:
+                            tau_gaba_fast = synapse.TAU_GABA_FAST[pre][post]
+                            celltype_graph[pre][post]['tau_gaba_fast'] = tau_gaba_fast
+                        except KeyError:
+                            config.LOGGER.info('No tau_gaba for synapse between %s and %s' % (pre, post))                            
+                        try:
+                            tau_gaba_slow = synapse.TAU_GABA_SLOW[pre][post]
+                            celltype_graph[pre][post]['tau_gaba_slow'] = tau_gaba_slow
+                        except KeyError:
+                            config.LOGGER.info('No tau_gaba for synapse between %s and %s' % (pre, post))
+                    try:
+                        tau_ampa = synapse.TAU_AMPA[pre][post]
+                        celltype_graph[pre][post]['tau_ampa'] = tau_ampa
+                    except KeyError:
+                        config.LOGGER.info('No tau_ampa for synapse between %s and %s' % (pre, post))
+                    try:
+                        tau_nmda = synapse.TAU_NMDA[pre][post]
+                        celltype_graph[pre][post]['tau_nmda'] = tau_nmda
+                    except KeyError:
+                        config.LOGGER.info('No tau_gaba for synapse between %s and %s' % (pre, post))
+                    try:
+                        gbar_gaba = synapse.G_GABA[pre][post]
+                        celltype_graph[pre][post]['gbar_gaba'] = gbar_gaba
+                    except KeyError:
+                        config.LOGGER.info('No gbar_gaba for synapse between %s and %s' % (pre, post))
+                    try:
+                        gbar_ampa = synapse.G_AMPA[pre][post]
+                        celltype_graph[pre][post]['gbar_ampa'] = gbar_ampa
+                    except KeyError:
+                        config.LOGGER.info('No gbar_ampa for synapse between %s and %s' % (pre, post))
+                    try:
+                        gbar_nmda = synapse.G_NMDA[pre][post]
+                        celltype_graph[pre][post]['gbar_nmda'] = gbar_nmda
+                    except KeyError:
+                        config.LOGGER.info('No gbar_nmda for synapse between %s and %s' % (pre, post))
                     col += 1
         elif format == 'gml':
             celltype_graph = nx.read_gml(connmatrix_file)
@@ -201,11 +249,17 @@ each cell of type *b*.'
         """
         if format == 'gml':
             nx.write_gml(self.__celltype_graph, filename)
+        elif format == 'yaml':
+            nx.write_yaml(self.__celltype_graph, filename)
+        elif format == 'graphml':
+            nx.write_graphml(self.__celltype_graph, filename)
+        elif format == 'edgelist':
+            nx.write_edgelist(self.__celltype_graph, filename)
         else:
-            raise Exception('Only format supported is gml. Received: %s' % (format))
+            raise Exception('Supported formats: gml, graphml, yaml. Received: %s' % (format))
         print 'Saved celltype connectivity graph in', filename
 
-    def _load_cell_graph(self, filename, format):
+    def _read_cell_graph(self, filename, format):
         """Load the cell-to-cell connectivity graph from a
         file. 
 
@@ -284,19 +338,25 @@ each cell of type *b*.'
             nx.write_gml(self.__cell_graph, filename)
         elif format == 'pickle':
             nx.write_gpickle(self.__cell_graph, filename)
+        elif format == 'yaml':
+            nx.write_yaml(self.__cell_graph, filename)
+        elif format == 'graphml':
+            nx.write_graphml(self.__cell_graph, filename)
+        elif format == 'edgelist':
+            nx.write_edgelist(self.__cell_graph, filename)
         else:
             raise Exception('Not supported: %s' % (format))
         end = datetime.now()
         delta = end - start
         config.BENCHMARK_LOGGER.info('Saved cell graph in %g s' %(delta.seconds + 1e-6 * delta.microseconds))
-        print 'Saved cell-to-cell connectivity datat in', filename
+        print 'Saved cell-to-cell connectivity data in', filename
     
 def test():
     net = TraubNet()
     net.plot_celltype_graph()
-    net.save_celltype_graph()
+    net.save_celltype_graph(filename='celltype_graph.txt', format='edgelist')
     # net.plot_cell_graph()
-    # net.save_cell_graph('networkx_cell_graph.pickle', format='pickle')
+    net.save_cell_graph('networkx_cell_graph.txt', format='edgelist')
 
 if __name__ == '__main__':
     test()
