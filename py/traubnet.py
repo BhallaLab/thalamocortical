@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Aug 10 15:45:05 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Aug 25 00:42:52 2010 (+0530)
+# Last-Updated: Wed Aug 25 16:56:59 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 377
+#     Update #: 467
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -48,6 +48,7 @@
 # Code:
 
 from datetime import datetime
+import sys
 import os
 import csv
 import numpy
@@ -69,27 +70,20 @@ class TraubNet(object):
     
     """
     def __init__(self, 
-                 connmatrix_file='connmatrix.txt', 
-                 allowedcomp_file='allowedcomp.txt', 
-                 cellcount_file='cells.txt'):
+                 celltypes_file='nx_celltype_graph.edgelist', 
+                 cells_file='nx_cell_graph.edgelist', format='edgelist'):
         """
-        connmatrix_file -- filename of the text file containing
-        connectivity matrix. This should be a csv file with header
-        containining the cell types followed by rows of
-        integers. row[i][j] is the number of presynaptic cells of type
-        header[i] that connect to each cell of type header[j].
+        celltypes_file -- file containing celltype-celltype connectivity graph
         
-        allowedcomp_file -- filename of csv file containing the list
-        of allowed postsynaptic compartment numbers for each cell type
-        pair. A row of this file should be of the form:
-        presynaptic_celltype, postsynaptic_celltype, n1, n2, ...
-        
-        cellcount_file -- filename of a text file containing all the
-        cell types along with the size of their population.
+        cells_file -- file containing cell-cell connectivity graph
+
+        format -- string representation of file format of the celltypes_file and cells_file.
 
         """
-        self.__celltype_graph = self._read_celltype_graph(connmatrix_file, format='csv', cellcount_file=cellcount_file)
-        self.__cell_graph = self._read_cell_graph('networkx_cell_graph.txt', 'edgelist')
+        self.__celltype_graph = self._read_celltype_graph(celltypes_file, format=format)
+        if not self.__celltype_graph:
+            self.__celltype_graph = self._make_celltype_graph('connmatrix.txt', 'cells.txt')
+        self.__cell_graph = self._read_cell_graph(cells_file, format=format)
         if not self.__cell_graph:
             self.__cell_graph = self._make_cell_graph()
         start = datetime.now()
@@ -98,21 +92,10 @@ class TraubNet(object):
         delta = end - start
         config.BENCHMARK_LOGGER.info('Computed Graph info in: %g' % (delta.seconds + 1e-6 * delta.microseconds))
 
-    def _read_celltype_graph(self, 
-                             connmatrix_file, 
-                             format='gml', 
-                             cellcount_file=None):
-        """Load the celltype-to-celltype connectivity map from file
-        and return a nested dictionary dict where dict[X][Y] is the
-        number of presynaptic cells of type X connecting to each
-        postsynaptic cell of type Y.
-
-        connmatrix_file -- the path of the file containing
-        the connectivity matrix.
+    def _make_celltype_graph(self, connmatrix_file, cellcount_file):        
+        """
+        connmatrix_file -- csv file containig the connection matrix.
         
-        format -- format of the file. Can be csv (comma separated
-        values) or gml.
-
         The first row in the csv file should be the column headers - which
         are the cell types. The connection matrix itself is a square
         matrix with entry[i][j] specifying the number of presynaptic
@@ -120,100 +103,136 @@ class TraubNet(object):
         of type header[i] and the postsynaptic cell is of type
         header[j]
 
+        cellcount_file -- csv file containing the number of instances
+        of each celltype.
+
         """
+        start = datetime.now()
         celltype_graph = None
         cellcount_dict = {}
-        if cellcount_file is not None:
-            with open(cellcount_file, 'r') as popfile:
-                reader = csv.reader(popfile)
-                for line in reader:
-                    if len(line) > 0:
-                        cellcount_dict[line[0]] = int(line[1])
-
-        if format == 'csv':
-            celltype_graph = nx.DiGraph()
-            index = 0
-            for key, value in cellcount_dict.items():
-                print key, value
-                celltype_graph.add_node(key, count=value, index=index)
-                index += 1
-            reader = csv.reader(file(connmatrix_file))
-            header = reader.next()
-            row = 0
+        with open(cellcount_file, 'r') as popfile:
+            reader = csv.reader(popfile)
             for line in reader:
-                if len(line) <= 0:
+                if len(line) > 0:
+                    cellcount_dict[line[0]] = int(line[1])
+        celltype_graph = nx.DiGraph()
+        index = 0
+        for key, value in cellcount_dict.items():
+            print key, value
+            celltype_graph.add_node(key, count=value, index=index)
+            index += 1
+        reader = csv.reader(file(connmatrix_file))
+        header = reader.next()
+        row = 0
+        for line in reader:
+            if len(line) <= 0:
+                continue
+            pre = header[row]
+            row += 1
+            col = 0
+            for entry in line:
+                post = header[col]
+                value = int(entry)
+                if value == 0:
                     continue
-                pre = header[row]
-                row += 1
-                col = 0
-                for entry in line:
-                    post = header[col]
-                    value = int(entry)
-                    if value == 0:
-                        continue
-                    celltype_graph.add_edge(pre, post, 
-                                            weight=value)
+                celltype_graph.add_edge(pre, post, weight=value)
 
-                    try:
-                        allowed_comps = allowedcomp.ALLOWED_COMP[pre][post]
-                    except KeyError:
-                        allowed_comps = []
-                    celltype_graph[pre][post]['ps_comps'] = str(allowed_comps)
+                try:
+                    allowed_comps = allowedcomp.ALLOWED_COMP[pre][post]
+                except KeyError:
+                    allowed_comps = []
+                celltype_graph[pre][post]['ps_comps'] = str(allowed_comps)
 
-                    if pre != 'nRT':
-                        try:
-                            tau_gaba_fast = synapse.TAU_GABA[pre][post]                            
-                            celltype_graph[pre][post]['tau_gaba_fast'] = tau_gaba_fast
-                        except KeyError:
-                            config.LOGGER.info('No tau_gaba for synapse between %s and %s' % (pre, post))
-                    else:
-                        try:
-                            tau_gaba_fast = synapse.TAU_GABA_FAST[pre][post]
-                            celltype_graph[pre][post]['tau_gaba_fast'] = tau_gaba_fast
-                        except KeyError:
-                            config.LOGGER.info('No tau_gaba for synapse between %s and %s' % (pre, post))                            
-                        try:
-                            tau_gaba_slow = synapse.TAU_GABA_SLOW[pre][post]
-                            celltype_graph[pre][post]['tau_gaba_slow'] = tau_gaba_slow
-                        except KeyError:
-                            config.LOGGER.info('No tau_gaba for synapse between %s and %s' % (pre, post))
+                if pre != 'nRT':
                     try:
-                        tau_ampa = synapse.TAU_AMPA[pre][post]
-                        celltype_graph[pre][post]['tau_ampa'] = tau_ampa
-                    except KeyError:
-                        config.LOGGER.info('No tau_ampa for synapse between %s and %s' % (pre, post))
-                    try:
-                        tau_nmda = synapse.TAU_NMDA[pre][post]
-                        celltype_graph[pre][post]['tau_nmda'] = tau_nmda
+                        tau_gaba_fast = synapse.TAU_GABA[pre][post]                            
+                        celltype_graph[pre][post]['tau_gaba_fast'] = tau_gaba_fast
                     except KeyError:
                         config.LOGGER.info('No tau_gaba for synapse between %s and %s' % (pre, post))
+                else:
                     try:
-                        gbar_gaba = synapse.G_GABA[pre][post]
-                        celltype_graph[pre][post]['gbar_gaba'] = gbar_gaba
+                        tau_gaba_fast = synapse.TAU_GABA_FAST[pre][post]
+                        celltype_graph[pre][post]['tau_gaba_fast'] = tau_gaba_fast
                     except KeyError:
-                        config.LOGGER.info('No gbar_gaba for synapse between %s and %s' % (pre, post))
+                        config.LOGGER.info('No tau_gaba for synapse between %s and %s' % (pre, post))                            
                     try:
-                        gbar_ampa = synapse.G_AMPA[pre][post]
-                        celltype_graph[pre][post]['gbar_ampa'] = gbar_ampa
+                        tau_gaba_slow = synapse.TAU_GABA_SLOW[pre][post]
+                        celltype_graph[pre][post]['tau_gaba_slow'] = tau_gaba_slow
                     except KeyError:
-                        config.LOGGER.info('No gbar_ampa for synapse between %s and %s' % (pre, post))
-                    try:
-                        gbar_nmda = synapse.G_NMDA[pre][post]
-                        celltype_graph[pre][post]['gbar_nmda'] = gbar_nmda
-                    except KeyError:
-                        config.LOGGER.info('No gbar_nmda for synapse between %s and %s' % (pre, post))
-                    col += 1
-        elif format == 'gml':
-            celltype_graph = nx.read_gml(connmatrix_file)
-        elif format == 'edgelist':
-            celltype_graph = nx.read_edgelist(connmatrix_file)
+                        config.LOGGER.info('No tau_gaba for synapse between %s and %s' % (pre, post))
+                try:
+                    tau_ampa = synapse.TAU_AMPA[pre][post]
+                    celltype_graph[pre][post]['tau_ampa'] = tau_ampa
+                except KeyError:
+                    config.LOGGER.info('No tau_ampa for synapse between %s and %s' % (pre, post))
+                try:
+                    tau_nmda = synapse.TAU_NMDA[pre][post]
+                    celltype_graph[pre][post]['tau_nmda'] = tau_nmda
+                except KeyError:
+                    config.LOGGER.info('No tau_gaba for synapse between %s and %s' % (pre, post))
+                try:
+                    gbar_gaba = synapse.G_GABA[pre][post]
+                    celltype_graph[pre][post]['gbar_gaba'] = gbar_gaba
+                except KeyError:
+                    config.LOGGER.info('No gbar_gaba for synapse between %s and %s' % (pre, post))
+                try:
+                    gbar_ampa = synapse.G_AMPA[pre][post]
+                    celltype_graph[pre][post]['gbar_ampa'] = gbar_ampa
+                except KeyError:
+                    config.LOGGER.info('No gbar_ampa for synapse between %s and %s' % (pre, post))
+                try:
+                    gbar_nmda = synapse.G_NMDA[pre][post]
+                    celltype_graph[pre][post]['gbar_nmda'] = gbar_nmda
+                except KeyError:
+                    config.LOGGER.info('No gbar_nmda for synapse between %s and %s' % (pre, post))
+                col += 1
+        end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('Generated celltype_graph in %g s' % (delta.seconds + delta.microseconds * 1e-6))
+        return celltype_graph
+        
+    def _read_celltype_graph(self, 
+                             celltypes_file, 
+                             format='gml'):
+        """
+        Read celltype-celltype connectivity graph from file.
 
-        celltype_graph.graph['doc'] = 'Celltype-based connectivity data. \
+        celltypes_file -- the path of the file containing
+        the graph.
+        
+        format -- format of the file. allowed values: gml, graphml, edgelist, pickle, yaml.
+
+        """
+        start = datetime.now()
+        celltype_graph = None
+        try:
+            if format == 'gml':
+                celltype_graph = nx.read_gml(celltypes_file)
+            elif format == 'edgelist':
+                celltype_graph = nx.read_edgelist(celltypes_file)
+            elif format == 'graphml':
+                celltype_graph = nx.read_graphml(celltypes_file)
+            elif format == 'pickle':
+                celltype_graph = nx.read_gpickle(celltypes_file)
+            elif format == 'yaml':
+                celltype_graph = nx.read_yaml(celltypes_file)
+            else:
+                print 'Unrecognized format %s' % (format)
+        except Exception, e:
+            print e
+        if celltype_graph is not None:
+            if not ('doc' in celltype_graph):
+                celltype_graph.graph['doc'] = 'Celltype-based connectivity data. \
 count of node *n* is the number of cells of type *n* \
 that are present in the model. weight of edge (a, b) \
 is the number of cells of type *a* that connect to \
 each cell of type *b*.'
-        celltype_graph.name = 'CellTypeGraph'
+            if not celltype_graph.name:
+                celltype_graph.name = 'CellTypeGraph'
+        end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('Read celltype_graph from file %s of format %s in %g s' 
+                                     % (celltypes_file, format, delta.seconds + 1e-6 * delta.microseconds))
         return celltype_graph
 
     def plot_celltype_graph(self):
@@ -249,6 +268,7 @@ each cell of type *b*.'
         not complete in NetworkX.  
 
         """
+        start = datetime.now()
         if format == 'gml':
             nx.write_gml(self.__celltype_graph, filename)
         elif format == 'yaml':
@@ -257,16 +277,23 @@ each cell of type *b*.'
             nx.write_graphml(self.__celltype_graph, filename)
         elif format == 'edgelist':
             nx.write_edgelist(self.__celltype_graph, filename)
+        elif format == 'pickle':
+            nx.write_gpickle(self.__celltype_graph, filename)
         else:
             raise Exception('Supported formats: gml, graphml, yaml. Received: %s' % (format))
+        end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('Saved celltype_graph in file %s of format %s in %g s' 
+                                     % (filename, format, delta.seconds + delta.microseconds * 1e-6))
         print 'Saved celltype connectivity graph in', filename
 
     def _read_cell_graph(self, filename, format):
         """Load the cell-to-cell connectivity graph from a
         file. 
 
-        Returns None if any error happens."""
-        cell_graph = None
+        Returns None if any error happens.
+        """
+        cell_graph = None        
         if filename:
             try:
                 start = datetime.now()
@@ -276,11 +303,16 @@ each cell of type *b*.'
                     cell_graph = nx.read_gpickle(filename)
                 elif format == 'edgelist':
                     cell_graph = nx.read_edgelist(filename)
+                elif format == 'yaml':
+                    cell_graph = nx.read_yaml(filename)
+                elif format == 'graphml':
+                    cell_graph = cell_graph = nx.read_graphml(filename)
                 else:
                     print 'Unrecognized format:', format
                 end = datetime.now()
                 delta = end - start
-                config.BENCHMARK_LOGGER.info('Read cell_graph - time: %g s' % (delta.seconds + 1e-6 * delta.microseconds))
+                config.BENCHMARK_LOGGER.info('Read cell_graph from file %s of format %s in %g s' 
+                                             % (filename, format, delta.seconds + 1e-6 * delta.microseconds))
             except Exception, e:
                 print e
         return cell_graph
@@ -352,18 +384,25 @@ each cell of type *b*.'
             raise Exception('Not supported: %s' % (format))
         end = datetime.now()
         delta = end - start
-        config.BENCHMARK_LOGGER.info('Saved cell graph in %g s' %(delta.seconds + 1e-6 * delta.microseconds))
+        config.BENCHMARK_LOGGER.info('Saved cell graph in file %s of type %s in %g s' %(filename, format, delta.seconds + 1e-6 * delta.microseconds))
         print 'Saved cell-to-cell connectivity data in', filename
     
-def test():
-    net = TraubNet()
-    net.plot_celltype_graph()
-    net.save_celltype_graph(filename='celltype_graph.txt', format='edgelist')
+def test(args=None):
+    if len(args) > 1:
+        format = args[1]
+    else:
+        format = 'edgelist'
+    celltype_graph_file = 'nx_celltype_graph.' + format
+    cell_graph_file = 'nx_cell_graph.' + format
+    net = TraubNet(celltype_graph_file, cell_graph_file, format=format)    
+    # net.plot_celltype_graph()
+    net.save_celltype_graph(filename=celltype_graph_file, format=format)
     # net.plot_cell_graph()
-    net.save_cell_graph('networkx_cell_graph.txt', format='edgelist')
+    net.save_cell_graph(cell_graph_file, format=format)
 
 if __name__ == '__main__':
-    test()
+    print sys.argv
+    test(sys.argv)
 
 # 
 # traubnet.py ends here
