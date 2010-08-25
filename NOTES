@@ -2100,3 +2100,34 @@ networkx works fast.
   wheel, as Upi says. But I cannot wait till the wheel is invented by the
   community. Aditya is looking at possiblities of using neuroML/9ml for
   network specification, but facing enough issues.
+
+* <2010-08-25 Wed 14:20> Performance of various formats
+  Here is benchmark of various formats of writing the graphs:
+
+  Name: CellGraph
+  Type: MultiDiGraph
+  Number of nodes: 3560
+  Number of edges: 673610
+  Average in degree: 189.0000
+  Average out degree: 189.0000
+
+  %MEM: 68.4
+  real	11m24.556s
+  user	13m47.740s
+  sys	0m16.450s
+  Saved cell graph in file networkx_cell_graph.yaml of type yaml in 668.958 s
+
+  %MEM: 24.5
+  real	1m15.044s
+  user	1m12.530s
+  sys	0m1.450s
+  Saved cell graph in file networkx_cell_graph.pickle of type pickle in 58.4482 s
+
+  %MEM: 15.9
+  real	0m32.638s
+  user	0m31.890s
+  sys	0m0.700s
+  Saved cell graph in file networkx_cell_graph.edgelist of type edgelist in 17.3055 s
+
+  In all these I am creating the cell-to-cell connectivity graph from scratch
+  and it takes 11-12 s.
