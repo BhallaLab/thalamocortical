@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Aug 10 15:45:05 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Aug 25 16:56:59 2010 (+0530)
+# Last-Updated: Wed Aug 25 23:28:26 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 467
+#     Update #: 518
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -337,15 +337,33 @@ each cell of type *b*.'
             pre_count = self.__celltype_graph.node[pre]['count']
             post_count = self.__celltype_graph.node[post]['count']            
             pre_post_ratio = edata['weight']
-            # 
+            ps_comps = numpy.array(eval(edata['ps_comps']), dtype=int)
+            # THIS NEEDS INVESTIGATION: WHY IS THE ALLOWED_COMP LIST EMPTY FOR SOME EDGES?
+            if (pre_post_ratio == 0) or (len(ps_comps) == 0):
+                continue
             # randint returns unifrom random integers in [low, high)
             # interval. i-th row of pre_indices = list of indices of
             # presynaptic cells of type pre connected to i-th cell of
             # type post.
             pre_indices = numpy.random.randint(low=0, high=pre_count, size=(post_count, pre_post_ratio)) 
+            # List of indices in ps_comps for all post-synaptic cells
+            # for all presynaptic cells.
+            # The i-th row of post_comp_indices will have the list of
+            # indices of the post synaptic compartments for each
+            # presynaptic cell of i-th post cell. Thus, if
+            # ps_comp_indices[i][j] = k, then the j-th pre cell for i-th
+            # post cell will create a synapse on k-th entry in
+            # the ps_comps list for the pre-post edge.
+            post_comp_indices = numpy.random.randint(low=0, high=len(ps_comps), size=(post_count, pre_post_ratio))
+            
             for ii in range(post_count):
-                for jj in pre_indices[ii]:
-                    cell_graph.add_edge('%s_%d' % (pre, jj), '%s_%d' % (post, ii))
+                post_cell_name = '%s_%d' % (post, ii)
+                post_comps = ps_comps[post_comp_indices[ii]]
+                print 'Length of post_comps', len(post_comps), 'prepost', pre_post_ratio
+                pre_indices_for_post = pre_indices[ii]
+                for jj in range(pre_post_ratio):
+                    pre_cell_name = '%s_%d' % (pre, pre_indices[ii][jj])
+                    cell_graph.add_edge(pre_cell_name, post_cell_name, ps_comp=post_comps[jj])
         end = datetime.now()
         delta = end - start
         config.BENCHMARK_LOGGER.info('Built cell_graph programmatically - time: %g s' % (delta.seconds + 1e-6 * delta.microseconds))
