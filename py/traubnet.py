@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Aug 10 15:45:05 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Aug 26 06:08:14 2010 (+0530)
-#           By: subha
-#     Update #: 520
+# Last-Updated: Thu Aug 26 21:49:54 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 607
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -58,6 +58,13 @@ import allowedcomp
 matplotlib.use('SVG')
 
 import matplotlib.pyplot as plt
+has_mayavi = True
+try:
+    from enthought.mayavi import mlab
+except ImportError:
+    has_mayavi = False
+    print 'Mayavi Python Module not available on this system. No 3-D visualization'
+    
 
 import networkx as nx
 
@@ -86,11 +93,11 @@ class TraubNet(object):
         self.__cell_graph = self._read_cell_graph(cells_file, format=format)
         if not self.__cell_graph:
             self.__cell_graph = self._make_cell_graph()
-        start = datetime.now()
-        print nx.info(self.__cell_graph)
-        end = datetime.now()
-        delta = end - start
-        config.BENCHMARK_LOGGER.info('Computed Graph info in: %g' % (delta.seconds + 1e-6 * delta.microseconds))
+        # start = datetime.now()
+        # print nx.info(self.__cell_graph)
+        # end = datetime.now()
+        # delta = end - start
+        # config.BENCHMARK_LOGGER.info('Computed Graph info in: %g' % (delta.seconds + 1e-6 * delta.microseconds))
 
     def _make_celltype_graph(self, connmatrix_file, cellcount_file):        
         """
@@ -258,6 +265,25 @@ each cell of type *b*.'
         plt.show()
         plt.savefig('celltype_graph')
 
+    def plot_celltype_graph_3d(self):
+        """Some eyecandi useful for presentations."""
+        numeric_graph = nx.convert_node_labels_to_integers(self.__celltype_graph)
+        pos = nx.spring_layout(numeric_graph, dim=3)        
+        xyz = numpy.array([pos[v] for v in numeric_graph])
+        scalars = [self.__celltype_graph.node[vertex]['count'] for vertex in self.__celltype_graph]
+        mlab.figure(1, bgcolor=(0, 0, 0))
+        mlab.clf()
+        points = mlab.points3d(xyz[:,0], xyz[:,1], xyz[:,2],
+                               scalars,
+                               scale_factor=0.1,
+                               colormap='Blues',
+                               resolution=20)
+        points.mlab_source.dataset.lines = numpy.array(numeric_graph.edges())
+        tube = mlab.pipeline.tube(points, tube_radius=0.01)
+        mlab.pipeline.surface(tube, color=(0.8, 0.8, 0.8))
+        mlab.savefig('celltypes_graph.png')
+        mlab.show()
+
     def save_celltype_graph(self, filename='celltype_conn.gml', format='gml'):
         """
         Save the celltype-to-celltype connectivity information in a file.
@@ -382,6 +408,35 @@ each cell of type *b*.'
         plt.show()
         plt.savefig('cell_graph')
 
+    def plot_cell_graph_3d(self):
+        """Some eyecandi useful for presentations."""
+        numeric_graph = nx.convert_node_labels_to_integers(self.__cell_graph)
+        pos = nx.spring_layout(numeric_graph, dim=3)        
+        xyz = numpy.array([pos[v] for v in numeric_graph])
+        celltypes = self.__celltype_graph.nodes()
+
+        scalars = []
+        for cell in self.__cell_graph:
+            celltype = cell.split('_')[0]
+            scalars.append(celltypes.index(celltype))
+        scalars = numpy.array(scalars)
+        mlab.figure(1, bgcolor=(0, 0, 0))
+        mlab.clf()
+        points = mlab.points3d(xyz[:,0], xyz[:,1], xyz[:,2],
+                               scalars,
+                               scale_factor=0.1,
+                               colormap='autumn',
+                               resolution=20,
+                               vmin = 0,
+                               vmax=len(celltypes)
+                               )
+        points.mlab_source.dataset.lines = numpy.array(numeric_graph.edges())
+        tube = mlab.pipeline.tube(points, tube_radius=0.01)
+        mlab.pipeline.surface(tube, color=(0.8, 0.8, 0.8))
+        mlab.savefig('celltypes_graph.png')
+        mlab.show()
+        
+
     def save_cell_graph(self, filename='cell_graph.gml', format='gml'):
         """Save the cell to cell connectivity graph in a file.
 
@@ -412,10 +467,11 @@ def test(args=None):
     celltype_graph_file = 'nx_celltype_graph.' + format
     cell_graph_file = 'nx_cell_graph.' + format
     net = TraubNet(celltype_graph_file, cell_graph_file, format=format)    
-    # net.plot_celltype_graph()
-    net.save_celltype_graph(filename=celltype_graph_file, format=format)
+    # net.plot_celltype_graph_3d()
+    # net.save_celltype_graph(filename=celltype_graph_file, format=format)
     # net.plot_cell_graph()
-    net.save_cell_graph(cell_graph_file, format=format)
+    net.plot_cell_graph_3d()
+    # net.save_cell_graph(cell_graph_file, format=format)
 
 if __name__ == '__main__':
     print sys.argv
