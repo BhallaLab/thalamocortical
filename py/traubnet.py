@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Aug 10 15:45:05 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Aug 25 23:28:26 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 518
+# Last-Updated: Thu Aug 26 06:08:14 2010 (+0530)
+#           By: subha
+#     Update #: 520
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -359,7 +359,6 @@ each cell of type *b*.'
             for ii in range(post_count):
                 post_cell_name = '%s_%d' % (post, ii)
                 post_comps = ps_comps[post_comp_indices[ii]]
-                print 'Length of post_comps', len(post_comps), 'prepost', pre_post_ratio
                 pre_indices_for_post = pre_indices[ii]
                 for jj in range(pre_post_ratio):
                     pre_cell_name = '%s_%d' % (pre, pre_indices[ii][jj])
