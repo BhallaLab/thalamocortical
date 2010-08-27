@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Aug 10 15:45:05 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Aug 26 21:49:54 2010 (+0530)
+# Last-Updated: Fri Aug 27 16:42:15 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 607
+#     Update #: 627
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -276,6 +276,7 @@ each cell of type *b*.'
         points = mlab.points3d(xyz[:,0], xyz[:,1], xyz[:,2],
                                scalars,
                                scale_factor=0.1,
+                               # scale_mode='none',
                                colormap='Blues',
                                resolution=20)
         points.mlab_source.dataset.lines = numpy.array(numeric_graph.edges())
@@ -424,16 +425,19 @@ each cell of type *b*.'
         mlab.clf()
         points = mlab.points3d(xyz[:,0], xyz[:,1], xyz[:,2],
                                scalars,
-                               scale_factor=0.1,
+                               scale_factor=0.01,
+                               scale_mode='none',
                                colormap='autumn',
+                               opacity=0.4,
                                resolution=20,
-                               vmin = 0,
-                               vmax=len(celltypes)
+                               vmin = 0.0,
+                               vmax=len(celltypes),
+                               transparent=True
                                )
         points.mlab_source.dataset.lines = numpy.array(numeric_graph.edges())
-        tube = mlab.pipeline.tube(points, tube_radius=0.01)
+        tube = mlab.pipeline.tube(points, tube_radius=0.001)
         mlab.pipeline.surface(tube, color=(0.8, 0.8, 0.8))
-        mlab.savefig('celltypes_graph.png')
+        mlab.savefig('cell_graph.png')
         mlab.show()
         
 
