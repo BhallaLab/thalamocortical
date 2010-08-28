@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Aug 10 15:45:05 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Aug 28 09:41:33 2010 (+0530)
+# Last-Updated: Sat Aug 28 10:05:47 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 704
+#     Update #: 721
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -246,7 +246,7 @@ each cell of type *b*.'
                                      % (celltypes_file, format, delta.seconds + 1e-6 * delta.microseconds))
         return celltype_graph
 
-    def plot_celltype_graph(self):
+    def plot_celltype_graph(self, filename='celltype_graph.png'):
         """Display the celltype connectivity graph 
 
         """
@@ -257,6 +257,7 @@ each cell of type *b*.'
             pos = nx.spring_layout(self.__celltype_graph)
         node_size_list = [self.__celltype_graph.node[vertex]['count'] * 10 for vertex in self.__celltype_graph]
         edge_weights = [edata['weight'] for u, v, edata in self.__celltype_graph.edges(data=True)]
+        plt.figure(1)
         nx.draw(self.__celltype_graph,
                 pos,
                 alpha=0.4,
@@ -267,15 +268,16 @@ each cell of type *b*.'
                 edge_vmin=min(edge_weights),
                 edge_vmax=max(edge_weights))
         #plt.show()
-        plt.savefig('celltype_graph')
+        plt.savefig(filename)
+        print 'Saved figure in', filename
 
-    def plot_celltype_graph_3d(self):
+    def plot_celltype_graph_3d(self, filename='celltypes_graph_3d.png'):
         """Some eyecandi useful for presentations."""
         numeric_graph = nx.convert_node_labels_to_integers(self.__celltype_graph)
         pos = nx.spring_layout(numeric_graph, dim=3)        
         xyz = numpy.array([pos[v] for v in numeric_graph])
         scalars = [self.__celltype_graph.node[vertex]['count'] for vertex in self.__celltype_graph]
-        mlab.figure(1, bgcolor=(0, 0, 0))
+        fig = mlab.figure(1, bgcolor=(0, 0, 0))
         mlab.clf()
         points = mlab.points3d(xyz[:,0], xyz[:,1], xyz[:,2],
                                scalars,
@@ -286,7 +288,8 @@ each cell of type *b*.'
         points.mlab_source.dataset.lines = numpy.array(numeric_graph.edges())
         tube = mlab.pipeline.tube(points, tube_radius=0.01)
         mlab.pipeline.surface(tube, color=(0.8, 0.8, 0.8))
-        mlab.savefig('celltypes_graph_3d.png')
+        mlab.savefig(filename, size=(1280, 800), figure=fig)
+        print 'Mayavi celltype graph saved in', filename
         # mlab.show()
 
     def save_celltype_graph(self, filename='celltype_conn.gml', format='gml'):
@@ -403,6 +406,7 @@ each cell of type *b*.'
         """Display the cell-to-cell connection graph.
 
         """
+        plt.figure(2)
         nx.draw(self.__cell_graph,
                 alpha=0.4,
                 with_labels=False,
@@ -413,6 +417,7 @@ each cell of type *b*.'
                 edge_color='b')
         #plt.show()
         plt.savefig('cell_graph')
+        print 'Saved 2D cell graph in', 'cell_graph'
 
     def plot_cell_graph_3d(self, filename=None):
         """Some eyecandi useful for presentations."""
@@ -426,7 +431,7 @@ each cell of type *b*.'
             celltype = cell.split('_')[0]
             scalars.append(celltypes.index(celltype))
         scalars = numpy.array(scalars)
-        mlab.figure(2, size=(1280, 800), bgcolor=(0, 0, 0))
+        fig = mlab.figure(2, size=(1280, 800), bgcolor=(0, 0, 0))
         mlab.clf()
         # print xyz
         # print xyz[:,0], xyz[:,1], xyz[:,2]
@@ -450,7 +455,8 @@ each cell of type *b*.'
 	# mlab.move(3) # Move the camera forward
         if filename is None:
             filename = 'cell_graph_3d.png'
-        mlab.savefig(filename)
+        mlab.savefig(filename, size=(1280,800), figure=fig)
+        print 'Mayavi image saved in', filename
         #mlab.show()
         
 
@@ -496,7 +502,7 @@ def test(args=None):
 #    net.plot_celltype_graph_3d()
     # net.save_celltype_graph(filename=celltype_graph_file, format=format)
     net.plot_cell_graph()
-#    net.plot_cell_graph_3d()
+    net.plot_cell_graph_3d()
     # net.save_cell_graph(cell_graph_file, format=format)
 
 if __name__ == '__main__':
