@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Aug 10 15:45:05 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Aug 28 10:05:47 2010 (+0530)
+# Last-Updated: Sat Aug 28 18:28:36 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 721
+#     Update #: 736
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -61,7 +61,8 @@ import matplotlib.pyplot as plt
 has_mayavi = True
 try:
     from enthought.mayavi import mlab
-    mlab.options.offscreen = True
+#    mlab.options.offscreen = True #-- this causes mayavi to crash
+# known bug: https://svn.enthought.com/enthought/ticket/1824
 except ImportError:
     has_mayavi = False
     print 'Mayavi Python Module not available on this system. No 3-D visualization'
@@ -283,11 +284,18 @@ each cell of type *b*.'
                                scalars,
                                scale_factor=0.1,
                                scale_mode='none',
-                               colormap='Blues',
+                               colormap='summer',
+                               opacity=0.4,
+                               transparent=True,
                                resolution=20)
         points.mlab_source.dataset.lines = numpy.array(numeric_graph.edges())
-        tube = mlab.pipeline.tube(points, tube_radius=0.01)
-        mlab.pipeline.surface(tube, color=(0.8, 0.8, 0.8))
+        points.mlab_source.update()
+        mlab.pipeline.surface(points, color=(1,1,1),
+                              representation='wireframe',
+                              line_width=2,
+                              name='synapses')
+        # tube = mlab.pipeline.tube(points, tube_radius=0.01)
+        # mlab.pipeline.surface(tube, color=(0.8, 0.8, 0.8))
         mlab.savefig(filename, size=(1280, 800), figure=fig)
         print 'Mayavi celltype graph saved in', filename
         # mlab.show()
@@ -499,9 +507,9 @@ def test(args=None):
     cell_graph_file = 'nx_cell_graph.' + format
     net = TraubNet(celltype_graph_file, cell_graph_file, format=format, scale=scale)    
     # net.plot_celltype_graph()
-#    net.plot_celltype_graph_3d()
+    net.plot_celltype_graph_3d()
     # net.save_celltype_graph(filename=celltype_graph_file, format=format)
-    net.plot_cell_graph()
+    # net.plot_cell_graph()
     net.plot_cell_graph_3d()
     # net.save_cell_graph(cell_graph_file, format=format)
 
