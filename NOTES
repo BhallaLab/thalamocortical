@@ -2131,3 +2131,29 @@ networkx works fast.
 
   In all these I am creating the cell-to-cell connectivity graph from scratch
   and it takes 11-12 s.
+* <2010-08-27 Fri 23:35> Visualization
+  I ended up using Mayavi 2 to do the 3d visualization. The complete cell-cell
+  graph literally looks like a hairball (which Upi found very exciting) using nx.spring_layout. I
+  tried shell_layout - but it does not work for 3D, nor does
+  circular_layout. spectral_layout works for a 0.1 times the number of nodes
+  and edges, but gives the exception:
+
+  Traceback (most recent call last):
+  File "traubnet.py", line 494, in <module>
+    test(sys.argv)
+  File "traubnet.py", line 489, in test
+    net.plot_cell_graph_3d()
+  File "traubnet.py", line 418, in plot_cell_graph_3d
+    pos = nx.spectral_layout(numeric_graph, dim=3)        
+  File "/usr/local/lib/python2.6/dist-packages/networkx/drawing/layout.py", line 438, in spectral_layout
+    A=A+np.transpose(A)
+  File "/usr/lib/python2.6/dist-packages/numpy/core/fromnumeric.py", line 399, in transpose
+    return transpose(axes)
+TypeError: transpose() takes exactly 1 argument (2 given)
+
+The documentation for this layout says: Position nodes using the eigenvectors
+of the graph Laplacian.
+
+I have to read-up what graph Laplacian means!
+
+Next option is random layout and I doubt if it will be far from hairball.
