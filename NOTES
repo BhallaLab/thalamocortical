@@ -2157,3 +2157,24 @@ of the graph Laplacian.
 I have to read-up what graph Laplacian means!
 
 Next option is random layout and I doubt if it will be far from hairball.
+
+* <2010-08-28 Sat 18:29> Faced with Mayavi bug
+  I tried to generate the 3D pictures of the network model on ghevar over
+  ssh X forwarding (-Y). Funnily, this was causing my Xwindows to crash. When
+  I used ssh without -Y, it gave DISPLAY not found error as expected. After
+  trying the code on my system with mlab.options.offscreen = True, I faced
+  this error:
+
+  The program 'python' received an X Window System error.
+  This probably reflects a bug in the program.
+  The error was 'GLXBadContextTag'.
+  (Details: serial 120 error_code 170 request_code 153 minor_code 5)
+  (Note to programmers: normally, X errors are reported asynchronously;
+   that is, you will receive the error a while after causing it.
+   To debug your program, run it with the --sync command line
+   option to change this behavior. You can then get a meaningful
+   backtrace from your debugger if you break on the gdk_x_error() function.)
+
+   This is a known bug: https://svn.enthought.com/enthought/ticket/1824
+
+   Caused enough waste of time.
