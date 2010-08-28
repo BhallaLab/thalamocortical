@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Aug 10 15:45:05 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Aug 27 16:42:15 2010 (+0530)
+# Last-Updated: Sat Aug 28 09:41:33 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 627
+#     Update #: 704
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -61,6 +61,7 @@ import matplotlib.pyplot as plt
 has_mayavi = True
 try:
     from enthought.mayavi import mlab
+    mlab.options.offscreen = True
 except ImportError:
     has_mayavi = False
     print 'Mayavi Python Module not available on this system. No 3-D visualization'
@@ -78,7 +79,7 @@ class TraubNet(object):
     """
     def __init__(self, 
                  celltypes_file='nx_celltype_graph.edgelist', 
-                 cells_file='nx_cell_graph.edgelist', format='edgelist'):
+                 cells_file='nx_cell_graph.edgelist', format='edgelist', scale=1.0):
         """
         celltypes_file -- file containing celltype-celltype connectivity graph
         
@@ -89,7 +90,7 @@ class TraubNet(object):
         """
         self.__celltype_graph = self._read_celltype_graph(celltypes_file, format=format)
         if not self.__celltype_graph:
-            self.__celltype_graph = self._make_celltype_graph('connmatrix.txt', 'cells.txt')
+            self.__celltype_graph = self._make_celltype_graph('connmatrix.txt', 'cells.txt', scale=scale)
         self.__cell_graph = self._read_cell_graph(cells_file, format=format)
         if not self.__cell_graph:
             self.__cell_graph = self._make_cell_graph()
@@ -99,7 +100,7 @@ class TraubNet(object):
         # delta = end - start
         # config.BENCHMARK_LOGGER.info('Computed Graph info in: %g' % (delta.seconds + 1e-6 * delta.microseconds))
 
-    def _make_celltype_graph(self, connmatrix_file, cellcount_file):        
+    def _make_celltype_graph(self, connmatrix_file, cellcount_file, scale=1.0):        
         """
         connmatrix_file -- csv file containig the connection matrix.
         
@@ -112,6 +113,8 @@ class TraubNet(object):
 
         cellcount_file -- csv file containing the number of instances
         of each celltype.
+
+        scale -- reduce/increase the number of cells of each type by this multiple
 
         """
         start = datetime.now()
@@ -126,6 +129,7 @@ class TraubNet(object):
         index = 0
         for key, value in cellcount_dict.items():
             print key, value
+            value = int(numpy.round(value*scale))
             celltype_graph.add_node(key, count=value, index=index)
             index += 1
         reader = csv.reader(file(connmatrix_file))
@@ -139,7 +143,7 @@ class TraubNet(object):
             col = 0
             for entry in line:
                 post = header[col]
-                value = int(entry)
+                value = int(numpy.round(int(entry)*scale))
                 if value == 0:
                     continue
                 celltype_graph.add_edge(pre, post, weight=value)
@@ -262,7 +266,7 @@ each cell of type *b*.'
                 edge_cmap=plt.cm.jet,
                 edge_vmin=min(edge_weights),
                 edge_vmax=max(edge_weights))
-        plt.show()
+        #plt.show()
         plt.savefig('celltype_graph')
 
     def plot_celltype_graph_3d(self):
@@ -276,14 +280,14 @@ each cell of type *b*.'
         points = mlab.points3d(xyz[:,0], xyz[:,1], xyz[:,2],
                                scalars,
                                scale_factor=0.1,
-                               # scale_mode='none',
+                               scale_mode='none',
                                colormap='Blues',
                                resolution=20)
         points.mlab_source.dataset.lines = numpy.array(numeric_graph.edges())
         tube = mlab.pipeline.tube(points, tube_radius=0.01)
         mlab.pipeline.surface(tube, color=(0.8, 0.8, 0.8))
-        mlab.savefig('celltypes_graph.png')
-        mlab.show()
+        mlab.savefig('celltypes_graph_3d.png')
+        # mlab.show()
 
     def save_celltype_graph(self, filename='celltype_conn.gml', format='gml'):
         """
@@ -401,15 +405,16 @@ each cell of type *b*.'
         """
         nx.draw(self.__cell_graph,
                 alpha=0.4,
-                with_labels = False,
-                node_color = [self.__cell_graph.node[vertex]['type_index'] for vertex in self.__cell_graph],
+                with_labels=False,
+                node_color=[self.__cell_graph.node[vertex]['type_index'] for vertex in self.__cell_graph],
                 cmap=plt.cm.jet,
                 vmin=0,
-                vmax=len(self.__celltype_graph))
-        plt.show()
+                vmax=len(self.__celltype_graph),
+                edge_color='b')
+        #plt.show()
         plt.savefig('cell_graph')
 
-    def plot_cell_graph_3d(self):
+    def plot_cell_graph_3d(self, filename=None):
         """Some eyecandi useful for presentations."""
         numeric_graph = nx.convert_node_labels_to_integers(self.__cell_graph)
         pos = nx.spring_layout(numeric_graph, dim=3)        
@@ -421,24 +426,32 @@ each cell of type *b*.'
             celltype = cell.split('_')[0]
             scalars.append(celltypes.index(celltype))
         scalars = numpy.array(scalars)
-        mlab.figure(1, bgcolor=(0, 0, 0))
+        mlab.figure(2, size=(1280, 800), bgcolor=(0, 0, 0))
         mlab.clf()
+        # print xyz
+        # print xyz[:,0], xyz[:,1], xyz[:,2]
         points = mlab.points3d(xyz[:,0], xyz[:,1], xyz[:,2],
                                scalars,
                                scale_factor=0.01,
                                scale_mode='none',
                                colormap='autumn',
-                               opacity=0.4,
+                               opacity=0.5,
                                resolution=20,
                                vmin = 0.0,
                                vmax=len(celltypes),
-                               transparent=True
+                               transparent=True,
                                )
         points.mlab_source.dataset.lines = numpy.array(numeric_graph.edges())
         tube = mlab.pipeline.tube(points, tube_radius=0.001)
         mlab.pipeline.surface(tube, color=(0.8, 0.8, 0.8))
-        mlab.savefig('cell_graph.png')
-        mlab.show()
+        camera = mlab.view()
+        mlab.view(camera[0], camera[1], camera[2] - 1.0, camera[3])
+        print 'Azimuth, Elevation, Distance, Focal point', camera
+	# mlab.move(3) # Move the camera forward
+        if filename is None:
+            filename = 'cell_graph_3d.png'
+        mlab.savefig(filename)
+        #mlab.show()
         
 
     def save_cell_graph(self, filename='cell_graph.gml', format='gml'):
@@ -468,13 +481,22 @@ def test(args=None):
         format = args[1]
     else:
         format = 'edgelist'
+    if len(args) > 2:
+        scale = float(args[2])
+    else:
+        scale = 1.0
+    if len(args) > 3:
+        filename = args[3]
+    else:
+        filename = 'cell_graph.png'
     celltype_graph_file = 'nx_celltype_graph.' + format
     cell_graph_file = 'nx_cell_graph.' + format
-    net = TraubNet(celltype_graph_file, cell_graph_file, format=format)    
-    # net.plot_celltype_graph_3d()
+    net = TraubNet(celltype_graph_file, cell_graph_file, format=format, scale=scale)    
+    # net.plot_celltype_graph()
+#    net.plot_celltype_graph_3d()
     # net.save_celltype_graph(filename=celltype_graph_file, format=format)
-    # net.plot_cell_graph()
-    net.plot_cell_graph_3d()
+    net.plot_cell_graph()
+#    net.plot_cell_graph_3d()
     # net.save_cell_graph(cell_graph_file, format=format)
 
 if __name__ == '__main__':
