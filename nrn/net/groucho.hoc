@@ -5849,7 +5849,7 @@ if (pmesg)	print "Total number: syn_num = ",syn_num,"suppyrRS_to_suppyrRS synaps
 	    postsyncell_ = cellobj(suppyrRS_base+postsyn_cell_num)
 	    postsyncell_.comp[k] syn_ = new AMPA(0.5)
 	    postsyncell_.synlist.append(syn_)
-	    syn_.tau = tauAMPA_spinstell_to_suppyrRS
+	    syn_.tau = tauAMPA_spinstell_to_vasuppyrRS
 
 	    // connect to presynaptic cell:
         // arguments (presyn cell #     , postsyn cell #                  , synapse #                     , weight     , delay)
