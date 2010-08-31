@@ -6,9 +6,15 @@
 # Maintainer: 
 # Created: Tue Aug 10 15:45:05 2010 (+0530)
 # Version: 
+<<<<<<< HEAD
 # Last-Updated: Tue Aug 31 16:49:01 2010 (+0530)
 #           By: Subhasis Ray
 #     Update #: 739
+=======
+# Last-Updated: Sat Aug 28 04:09:52 2010 (+0530)
+#           By: subha
+#     Update #: 726
+>>>>>>> e0cd154b11ac16e614859138868ea14a8b67bc81
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -55,7 +61,7 @@ import numpy
 import matplotlib
 import allowedcomp
 
-matplotlib.use('SVG')
+# matplotlib.use('SVG')
 
 import matplotlib.pyplot as plt
 has_mayavi = True
@@ -414,7 +420,7 @@ each cell of type *b*.'
         """Display the cell-to-cell connection graph.
 
         """
-        plt.figure(2)
+        plt.figure(3)
         nx.draw(self.__cell_graph,
                 alpha=0.4,
                 with_labels=False,
@@ -439,7 +445,7 @@ each cell of type *b*.'
             celltype = cell.split('_')[0]
             scalars.append(celltypes.index(celltype))
         scalars = numpy.array(scalars)
-        fig = mlab.figure(2, size=(1280, 800), bgcolor=(0, 0, 0))
+        fig = mlab.figure(4, size=(1280, 800), bgcolor=(0, 0, 0))
         mlab.clf()
         # print xyz
         # print xyz[:,0], xyz[:,1], xyz[:,2]
@@ -506,7 +512,11 @@ def test(args=None):
     celltype_graph_file = 'nx_celltype_graph.' + format
     cell_graph_file = 'nx_cell_graph.' + format
     net = TraubNet(celltype_graph_file, cell_graph_file, format=format, scale=scale)    
+<<<<<<< HEAD
     # net.plot_celltype_graph()
+=======
+    net.plot_celltype_graph()
+>>>>>>> e0cd154b11ac16e614859138868ea14a8b67bc81
     net.plot_celltype_graph_3d()
     # net.save_celltype_graph(filename=celltype_graph_file, format=format)
     # net.plot_cell_graph()
