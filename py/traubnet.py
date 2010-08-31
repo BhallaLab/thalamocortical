@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Aug 10 15:45:05 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Aug 28 18:28:36 2010 (+0530)
+# Last-Updated: Tue Aug 31 16:49:01 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 736
+#     Update #: 739
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -95,11 +95,11 @@ class TraubNet(object):
         self.__cell_graph = self._read_cell_graph(cells_file, format=format)
         if not self.__cell_graph:
             self.__cell_graph = self._make_cell_graph()
-        # start = datetime.now()
-        # print nx.info(self.__cell_graph)
-        # end = datetime.now()
-        # delta = end - start
-        # config.BENCHMARK_LOGGER.info('Computed Graph info in: %g' % (delta.seconds + 1e-6 * delta.microseconds))
+        start = datetime.now()
+        print nx.info(self.__cell_graph)
+        end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('Computed Graph info in: %g' % (delta.seconds + 1e-6 * delta.microseconds))
 
     def _make_celltype_graph(self, connmatrix_file, cellcount_file, scale=1.0):        
         """
@@ -290,15 +290,15 @@ each cell of type *b*.'
                                resolution=20)
         points.mlab_source.dataset.lines = numpy.array(numeric_graph.edges())
         points.mlab_source.update()
-        mlab.pipeline.surface(points, color=(1,1,1),
-                              representation='wireframe',
-                              line_width=2,
-                              name='synapses')
-        # tube = mlab.pipeline.tube(points, tube_radius=0.01)
-        # mlab.pipeline.surface(tube, color=(0.8, 0.8, 0.8))
+        # mlab.pipeline.surface(points, color=(1,1,1),
+        #                       representation='wireframe',
+        #                       line_width=2,
+        #                       name='synapses')
+        tube = mlab.pipeline.tube(points, tube_radius=0.01)
+        mlab.pipeline.surface(tube, color=(0.8, 0.8, 0.8))
         mlab.savefig(filename, size=(1280, 800), figure=fig)
         print 'Mayavi celltype graph saved in', filename
-        # mlab.show()
+        mlab.show()
 
     def save_celltype_graph(self, filename='celltype_conn.gml', format='gml'):
         """
