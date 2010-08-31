@@ -6,15 +6,9 @@
 # Maintainer: 
 # Created: Tue Aug 10 15:45:05 2010 (+0530)
 # Version: 
-<<<<<<< HEAD
-# Last-Updated: Tue Aug 31 16:49:01 2010 (+0530)
+# Last-Updated: Tue Aug 31 22:18:47 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 739
-=======
-# Last-Updated: Sat Aug 28 04:09:52 2010 (+0530)
-#           By: subha
-#     Update #: 726
->>>>>>> e0cd154b11ac16e614859138868ea14a8b67bc81
+#     Update #: 737
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -512,11 +506,7 @@ def test(args=None):
     celltype_graph_file = 'nx_celltype_graph.' + format
     cell_graph_file = 'nx_cell_graph.' + format
     net = TraubNet(celltype_graph_file, cell_graph_file, format=format, scale=scale)    
-<<<<<<< HEAD
     # net.plot_celltype_graph()
-=======
-    net.plot_celltype_graph()
->>>>>>> e0cd154b11ac16e614859138868ea14a8b67bc81
     net.plot_celltype_graph_3d()
     # net.save_celltype_graph(filename=celltype_graph_file, format=format)
     # net.plot_cell_graph()
