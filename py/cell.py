@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 24 10:04:47 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Sep  3 18:58:18 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 631
+# Last-Updated: Tue Sep 14 09:46:35 2010 (+0530)
+#           By: subha
+#     Update #: 633
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -148,7 +148,7 @@ class TraubCell(moose.Cell):
         else:
             config.LOGGER.debug(__name__ + ' cell exists: ' + cellpath)
         ret = moose.Cell(cellpath)
-        TraubCell.generate_morphology(ret)
+        # TraubCell.generate_morphology(ret)
 	config.LOGGER.debug('Returning cell %s' % (ret.path))
         for handler in config.LOGGER.handlers:
             handler.flush()
@@ -331,10 +331,5 @@ class TraubCell(moose.Cell):
         mlab.show()
         raise Exception('Stop here for testing')
                                        
-                
-                        
-        
-        
-
 # 
 # cell.py ends here

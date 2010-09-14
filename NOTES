@@ -2178,3 +2178,13 @@ Next option is random layout and I doubt if it will be far from hairball.
    This is a known bug: https://svn.enthought.com/enthought/ticket/1824
 
    Caused enough waste of time.
+* <2010-09-14 Tue 09:47> Upi and Oliver pointed out neuron-morphology generation
+  Upi mentioned Mark Ha"user's work in Lab meet and then Olver pointed out
+  this paper where they show algorithmic generation of most neuronal
+  morphologies: 
+  
+  Cuntz H, Forstner F, Borst A, Häusser M (2010) One Rule to Grow Them All: A
+  General Theory of Neuronal Branching and Its Practical Application. PLoS
+  Comput Biol 6(8): e1000877. doi:10.1371/journal.pcbi.1000877
+
+  I am yet to read the paper and see if it is worth the effort.
