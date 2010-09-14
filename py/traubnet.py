@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Aug 10 15:45:05 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Aug 31 22:18:47 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 737
+# Last-Updated: Tue Sep 14 11:26:40 2010 (+0530)
+#           By: subha
+#     Update #: 759
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -58,14 +58,15 @@ import allowedcomp
 # matplotlib.use('SVG')
 
 import matplotlib.pyplot as plt
-has_mayavi = True
-try:
-    from enthought.mayavi import mlab
+has_mayavi = False
+# try:
+#     from enthought.mayavi import mlab
+#     has_mayavi = True
 #    mlab.options.offscreen = True #-- this causes mayavi to crash
 # known bug: https://svn.enthought.com/enthought/ticket/1824
-except ImportError:
-    has_mayavi = False
-    print 'Mayavi Python Module not available on this system. No 3-D visualization'
+# except ImportError:
+#     has_mayavi = False
+#     print 'Mayavi Python Module not available on this system. No 3-D visualization'
     
 
 import networkx as nx
@@ -144,8 +145,10 @@ class TraubNet(object):
             col = 0
             for entry in line:
                 post = header[col]
+                col += 1
                 value = int(numpy.round(int(entry)*scale))
                 if value == 0:
+                    config.LOGGER.debug('No edge between %s and %s' % (pre, post))
                     continue
                 celltype_graph.add_edge(pre, post, weight=value)
 
@@ -197,7 +200,6 @@ class TraubNet(object):
                     celltype_graph[pre][post]['gbar_nmda'] = gbar_nmda
                 except KeyError:
                     config.LOGGER.info('No gbar_nmda for synapse between %s and %s' % (pre, post))
-                col += 1
         end = datetime.now()
         delta = end - start
         config.BENCHMARK_LOGGER.info('Generated celltype_graph in %g s' % (delta.seconds + delta.microseconds * 1e-6))
@@ -274,6 +276,8 @@ each cell of type *b*.'
 
     def plot_celltype_graph_3d(self, filename='celltypes_graph_3d.png'):
         """Some eyecandi useful for presentations."""
+        if not has_mayavi:
+            return
         numeric_graph = nx.convert_node_labels_to_integers(self.__celltype_graph)
         pos = nx.spring_layout(numeric_graph, dim=3)        
         xyz = numpy.array([pos[v] for v in numeric_graph])
@@ -380,7 +384,6 @@ each cell of type *b*.'
             post_count = self.__celltype_graph.node[post]['count']            
             pre_post_ratio = edata['weight']
             ps_comps = numpy.array(eval(edata['ps_comps']), dtype=int)
-            # THIS NEEDS INVESTIGATION: WHY IS THE ALLOWED_COMP LIST EMPTY FOR SOME EDGES?
             if (pre_post_ratio == 0) or (len(ps_comps) == 0):
                 continue
             # randint returns unifrom random integers in [low, high)
@@ -429,6 +432,8 @@ each cell of type *b*.'
 
     def plot_cell_graph_3d(self, filename=None):
         """Some eyecandi useful for presentations."""
+        if not has_mayavi:
+            return
         numeric_graph = nx.convert_node_labels_to_integers(self.__cell_graph)
         pos = nx.spring_layout(numeric_graph, dim=3)        
         xyz = numpy.array([pos[v] for v in numeric_graph])
@@ -491,10 +496,19 @@ each cell of type *b*.'
         print 'Saved cell-to-cell connectivity data in', filename
     
 def test(args=None):
+    """the first argument specifies the graph file format. Default is GML
+
+    second argument is the scale factor. All the cell and edge counts
+    in the celltype graph are multiplied by this factor.
+
+    third argument was used earlier to save the cell-graph image in a
+    file.
+    
+    """
     if len(args) > 1:
         format = args[1]
     else:
-        format = 'edgelist'
+        format = 'gml'
     if len(args) > 2:
         scale = float(args[2])
     else:
@@ -508,12 +522,21 @@ def test(args=None):
     net = TraubNet(celltype_graph_file, cell_graph_file, format=format, scale=scale)    
     # net.plot_celltype_graph()
     net.plot_celltype_graph_3d()
-    # net.save_celltype_graph(filename=celltype_graph_file, format=format)
+    net.save_celltype_graph(filename=celltype_graph_file, format=format)
     # net.plot_cell_graph()
     net.plot_cell_graph_3d()
-    # net.save_cell_graph(cell_graph_file, format=format)
+    net.save_cell_graph(cell_graph_file, format=format)
 
 if __name__ == '__main__':
+    """the first argument specifies the graph file format. Default is GML
+
+    second argument is the scale factor. All the cell and edge counts
+    in the celltype graph are multiplied by this factor.
+
+    third argument was used earlier to save the cell-graph image in a
+    file.
+    
+    """
     print sys.argv
     test(sys.argv)
 
