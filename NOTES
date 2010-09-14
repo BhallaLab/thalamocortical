@@ -2188,3 +2188,6 @@ Next option is random layout and I doubt if it will be far from hairball.
   Comput Biol 6(8): e1000877. doi:10.1371/journal.pcbi.1000877
 
   I am yet to read the paper and see if it is worth the effort.
+
+  I redid the benchmarking for GML in networkx. Filed a ticket in networkx
+  tracker.
