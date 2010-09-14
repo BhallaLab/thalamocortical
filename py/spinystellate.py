@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Sep 29 11:43:22 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Apr 29 17:07:25 2010 (+0530)
+# Last-Updated: Wed Sep  1 23:13:07 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 497
+#     Update #: 516
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -52,8 +52,12 @@ class SpinyStellate(TraubCell):
     prototype = TraubCell.read_proto("SpinyStellate.p", "SpinyStellate", chan_params)
     def __init__(self, *args):
         start = datetime.now()
+        for arg in args: print arg
 	TraubCell.__init__(self, *args)
+        print 'TraubCell.__init__ passed'
+        print 'Soma:', self.soma.path
         soma_ca_pool = moose.CaConc(self.soma.path + '/CaPool')
+        print 'CaPool generated'
         soma_ca_pool.tau = 50e-3
         end = datetime.now()
         delta = end - start
@@ -81,7 +85,11 @@ class SpinyStellate(TraubCell):
         config.LOGGER.info(" *")
         config.LOGGER.info(" **************************************************************************/")
         sim = Simulation(cls.__name__)
-        mycell = SpinyStellate(sim.model.path + "/SpinyStellate", SpinyStellate.proto_file)
+        proto = TraubCell.read_proto("SpinyStellate.p", "SpinyStellate_1", SpinyStellate.chan_params)
+        print 'Model path', sim.model.path , 'proto', proto
+
+        mycell = SpinyStellate(proto, sim.model.path + "/SpinyStellate")
+        print 'Cell created'
         for handler in config.LOGGER.handlers:
             handler.flush()
 

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 24 10:04:47 2009 (+0530)
 # Version: 
-# Last-Updated: Fri May  7 16:41:47 2010 (+0530)
+# Last-Updated: Fri Sep  3 18:58:18 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 413
+#     Update #: 631
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -44,8 +44,10 @@
 # 
 
 # Code:
+import sys
 from collections import defaultdict
-
+import numpy as np
+from enthought.mayavi import mlab
 import moose
 import config
 import pymoose
@@ -84,6 +86,7 @@ def get_comp(cell, index):
     """Return a wrapper over compartment specified by index. None if
     no such compartment exists."""
     path = cell.path + '/comp_' + str(index)
+    print 'get_comp', path
     if config.context.exists(path):
         return MyCompartment(path)
     else:
@@ -95,7 +98,9 @@ class TraubCell(moose.Cell):
     channel_lib = init_channel_lib()
                      
     def __init__(self, *args):
+        print 'TraubCell.__init__:', args
         moose.Cell.__init__(self, *args)
+        print 'Cell.__init__ done'
         
     
     # Dynamic access to a compartment by index.  It mimics a python
@@ -142,10 +147,12 @@ class TraubCell(moose.Cell):
             config.context.readCell(filename, cellpath)
         else:
             config.LOGGER.debug(__name__ + ' cell exists: ' + cellpath)
-	config.LOGGER.debug('Returning cell %s' % (cellpath))
+        ret = moose.Cell(cellpath)
+        TraubCell.generate_morphology(ret)
+	config.LOGGER.debug('Returning cell %s' % (ret.path))
         for handler in config.LOGGER.handlers:
             handler.flush()
-        return moose.Cell(cellpath)
+        return ret
 
     @classmethod
     def adjust_chanlib(cls, chan_params):
@@ -254,7 +261,80 @@ class TraubCell(moose.Cell):
                     dump_file.write(',%g,%g' % (channel.Ek, channel.Gbar))
             dump_file.write('\n')
 
+    @classmethod
+    def generate_morphology(cls, cell, iterations=50):
+        """Automatically generate morphology information for spatial
+        layout. 
 
+        An implementation of Fruchterman Reingold algorithm in 3D."""
+        nodes = defaultdict(dict)
+        for comp in cell.childList:
+            if moose.Neutral(comp).className == 'Compartment':
+                print 'Appending %s', comp
+                nodes[comp]['pos'] = 0.0
+                nodes[comp]['disp'] = 0.0
+        # populate the edge set
+        edges = set()        
+        for comp in nodes.keys():
+            nid_list = moose.Neutral(comp).neighbours('raxial')
+            for neighbour in nid_list:
+                print 'Adding (%s, %s)' % (comp, neighbour)
+                edges.add((comp, neighbour))
+        
+        # Generate random initial positions for all the compartments
+        init_pos = np.ones((len(nodes), 3)) * 0.5 - np.random.rand(len(nodes), 3) 
+        width = 1.0
+        depth = 1.0
+        height = 1.0
+        ii = 0
+        for key, value in nodes.items():
+            value['pos'] =init_pos[ii]
+            ii += 1
+        volume = width * height * depth
+        k = np.power(volume / len(nodes), 1.0/3)
+        t = 0.1
+        dt = t / iterations
+        for ii in range(iterations):   
+            print 'Iteration', ii
+            # calculate repulsive forces         
+            for comp, data in nodes.items():
+                data['disp'] = np.zeros(3)
+                for other, o_data in nodes.items():
+                    if comp != other:
+                        delta = data['pos'] - o_data['pos'] 
+                        distance = np.linalg.norm(delta)
+                        if distance < 1e-2:
+                            distance = 1e-2
+                        data['disp'] += delta * k * k / distance ** 2
+                        print comp, other, delta, data['disp']
+            for edge in edges: # calculate attractive forces
+                delta = nodes[edge[0]]['pos'] - nodes[edge[1]]['pos']
+                distance = np.linalg.norm(delta)
+                if distance < 1e-2:
+                    distance = 1e-2
+                nodes[edge[0]]['disp'] -= delta * distance / k
+                nodes[edge[1]]['disp'] += delta * distance / k
+                print edge[0], edge[1], delta, nodes[edge[0]]['disp'], nodes[edge[1]]['disp']
+
+            for key, data in nodes.items():
+                data['pos'] += data['disp']/np.linalg.norm(data['disp']) * min(np.linalg.norm(data['disp']), t)
+                data['pos'][0] = min(width/2, max(-width/2, data['pos'][0]))
+                data['pos'][1] = min(height/2, max(-height/2, data['pos'][1]))
+                data['pos'][2] = min(depth/2, max(-depth/2, data['pos'][2]))
+            t -= dt
+        pos = []
+        for key, data in nodes.items():
+            print key, data['pos']
+            pos.append(data['pos'])
+        pos = np.array(pos)
+        points = mlab.points3d(pos[:,0], pos[:, 1], pos[:, 2])
+        mlab.show()
+        raise Exception('Stop here for testing')
+                                       
+                
+                        
+        
+        
 
 # 
 # cell.py ends here

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Mar 29 11:24:18 2010 (+0530)
+# Last-Updated: Wed Sep  1 23:01:47 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 227
+#     Update #: 228
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -42,6 +42,7 @@ from archan import AR
 
 class MyCompartment(moose.Compartment):
     def __init__(self, *args):
+        for arg in args: print 'MyCompartment.__init__:', arg
         moose.Compartment.__init__(self, *args)
         self.channels = []
         self._xarea = None
