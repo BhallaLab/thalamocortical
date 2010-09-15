@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Jan 13 22:33:35 2010 (+0530)
 # Version: 
-# Last-Updated: Tue May 25 04:02:47 2010 (+0530)
+# Last-Updated: Wed Sep 15 08:52:40 2010 (+0530)
 #         By: subha
-#    Update #: 605
+#    Update #: 606
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -156,9 +156,9 @@ def test_full_model(simtime, simdt=1e-4, plotdt=1e-3, cell_count=None):
         cell_count = CELL_COUNT
     network = Network(sim, cell_count)
     network.setup_random_recording(0.05) # record from 5% of cells
-    sim.schedule(simdt=simdt, plotdt=plotdt, gldt=1e10)
-    sim.run(time=simtime)
-    sim.dump_data('data', True)
+    # sim.schedule(simdt=simdt, plotdt=plotdt, gldt=1e10)
+    # sim.run(time=simtime)
+    # sim.dump_data('data', True)
 
 def test_all_cell_type():
     """test-load all different cell type. this is for debugging - as
