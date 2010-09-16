@@ -2191,3 +2191,11 @@ Next option is random layout and I doubt if it will be far from hairball.
 
   I redid the benchmarking for GML in networkx. Filed a ticket in networkx
   tracker.
+* <2010-09-16 Thu 14:58> A test for full model generation vs only graph generation
+  I tried to see how slow/fast the creation of the complete model was. I tried
+  running it on ghevar: it started taking up to 4 GB RAM and competed with
+  Upi's copies of MOOSE running on it. So I terminated it.
+
+  Tried on my laptop : continued for over 1 hr and 3.7 GB RAM. whereas, just
+  using a networkx graph to define the network takes much less (~10-20 s). So
+  I shall continue to check the connectivity with graph datastructure.
