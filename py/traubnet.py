@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Aug 10 15:45:05 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Sep 15 08:29:45 2010 (+0530)
-#           By: subha
-#     Update #: 760
+# Last-Updated: Thu Sep 16 16:00:24 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 761
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -525,7 +525,7 @@ def test(args=None):
     # net.save_celltype_graph(filename=celltype_graph_file, format=format)
     # net.plot_cell_graph()
     # net.plot_cell_graph_3d()
-    # net.save_cell_graph(cell_graph_file, format=format)
+    net.save_cell_graph(cell_graph_file, format=format)
 
 if __name__ == '__main__':
     """the first argument specifies the graph file format. Default is GML

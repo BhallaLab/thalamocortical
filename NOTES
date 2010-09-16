@@ -2199,3 +2199,31 @@ Next option is random layout and I doubt if it will be far from hairball.
   Tried on my laptop : continued for over 1 hr and 3.7 GB RAM. whereas, just
   using a networkx graph to define the network takes much less (~10-20 s). So
   I shall continue to check the connectivity with graph datastructure.
+* <2010-09-17 Fri> Switching to igraph
+  I wrote a enhancement request in networkx bug tracker for improving the gml
+  reading speed. The response from the networkx developer aric seems to
+  indicate that it's up to me to write a gml parser in python (they use
+  pyparsing - which is terribly inefficient).
+
+  So I switched to igraph for the time being. This is better for my brain as
+  igraph is more c-like and close to the way a computer scientist thinks about
+  graph.
+
+  The current issue is I cannot add edges:
+  
+  ----------------
+
+  Traceback (most recent call last):
+  File "ig_traubnet.py", line 133, in <module>
+    cell_graph = TraubNet('nx_celltype_graph.gml', scale=scale)
+  File "ig_traubnet.py", line 77, in __init__
+    self.__cell_graph = self._generate_cell_graph()
+  File "ig_traubnet.py", line 122, in _generate_cell_graph
+    self.__cell_graph.add_edges(edge_list)
+TypeError: sequence elements must be integer pairs
+
+
+   ----------------
+
+   I am trying to make an edgelist first and the call add_edges. Not sure why
+   this error is coming up.
