@@ -1,6 +1,5 @@
 graph [
   directed 1
-  directed 1
   doc "Celltype-based connectivity data. count of node *n* is the number of cells of type *n* that are present in the model. weight of edge (a, b) is the number of cells of type *a* that connect to each cell of type *b*."
   node [
     id 0
