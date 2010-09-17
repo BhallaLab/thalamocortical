@@ -2227,3 +2227,13 @@ TypeError: sequence elements must be integer pairs
 
    I am trying to make an edgelist first and the call add_edges. Not sure why
    this error is coming up.
+* <2010-09-17 Fri 16:53> Fixed the above issue
+  The reason for the issue above was the randint() function in numpy returns a
+  nupy specific int64 instance, which is not recognized by igraph. After
+  converting that to int it works.
+
+  Now the igraph version takes ~ 9s to generate the cell-cell graph. Not a
+  remarkable improvement when considering the dict based networkx version (~13
+  s). However, the memory consumption is about half that of networkx (390
+  MBfor igraph, 870 MB for networkx).
+
