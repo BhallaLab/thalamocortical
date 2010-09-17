@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Sep 17 17:04:08 2010 (+0530)
+# Last-Updated: Fri Sep 17 17:26:55 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 221
+#     Update #: 228
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -46,6 +46,7 @@ class TraubNet(object):
         """
         start = datetime.now()
         self.__celltype_graph = ig.read(celltype_graph_file, format=format)
+        print self.__celltype_graph.summary()
         end = datetime.now()
         delta = end - start
         config.BENCHMARK_LOGGER.info('celltype_graph read from file %s in %g' % 
@@ -95,6 +96,7 @@ class TraubNet(object):
             celltype['start_index'] = start_index
             cell_graph.add_vertices(count)
             cell_graph.vs[start_index: start_index + count]['type_index'] = [celltype.index] * count
+
         # Adding the edges is the tricky bit and this is the most
         # important part of the network definition.  
 
@@ -110,7 +112,7 @@ class TraubNet(object):
         # (``start_index`` to ``start_index + count``). Moreover, for
         # each such edge, we select a random compartment no. from the
         # list of allowed compartments on the post-synaptic cell.
-
+        edge_count = 0
         for edge in self.__celltype_graph.es:
             pre = edge.source
             post = edge.target
@@ -127,22 +129,19 @@ class TraubNet(object):
             pre_cell_indices = numpy.random.randint(low=pre_start_index, 
                                                     high=(pre_start_index + pre_count), 
                                                     size=(post_count, pre_post_ratio))
-            # config.LOGGER.debug('pre cell indices: low = %d, high = %s, size = (%d, %d)' % 
-            #                     (pre_start_index, 
-            #                      pre_start_index + pre_count, 
-            #                      post_count, 
-            #                      pre_post_ratio))
             post_comp_indices = numpy.random.randint(low=0, 
                                                      high=len(ps_comps), 
                                                      size=(post_count, pre_post_ratio))
             edge_list = [(int(pre_cell_index), post_cell_index + post_start_index) 
                          for post_cell_index in range(post_count)
-                         for pre_cell_index in pre_cell_indices[post_cell_index]]
+                         for pre_cell_index in pre_cell_indices[post_cell_index]]            
             edge_start = len(cell_graph.es)
             new_edge_count = len(edge_list)
+            edge_count += new_edge_count
             cell_graph.add_edges(edge_list)
             new_edges = cell_graph.es.select(range(edge_start, edge_start+new_edge_count))
             new_edges['ps_comp'] = post_comp_indices.flatten()                
+        print 'Edges:', edge_count
         end = datetime.now()
         delta = end - start
         config.BENCHMARK_LOGGER.info('Cellgraph generated in %g s' % (delta.seconds + 1e-6 * delta.microseconds))
