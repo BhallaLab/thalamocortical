@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Aug 10 15:45:05 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Sep 16 16:00:24 2010 (+0530)
+# Last-Updated: Thu Sep 23 00:47:35 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 761
+#     Update #: 766
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -522,10 +522,12 @@ def test(args=None):
     net = TraubNet(celltype_graph_file, cell_graph_file, format=format, scale=scale)    
     # net.plot_celltype_graph()
     # net.plot_celltype_graph_3d()
-    # net.save_celltype_graph(filename=celltype_graph_file, format=format)
+    net.save_celltype_graph(filename=celltype_graph_file, format=format)
     # net.plot_cell_graph()
     # net.plot_cell_graph_3d()
-    net.save_cell_graph(cell_graph_file, format=format)
+    # net.save_cell_graph(cell_graph_file, format=format)
+
+    
 
 if __name__ == '__main__':
     """the first argument specifies the graph file format. Default is GML
