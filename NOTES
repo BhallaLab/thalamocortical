@@ -2237,3 +2237,13 @@ TypeError: sequence elements must be integer pairs
   s). However, the memory consumption is about half that of networkx (390
   MBfor igraph, 870 MB for networkx).
 
+* <2010-09-23 Thu 00:18> lazy attempt to write a gml parser and back to igraph
+  I spent couple of hours to write a simple parser for GML files that can used
+  for speeding up networkx gml file reading. But after ~50 lines of code in 2
+  hrs I realized that it is nontrivial to write a generic parser for this -
+  and even if I could parse the graph structure in a dict of dicts relatively
+  easily, I would have to convert this dict to networkx graph. Also, as a
+  generic format, GML syntax is not very cleanly defined (the BNF grammar in
+  the original document is not self-contained and looks sloppy (like the
+  definition of real - which is obviously incomplete).
+* <2010-10-01 Fri 20:23> Handcoding a hard-copy of the synaptic tau-s and g-s.
