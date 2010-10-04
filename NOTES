@@ -2247,3 +2247,92 @@ TypeError: sequence elements must be integer pairs
   the original document is not self-contained and looks sloppy (like the
   definition of real - which is obviously incomplete).
 * <2010-10-01 Fri 20:23> Handcoding a hard-copy of the synaptic tau-s and g-s.
+* <2010-10-04 Mon 17:14> Handcoded Hardcopy of synaptic taus and gs.
+  The summary of celltype graph and cell graph respectively:
+
+  14 nodes, 135 edges, directed
+
+  Number of components: 1
+  Diameter: 3
+  Density: 0.7418
+  Reciprocity: 0.6986
+  Average path length: 1.3462
+
+  3560 nodes, 630160 edges, directed
+
+  Number of components: 191
+  Diameter: 3
+  Density: 0.0497
+  Reciprocity: 0.0244
+  Average path length: 2.0104
+
+  Why is the number of edges 630160? With the earlier cell graph it was:
+  618560!!
+
+  The non-hardcoded version gives the following:
+
+  14 nodes, 135 edges, directed
+
+  Number of components: 1
+  Diameter: 3
+  Density: 0.7418
+  Reciprocity: 0.6986
+  Average path length: 1.3462
+
+  3560 nodes, 618560 edges, directed
+
+  Number of components: 191
+  Diameter: 3
+  Density: 0.0488
+  Reciprocity: 0.0250
+  Average path length: 2.0031
+
+  I think I had checked the pre-post ratio correctly!
+
+
+* <2010-10-04 Mon 22:28> The no. of edges becomes 123 when empty allowed_comp list for a pair of celltypes is considered to indicate no-connection,
+  Although allowed_comps list is empty, it may indicate axo-axonic / gap
+  junction connection. So I should not use empty allowed_comp to exclude an
+  edge.
+
+  - Turned out that I had messed up the no. of nontuftedRS and DeepBasket
+    cells - as in the list of cell counts nontuftedRS comes before deep basket
+    but in description of the synapses nontuftedRS comes after other deep
+    pyramids (before TCR and nRT). After fixing this, even the hardcoded
+    version has 618560 edges.
+
+  - One notable point is that I am ignoring gap junctions when setting up
+    cell-cell connectivty, or skipping an edge when the postsynaptic allowed
+    compartment list is empty - this included the connections from axoaxonic
+    cells - as for them the target compartment was always axon  initial
+    segment: and hence no separate list of allowed comp. 
+
+  - After checking the above, I added single entries for the axon initial
+    segement by looking at groucho.hoc for all axoaxonic->glutamatargic cell
+    in the allowed_comps list. 
+
+  - Checked if the random number generator selects this single entry every
+    time: yes, numpy.random.randint(low=0, high=1, size=(m,n))
+    always returns an mxn matrix of 0-s.
+
+  - Now the summary of the network is:
+    Celltype-graph
+    --------------------
+    14 nodes, 135 edges, directed
+
+    Number of components: 1
+    Diameter: 3
+    Density: 0.7418
+    Reciprocity: 0.6986
+    Average path length: 1.3462
+    
+    Cell-graph
+    --------------------
+    3560 nodes, 662210 edges, directed
+
+    Number of components: 1
+    Diameter: 3
+    Density: 0.0523
+    Reciprocity: 0.0270
+    Average path length: 1.9966
+    
