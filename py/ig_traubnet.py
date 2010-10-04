@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  1 17:23:46 2010 (+0530)
+# Last-Updated: Mon Oct  4 23:18:21 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 313
+#     Update #: 725
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -47,6 +47,9 @@ from datetime import datetime
 import numpy
 import igraph as ig
 import config
+# synapse.py is imported for checking against the older version of the synaptic data.
+import synapse
+import allowedcomp
 
 class TraubFullNetData(object):
     """Information about connectivity.
@@ -93,10 +96,10 @@ class TraubFullNetData(object):
                           240,
                           800,
                           200,
+                          100,
+                          100,
+                          100,
                           500,
-                          100,
-                          100,
-                          100,
                           100,
                           100]
 
@@ -131,7 +134,8 @@ class TraubFullNetData(object):
                          [   2.0e-3,    2.0e-3,  1.0e-3,  1.0e-3,    0.0, 2.0e-3, 2.0e-3, 2.0e-3,   1.0e-3,   1.0e-3,     0.0,    2.0e-3,    0.0, 2.0e-3],
                          [      0.0,       0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,      0.0,      0.0,     0.0,       0.0,    0.0,    0.0]]
 
-        self.tau_nmda = [[ 130.0e-3,    130e-3,  100e-3,  100e-3, 100e-3, 130e-3, 130e-3, 130e-3,   100e-3,   100e-3,   100e-3,    130e-3,    0.0,    0.0],
+        # ta_nmda[suppyrrs][suppyrrs] = 130.0 ms according to paper, but 130.5 ms in code
+        self.tau_nmda = [[ 130.5e-3,    130e-3,  100e-3,  100e-3, 100e-3, 130e-3, 130e-3, 130e-3,   100e-3,   100e-3,   100e-3,    130e-3,    0.0,    0.0],
                          [ 130.0e-3,    130e-3,  100e-3,  100e-3, 100e-3, 130e-3, 130e-3, 130e-3,   100e-3,   100e-3,   100e-3,    130e-3,    0.0,    0.0],
                          [      0.0,       0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,      0.0,      0.0,      0.0,       0.0,    0.0,    0.0],
                          [      0.0,       0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,      0.0,      0.0,      0.0,       0.0,    0.0,    0.0],
@@ -196,6 +200,341 @@ class TraubFullNetData(object):
             [  0.05e-9,   0.05e-9, 0.01e-9, 0.01e-9,     0.0,  0.1e-9, 0.15e-9, 0.15e-9,   0.1e-9,   0.1e-9,     0.0,    0.1e-9,      0.0, 0.15e-9 ],
             [      0.0,       0.0,     0.0,     0.0,     0.0,     0.0,     0.0,     0.0,      0.0,      0.0,     0.0,       0.0,      0.0,     0.0 ]]
 
+        # for each nRT->TCR connections, g_gaba_baseline is taken from a uniform distribution in the range 0.7e-9 to 2.1e-9 Siemens.
+        self.g_gaba_baseline = [
+            [      0.0,       0.0,     0.0,     0.0,     0.0,     0.0,     0.0,     0.0,      0.0,      0.0,     0.0,       0.0, 0.0,    0.0 ],
+            [      0.0,       0.0,     0.0,     0.0,     0.0,     0.0,     0.0,     0.0,      0.0,      0.0,     0.0,       0.0, 0.0,    0.0 ],
+            [   1.2e-9,    1.2e-9,  0.2e-9,  0.2e-9,  0.5e-9,  0.1e-9,     0.0,     0.0,      0.0,      0.0,     0.0,       0.0, 0.0,    0.0 ],
+            [   1.2e-9,    1.2e-9,     0.0,     0.0,     0.0,  0.1e-9,    1e-9,    1e-9,      0.0,      0.0,     0.0,      1e-9, 0.0,    0.0 ],
+            [  0.01e-9,   0.01e-9, 0.01e-9, 0.01e-9, 0.05e-9, 0.01e-9, 0.02e-9, 0.02e-9,  0.01e-9,  0.01e-9, 0.05e-9,   0.01e-9, 0.0,    0.0 ],
+            [      0.0,       0.0,     0.0,     0.0,     0.0,     0.0,     0.0,     0.0,      0.0,      0.0,     0.0,       0.0, 0.0,    0.0 ],
+            [      0.0,       0.0,     0.0,     0.0,     0.0,     0.0,     0.0,     0.0,      0.0,      0.0,     0.0,       0.0, 0.0,    0.0 ],
+            [      0.0,       0.0,     0.0,     0.0,     0.0,     0.0,     0.0,     0.0,      0.0,      0.0,     0.0,       0.0, 0.0,    0.0 ],
+            [      0.0,       0.0,     0.0,     0.0,     0.0,  1.5e-9,  0.7e-9,  0.7e-9,   0.2e-9,   0.2e-9,  0.7e-9,    0.7e-9, 0.0,    0.0 ],
+            [     1e-9,      1e-9,     0.0,     0.0,     0.0,  1.5e-9,    1e-9,    1e-9,      0.0,      0.0,     0.0,      1e-9, 0.0,    0.0 ],
+            [  0.01e-9,   0.01e-9, 0.01e-9, 0.01e-9, 0.05e-9, 0.01e-9, 0.05e-9, 0.02e-9,  0.01e-9,  0.01e-9, 0.05e-9,   0.01e-9, 0.0,    0.0 ],
+            [      0.0,       0.0,     0.0,     0.0,     0.0,     0.0,     0.0,     0.0,      0.0,      0.0,     0.0,       0.0, 0.0,    0.0 ],
+            [      0.0,       0.0,     0.0,     0.0,     0.0,     0.0,     0.0,     0.0,      0.0,      0.0,     0.0,       0.0, 0.0,    0.0 ],
+            [      0.0,       0.0,     0.0,     0.0,     0.0,     0.0,     0.0,     0.0,      0.0,      0.0,     0.0,       0.0, 0.0, 0.3e-9 ]]
+
+        self.allowed_comps = [
+            [# SupPyrRS
+                [2,3,4,5,6,7,8,9,14,15,16,17,18,19,20,21,26, 27,28,29,30,31,32,33,10,11,12,13,22,23,24,25, 34,35,36,37], # SupPyrRS
+                [2,3,4,5,6,7,8,9,14,15,16,17,18,19,20,21,26, 27,28,29,30,31,32,33,10,11,12,13,22,23,24,25, 34,35,36,37], # SupPyrFRB
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36, 44,45,46,47,48,49], # SupBasket
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36, 44,45,46,47,48,49], # SupAxoaxonic
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36, 44,45,46,47,48,49], # SupLTS
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36, 44,45,46,47,48,49], # SpinyStellate
+                [39,40,41,42,43,44,45,46], # TuftedIB
+                [39,40,41,42,43,44,45,46], # TuftedRS
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36, 44,45,46,47,48,49], # DeepBasket
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36, 44,45,46,47,48,49], # DeepAxoaxonic
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36, 44,45,46,47,48,49], # DeepLTS
+                [38,39,40,41,42,43,44], # NontuftedRS
+                [], # TCR 
+                []], # nRT
+            [ # SupPyrFRB
+                [2,3,4,5,6,7,8,9,14,15,16,17,18,19,20,21,26, 27,28,29,30,31,32,33,10,11,12,13,22,23,24,25, 34,35,36,37], # SupPyrRS
+                [2,3,4,5,6,7,8,9,14,15,16,17,18,19,20,21,26, 27,28,29,30,31,32,33,10,11,12,13,22,23,24,25, 34,35,36,37], # SupPyrFRB
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36, 44,45,46,47,48,49], # SupBasket
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36, 44,45,46,47,48,49], # SupAxoaxonic
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36, 44,45,46,47,48,49], # SupLTS
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # SpinyStellate
+                [39,40,41,42,43,44,45,46], # TuftedIB
+                [39,40,41,42,43,44,45,46], # TuftedRS
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # DeepBasket
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # DeepAxoaxonic
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # DeepLTS
+                [38,39,40,41,42,43,44], # NontuftedRS
+                [],
+                []],
+            [# SupBasket
+                [1,2,3,4,5,6,7,8,9,38,39], # SupPyrRS
+                [1,2,3,4,5,6,7,8,9,38,39], # SupPyrFRB
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # SupBasket
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # SupAxoaxonic
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # SupLTS
+                [1,2,15,28,41], # SpinyStellate
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                []],
+            [ # SupAxoaxonic
+                [69],
+                [69],
+                [],
+                [],
+                [],
+                [54],
+                [56],
+                [56],
+                [],
+                [],
+                [],
+                [45],
+                [],
+                []],
+            [ # SupLTS
+                [14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68] , # SupPyrRS
+                [14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68], # SupPyrFRB
+                [5,6,7,8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26,27,31,32,33,34,35,36,37,38,39,40,44,45,46,47,48,49,50,51,52,53], # SupBasket
+                [5,6,7,8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26,27,31,32,33,34,35,36,37,38,39,40,44,45,46,47,48,49,50,51,52,53], # SupAxoaxonic
+                [5,6,7,8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26,27,31,32,33,34,35,36,37,38,39,40,44,45,46,47,48,49,50,51,52,53], # SupLTS
+                [5,6,7,8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26,27,31,32,33,34,35,36,37,38,39,40,44,45,46,47,48,49,50,51,52,53], # SpinyStellate
+                [13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55], # TuftedIB
+                [13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55], # TuftedRS
+                [8,9,10,11,12,21,22,23,24,25,34,35,36,37,38,47,48,49,50,51], # DeepBasket
+                [8,9,10,11,12,21,22,23,24,25,34,35,36,37,38,47,48,49,50,51], # DeepAxoaxonic
+                [8,9,10,11,12,21,22,23,24,25,34,35,36,37,38,47,48,49,50,51], # DeepLTS
+                [13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,38,39,40,41,42,43,44], # NontuftedRS
+                [],
+                []],
+            [ #SpinyStellate
+                [ 2, 3, 4, 5, 6, 7, 8, 9,14,15,16,17,18,19,20,21,26,27,28,29,30,31,32,33], # SupPyrRS
+                [ 2, 3, 4, 5, 6, 7, 8, 9,14,15,16,17,18,19,20,21,26,27,28,29,30,31,32,33], # SupPyrFRB
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # SupBasket
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # SupAxoaxonic
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # SupLTS
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # SpinyStellate
+                [7,8,9,10,11,12,36,37,38,39,40,41], # TuftedIB
+                [7,8,9,10,11,12,36,37,38,39,40,41], # TuftedRS
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # DeepBasket
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # DeepAxoaxonic
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # DeepLTS
+                [37,38,39,40,41], # NontuftedRS
+                [],
+                []],
+            [ #TuftedIB
+                [40,41,42,43,44,45,46,47,48,49,50,51,52], #SupPyrRS
+                [40,41,42,43,44,45,46,47,48,49,50,51,52], # SupPyrFRB
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # SupBasket
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # SupAxoaxonic
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # SupLTS
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # SpinyStellate
+                [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47], # TuftedIB
+                [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47], # TuftedRS
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # DeepBasket
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # DeepAxoaxonic
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # DeepLTS
+                [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44], # NontuftedRS
+                [],
+                []],
+            [ # TuftedRS
+                [40,41,42,43,44,45,46,47,48,49,50,51,52], # SupPyrRS
+                [40,41,42,43,44,45,46,47,48,49,50,51,52], # SupPyrFRB
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # SupBasket
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # SupAxoaxonic
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # SupLTS
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # SpinyStellate
+                [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47], # TuftedIB
+                [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47], # TuftedRS
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # DeepBasket
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # DeepAxoaxonic
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # DeepLTS
+                [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44], # NontuftedRS
+                [],
+                []],
+            [ # DeepBasket
+                [],
+                [],
+                [],
+                [],
+                [],
+                [1,2,15,28,41], # SpinyStellate
+                [1,2,3,4,5,6,35,36], # TuftedIB
+                [1,2,3,4,5,6,35,36], # TuftedRS
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # DeepBasket
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # DeepAxoaxonic
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # DeepLTS
+                [1,2,3,4,5,6,35,36], # NontuftedRS
+                [],
+                []],
+            [ # DeepAxoaxonic
+                [69],
+                [69],
+                [],
+                [],
+                [],
+                [54],
+                [56],
+                [56],
+                [],
+                [],
+                [],
+                [45],
+                [],
+                []],
+            [ # DeepLTS 
+                [14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68], # SupPyrRS
+                [14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68], # SupPyrFRB
+                [8,9,10,11,12,21,22,23,24,25,34,35,36,37,38,47,48,49,50,51], # SupBasket
+                [8,9,10,11,12,21,22,23,24,25,34,35,36,37,38,47,48,49,50,51], # SupAxoaxonic
+                [8,9,10,11,12,21,22,23,24,25,34,35,36,37,38,47,48,49,50,51], # SupLTS
+                [5,6,7,8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26,27,31,32,33,34,35,36,37,38,39,40,44,45,46,47,48,49,50,51,52,53], # SpinyStellate
+                [13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55], # TuftedIB
+                [13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55], # TuftedRS
+                [5,6,7,8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26,27,31,32,33,34,35,36,37,38,39,40,44,45,46,47,48,49,50,51,52,53], # DeepBasket
+                [5,6,7,8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26,27,31,32,33,34,35,36,37,38,39,40,44,45,46,47,48,49,50,51,52,53], # DeepAxoaxonic
+                [5,6,7,8,9,10,11,12,13,14,18,19,20,21,22,23,24,25,26,27,31,32,33,34,35,36,37,38,39,40,44,45,46,47,48,49,50,51,52,53], # DeepLTS
+                [13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,38,39,40,41,42,43,44], #NontuftedRS
+                [],
+                []],
+            [ # NontuftedRS
+                [41,42,43,44], # SupPyrRS
+                [41,42,43,44], # SupPyrFRB
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # SupBasket
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # SupAxoaxonic
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # SupLTS
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # SpinyStellate
+                [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47], # TuftedIB
+                [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47], # TuftedRS
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # DeepBasket
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # DeepAxoaxonic
+                [5,6,7,8,9,10,18,19,20,21,22,23,31,32,33,34,35,36,44,45,46,47,48,49], # DeepLTS
+                [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44],  # NontuftedRS
+                [6,7,8,9,10,11,12,13,14,19,20,21,22,23,24,25,26,27,32,33,34,35,36,37,38,39,40,45,46,47,48,49,50,51,52,53,58,59,60,61,62,63,64,65,66,71,72,73,74,75,76,77,78,79,84,85,86,87,88,89,90,91,92,97,98,99,100,101,102,103,104,105,110,111,112,113,114,115,116,117,118,123,124,125,126,127,128,129,130,131], # TCR
+                [2,3,4,15,16,17,28,29,30,41,42,43]], # nRT
+            [ # TCR
+                [45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68], # SupPyrRS
+                [45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68], # SupPyrFRB
+                [2,3,4,15,16,17,28,29,30,41,42,43], # SupBasket
+                [2,3,4,15,16,17,28,29,30,41,42,43], # SupAxoaxonic
+                [], # SupLTS
+                [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53], # SpinyStellate
+                [47,48,49,50,51,52,53,54,55], # TuftedIB
+                [47,48,49,50,51,52,53,54,55], # TuftedRS
+                [2,3,4,15,16,17,28,29,30,41,42,43], # DeepBasket
+                [2,3,4,15,16,17,28,29,30,41,42,43], # DeepAxoaxonic
+                [],
+                [40,41,42,43,44], # NontuftedRS
+                [],
+                [2,3,4,15,16,17,28,29,30,41,42,43]], # nRT
+            [ # nRT
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                [1,2,15,28,41,54,67,80,93,106,119], # TCR
+                [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53]] # nRT
+            ]
+        
+    def check_pre_post_ratio(self):
+        """Check the pre-post ratio for each celltype pair"""
+        with open('connmatrix.txt') as connmatrix_file:
+            index = -1
+            for line in connmatrix_file.readlines():
+                index += 1
+                if index == 0:
+                    print line
+                    continue
+                line = line.strip()
+                if line == '':
+                    continue
+                values = line.split(',')
+                # print values
+                for ii in range(14):
+                    if self.pre_post_ratio[index-1][ii] != int(values[ii]):
+                        config.LOGGER.debug('pre-post ratio mismatch for %s-%s' % (self.celltype[index-1], self.celltype[ii]))
+                        return False
+        return True
+                    
+    def check_allowed_comps(self):
+        """Compare the allowed_comps list to the original allowedcomp.py"""
+        if len(self.allowed_comps) != 14:
+            config.LOGGER.debug('Allowed_comp list must be of length 14. Got: %d' % (len(self.allowed_comps)))
+            return False
+        
+        for index in range(len(self.allowed_comps)):
+            if len(self.allowed_comps[index]) != 14:
+                config.LOGGER.debug('Each row must lists for 14 cell types. But has %d for %s' % (len(self.allowed_comps[index]), self.celltype[index]))
+                return False
+        for ii in range(14):
+            for jj in range(14):
+                try:
+                    orig = allowedcomp.ALLOWED_COMP[self.celltype[ii]][self.celltype[jj]]
+                    for kk in range(len(self.allowed_comps[ii][jj])):
+                        if self.allowed_comps[ii][jj][kk] != orig[kk]:
+                            config.LOGGER.debug('Valued don\'t match for %s -> %s' % (self.celltype[ii], self.celltype[jj]))
+                            return False
+                except KeyError:
+                    if  self.allowed_comps[ii][jj] != []:
+                        config.LOGGER.debug('Expected an empty list. But got something else for %s -> %s' % (self.celltype[ii], self.celltype[jj]))
+                        return False
+        return True
+
+
+    def check_tau_ampa(self):
+        """Compare the tau_AMPA with older version with dict."""        
+        for pre_index in range(len(self.celltype)):
+            for post_index in range(len(self.celltype)):
+                left = self.tau_ampa[pre_index][post_index]
+                try:
+                    right = synapse.TAU_AMPA[self.celltype[pre_index]][self.celltype[post_index]]
+                except KeyError:
+                    if left!= 0.0:
+                        config.LOGGER.debug('Key not present in synapse.py:TAU_AMPA - %s, %s' % (self.celltype[pre_index], self.celltype[post_index]))
+                        return False
+                    else:
+                        right = 0.0
+                if not numpy.allclose([left], [right]):
+                    config.LOGGER.debug('Values not equal: TAU_AMPA - %s, %s: %g <> %g' % (self.celltype[pre_index], self.celltype[post_index], left, right))
+                    return False
+        return True
+
+                        
+    def check_tau_nmda(self):
+        """Compare the tau_nmda with older version with dict."""        
+        for pre_index in range(len(self.celltype)):
+            for post_index in range(len(self.celltype)):
+                left = self.tau_nmda[pre_index][post_index]
+                try:
+                    right = synapse.TAU_NMDA[self.celltype[pre_index]][self.celltype[post_index]]
+                except KeyError:
+                    if left != 0.0:
+                        config.LOGGER.debug('Key not present in synapse.py:TAU_NMDA - %s, %s' % (self.celltype[pre_index], self.celltype[post_index]))
+                        return False
+                    else:
+                        right = 0.0
+                if not numpy.allclose([left], [right]):
+                    config.LOGGER.debug('Values not equal: TAU_NMDA - %s, %s: %g <> %g' % (self.celltype[pre_index], self.celltype[post_index], left, right))
+                    return False
+        return True
+                    
+    def check_tau_gaba(self):
+        """Compare the tau_gaba with older version with dict."""        
+        for pre_index in range(len(self.celltype)):
+            for post_index in range(len(self.celltype)):
+                left = self.tau_gaba[pre_index][post_index]
+                try:
+                    if self.celltype[pre_index] == 'nRT':
+                        right = synapse.TAU_GABA_FAST[self.celltype[pre_index]][self.celltype[post_index]]
+                    else:
+                        right = synapse.TAU_GABA[self.celltype[pre_index]][self.celltype[post_index]]
+                except KeyError:
+                    if left != 0.0:
+                        config.LOGGER.debug('Key not present in synapse.py:TAU_GABA - %s, %s' % (self.celltype[pre_index], self.celltype[post_index]))
+                        return False
+                    else:
+                        right = 0.0
+                if not numpy.allclose([left], [right]):
+                    config.LOGGER.debug('Values not equal: TAU_GABA - %s, %s: %g <> %g' % (self.celltype[pre_index], self.celltype[post_index], left, right))
+                    return False
+        return True
+        
+        
+
 class TraubNet(object):
     def __init__(self, celltype_graph_file, cell_graph_file=None, format='gml', scale=1.0):
         """scale -- specifies the scale by which the cell count and
@@ -204,7 +543,10 @@ class TraubNet(object):
         
         """
         start = datetime.now()
-        self.__celltype_graph = ig.read(celltype_graph_file, format=format)
+        if celltype_graph_file is None:
+            self.__celltype_graph = self._generate_celltype_graph()
+        else:
+            self.__celltype_graph = ig.read(celltype_graph_file, format=format)
         print self.__celltype_graph.summary()
         end = datetime.now()
         delta = end - start
@@ -228,6 +570,38 @@ class TraubNet(object):
 
         print self.__cell_graph.summary()
 
+
+    def _generate_celltype_graph(self):
+        """Generate the celltype connectivity graph from hardcoded TraubFullNetData object."""
+        tn = TraubFullNetData()
+        graph = ig.Graph(0, directed=True)
+        graph.add_vertices(len(tn.celltype))
+        edge_count = 0
+        for celltype in graph.vs:
+            celltype['label'] = tn.celltype[celltype.index]
+            celltype['count'] = tn.cellcount[celltype.index]
+            for posttype in graph.vs:
+                pre_post_ratio = tn.pre_post_ratio[celltype.index][posttype.index]
+                if pre_post_ratio > 0:
+                    graph.add_edges((celltype.index, posttype.index))
+                    edge_count += 1
+                    graph.es[edge_count-1]['weight'] = pre_post_ratio
+                    graph.es[edge_count-1]['g_ampa'] = tn.g_ampa_baseline[celltype.index][posttype.index]
+                    graph.es[edge_count-1]['g_nmda'] = tn.g_nmda_baseline[celltype.index][posttype.index]
+                    graph.es[edge_count-1]['g_gaba'] = tn.g_gaba_baseline[celltype.index][posttype.index]
+                    graph.es[edge_count-1]['tau_ampa'] = tn.tau_ampa[celltype.index][posttype.index]
+                    graph.es[edge_count-1]['tau_nmda'] = tn.tau_nmda[celltype.index][posttype.index]
+                    graph.es[edge_count-1]['tau_gaba'] = tn.tau_gaba[celltype.index][posttype.index]
+                    graph.es[edge_count-1]['ps_comps'] = str(tn.allowed_comps[celltype.index][posttype.index])
+                    if celltype['label'] == 'nRT':
+                        if posttype['label'] == 'TCR':
+                            graph.es[edge_count-1]['tau_gaba_slow'] = tn.nRT_tau_gaba_slow[0]
+                        elif posttype['label'] == 'nRT':
+                            graph.es[edge_count-1]['tau_gaba_slow'] = tn.nRT_tau_gaba_slow[1]
+        return graph
+                            
+            
+            
     def _generate_cell_graph(self):
         """generate the cell-cell graph from the celltype graph.
 
@@ -283,6 +657,7 @@ class TraubNet(object):
             post_count = int(post_celltype['count'] * self.scale)
             pre_post_ratio = edge['weight']
             ps_comps = numpy.array(eval(edge['ps_comps']), dtype=int)
+            config.LOGGER.debug('Connecting populations: pre - %s(%d), post - %s(%d), pre_post_ratio - %d' % (pre_celltype['label'], pre_count, post_celltype['label'], post_count, pre_post_ratio))
             if (pre_post_ratio == 0) or (len(ps_comps) == 0):
                 continue
             pre_cell_indices = numpy.random.randint(low=pre_start_index, 
@@ -311,13 +686,26 @@ class TraubNet(object):
     
     def save_cell_graph(self, filename, format=None):
         ig.write(self.__cell_graph, filename, format)
-        
+
+
+def testTraubFullNetData():
+    tn = TraubFullNetData()
+    print 'check pre_post_ratio:', tn.check_pre_post_ratio()
+    print 'check_tau_ampa:', tn.check_tau_ampa()
+    print 'check_tau_nmda:', tn.check_tau_nmda()
+    print 'check_tau_gaba:', tn.check_tau_gaba()
+    print 'check_allowed_comps:', tn.check_allowed_comps()
 if __name__ == '__main__':
+    ## commented out for testing TraubFullNetData
     scale = 1.0
     if len(sys.argv) > 1:
         scale = float(sys.argv[1])
-    network = TraubNet('nx_celltype_graph.gml', scale=scale)
+    # network = TraubNet('nx_celltype_graph.gml', scale=scale)
+    network = TraubNet(None, scale=scale)
     network.save_celltype_graph('celltype_graph.gml', format='gml')
     network.save_cell_graph('cell_graph.gml', format='gml')
+    #! commented out till here for testing TraubFullNetData !
+    testTraubFullNetData()
+
 # 
 # ig_traubnet.py ends here
