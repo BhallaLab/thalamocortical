@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Oct  4 23:18:21 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 725
+# Last-Updated: Tue Oct  5 20:20:11 2010 (+0530)
+#           By: subha
+#     Update #: 769
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -36,7 +36,11 @@
 # which have multiple attributes for all types of
 # synapse. taugabafast, taugabaslow,
 # 
-# 
+# 2010-10-05 19:18:49 (+0530) -- changed _generate_celltype_graph and
+# _generate_cell_graph to public methods generate_celltype_graph and
+# generate_cell_graph. The idea is, I may want to manipulate the
+# celltype-graph before generating the cell-graph - especially for
+# scaling the synaptic conductances.
 # 
 
 # Code:
@@ -542,44 +546,53 @@ class TraubNet(object):
         graph.
         
         """
+        self.celltype_graph_file = celltype_graph_file
+        self.cell_graph_file = cell_graph_file
+        self.format = format
+        self.scale = scale
+
+
+    def setup(self):
         start = datetime.now()
-        if celltype_graph_file is None:
-            self.__celltype_graph = self._generate_celltype_graph()
+        if self.celltype_graph_file is None:
+            self.__celltype_graph = self.generate_celltype_graph()
         else:
-            self.__celltype_graph = ig.read(celltype_graph_file, format=format)
+            self.__celltype_graph = ig.read(self.celltype_graph_file, format=self.format)
         print self.__celltype_graph.summary()
         end = datetime.now()
         delta = end - start
         config.BENCHMARK_LOGGER.info('celltype_graph read from file %s in %g' % 
                                      (celltype_graph_file, delta.seconds + 1e-6 * delta.microseconds))
-        self.scale = 1
 
         # If ``cell_graph_file`` is specified, then try reading it
         # directly, otherwise generate the cell-cell graph using the
         # celltype-graph.  
 
-        if cell_graph_file is not None:
+        if self.cell_graph_file is not None:
+            self.scale = 1.0
             start = datetime.now()
             self.__cell_graph = ig.read(cell_graph_file, format=format)
             end = datetime.now()
             delta = end - start
             config.BENCHMARK_LOGGER.info('cell_graph read from file %s in %g' % (cell_graph_file, delta.seconds + 1e-6 * delta.microseconds))
         else:
-            self.scale = float(scale) # scale is used only if we are generating cell-cell graph from scratch
-            self.__cell_graph = self._generate_cell_graph()
+            self.__cell_graph = self.generate_cell_graph()
 
         print self.__cell_graph.summary()
 
 
-    def _generate_celltype_graph(self):
+    def generate_celltype_graph(self):
         """Generate the celltype connectivity graph from hardcoded TraubFullNetData object."""
         tn = TraubFullNetData()
         graph = ig.Graph(0, directed=True)
         graph.add_vertices(len(tn.celltype))
         edge_count = 0
+        start_index = 0
         for celltype in graph.vs:
             celltype['label'] = tn.celltype[celltype.index]
             celltype['count'] = tn.cellcount[celltype.index]
+            celltype['start_index'] = start_index
+            start_index += celltype['count']
             for posttype in graph.vs:
                 pre_post_ratio = tn.pre_post_ratio[celltype.index][posttype.index]
                 if pre_post_ratio > 0:
@@ -602,7 +615,7 @@ class TraubNet(object):
                             
             
             
-    def _generate_cell_graph(self):
+    def generate_cell_graph(self):
         """generate the cell-cell graph from the celltype graph.
 
         """
@@ -674,7 +687,14 @@ class TraubNet(object):
             edge_count += new_edge_count
             cell_graph.add_edges(edge_list)
             new_edges = cell_graph.es.select(range(edge_start, edge_start+new_edge_count))
-            new_edges['ps_comp'] = post_comp_indices.flatten()                
+            new_edges['ps_comp'] = post_comp_indices.flatten()
+            new_edges['tau_ampa'] = edge['tau_ampa']
+            new_edges['tau_nmda'] = edge['tau_nmda']
+            new_edges['tau_gaba'] = edge['tau_gaba']
+            new_edges['tau_gaba_slow'] = edge['tau_gaba_slow']
+            new_edges['g_ampa'] = edge['g_ampa']
+            new_edges['g_nmda'] = edge['g_nmda']
+            new_edges['g_gaba'] = edge['g_gaba']
         print 'Edges:', edge_count
         end = datetime.now()
         delta = end - start
@@ -686,6 +706,29 @@ class TraubNet(object):
     
     def save_cell_graph(self, filename, format=None):
         ig.write(self.__cell_graph, filename, format)
+
+    def rescale_syn_conductance(self, pretype, posttype, conductance_type, scale_factor):
+        """Rescale the conductance for synaptic conductance of
+        conductance_type between pretype and posttype cells.
+
+        pretype -- label of presynaptic celltype - can be a list
+
+        posttype -- label of postsynaptic celltype - can be a list same in length as pretype
+
+        conductance_type -- key for the specific conductance between pre and post type, e.g. 'g_gaba' - can be a list of such keys.
+
+        """
+        if isinstance(pretype, str):
+            if isinstance(posttype, str):
+                pretype = [pretype]
+                posttype = [posttype]
+            else:
+                raise Exception('Both pretype and posttype must be either string or lists of same size.')
+        if isinstance(conductance_type, str):
+            conductance_type = [conductance_type]
+        assert len(pretype) == len(posttype)
+        for index in range(len(pretype)):
+            raise Exception('Incomplete')
 
 
 def testTraubFullNetData():
