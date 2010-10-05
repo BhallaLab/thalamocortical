@@ -2336,3 +2336,15 @@ TypeError: sequence elements must be integer pairs
     Reciprocity: 0.0270
     Average path length: 1.9966
     
+* <2010-10-05 Tue 16:00> I(h) or g(AR) issue
+  Just came across a paper: Dendritic Spikes in Apical Dendrites of
+  Neocortical Layer 2/3 Pyramidal Neurons by Matthew Evan Larkum, Jack Waters,
+  Bert Sakmann, and Fritjof Helmchen [The Journal of Neuroscience, August 22,
+  2007, 27(34):8999-9008; doi:10.1523/JNEUROSCI.1717-07.2007]
+
+  This paper says the I(h) conductance is much less in superficial pyramidal
+  cell dendrites compared to layer 5. But in Traub model it is the reverse: in
+  layer 2/3 it is ~0.25 nS, whereas in deep layers it is ~0.1 nS.
+
+  Also, I am a bit worried about gap junctions: not handled by hsolve, nor can
+  I use GENESIS style raxial setting to simulate them in MOOSE.
