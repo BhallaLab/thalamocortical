@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Jan 13 22:33:35 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Sep 15 15:47:34 2010 (+0530)
+# Last-Updated: Thu Oct  7 17:32:57 2010 (+0530)
 #         By: subha
-#    Update #: 607
+#    Update #: 611
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -31,6 +31,11 @@
 # 2010-03-29 12:15:20 (+0530) -- shifted the original file to network_spec.py
 #                          the current file will be used for creating 
 #                          the complete network - more as a driver program.
+#
+# 2010-10-07 17:27:05 (+0530) -- switched to the use of Graph as the
+#                          base data structure for network definition.
+#                          current version is in ig_traubnet.py.
+#
 
 # Code:
 
