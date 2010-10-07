@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 18 22:00:46 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Jun 28 12:19:17 2010 (+0530)
+# Last-Updated: Thu Oct  7 17:26:12 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 772
+#     Update #: 774
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -24,7 +24,9 @@
 
 # Change log:
 # 
-# 
+# 2010-10-07 17:21:10 (+0530) The connectivity datastructure is now a
+# graph. So will map the cell-cell connectivity graph directly to
+# network.
 # 
 # 
 

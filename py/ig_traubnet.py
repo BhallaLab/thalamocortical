@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Oct  6 17:01:09 2010 (+0530)
+# Last-Updated: Thu Oct  7 17:59:21 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 875
+#     Update #: 922
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -53,7 +53,25 @@ import igraph as ig
 import config
 # synapse.py is imported for checking against the older version of the synaptic data.
 import synapse
+# allowedcomp is imported for verification with older data structure only
 import allowedcomp
+
+# The cell classes
+from spinystellate import SpinyStellate
+from suppyrRS import SupPyrRS
+from suppyrFRB import SupPyrFRB
+from supbasket import SupBasket
+from supaxoaxonic import SupAxoaxonic
+from supLTS import SupLTS
+from tuftedIB import TuftedIB
+from deepbasket import DeepBasket
+from deepaxoaxonic import DeepAxoaxonic
+from deepLTS import DeepLTS
+from tuftedRS import TuftedRS
+from nontuftedRS import NontuftedRS
+from tcr import TCR
+from nRT import nRT
+
 
 class TraubFullNetData(object):
     """Information about connectivity.
@@ -558,6 +576,9 @@ class TraubNet(object):
         self.__celltype_graph = None
         self.__cell_graph = None
 
+    def load_cell_graph(self):
+        self.__cell_graph = ig.read(self.cell_graph_file, format=self.format)
+
     def setup(self):
         start = datetime.now()
         if self.celltype_graph_file is None:
@@ -755,7 +776,27 @@ class TraubNet(object):
                 for conductance_name in conductance_type:
                     edge[conductance_name] *= scale_factor
             
-            
+   def setup_model(self, container):
+       """
+       setup the actual MOOSE model from the cell_graph.
+
+       container -- container for the cells in the network.
+       """
+       if self.__cell_graph is None:
+           raise Exception('cell_graph is empty. First call generate_celltype_graph and generate_cell_graph to instantiate it.')
+       if isinstance(container, str):
+           if not config.context.exists(container):
+               container = moose.Neutral(container)
+       else:
+           if not isinstance(container, moose.PyMooseBase):
+               raise Exception('Container must be a MOOSE object.')
+       for vertex in self.__celltype_graph.vs:
+           cell_class = eval(vertex['label'])
+           for cell_vertex in self.__cell_graph.vs.select(type_index=vertex.index):
+               cell = cell_class(cell_vertex['label'], container)
+               config.LOGGER.debug('Created %s' % (cell.path))
+           
+           
 
 
 def testTraubFullNetData():
@@ -778,6 +819,7 @@ if __name__ == '__main__':
     network = TraubNet(None, scale=scale)
     network.generate_celltype_graph()
     network.generate_cell_graph()
+    network.setup_model('traubnet')
     network.save_celltype_graph('celltype_graph.gml', format='gml')
     network.save_cell_graph('cell_graph.gml', format='gml')
     #! commented out till here for testing TraubFullNetData !
