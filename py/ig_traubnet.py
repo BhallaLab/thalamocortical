@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Oct  7 18:08:27 2010 (+0530)
+# Last-Updated: Thu Oct  7 18:15:15 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 924
+#     Update #: 926
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -793,7 +793,8 @@ class TraubNet(object):
         for vertex in self.__celltype_graph.vs:
             cell_class = eval(vertex['label'])
             for cell_vertex in self.__cell_graph.vs.select(type_index=vertex.index):
-                cell = cell_class(cell_vertex['label'], container)
+                cell_path = container.path + '/' + cell_vertex['label']
+                cell = cell_class(cell_class.prototype, cell_path)
                 config.LOGGER.debug('Created %s' % (cell.path))
            
            
