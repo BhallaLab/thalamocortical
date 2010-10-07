@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Oct  7 18:15:15 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 926
+# Last-Updated: Thu Oct  7 18:17:09 2010 (+0530)
+#           By: subha
+#     Update #: 927
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -50,6 +50,9 @@ import os
 from datetime import datetime
 import numpy
 import igraph as ig
+
+import moose
+
 import config
 # synapse.py is imported for checking against the older version of the synaptic data.
 import synapse
