@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Oct  7 17:59:21 2010 (+0530)
+# Last-Updated: Thu Oct  7 18:08:27 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 922
+#     Update #: 924
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -776,25 +776,25 @@ class TraubNet(object):
                 for conductance_name in conductance_type:
                     edge[conductance_name] *= scale_factor
             
-   def setup_model(self, container):
-       """
-       setup the actual MOOSE model from the cell_graph.
-
-       container -- container for the cells in the network.
-       """
-       if self.__cell_graph is None:
-           raise Exception('cell_graph is empty. First call generate_celltype_graph and generate_cell_graph to instantiate it.')
-       if isinstance(container, str):
-           if not config.context.exists(container):
-               container = moose.Neutral(container)
-       else:
-           if not isinstance(container, moose.PyMooseBase):
-               raise Exception('Container must be a MOOSE object.')
-       for vertex in self.__celltype_graph.vs:
-           cell_class = eval(vertex['label'])
-           for cell_vertex in self.__cell_graph.vs.select(type_index=vertex.index):
-               cell = cell_class(cell_vertex['label'], container)
-               config.LOGGER.debug('Created %s' % (cell.path))
+    def setup_model(self, container):
+        """
+        setup the actual MOOSE model from the cell_graph.
+        
+        container -- container for the cells in the network.
+        """
+        if self.__cell_graph is None:
+            raise Exception('cell_graph is empty. First call generate_celltype_graph and generate_cell_graph to instantiate it.')
+        if isinstance(container, str):
+            if not config.context.exists(container):
+                container = moose.Neutral(container)
+        else:
+            if not isinstance(container, moose.PyMooseBase):
+                raise Exception('Container must be a MOOSE object.')
+        for vertex in self.__celltype_graph.vs:
+            cell_class = eval(vertex['label'])
+            for cell_vertex in self.__cell_graph.vs.select(type_index=vertex.index):
+                cell = cell_class(cell_vertex['label'], container)
+                config.LOGGER.debug('Created %s' % (cell.path))
            
            
 
