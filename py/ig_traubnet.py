@@ -823,7 +823,7 @@ if __name__ == '__main__':
     network.save_celltype_graph('celltype_graph.gml', format='gml')
     network.save_cell_graph('cell_graph.gml', format='gml')
     #! commented out till here for testing TraubFullNetData !
-    testTraubFullNetData()
+#    testTraubFullNetData()
 
 # 
 # ig_traubnet.py ends here
