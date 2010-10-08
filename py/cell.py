@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 24 10:04:47 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  8 16:46:06 2010 (+0530)
+# Last-Updated: Fri Oct  8 17:02:22 2010 (+0530)
 #           By: subha
-#     Update #: 638
+#     Update #: 639
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -85,6 +85,7 @@ def nameindex(comp):
 def get_comp(cell, index):
     """Return a wrapper over compartment specified by index. None if
     no such compartment exists."""
+    if index <= 0: return None
     path = cell.path + '/comp_' + str(index)
     # print 'get_comp', path
     if config.context.exists(path):

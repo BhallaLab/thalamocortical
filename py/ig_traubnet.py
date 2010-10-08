@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  8 16:07:33 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 1024
+# Last-Updated: Fri Oct  8 17:09:08 2010 (+0530)
+#           By: subha
+#     Update #: 1026
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -793,6 +793,7 @@ class TraubNet(object):
         """
         if self.__cell_graph is None:
             raise Exception('cell_graph is empty. First call generate_celltype_graph and generate_cell_graph to instantiate it.')
+        start = datetime.now()
         if isinstance(container, str):
             if not config.context.exists(container):
                 container = moose.Neutral(container)
@@ -840,7 +841,9 @@ class TraubNet(object):
                 source_comp.makeSynapse(target_comp, name='gaba',
                                             Ek=edge['ek_gaba'],
                                             tau1=edge['tau_gaba'])
-            
+        end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('Finished setting up model in: %g s' % (delta.seconds + 1e-6 * delta.microseconds))
            
            
 
