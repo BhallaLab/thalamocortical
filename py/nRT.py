@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 15:18:24 2009 (+0530)
 # Version: 
-# Last-Updated: Fri May  7 17:56:27 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 76
+# Last-Updated: Fri Oct  8 16:52:51 2010 (+0530)
+#           By: subha
+#     Update #: 77
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -70,7 +70,7 @@ class nRT(TraubCell):
     ca_dep_chans = ['KAHP_SLOWER','KC']
 
     def __init__(self, *args):
-	TraubCell.__init__(self, *args)
+        TraubCell.__init__(self, *args)
         moose.CaConc(self.soma.path + '/CaPool').tau = 50e-3
 	
     def _topology(self):

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 11:34:27 2009 (+0530)
 # Version: 
-# Last-Updated: Fri May  7 17:17:36 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 29
+# Last-Updated: Fri Oct  8 16:52:41 2010 (+0530)
+#           By: subha
+#     Update #: 30
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -69,8 +69,8 @@ class NontuftedRS(TraubCell):
     prototype = TraubCell.read_proto(proto_file, 'NontuftedRS', chan_params)
     ca_dep_chans = ['KAHP_DP', 'KC']
     def __init__(self, *args):
-	TraubCell.__init__(self, *args)
-	moose.CaConc(self.soma.path + '/CaPool').tau = 100e-3
+        TraubCell.__init__(self, *args)
+        moose.CaConc(self.soma.path + '/CaPool').tau = 100e-3
 	
     def _topology(self):
         raise Exception, 'Deprecated'

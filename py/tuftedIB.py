@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 11:44:48 2009 (+0530)
 # Version: 
-# Last-Updated: Fri May  7 15:57:23 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 50
+# Last-Updated: Fri Oct  8 16:54:26 2010 (+0530)
+#           By: subha
+#     Update #: 51
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -69,7 +69,7 @@ class TuftedIB(TraubCell):
     proto_file = 'TuftedIB.p'
     prototype = TraubCell.read_proto(proto_file, "TuftedIB", chan_params)
     def __init__(self, *args):
-	TraubCell.__init__(self, *args)
+        TraubCell.__init__(self, *args)
         soma_ca_pool = moose.CaConc(self.soma.path + '/CaPool')
         soma_ca_pool.tau = 100e-3
 	# Special case: individually specified beta_cad's in level  2

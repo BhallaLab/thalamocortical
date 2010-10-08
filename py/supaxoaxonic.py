@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Oct  6 16:52:28 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Apr 29 11:01:20 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 34
+# Last-Updated: Fri Oct  8 16:53:11 2010 (+0530)
+#           By: subha
+#     Update #: 35
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -69,8 +69,8 @@ class SupAxoaxonic(TraubCell):
     prototype = TraubCell.read_proto(proto_file, 'SupAxoaxonic', chan_params)
     def __init__(self, *args):
         start = datetime.now()
-	TraubCell.__init__(self, *args)
-	caPool = moose.CaConc(self.soma.path + '/CaPool')
+        TraubCell.__init__(self, *args)
+        caPool = moose.CaConc(self.soma.path + '/CaPool')
         caPool.tau = 50e-3
         end = datetime.now()
         delta = end - start

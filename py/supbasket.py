@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Oct  6 16:52:28 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 26 23:51:09 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 44
+# Last-Updated: Fri Oct  8 16:53:27 2010 (+0530)
+#           By: subha
+#     Update #: 45
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -70,7 +70,7 @@ class SupBasket(TraubCell):
     prototype = TraubCell.read_proto(proto_file, 'SupBasket', chan_params)
     def __init__(self, *args):
         start = datetime.now()
-	TraubCell.__init__(self, *args)
+        TraubCell.__init__(self, *args)
         soma_ca_pool = moose.CaConc(self.soma.path + '/CaPool')
         soma_ca_pool.tau = 50e-3
         end = datetime.now()

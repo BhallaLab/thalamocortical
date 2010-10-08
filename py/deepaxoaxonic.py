@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 11:11:39 2009 (+0530)
 # Version: 
-# Last-Updated: Fri May  7 17:37:15 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 40
+# Last-Updated: Fri Oct  8 16:51:42 2010 (+0530)
+#           By: subha
+#     Update #: 41
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -70,7 +70,7 @@ class DeepAxoaxonic(TraubCell):
     prototype = TraubCell.read_proto(proto_file, "DeepAxoaxonic", chan_params)
     ca_dep_chans = ['KC_FAST']
     def __init__(self, *args):
-	TraubCell.__init__(self, *args)
+        TraubCell.__init__(self, *args)
         moose.CaConc(self.soma.path + '/CaPool').tau = 50e-3
 	
     def _topology(self):
