@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Oct  6 16:52:28 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  8 16:53:11 2010 (+0530)
+# Last-Updated: Fri Oct  8 17:41:45 2010 (+0530)
 #           By: subha
-#     Update #: 35
+#     Update #: 36
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -68,13 +68,13 @@ class SupAxoaxonic(TraubCell):
     proto_file = 'SupAxoaxonic.p'
     prototype = TraubCell.read_proto(proto_file, 'SupAxoaxonic', chan_params)
     def __init__(self, *args):
-        start = datetime.now()
+        # start = datetime.now()
         TraubCell.__init__(self, *args)
         caPool = moose.CaConc(self.soma.path + '/CaPool')
         caPool.tau = 50e-3
-        end = datetime.now()
-        delta = end - start
-        config.BENCHMARK_LOGGER.info('created cell in: %g s' % (delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
+        # end = datetime.now()
+        # delta = end - start
+        # config.BENCHMARK_LOGGER.info('created cell in: %g s' % (delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
 
     def _topology(self):
         raise Exception, 'Deprecated'
