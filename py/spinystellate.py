@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Sep 29 11:43:22 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  8 17:05:30 2010 (+0530)
+# Last-Updated: Fri Oct  8 17:39:25 2010 (+0530)
 #           By: subha
-#     Update #: 518
+#     Update #: 519
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -51,7 +51,7 @@ class SpinyStellate(TraubCell):
     proto_file = 'SpinyStellate.p'
     prototype = TraubCell.read_proto("SpinyStellate.p", "SpinyStellate", chan_params)
     def __init__(self, *args):
-        start = datetime.now()
+        # start = datetime.now()
         # for arg in args: print arg
         TraubCell.__init__(self, *args)
         # print 'TraubCell.__init__ passed'
@@ -59,9 +59,9 @@ class SpinyStellate(TraubCell):
         soma_ca_pool = moose.CaConc(self.soma.path + '/CaPool')
         # print 'CaPool generated'
         soma_ca_pool.tau = 50e-3
-        end = datetime.now()
-        delta = end - start
-        config.BENCHMARK_LOGGER.info('created cell in: %g s' % (delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
+        # end = datetime.now()
+        # delta = end - start
+        # config.BENCHMARK_LOGGER.info('created cell in: %g s' % (delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
 
     def _topology(self):
         raise Exception, 'Deprecated method.'
