@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 24 10:04:47 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Sep 14 09:46:35 2010 (+0530)
+# Last-Updated: Fri Oct  8 16:46:06 2010 (+0530)
 #           By: subha
-#     Update #: 633
+#     Update #: 638
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -86,11 +86,11 @@ def get_comp(cell, index):
     """Return a wrapper over compartment specified by index. None if
     no such compartment exists."""
     path = cell.path + '/comp_' + str(index)
-    print 'get_comp', path
+    # print 'get_comp', path
     if config.context.exists(path):
         return MyCompartment(path)
     else:
-        print 'No compartment with index:', index
+        config.LOGGER.warning('No compartment with index: %d' % (index))
         return None
 
 
@@ -98,9 +98,9 @@ class TraubCell(moose.Cell):
     channel_lib = init_channel_lib()
                      
     def __init__(self, *args):
-        print 'TraubCell.__init__:', args
+        # print 'TraubCell.__init__:', args
         moose.Cell.__init__(self, *args)
-        print 'Cell.__init__ done'
+        # print 'Cell.__init__ done'
         
     
     # Dynamic access to a compartment by index.  It mimics a python
@@ -270,7 +270,7 @@ class TraubCell(moose.Cell):
         nodes = defaultdict(dict)
         for comp in cell.childList:
             if moose.Neutral(comp).className == 'Compartment':
-                print 'Appending %s', comp
+                config.LOGGER.debug('Appending %s' % (comp))
                 nodes[comp]['pos'] = 0.0
                 nodes[comp]['disp'] = 0.0
         # populate the edge set
@@ -278,7 +278,7 @@ class TraubCell(moose.Cell):
         for comp in nodes.keys():
             nid_list = moose.Neutral(comp).neighbours('raxial')
             for neighbour in nid_list:
-                print 'Adding (%s, %s)' % (comp, neighbour)
+                config.LOGGER.debug('Adding (%s, %s)' % (comp, neighbour))
                 edges.add((comp, neighbour))
         
         # Generate random initial positions for all the compartments
