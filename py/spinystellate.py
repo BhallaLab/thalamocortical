@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Sep 29 11:43:22 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  8 16:50:51 2010 (+0530)
+# Last-Updated: Fri Oct  8 17:05:30 2010 (+0530)
 #           By: subha
-#     Update #: 517
+#     Update #: 518
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -52,8 +52,8 @@ class SpinyStellate(TraubCell):
     prototype = TraubCell.read_proto("SpinyStellate.p", "SpinyStellate", chan_params)
     def __init__(self, *args):
         start = datetime.now()
-        for arg in args: print arg
-	TraubCell.__init__(self, *args)
+        # for arg in args: print arg
+        TraubCell.__init__(self, *args)
         # print 'TraubCell.__init__ passed'
         # print 'Soma:', self.soma.path
         soma_ca_pool = moose.CaConc(self.soma.path + '/CaPool')
