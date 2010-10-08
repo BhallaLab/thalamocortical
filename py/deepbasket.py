@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 14:30:33 2009 (+0530)
 # Version: 
-# Last-Updated: Fri May  7 17:32:06 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 53
+# Last-Updated: Fri Oct  8 16:51:56 2010 (+0530)
+#           By: subha
+#     Update #: 54
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -69,8 +69,8 @@ class DeepBasket(TraubCell):
     proto_file = 'DeepBasket.p'
     prototype = TraubCell.read_proto(proto_file, "DeepBasket", chan_params)
     def __init__(self, *args):
-	TraubCell.__init__(self, *args)
-	moose.CaConc(self.soma.path + '/CaPool').tau = 50e-3
+        TraubCell.__init__(self, *args)
+        moose.CaConc(self.soma.path + '/CaPool').tau = 50e-3
 	
     def _topology(self):
         self.presyn = 59

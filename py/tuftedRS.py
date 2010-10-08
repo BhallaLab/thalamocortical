@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 13:42:14 2009 (+0530)
 # Version: 
-# Last-Updated: Fri May  7 16:56:20 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 29
+# Last-Updated: Fri Oct  8 16:54:39 2010 (+0530)
+#           By: subha
+#     Update #: 31
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -71,10 +71,10 @@ class TuftedRS(TraubCell):
     ca_dep_chans = ['KAHP_DP', 'KC']
 
     def __init__(self, *args):
-	TraubCell.__init__(self, *args)
-	moose.CaConc(self.soma.path + '/CaPool').tau = 100e-3
-	# Special case: individually specified beta_cad's in level  2
-	moose.CaConc(self.comp[2].path + '/CaPool').tau  =   1e-3/0.02
+        TraubCell.__init__(self, *args)
+        moose.CaConc(self.soma.path + '/CaPool').tau = 100e-3
+        # Special case: individually specified beta_cad's in level  2
+        moose.CaConc(self.comp[2].path + '/CaPool').tau  =   1e-3/0.02
         moose.CaConc(self.comp[5].path + '/CaPool' ).tau = 1e-3 /  0.02
         moose.CaConc(self.comp[6].path + '/CaPool' ).tau = 1e-3 /  0.02
 	

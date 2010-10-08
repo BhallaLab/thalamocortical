@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 19:32:34 2009 (+0530)
 # Version: 
-# Last-Updated: Fri May  7 17:45:08 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 41
+# Last-Updated: Fri Oct  8 16:52:18 2010 (+0530)
+#           By: subha
+#     Update #: 42
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -69,7 +69,7 @@ class DeepLTS(TraubCell):
     proto_file = 'DeepLTS.p'
     prototype = TraubCell.read_proto(proto_file, "DeepLTS", chan_params)
     def __init__(self, *args):
-	TraubCell.__init__(self, *args)
+        TraubCell.__init__(self, *args)
         moose.CaConc(self.soma.path + '/CaPool').tau = 50e-3
 	
     def _topology(self):
