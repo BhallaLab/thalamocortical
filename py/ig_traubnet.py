@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  8 17:37:21 2010 (+0530)
-#           By: subha
-#     Update #: 1038
+# Last-Updated: Fri Oct  8 20:29:36 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 1039
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -876,6 +876,7 @@ if __name__ == '__main__':
     network.generate_celltype_graph()
     network.generate_cell_graph()
     network.setup_model('traubnet')
+    network.run(1.0)
     network.save_celltype_graph('celltype_graph.gml', format='gml')
     network.save_cell_graph('cell_graph.gml', format='gml')
     #! commented out till here for testing TraubFullNetData !
