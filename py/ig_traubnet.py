@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Oct  7 18:17:09 2010 (+0530)
-#           By: subha
-#     Update #: 927
+# Last-Updated: Fri Oct  8 16:07:33 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 1024
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -455,6 +455,9 @@ class TraubFullNetData(object):
                 [1,2,15,28,41,54,67,80,93,106,119], # TCR
                 [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53]] # nRT
             ]
+        # ek_gaba depends only on the postsynaptic cell. ek_gaba[i] is for post synaptic cell of type celltype[i]
+        self.ek_gaba = [-81e-3, -81e-3, -75e-3, -75e-3, -75e-3, -75e-3, -75e-3, -75e-3, -75e-3, -75e-3, -75e-3, -75e-3, -81e-3, -75e-3]
+
         
     def check_pre_post_ratio(self):
         """Check the pre-post ratio for each celltype pair"""
@@ -578,6 +581,7 @@ class TraubNet(object):
         self.nRT_g_gaba_low = 0.7e-9
         self.__celltype_graph = None
         self.__cell_graph = None
+        self.vertex_cell_map = {}
 
     def load_cell_graph(self):
         self.__cell_graph = ig.read(self.cell_graph_file, format=self.format)
@@ -615,6 +619,7 @@ class TraubNet(object):
     def generate_celltype_graph(self):
         """Generate the celltype connectivity graph from hardcoded TraubFullNetData object."""
         tn = TraubFullNetData()
+        self._netdata = tn
         graph = ig.Graph(0, directed=True)
         graph.add_vertices(len(tn.celltype))
         edge_count = 0
@@ -637,6 +642,7 @@ class TraubNet(object):
                     graph.es[edge_count-1]['tau_nmda'] = tn.tau_nmda[celltype.index][posttype.index]
                     graph.es[edge_count-1]['tau_gaba'] = tn.tau_gaba[celltype.index][posttype.index]
                     graph.es[edge_count-1]['ps_comps'] = str(tn.allowed_comps[celltype.index][posttype.index])
+                    graph.es[edge_count-1]['ek_gaba'] = tn.ek_gaba[posttype.index]
                     if celltype['label'] == 'nRT':
                         if posttype['label'] == 'TCR':
                             graph.es[edge_count-1]['tau_gaba_slow'] = tn.nRT_TCR_tau_gaba_slow
@@ -798,7 +804,43 @@ class TraubNet(object):
             for cell_vertex in self.__cell_graph.vs.select(type_index=vertex.index):
                 cell_path = container.path + '/' + cell_vertex['label']
                 cell = cell_class(cell_class.prototype, cell_path)
+                self.vertex_cell_map[cell_vertex.index] = cell
                 config.LOGGER.debug('Created %s' % (cell.path))
+        # Connect the edges - as synapses
+        for edge in self.__cell_graph.es:
+            source = edge.source
+            target = edge.target
+            pre_cell = self.vertex_cell_map[source]
+            post_cell = self.vertex_cell_map[target]
+            source_comp = pre_cell.comp[pre_cell.presyn]
+            target_comp = post_cell.comp[edge['ps_comp']]
+            g_ampa = edge['g_ampa']
+            if g_ampa > 0.0 and not numpy.allclose(0.0, g_ampa):
+                source_comp.makeSynapse(target_comp, name='ampa',
+                                        Ek=edge['ek_ampa'],
+                                        Gbar=g_ampa,
+                                        tau1=0.0,
+                                        tau2=edge['tau_ampa'])
+            g_nmda = edge['g_nmda']
+            if g_nmda > 0.0 and not numpy.allclose(0.0, g_nmda):
+                source_comp.makeSynapse(target_comp, classname='NMDAChan', 
+                                        name='nmda',
+                                        Ek=edge['ek_nmda'],
+                                        tau1=edge['tau_nmda'],
+                                        tau2=5e-3)
+            g_gaba = edge['g_gaba']
+            if g_gaba > 0.0 and not numpy.allclose(0.0, g_gaba):
+                tau_gaba_slow = edge['tau_gaba_slow']
+                if tau_gaba_slow > 0.0:
+                    if not numpy.allclose(0.0, tau_gaba_slow):
+                        source_comp.makeSynapse(target_comp, name='gaba_slow',
+                                                Ek=edge['ek_gaba'],
+                                                tau1=tau_gaba_slow)
+                
+                source_comp.makeSynapse(target_comp, name='gaba',
+                                            Ek=edge['ek_gaba'],
+                                            tau1=edge['tau_gaba'])
+            
            
            
 
