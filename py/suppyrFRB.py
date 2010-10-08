@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Sep 21 01:45:00 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 26 22:23:32 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 134
+# Last-Updated: Fri Oct  8 16:53:49 2010 (+0530)
+#           By: subha
+#     Update #: 135
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -68,7 +68,7 @@ class SupPyrFRB(TraubCell):
     prototype = TraubCell.read_proto(proto_file, "SupPyrFRB", chan_params)
 
     def __init__(self, *args):
-	TraubCell.__init__(self, *args)
+        TraubCell.__init__(self, *args)
         soma_ca_pool = moose.CaConc(self.soma.path + '/CaPool')
         soma_ca_pool.tau = 100e-3
 

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Apr 26 22:03:41 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 667
+# Last-Updated: Fri Oct  8 16:54:01 2010 (+0530)
+#           By: subha
+#     Update #: 668
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -69,7 +69,7 @@ class SupPyrRS(TraubCell):
     prototype = TraubCell.read_proto(proto_file, "SupPyrRS", chan_params)
     def __init__(self, *args):
         start = datetime.now()
-	TraubCell.__init__(self, *args)
+        TraubCell.__init__(self, *args)
         soma_ca_pool = moose.CaConc(self.soma.path + '/CaPool')
         soma_ca_pool.tau = 100e-3
         end = datetime.now()

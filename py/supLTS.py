@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Sep 23 00:18:00 2009 (+0530)
 # Version: 
-# Last-Updated: Mon May 10 05:20:07 2010 (+0530)
+# Last-Updated: Fri Oct  8 16:53:42 2010 (+0530)
 #           By: subha
-#     Update #: 130
+#     Update #: 131
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -53,8 +53,8 @@ class SupLTS(TraubCell):
     prototype = TraubCell.read_proto(proto_file, "SupLTS", chan_params)
     def __init__(self, *args):
         start = datetime.now()
-	TraubCell.__init__(self, *args)
-	caPool = moose.CaConc(self.soma.path + '/CaPool')
+        TraubCell.__init__(self, *args)
+        caPool = moose.CaConc(self.soma.path + '/CaPool')
         caPool.tau = 50e-3
         end = datetime.now()
         delta = end - start

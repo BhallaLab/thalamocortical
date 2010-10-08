@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 10:14:07 2009 (+0530)
 # Version: 
-# Last-Updated: Fri May  7 17:49:16 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 43
+# Last-Updated: Fri Oct  8 16:54:12 2010 (+0530)
+#           By: subha
+#     Update #: 44
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -69,7 +69,7 @@ class TCR(TraubCell):
     proto_file = 'TCR.p'
     prototype = TraubCell.read_proto(proto_file, "TCR", chan_params)
     def __init__(self, *args):
-	TraubCell.__init__(self, *args)
+        TraubCell.__init__(self, *args)
         moose.CaConc(self.soma.path + '/CaPool').tau = 50e-3
 	
     def _topology(self):
