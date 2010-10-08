@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  8 17:09:08 2010 (+0530)
+# Last-Updated: Fri Oct  8 17:37:21 2010 (+0530)
 #           By: subha
-#     Update #: 1026
+#     Update #: 1038
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -52,6 +52,7 @@ import numpy
 import igraph as ig
 
 import moose
+from simulation import Simulation
 
 import config
 # synapse.py is imported for checking against the older version of the synaptic data.
@@ -806,7 +807,7 @@ class TraubNet(object):
                 cell_path = container.path + '/' + cell_vertex['label']
                 cell = cell_class(cell_class.prototype, cell_path)
                 self.vertex_cell_map[cell_vertex.index] = cell
-                config.LOGGER.debug('Created %s' % (cell.path))
+                # config.LOGGER.debug('Created %s' % (cell.path))
         # Connect the edges - as synapses
         for edge in self.__cell_graph.es:
             source = edge.source
@@ -846,7 +847,13 @@ class TraubNet(object):
         config.BENCHMARK_LOGGER.info('Finished setting up model in: %g s' % (delta.seconds + 1e-6 * delta.microseconds))
            
            
-
+    def run(self, time):
+        self.sim = Simulation('traub2005')
+        self.generate_celltype_graph()
+        self.generate_cell_graph()
+        self.setup_model(self.sim.model)
+        self.sim.schedule()
+        self.sim.run(time)
 
 def testTraubFullNetData():
     """

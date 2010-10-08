@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  8 16:54:01 2010 (+0530)
+# Last-Updated: Fri Oct  8 17:37:56 2010 (+0530)
 #           By: subha
-#     Update #: 668
+#     Update #: 669
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -68,13 +68,13 @@ class SupPyrRS(TraubCell):
     proto_file = "SupPyrRS.p"
     prototype = TraubCell.read_proto(proto_file, "SupPyrRS", chan_params)
     def __init__(self, *args):
-        start = datetime.now()
+        # start = datetime.now()
         TraubCell.__init__(self, *args)
         soma_ca_pool = moose.CaConc(self.soma.path + '/CaPool')
         soma_ca_pool.tau = 100e-3
-        end = datetime.now()
-        delta = end - start
-        config.BENCHMARK_LOGGER.info('created cell in: %g s' % (delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
+        # end = datetime.now()
+        # delta = end - start
+        # config.BENCHMARK_LOGGER.info('created cell in: %g s' % (delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
 	
     def _topology(self):
         raise Exception, 'Deprecated'
