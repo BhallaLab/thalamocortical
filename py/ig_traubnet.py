@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Oct  9 10:07:08 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 1050
+# Last-Updated: Sat Oct  9 11:51:28 2010 (+0530)
+#           By: subha
+#     Update #: 1056
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -803,6 +803,7 @@ class TraubNet(object):
         else:
             if not isinstance(container, moose.PyMooseBase):
                 raise Exception('Container must be a MOOSE object.')
+
         for vertex in self.__celltype_graph.vs:
             cell_class = eval(vertex['label'])
             for cell_vertex in self.__cell_graph.vs.select(type_index=vertex.index):
@@ -821,30 +822,33 @@ class TraubNet(object):
             target_comp = post_cell.comp[edge['ps_comp']]
             g_ampa = edge['g_ampa']
             if g_ampa > 0.0 and not numpy.allclose(0.0, g_ampa):
-                source_comp.makeSynapse(target_comp, name='ampa',
-                                        Ek=edge['ek_ampa'],
-                                        Gbar=g_ampa,
-                                        tau1=0.0,
-                                        tau2=edge['tau_ampa'])
+                pass
+                # source_comp.makeSynapse(target_comp, name='ampa',
+                #                         Ek=edge['ek_ampa'],
+                #                         Gbar=g_ampa,
+                #                         tau1=0.0,
+                #                         tau2=edge['tau_ampa'])
             g_nmda = edge['g_nmda']
             if g_nmda > 0.0 and not numpy.allclose(0.0, g_nmda):
-                source_comp.makeSynapse(target_comp, classname='NMDAChan', 
-                                        name='nmda',
-                                        Ek=edge['ek_nmda'],
-                                        tau1=edge['tau_nmda'],
-                                        tau2=5e-3)
+                pass
+                # source_comp.makeSynapse(target_comp, classname='NMDAChan', 
+                #                         name='nmda',
+                #                         Ek=edge['ek_nmda'],
+                #                         tau1=edge['tau_nmda'],
+                #                         tau2=5e-3)
             g_gaba = edge['g_gaba']
             if g_gaba > 0.0 and not numpy.allclose(0.0, g_gaba):
                 tau_gaba_slow = edge['tau_gaba_slow']
                 if tau_gaba_slow > 0.0:
-                    if not numpy.allclose(0.0, tau_gaba_slow):
-                        source_comp.makeSynapse(target_comp, name='gaba_slow',
-                                                Ek=edge['ek_gaba'],
-                                                tau1=tau_gaba_slow)
+                    pass
+                    # if not numpy.allclose(0.0, tau_gaba_slow):
+                    #     source_comp.makeSynapse(target_comp, name='gaba_slow',
+                    #                             Ek=edge['ek_gaba'],
+                    #                             tau1=tau_gaba_slow)
                 
-                source_comp.makeSynapse(target_comp, name='gaba',
-                                            Ek=edge['ek_gaba'],
-                                            tau1=edge['tau_gaba'])
+                # source_comp.makeSynapse(target_comp, name='gaba',
+                #                             Ek=edge['ek_gaba'],
+                #                             tau1=edge['tau_gaba'])
         end = datetime.now()
         delta = end - start1
         config.BENCHMARK_LOGGER.info('Finished setting up synapse in: %g s' % (delta.seconds + 1e-6 * delta.microseconds))
