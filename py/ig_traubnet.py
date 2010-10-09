@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  8 20:29:36 2010 (+0530)
+# Last-Updated: Sat Oct  9 09:55:39 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1039
+#     Update #: 1043
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -809,6 +809,7 @@ class TraubNet(object):
                 self.vertex_cell_map[cell_vertex.index] = cell
                 # config.LOGGER.debug('Created %s' % (cell.path))
         # Connect the edges - as synapses
+        start1 = datetime.now()
         for edge in self.__cell_graph.es:
             source = edge.source
             target = edge.target
@@ -843,6 +844,8 @@ class TraubNet(object):
                                             Ek=edge['ek_gaba'],
                                             tau1=edge['tau_gaba'])
         end = datetime.now()
+        delta = end - start1
+        config.BENCHMARK_LOGGER.info('Finished setting up synapse in: %g s' % (delta.seconds + 1e-6 * delta.microseconds))
         delta = end - start
         config.BENCHMARK_LOGGER.info('Finished setting up model in: %g s' % (delta.seconds + 1e-6 * delta.microseconds))
            
