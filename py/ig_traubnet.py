@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Oct  9 09:55:39 2010 (+0530)
+# Last-Updated: Sat Oct  9 10:07:08 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1043
+#     Update #: 1050
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -792,6 +792,8 @@ class TraubNet(object):
         
         container -- container for the cells in the network.
         """
+        for handler in config.LOGGER.handlers:
+            handler.flush()
         if self.__cell_graph is None:
             raise Exception('cell_graph is empty. First call generate_celltype_graph and generate_cell_graph to instantiate it.')
         start = datetime.now()
@@ -846,17 +848,38 @@ class TraubNet(object):
         end = datetime.now()
         delta = end - start1
         config.BENCHMARK_LOGGER.info('Finished setting up synapse in: %g s' % (delta.seconds + 1e-6 * delta.microseconds))
+        for handler in config.LOGGER.handlers:
+            handler.flush()
+
         delta = end - start
         config.BENCHMARK_LOGGER.info('Finished setting up model in: %g s' % (delta.seconds + 1e-6 * delta.microseconds))
+        for handler in config.LOGGER.handlers:
+            handler.flush()
            
            
     def run(self, time):
         self.sim = Simulation('traub2005')
         self.generate_celltype_graph()
         self.generate_cell_graph()
+        for handler in config.LOGGER.handlers:
+            handler.flush()
+        for handler in config.BENCHMARK_LOGGER.handlers:
+            handler.flush()
         self.setup_model(self.sim.model)
+        for handler in config.LOGGER.handlers:
+            handler.flush()
+        for handler in config.BENCHMARK_LOGGER.handlers:
+            handler.flush()
         self.sim.schedule()
+        for handler in config.LOGGER.handlers:
+            handler.flush()
+        for handler in config.BENCHMARK_LOGGER.handlers:
+            handler.flush()
         self.sim.run(time)
+        for handler in config.LOGGER.handlers:
+            handler.flush()
+        for handler in config.BENCHMARK_LOGGER.handlers:
+            handler.flush()
 
 def testTraubFullNetData():
     """
@@ -876,9 +899,6 @@ if __name__ == '__main__':
         scale = float(sys.argv[1])
     # network = TraubNet('nx_celltype_graph.gml', scale=scale)
     network = TraubNet(None, scale=scale)
-    network.generate_celltype_graph()
-    network.generate_cell_graph()
-    network.setup_model('traubnet')
     network.run(1.0)
     network.save_celltype_graph('celltype_graph.gml', format='gml')
     network.save_cell_graph('cell_graph.gml', format='gml')
