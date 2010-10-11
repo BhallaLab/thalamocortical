@@ -2348,3 +2348,16 @@ TypeError: sequence elements must be integer pairs
 
   Also, I am a bit worried about gap junctions: not handled by hsolve, nor can
   I use GENESIS style raxial setting to simulate them in MOOSE.
+* <2010-10-11 Mon 18:18> Switching network description to another file:
+  I started putting together the network description in trbnet.py. This should
+  be my final version, after scattering several experimental versions in
+  traubnet.py, ig_traubnet.py and network.py.
+
+  The conclusion is: keep the explicit datastructure for full network.
+  
+  have a celltype-celltype graph for pretty picture and quick conversion to
+  other forms.
+
+  generate cell-cell graph only for pictures. Otherwise generate the network
+  straight from the celltype-celltype graph.
+  
