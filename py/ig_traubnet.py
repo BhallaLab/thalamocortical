@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Oct  9 11:51:28 2010 (+0530)
+# Last-Updated: Sat Oct  9 16:32:41 2010 (+0530)
 #           By: subha
-#     Update #: 1056
+#     Update #: 1100
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -583,6 +583,7 @@ class TraubNet(object):
         self.__celltype_graph = None
         self.__cell_graph = None
         self.vertex_cell_map = {}
+        self.type_cell_map = defaultdict(list)
 
     def load_cell_graph(self):
         self.__cell_graph = ig.read(self.cell_graph_file, format=self.format)
@@ -654,8 +655,10 @@ class TraubNet(object):
                             
             
             
-    def generate_cell_graph(self):
+    def generate_cell_graph(self, container):
         """generate the cell-cell graph from the celltype graph.
+
+        container -- model container for the moose model.
 
         """
 
@@ -667,6 +670,10 @@ class TraubNet(object):
 
         start = datetime.now()
         
+        if isinstace(container, str):
+            container = moose.Neutral(container)
+        else:
+            assert isinstance(container, moose.PyMooseBase)
         # ``cell_graph`` is generated from the celltype_graph.  We
         # scale the number of cells of each type by ``scale`` and for
         # each celltype, set the ``start_index`` specifying the index
@@ -682,6 +689,12 @@ class TraubNet(object):
             cell_graph.add_vertices(count)
             cell_graph.vs[start_index: start_index + count]['type_index'] = [celltype.index] * count
             cell_graph.vs[start_index: start_index + count]['label'] = ['%s_%d' % (celltype['label'], index) for index in range(count)]
+            cell_class = eval(celltype['label'])
+            for num in range(count):
+                cell = cell_class(cell_class.prototype, '%s/%s_%d' % (container.path, celltype['label'], num))
+                self.vertex_cell_map[start_index + num] = cell
+                self.type_cell_map[celltype['label']].append(cell)
+                
 
         # Adding the edges is the tricky bit and this is the most
         # important part of the network definition.  
@@ -806,13 +819,16 @@ class TraubNet(object):
 
         for vertex in self.__celltype_graph.vs:
             cell_class = eval(vertex['label'])
-            for cell_vertex in self.__cell_graph.vs.select(type_index=vertex.index):
-                cell_path = container.path + '/' + cell_vertex['label']
+            cell_count = vertex['count']
+            for count in range(cell_count):
+                cell_path = '%s/%s_%d' % (container.path, vertex['label'], count)
                 cell = cell_class(cell_class.prototype, cell_path)
-                self.vertex_cell_map[cell_vertex.index] = cell
-                # config.LOGGER.debug('Created %s' % (cell.path))
-        # Connect the edges - as synapses
+                self.type_cell_map[vertex['label']].append(cell)
         start1 = datetime.now()
+        delta = start1 - start
+        config.BENCHMARK_LOGGER.info('Time to create cells: %g' % (delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
+        # Connect the edges - as synapses
+            
         for edge in self.__cell_graph.es:
             source = edge.source
             target = edge.target
