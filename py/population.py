@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 18 22:00:46 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Oct  7 17:26:12 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 774
+# Last-Updated: Mon Oct 11 11:26:25 2010 (+0530)
+#           By: subha
+#     Update #: 780
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -100,7 +100,7 @@ class Population(moose.Neutral):
         TraubCell.adjust_chanlib(cell_class.chan_params)
         if prefix is None:
             prefix = self.cell_type
-        for number in range(cell_count):
+        for number in range(int(cell_count)):
             cell_name = '%s_%d' % (prefix, number)
             cell_instance = cell_class(cell_class.prototype, self.path + '/' + cell_name)
             self.cell_list.append(cell_instance)
@@ -121,7 +121,7 @@ class Population(moose.Neutral):
         config.LOGGER.debug(__name__ + ' starting')
         start = datetime.now()
         connection_map = self.get_connection_map()
-        config.LOGGER.debug('Connecting %s to %s' % (self.cell_type, target.cell_type)) 
+        # config.LOGGER.debug('Connecting %s to %s' % (self.cell_type, target.cell_type)) 
         num_pre_per_post = connection_map[self.cell_type][target.cell_type]
         self.conn_map[target] = numpy.zeros((len(target.cell_list), num_pre_per_post, 2), dtype=int)
         # This gets a 2_D matrix whose row[i] is the array of indices
@@ -160,7 +160,7 @@ class Population(moose.Neutral):
                 post_syn_comp_index = target_comp_list[jj]
                 post_syn_comp = postcell.comp[post_syn_comp_index]
                 pre_syn_comp = precell.comp[self.cell_class.presyn]
-                config.LOGGER.debug('connecting: \t%s \tto \t%s' % (pre_syn_comp.path, post_syn_comp.path))
+                # config.LOGGER.debug('connecting: \t%s \tto \t%s' % (pre_syn_comp.path, post_syn_comp.path))
                 
                 if tau_GABA_fast is not None:
                     if self.cell_type == 'nRT':                    
@@ -200,7 +200,7 @@ class Population(moose.Neutral):
                                                  delay=delay)
                     count = self.syncount[target]['GABA']
                     self.syncount[target]['GABA'] = count + 1
-                    config.LOGGER.debug('%s\tto%s\tGABA' % (pre_syn_comp.path, post_syn_comp.path))
+                    # config.LOGGER.debug('%s\tto%s\tGABA' % (pre_syn_comp.path, post_syn_comp.path))
                 if tau_AMPA is not None:
                     pre_syn_comp.makeSynapse(post_syn_comp, 
                                              name='AMPA', 
@@ -212,7 +212,7 @@ class Population(moose.Neutral):
                                              delay=delay)
                     count = self.syncount[target]['AMPA']
                     self.syncount[target]['AMPA'] = count + 1
-                    config.LOGGER.debug('%s\tto%s\tAMPA' % (pre_syn_comp.path, post_syn_comp.path))
+                    # config.LOGGER.debug('%s\tto%s\tAMPA' % (pre_syn_comp.path, post_syn_comp.path))
                 if tau_NMDA is not None:
                     # TODO: NMDA time course is defined as:
                     # c * g(V, [Mg2+]) * S(t) where c is scaling constant,
@@ -229,7 +229,7 @@ class Population(moose.Neutral):
                                              delay=delay)
                     count = self.syncount[target]['NMDA']
                     self.syncount[target]['NMDA'] = count + 1
-                    config.LOGGER.debug('%s\tto%s\tNMDA' % (pre_syn_comp.path, post_syn_comp.path))
+                    # config.LOGGER.debug('%s\tto%s\tNMDA' % (pre_syn_comp.path, post_syn_comp.path))
 
                 self.conn_map[target][ii][jj][0] = precell_index
                 self.conn_map[target][ii][jj][1] = post_syn_comp_index

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Jan 13 22:33:35 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Oct  7 17:32:57 2010 (+0530)
+# Last-Updated: Mon Oct 11 11:14:54 2010 (+0530)
 #         By: subha
-#    Update #: 611
+#    Update #: 620
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -102,14 +102,15 @@ class Network:
             path = self.sim.model.path + '/' + cell_type
             pop = Population(path, cell_class, count)
             self.population_list.append(pop)
-        
+        start1 = datetime.now()
         for pre_population in self.population_list:
             for post_population in self.population_list:
-                pre_population.connect(post_population)
-                
+                pre_population.connect(post_population)                
         end = datetime.now()
-        delta = end - start
-        config.BENCHMARK_LOGGER.info('time to create all the population: %g' % (delta.seconds + 1e-6 * delta.microseconds))
+        delta = end - start1
+        config.BENCHMARK_LOGGER.info('time to create all the connections: %g' % (delta.days * 86400.0 + delta.seconds + 1e-6 * delta.microseconds))
+        delta = end - start        
+        config.BENCHMARK_LOGGER.info('time to create all the population and connections: %g' % (delta.days * 86400.0 + delta.seconds + 1e-6 * delta.microseconds))
 
 
     def setup_random_recording(self, n=1):

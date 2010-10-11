@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Aug 12 17:04:11 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 100
+# Last-Updated: Mon Oct 11 11:17:14 2010 (+0530)
+#           By: subha
+#     Update #: 103
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -46,6 +46,7 @@
 # Code:
 
 import sys
+import os
 import logging
 import moose
 
@@ -94,7 +95,8 @@ channel_lib = {}
 # Logging
 def handleError(self, record):
     raise
-LOG_FILENAME = 'traub_2005.log'
+
+LOG_FILENAME = 'traub2005_%d.log' % (os.getpid())
 LOG_LEVEL = logging.DEBUG
 logging.Handler.handleError = handleError
 logging.basicConfig(filename=LOG_FILENAME, level=LOG_LEVEL, format='%(asctime)s %(levelname)s %(name)s %(filename)s %(funcName)s: %(message)s', filemode='w')
