@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 18 22:00:46 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Oct 11 11:26:25 2010 (+0530)
+# Last-Updated: Mon Oct 18 16:14:09 2010 (+0530)
 #           By: subha
-#     Update #: 780
+#     Update #: 783
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -160,7 +160,8 @@ class Population(moose.Neutral):
                 post_syn_comp_index = target_comp_list[jj]
                 post_syn_comp = postcell.comp[post_syn_comp_index]
                 pre_syn_comp = precell.comp[self.cell_class.presyn]
-                # config.LOGGER.debug('connecting: \t%s \tto \t%s' % (pre_syn_comp.path, post_syn_comp.path))
+                # The following info print is used later to check the connectivity of interesting cells.
+                config.LOGGER.info('connecting: \t%s \tto \t%s' % (pre_syn_comp.path, post_syn_comp.path))
                 
                 if tau_GABA_fast is not None:
                     if self.cell_type == 'nRT':                    

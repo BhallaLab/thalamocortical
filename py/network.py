@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # network.py --- 
 # 
 # Filename: network.py
@@ -6,9 +7,9 @@
 # Maintainer: 
 # Created: Wed Jan 13 22:33:35 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Oct 11 11:14:54 2010 (+0530)
+# Last-Updated: Mon Oct 18 17:45:30 2010 (+0530)
 #         By: subha
-#    Update #: 620
+#    Update #: 624
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -164,7 +165,7 @@ def test_full_model(simtime, simdt=1e-4, plotdt=1e-3, cell_count=None):
     network.setup_random_recording(0.05) # record from 5% of cells
     sim.schedule(simdt=simdt, plotdt=plotdt, gldt=1e10)
     sim.run(time=simtime)
-    sim.dump_data('data', True)
+    sim.dump_data(config.data_dir, True)
 
 def test_all_cell_type():
     """test-load all different cell type. this is for debugging - as
@@ -180,6 +181,7 @@ def test_all_cell_type():
 import sys
 
 if __name__ == '__main__':
+    config.LOGGER.info('Starting execution with argumentes: %s' % (' '.join(sys.argv)))
     simtime = 50e-3
     if len(sys.argv) > 1:
         simtime = float(sys.argv[1])
