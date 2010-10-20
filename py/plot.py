@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # plot.py --- 
 # 
 # Filename: plot.py
