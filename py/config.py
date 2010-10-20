@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Oct 11 11:17:14 2010 (+0530)
+# Last-Updated: Mon Oct 18 16:34:13 2010 (+0530)
 #           By: subha
-#     Update #: 103
+#     Update #: 113
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -47,8 +47,14 @@
 
 import sys
 import os
+from datetime import datetime
 import logging
 import moose
+
+timestamp = datetime.now()
+data_dir = os.path.join('data', timestamp.strftime('%Y_%m_%d'))
+if not os.access(data_dir, os.F_OK):
+    os.mkdir(data_dir)
 
 context = moose.PyMooseBase.getContext()
 lib = moose.Neutral('/library')
@@ -96,7 +102,7 @@ channel_lib = {}
 def handleError(self, record):
     raise
 
-LOG_FILENAME = 'traub2005_%d.log' % (os.getpid())
+LOG_FILENAME = os.path.join(data_dir, 'traub2005_%d.log' % (os.getpid()))
 LOG_LEVEL = logging.DEBUG
 logging.Handler.handleError = handleError
 logging.basicConfig(filename=LOG_FILENAME, level=LOG_LEVEL, format='%(asctime)s %(levelname)s %(name)s %(filename)s %(funcName)s: %(message)s', filemode='w')
