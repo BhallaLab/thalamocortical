@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Oct 11 17:56:50 2010 (+0530)
+# Last-Updated: Wed Oct 20 22:17:40 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 6
+#     Update #: 72
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -31,6 +31,8 @@
 #    can represent pre-post ratio (no. of presynaptic cell of type
 #    source vertex connecting to each cell of type destination vertex).
 #
+# 2. For analyzing the simulation data, it will be useful to have
+# connectivity information for all relevant cells.
 
 # Change log:
 # 
@@ -56,7 +58,36 @@
 
 # Code:
 
+import config
+import moose
+from collections import defaultdict
+import igraph as ig
 
+
+class Traubnet(object):
+    """Implements the full network in Traub et al 2005 model.
+
+    cell_class -- name of the class of cells contained in this population.
+    
+    cells -- list containing the MOOSE cell objects.
+
+    conn_graphs -- graphs for 
+    """
+    def __init__(self, celltype_file=None, scale=None):
+        self.celltype_graph_file = celltype_file
+        self.cells = None
+        self.scale = scale
+        self.populations = 
+
+    def setup_populations(self):
+        
+    def setup(self):
+        """TODO -- actually setup the connectivity here - maintain a
+        cell-cell connection graph.
+        """
+        
+        
+    
 
 
 # 
