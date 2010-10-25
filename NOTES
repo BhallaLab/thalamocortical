@@ -2360,4 +2360,68 @@ TypeError: sequence elements must be integer pairs
 
   generate cell-cell graph only for pictures. Otherwise generate the network
   straight from the celltype-celltype graph.
-  
+* <2010-10-22 Fri 23:02> Data storage and analysis ... HDF5? 
+** Upi's code
+   Yesterday I had a discussion with Upi and for data analysis and storage he
+   mentioned some code he had written earlier. However I looked around in his
+   home directory but could not find anything that looked like
+   analysis/compression code. 
+   
+   I should refer to his paper and go through the methods.
+
+** My additional plans
+   I was impressed by Ming Jhou Ding's causality based approach and am
+   interested in applying it. I still am picking up the theory of time series
+   analysis that he uses (ARIMA, Spectral Analysis), but should accelerate
+   towards applying them.
+
+** HDF5 and friends
+   In the mean time, I looked at numpy's built-in data saving capabilities and
+   pytables' hdf5 format. They take the same amount of space for simple
+   arrays. However pytables offers the added advantage of structured
+   data. It can be really helpful for organizing the simulation generated data
+   as well as the state.
+
+   However it turns out that numpy/hdf5 compression is not optimal in that it
+   does not compress the numeric data (100000 x 64 bit float take 800
+   KB even if all the entries are same). Obviously, there should be better
+   compression for regular data. Upi also mentioned some code he had written
+   to compress Vm data. However bzip2 does a good job of compressing data with
+   redundancy (an 1.6M npz is compressed to 240K where 50000 entries are
+   linearspaced, 150000 are zeros).
+
+   When using compression filters with a 2x10000 CArray, the size actually
+   increases to 1.7M (opposed to 1.6M uncompressed).
+
+   - I realized that I was making the mistake of not setting complevel
+     parameter to tables.Filters(), which defaulted to 0 (no-compression).
+
+** Discussion with John Jeffereys
+   I had a quick discussion with John Jeffereys after his talk today. He is
+   collaborating with Roger Traub. But he warned against too complex models
+   where the parameter space is not really constrained. 
+
+   I had started with the need for gap junctions to generate gamma
+   osicllations - Traub justified them by the fact that they are required in
+   the mdoel in order to get the gamma oscillation. Of course this is circular
+   logic and John pointed out that it is possible that you cannot rule out the
+   possibility that gamma osicllation could be achieved by tweaking other
+   parameters in the model without introducing gap junction. But he confirmed
+   that interneuron-interneuron gap junctions are very well studied, but not
+   excitatory-excitatory ones.
+
+   Also, the difficulty in tracing gap junctions is that pharmacological
+   agents that can be used for tracking gap junctions are not very specific.
+
+   If in future people can create markers for connexin/pannexin, then there is
+   a possibility. Currently, the evidence for excitatory-excitatory gap
+   junction in very thin: one study found 3 in 3000 cell-pair recordings
+   (reference?). 
+
+   Also, even without gap junctions, there can be field-based electrical
+   coupling between closely located fibres. Our knowledge of gap junctions is
+   quite vague at this point.
+   
+
+   
+   
