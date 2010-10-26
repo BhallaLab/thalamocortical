@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Oct  9 16:32:41 2010 (+0530)
-#           By: subha
-#     Update #: 1100
+# Last-Updated: Wed Oct 27 02:00:55 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 1122
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -48,6 +48,7 @@
 import sys
 import os
 from datetime import datetime
+from collections import defaultdict
 import numpy
 import igraph as ig
 
@@ -597,8 +598,8 @@ class TraubNet(object):
         print self.__celltype_graph.summary()
         end = datetime.now()
         delta = end - start
-        config.BENCHMARK_LOGGER.info('celltype_graph read from file %s in %g' % 
-                                     (celltype_graph_file, delta.seconds + 1e-6 * delta.microseconds))
+        config.BENCHMARK_LOGGER.info('celltype_graph created in %g' % 
+                                     (delta.seconds + 1e-6 * delta.microseconds))
 
         # If ``cell_graph_file`` is specified, then try reading it
         # directly, otherwise generate the cell-cell graph using the
@@ -629,7 +630,7 @@ class TraubNet(object):
         for celltype in graph.vs:
             celltype['label'] = tn.celltype[celltype.index]
             celltype['count'] = tn.cellcount[celltype.index]
-            celltype['start_index'] = start_index
+            celltype['start_ndex'] = start_index
             start_index += celltype['count']
             for posttype in graph.vs:
                 pre_post_ratio = tn.pre_post_ratio[celltype.index][posttype.index]
@@ -637,19 +638,19 @@ class TraubNet(object):
                     graph.add_edges((celltype.index, posttype.index))
                     edge_count += 1
                     graph.es[edge_count-1]['weight'] = pre_post_ratio
-                    graph.es[edge_count-1]['g_ampa'] = tn.g_ampa_baseline[celltype.index][posttype.index]
-                    graph.es[edge_count-1]['g_nmda'] = tn.g_nmda_baseline[celltype.index][posttype.index]
-                    graph.es[edge_count-1]['g_gaba'] = tn.g_gaba_baseline[celltype.index][posttype.index]
-                    graph.es[edge_count-1]['tau_ampa'] = tn.tau_ampa[celltype.index][posttype.index]
-                    graph.es[edge_count-1]['tau_nmda'] = tn.tau_nmda[celltype.index][posttype.index]
-                    graph.es[edge_count-1]['tau_gaba'] = tn.tau_gaba[celltype.index][posttype.index]
-                    graph.es[edge_count-1]['ps_comps'] = str(tn.allowed_comps[celltype.index][posttype.index])
-                    graph.es[edge_count-1]['ek_gaba'] = tn.ek_gaba[posttype.index]
+                    graph.es[edge_count-1]['gampa'] = tn.g_ampa_baseline[celltype.index][posttype.index]
+                    graph.es[edge_count-1]['gnmda'] = tn.g_nmda_baseline[celltype.index][posttype.index]
+                    graph.es[edge_count-1]['ggaba'] = tn.g_gaba_baseline[celltype.index][posttype.index]
+                    graph.es[edge_count-1]['tauampa'] = tn.tau_ampa[celltype.index][posttype.index]
+                    graph.es[edge_count-1]['taunmda'] = tn.tau_nmda[celltype.index][posttype.index]
+                    graph.es[edge_count-1]['taugaba'] = tn.tau_gaba[celltype.index][posttype.index]
+                    graph.es[edge_count-1]['pscomps'] = str(tn.allowed_comps[celltype.index][posttype.index])
+                    graph.es[edge_count-1]['ekgaba'] = tn.ek_gaba[posttype.index]
                     if celltype['label'] == 'nRT':
                         if posttype['label'] == 'TCR':
-                            graph.es[edge_count-1]['tau_gaba_slow'] = tn.nRT_TCR_tau_gaba_slow
+                            graph.es[edge_count-1]['taugabaslow'] = tn.nRT_TCR_tau_gaba_slow
                         elif posttype['label'] == 'nRT':
-                            graph.es[edge_count-1]['tau_gaba_slow'] = tn.nRT_nRT_tau_gaba_slow
+                            graph.es[edge_count-1]['taugabaslow'] = tn.nRT_nRT_tau_gaba_slow
         self.__celltype_graph = graph
         return graph
                             
@@ -685,9 +686,9 @@ class TraubNet(object):
         for celltype in self.__celltype_graph.vs:
             count = int(celltype['count'] * self.scale)
             start_index = len(cell_graph.vs)
-            celltype['start_index'] = start_index
+            celltype['startindex'] = start_index
             cell_graph.add_vertices(count)
-            cell_graph.vs[start_index: start_index + count]['type_index'] = [celltype.index] * count
+            cell_graph.vs[start_index: start_index + count]['typeindex'] = [celltype.index] * count
             cell_graph.vs[start_index: start_index + count]['label'] = ['%s_%d' % (celltype['label'], index) for index in range(count)]
             cell_class = eval(celltype['label'])
             for num in range(count):
@@ -717,12 +718,12 @@ class TraubNet(object):
             post = edge.target
             pre_celltype = self.__celltype_graph.vs[pre]
             post_celltype = self.__celltype_graph.vs[post]
-            pre_start_index = pre_celltype['start_index']
-            post_start_index = post_celltype['start_index']
+            pre_start_index = pre_celltype['startindex']
+            post_start_index = post_celltype['startindex']
             pre_count = int(pre_celltype['count'] * self.scale)
             post_count = int(post_celltype['count'] * self.scale)
             pre_post_ratio = edge['weight']
-            ps_comps = numpy.array(eval(edge['ps_comps']), dtype=int)
+            ps_comps = numpy.array(eval(edge['pscomps']), dtype=int)
             config.LOGGER.debug('Connecting populations: pre - %s(%d), post - %s(%d), pre_post_ratio - %d' % (pre_celltype['label'], pre_count, post_celltype['label'], post_count, pre_post_ratio))
             if (pre_post_ratio == 0) or (len(ps_comps) == 0):
                 continue
@@ -744,21 +745,21 @@ class TraubNet(object):
             new_edges = cell_graph.es.select(range(edge_start, edge_start+new_edge_count))
             new_edges['pretype'] = [pre_celltype['label']] * new_edge_count
             new_edges['posttype'] = [post_celltype['label']] * new_edge_count
-            new_edges['ps_comp'] = post_comp_indices.flatten()
-            new_edges['tau_ampa'] = [edge['tau_ampa'] ] * new_edge_count
-            new_edges['g_ampa'] = [edge['g_ampa']] * new_edge_count
-            new_edges['tau_nmda'] = [edge['tau_nmda']] * new_edge_count
-            new_edges['g_nmda'] = [edge['g_nmda']] * new_edge_count
-            new_edges['tau_gaba'] = [edge['tau_gaba']] * new_edge_count
+            new_edges['pscomp'] = post_comp_indices.flatten()
+            new_edges['tauampa'] = [edge['tauampa'] ] * new_edge_count
+            new_edges['gampa'] = [edge['gampa']] * new_edge_count
+            new_edges['taunmda'] = [edge['taunmda']] * new_edge_count
+            new_edges['gnmda'] = [edge['gnmda']] * new_edge_count
+            new_edges['taugaba'] = [edge['taugaba']] * new_edge_count
             # nRT->TCR and nRT->nRT GABA-ergic synapses have a slow component
             if pre_celltype['label'] == 'nRT' and ( post_celltype['label'] == 'TCR' or post_celltype['label'] == 'nRT' ):
-                new_edges['tau_gaba_slow'] = [edge['tau_gaba_slow']] * new_edge_count
+                new_edges['taugabaslow'] = [edge['taugabaslow']] * new_edge_count
             # nRT->TCR GABA-ergic synapses are a special case as the baseline conductance is uniformly distributed between 0.7 and 2.1 nS.
             if  pre_celltype['label'] == 'nRT' and post_celltype['label'] == 'TCR':
                 g_gaba = numpy.random.random_sample(new_edge_count) * (self.nRT_g_gaba_high - self.nRT_g_gaba_low) + self.nRT_g_gaba_low
             else:
-                g_gaba = [edge['g_gaba']] * new_edge_count
-            new_edges['g_gaba'] = g_gaba
+                g_gaba = [edge['ggaba']] * new_edge_count
+            new_edges['ggaba'] = g_gaba
         print 'Edges:', edge_count
         end = datetime.now()
         delta = end - start
@@ -835,8 +836,8 @@ class TraubNet(object):
             pre_cell = self.vertex_cell_map[source]
             post_cell = self.vertex_cell_map[target]
             source_comp = pre_cell.comp[pre_cell.presyn]
-            target_comp = post_cell.comp[edge['ps_comp']]
-            g_ampa = edge['g_ampa']
+            target_comp = post_cell.comp[edge['pscomp']]
+            g_ampa = edge['gampa']
             if g_ampa > 0.0 and not numpy.allclose(0.0, g_ampa):
                 pass
                 # source_comp.makeSynapse(target_comp, name='ampa',
@@ -844,7 +845,7 @@ class TraubNet(object):
                 #                         Gbar=g_ampa,
                 #                         tau1=0.0,
                 #                         tau2=edge['tau_ampa'])
-            g_nmda = edge['g_nmda']
+            g_nmda = edge['gnmda']
             if g_nmda > 0.0 and not numpy.allclose(0.0, g_nmda):
                 pass
                 # source_comp.makeSynapse(target_comp, classname='NMDAChan', 
@@ -852,9 +853,9 @@ class TraubNet(object):
                 #                         Ek=edge['ek_nmda'],
                 #                         tau1=edge['tau_nmda'],
                 #                         tau2=5e-3)
-            g_gaba = edge['g_gaba']
+            g_gaba = edge['ggaba']
             if g_gaba > 0.0 and not numpy.allclose(0.0, g_gaba):
-                tau_gaba_slow = edge['tau_gaba_slow']
+                tau_gaba_slow = edge['taugabaslow']
                 if tau_gaba_slow > 0.0:
                     pass
                     # if not numpy.allclose(0.0, tau_gaba_slow):
@@ -880,7 +881,7 @@ class TraubNet(object):
     def run(self, time):
         self.sim = Simulation('traub2005')
         self.generate_celltype_graph()
-        self.generate_cell_graph()
+        # self.generate_cell_graph()
         for handler in config.LOGGER.handlers:
             handler.flush()
         for handler in config.BENCHMARK_LOGGER.handlers:
@@ -919,6 +920,7 @@ if __name__ == '__main__':
         scale = float(sys.argv[1])
     # network = TraubNet('nx_celltype_graph.gml', scale=scale)
     network = TraubNet(None, scale=scale)
+
     network.run(1.0)
     network.save_celltype_graph('celltype_graph.gml', format='gml')
     network.save_cell_graph('cell_graph.gml', format='gml')
