@@ -2425,3 +2425,7 @@ TypeError: sequence elements must be integer pairs
 
    
    
+* <2010-10-27 Wed 01:58> Passed test for trbnet.py::celltype_graph
+  Just finished writing the test and fixed all issues with attributes(keys) in
+  GML specification (where underscore is illegal). Generated celltype graph
+  passes the comparison with that generated bu ig_traubnet.py.

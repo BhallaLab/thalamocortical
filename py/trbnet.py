@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Oct 21 17:23:17 2010 (+0530)
+# Last-Updated: Wed Oct 27 01:58:04 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 224
+#     Update #: 373
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -32,10 +32,26 @@
 #    source vertex connecting to each cell of type destination vertex).
 #
 # 2. For analyzing the simulation data, it will be useful to have
-# connectivity information for all relevant cells.
+#    connectivity information for all relevant cells.
+#
+# 3. Decided to use HDF5 for data.  Need a clean way to associate
+#    results of simulation with the model instance that was used. For
+#    each cell's spike data, it should be possible to go back to the
+#    model and see what was the connectivity for this cell. Thus model
+#    is part of the data.
+#
+# 4. I tried to write some test code: but I realized midway that this
+#    is rather circular. I am generating the graph using manually
+#    entered data (TraubFullNetData). I am trying to validate the
+#    celltype-graph against the celltype graph I generated earlier. So
+#    if there is an error it will keep propagating. The only
+#    reasonable test is manual check.
+#
 
 # Change log:
-# 
+#
+# 2010-10-26 14:13:00 (+0530) finished implementation of methods
+# _generate_celltype_graph and _read_celltype_graph
 # 
 # 
 # 
@@ -78,7 +94,8 @@ from nRT import nRT
 # class Population(object):
 #     """Class to implement a homogeneous population"""
 
-class Traubnet(object):
+
+class TraubNet(object):
     """Implements the full network in Traub et al 2005 model.
 
     celltype_file -- A file containing the celltype-celltype-graph.
@@ -118,20 +135,25 @@ class Traubnet(object):
             self.scale = 1.0
         if format is not None:
             self.format = format
-        self.setup()
+        self._generate_celltype_graph()
                 
     def setup(self):
+        """Set up the master graph.
+        """
         if self.celltype_file is None:
             config.LOGGER.info('Setting up network from predefined structure with full network information.')
-            self._setup_from_data()
+            self._generate_celltype_graph()
         else:
-            self._setup_from_file()
+            self._read_celltype_graph()
         
-    def _setup_from_data(self):
-        self.net_data = TraubFullNetData()
-        
+    def _generate_celltype_graph(self):
+        """Generate the celltype-graph as in Traub model (without the
+        gapjunctions at this point).
 
-    def _generate_full_celltype_graph(self, scale=1.0):
+        The generated graph will be manipulated to control the model
+        to be instantiated.
+
+        """
         tn = TraubFullNetData()
         self.celltype_graph = ig.Graph(0, directed=True)
         self.celltype_graph.add_vertices(len(tn.celltype))
@@ -147,23 +169,63 @@ class Traubnet(object):
                 if pre_post_ratio > 0:
                     self.celltype_graph.add_edges((celltype.index, posttype.index))
                     self.celltype_graph.es[edge_count]['weight'] = 1.0 * pre_post_ratio / celltype['count']
-                    self.celltype_graph.es[edge_count]['g_ampa'] = tn.g_ampa_baseline[celltype.index][posttype.index]
-                    self.celltype_graph.es[edge_count]['g_nmda'] = tn.g_nmda_baseline[celltype.index][posttype.index]
-                    self.celltype_graph.es[edge_count]['tau_ampa'] = tn.tau_ampa[celltype.index][posttype.index]
-                    self.celltype_graph.es[edge_count]['tau_nmda'] = tn.tau_nmda[celltype.index][posttype.index]
-                    self.celltype_graph.es[edge_count]['tau_gaba'] = tn.tau_gaba[celltype.index][posttype.index]
-                    self.celltype_graph.es[edge_count]['ps_comps'] = str(tn.allowed_comps[celltype.index][posttype.index])
-                    self.celltype_graph.es[edge_count]['ek_gaba'] = tn.ek_gaba[posttype.index]
+                    self.celltype_graph.es[edge_count]['gampa'] = tn.g_ampa_baseline[celltype.index][posttype.index]
+                    self.celltype_graph.es[edge_count]['gnmda'] = tn.g_nmda_baseline[celltype.index][posttype.index]
+                    self.celltype_graph.es[edge_count]['tauampa'] = tn.tau_ampa[celltype.index][posttype.index]
+                    self.celltype_graph.es[edge_count]['taunmda'] = tn.tau_nmda[celltype.index][posttype.index]
+                    self.celltype_graph.es[edge_count]['taugaba'] = tn.tau_gaba[celltype.index][posttype.index]
+                    self.celltype_graph.es[edge_count]['pscomps'] = str(tn.allowed_comps[celltype.index][posttype.index])
+                    self.celltype_graph.es[edge_count]['ekgaba'] = tn.ek_gaba[posttype.index]
                     if celltype['label'] == 'nRT':
                         if posttype['label'] == 'TCR':
-                            self.celltype_graph.es[edge_count]['tau_gaba_slow'] = tn.nRT_TCR_tau_gaba_slow
+                            self.celltype_graph.es[edge_count]['taugabaslow'] = tn.nRT_TCR_tau_gaba_slow
                         elif posttype['label'] == 'nRT':
-                            self.celltype_graph.es[edge_count]['tau_gaba_slow'] = tn.nRT_nRT_tau_gaba_slow
-                            self.celltype_graph.es[edge_count]['g_gaba'] = 'uniform(%f, %f)' % (tn.nRT_g_gaba_low, tn.nRT_g_gaba_high)
-                    
+                            self.celltype_graph.es[edge_count]['taugabaslow'] = tn.nRT_nRT_tau_gaba_slow
+                            self.celltype_graph.es[edge_count]['ggaba'] = 'uniform %f %f' % (tn.nRT_g_gaba_low, tn.nRT_g_gaba_high) # How to specify distribution?
+                    else:
+                        self.celltype_graph.es[edge_count]['ggaba'] = tn.g_gaba_baseline[celltype.index][posttype.index]
                     edge_count += 1
                     
-                    
+    def _read_celltype_graph(self):
+        """
+        read the celltype graph from a graph file.
+        """
+        self.celltype_graph = ig.read(self.celltype_file, format=self.graph_format)
 
+    def test_generate_celltype_graph(self, celltype_file='celltype_graph.gml', format='gml'):
+        celltype_graph = ig.read(celltype_file, format=format)
+        self._generate_celltype_graph()
+        for vertex in self.celltype_graph.vs:
+            original_vertex = celltype_graph.vs.select(label_eq=vertex['label'])
+            assert original_vertex 
+            assert original_vertex[0]['count'] == vertex['count']
+
+        for edge in self.celltype_graph.es:
+            source = self.celltype_graph.vs[edge.source]
+            target = self.celltype_graph.vs[edge.target]
+            original_source = celltype_graph.vs.select(label_eq=source['label'])
+            original_target = celltype_graph.vs.select(label_eq=target['label'])
+            original_edge_id = celltype_graph.get_eid(original_source[0].index, original_target[0].index)
+            original_edge = celltype_graph.es[original_edge_id]
+            assert int(edge['weight'] * source['count']) == original_edge['weight']
+            assert edge['gampa'] == original_edge['gampa']
+            assert edge['gnmda'] == original_edge['gnmda']
+            assert edge['tauampa'] == original_edge['tauampa']
+            assert edge['taunmda'] == original_edge['taunmda']
+            assert edge['taugaba'] == original_edge['taugaba']
+            assert edge['pscomps'] == original_edge['pscomps']
+            assert edge['ekgaba'] == original_edge['ekgaba']
+            if source['label'] == 'nRT' and target['label'] == 'TCR':
+                assert edge['taugabaslow'] == original_edge['taugabaslow']
+            
+            
+                
+        
+
+if __name__ == '__main__':
+    network = TraubNet()
+    # network.setup()
+    network.test_generate_celltype_graph()
+    
 # 
 # trbnet.py ends here
