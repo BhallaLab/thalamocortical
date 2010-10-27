@@ -1,15 +1,15 @@
 #!/usr/bin/env python
-# ig_traubnet.py --- 
+# trbnetdata.py --- 
 # 
-# Filename: ig_traubnet.py
+# Filename: trbnetdata.py
 # Description: 
 # Author: Subhasis Ray
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Oct 27 09:42:25 2010 (+0530)
+# Last-Updated: Wed Oct 27 01:21:11 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1123
+#     Update #: 1108
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -48,34 +48,16 @@
 import sys
 import os
 from datetime import datetime
-from collections import defaultdict
 import numpy
 import igraph as ig
 
 import moose
-from simulation import Simulation
-
 import config
 # synapse.py is imported for checking against the older version of the synaptic data.
 import synapse
 # allowedcomp is imported for verification with older data structure only
 import allowedcomp
 
-# The cell classes
-from spinystellate import SpinyStellate
-from suppyrRS import SupPyrRS
-from suppyrFRB import SupPyrFRB
-from supbasket import SupBasket
-from supaxoaxonic import SupAxoaxonic
-from supLTS import SupLTS
-from tuftedIB import TuftedIB
-from deepbasket import DeepBasket
-from deepaxoaxonic import DeepAxoaxonic
-from deepLTS import DeepLTS
-from tuftedRS import TuftedRS
-from nontuftedRS import NontuftedRS
-from tcr import TCR
-from nRT import nRT
 
 
 class TraubFullNetData(object):
@@ -161,7 +143,7 @@ class TraubFullNetData(object):
                          [   2.0e-3,    2.0e-3,  1.0e-3,  1.0e-3,    0.0, 2.0e-3, 2.0e-3, 2.0e-3,   1.0e-3,   1.0e-3,     0.0,    2.0e-3,    0.0, 2.0e-3],
                          [      0.0,       0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,      0.0,      0.0,     0.0,       0.0,    0.0,    0.0]]
 
-        # tau_nmda[suppyrrs][suppyrrs] = 130.0 ms according to paper, but 130.5 ms in code
+        # ta_nmda[suppyrrs][suppyrrs] = 130.0 ms according to paper, but 130.5 ms in code
         self.tau_nmda = [[ 130.5e-3,    130e-3,  100e-3,  100e-3, 100e-3, 130e-3, 130e-3, 130e-3,   100e-3,   100e-3,   100e-3,    130e-3,    0.0,    0.0],
                          [ 130.0e-3,    130e-3,  100e-3,  100e-3, 100e-3, 130e-3, 130e-3, 130e-3,   100e-3,   100e-3,   100e-3,    130e-3,    0.0,    0.0],
                          [      0.0,       0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,      0.0,      0.0,      0.0,       0.0,    0.0,    0.0],
@@ -459,7 +441,9 @@ class TraubFullNetData(object):
             ]
         # ek_gaba depends only on the postsynaptic cell. ek_gaba[i] is for post synaptic cell of type celltype[i]
         self.ek_gaba = [-81e-3, -81e-3, -75e-3, -75e-3, -75e-3, -75e-3, -75e-3, -75e-3, -75e-3, -75e-3, -75e-3, -75e-3, -81e-3, -75e-3]
-
+        # nRT->nRT GABAergic connections are taken from a unform random distribution between 0.7 nS and 2.1 nS.
+        self.nRT_g_gaba_high = 2.1e-9
+        self.nRT_g_gaba_low = 0.7e-9
         
     def check_pre_post_ratio(self):
         """Check the pre-post ratio for each celltype pair"""
@@ -568,364 +552,6 @@ class TraubFullNetData(object):
         
         
 
-class TraubNet(object):
-    def __init__(self, celltype_graph_file, cell_graph_file=None, format='gml', scale=1.0):
-        """scale -- specifies the scale by which the cell count and
-        edgecount should be multiplied when generating cell-cell
-        graph.
-        
-        """
-        self.celltype_graph_file = celltype_graph_file
-        self.cell_graph_file = cell_graph_file
-        self.format = format
-        self.scale = scale
-        self.nRT_g_gaba_high = 2.1e-9
-        self.nRT_g_gaba_low = 0.7e-9
-        self.__celltype_graph = None
-        self.__cell_graph = None
-        self.vertex_cell_map = {}
-        self.type_cell_map = defaultdict(list)
-
-    def load_cell_graph(self):
-        self.__cell_graph = ig.read(self.cell_graph_file, format=self.format)
-
-    def setup(self):
-        start = datetime.now()
-        if self.celltype_graph_file is None:
-            self.generate_celltype_graph()
-        else:
-            self.__celltype_graph = ig.read(self.celltype_graph_file, format=self.format)
-        print self.__celltype_graph.summary()
-        end = datetime.now()
-        delta = end - start
-        config.BENCHMARK_LOGGER.info('celltype_graph created in %g' % 
-                                     (delta.seconds + 1e-6 * delta.microseconds))
-
-        # If ``cell_graph_file`` is specified, then try reading it
-        # directly, otherwise generate the cell-cell graph using the
-        # celltype-graph.  
-
-        if self.cell_graph_file is not None:
-            self.scale = 1.0
-            start = datetime.now()
-            self.__cell_graph = ig.read(cell_graph_file, format=format)
-            end = datetime.now()
-            delta = end - start
-            config.BENCHMARK_LOGGER.info('cell_graph read from file %s in %g' % (cell_graph_file, delta.seconds + 1e-6 * delta.microseconds))
-        else:
-            self.generate_cell_graph()
-        # Default rescaling - as described in the paper
-
-        print self.__cell_graph.summary()
-
-
-    def generate_celltype_graph(self):
-        """Generate the celltype connectivity graph from hardcoded TraubFullNetData object."""
-        tn = TraubFullNetData()
-        self._netdata = tn
-        graph = ig.Graph(0, directed=True)
-        graph.add_vertices(len(tn.celltype))
-        edge_count = 0
-        start_index = 0
-        for celltype in graph.vs:
-            celltype['label'] = tn.celltype[celltype.index]
-            celltype['count'] = tn.cellcount[celltype.index]
-            celltype['start_ndex'] = start_index
-            start_index += celltype['count']
-            for posttype in graph.vs:
-                pre_post_ratio = tn.pre_post_ratio[celltype.index][posttype.index]
-                if pre_post_ratio > 0:
-                    graph.add_edges((celltype.index, posttype.index))
-                    edge_count += 1
-                    graph.es[edge_count-1]['weight'] = pre_post_ratio
-                    graph.es[edge_count-1]['gampa'] = tn.g_ampa_baseline[celltype.index][posttype.index]
-                    graph.es[edge_count-1]['gnmda'] = tn.g_nmda_baseline[celltype.index][posttype.index]
-                    graph.es[edge_count-1]['ggaba'] = tn.g_gaba_baseline[celltype.index][posttype.index]
-                    graph.es[edge_count-1]['tauampa'] = tn.tau_ampa[celltype.index][posttype.index]
-                    graph.es[edge_count-1]['taunmda'] = tn.tau_nmda[celltype.index][posttype.index]
-                    graph.es[edge_count-1]['taugaba'] = tn.tau_gaba[celltype.index][posttype.index]
-                    graph.es[edge_count-1]['pscomps'] = str(tn.allowed_comps[celltype.index][posttype.index])
-                    graph.es[edge_count-1]['ekgaba'] = tn.ek_gaba[posttype.index]
-                    if celltype['label'] == 'nRT':
-                        if posttype['label'] == 'TCR':
-                            graph.es[edge_count-1]['taugabaslow'] = tn.nRT_TCR_tau_gaba_slow
-                        elif posttype['label'] == 'nRT':
-                            graph.es[edge_count-1]['taugabaslow'] = tn.nRT_nRT_tau_gaba_slow
-        self.__celltype_graph = graph
-        return graph
-                            
-            
-            
-    def generate_cell_graph(self, container):
-        """generate the cell-cell graph from the celltype graph.
-
-        container -- model container for the moose model.
-
-        """
-
-        # * Idea: How can we specify the rules of generating cell-cell
-        # graph in the celltype-graph itself?
-        #       Right now, the code implicitly reflects my prior 
-        # knowledge of the network from reading of the paper. But 
-        # what about a general rule based network?
-
-        start = datetime.now()
-        
-        if isinstace(container, str):
-            container = moose.Neutral(container)
-        else:
-            assert isinstance(container, moose.PyMooseBase)
-        # ``cell_graph`` is generated from the celltype_graph.  We
-        # scale the number of cells of each type by ``scale`` and for
-        # each celltype, set the ``start_index`` specifying the index
-        # of the first vertex of this celltype in vertex sequence of
-        # the cell-graph. ``start_index`` attribute is used when
-        # adding the edges.
-
-        cell_graph = ig.Graph(0, directed=True)
-        for celltype in self.__celltype_graph.vs:
-            count = int(celltype['count'] * self.scale)
-            start_index = len(cell_graph.vs)
-            celltype['startindex'] = start_index
-            cell_graph.add_vertices(count)
-            cell_graph.vs[start_index: start_index + count]['typeindex'] = [celltype.index] * count
-            cell_graph.vs[start_index: start_index + count]['label'] = ['%s_%d' % (celltype['label'], index) for index in range(count)]
-            cell_class = eval(celltype['label'])
-            for num in range(count):
-                cell = cell_class(cell_class.prototype, '%s/%s_%d' % (container.path, celltype['label'], num))
-                self.vertex_cell_map[start_index + num] = cell
-                self.type_cell_map[celltype['label']].append(cell)
-                
-
-        # Adding the edges is the tricky bit and this is the most
-        # important part of the network definition.  
-
-        # The connectivity in the model is described in terms of the
-        # number of presynaptic cells per post synaptic cell. This
-        # information is saved as the edge weights of the
-        # ``celltype_graph``. We call this ``pre_post_ratio``. For
-        # each edge in the ``celltype_graph``, we add a set of edges
-        # from the vertex sequence for the presynaptic cells to each
-        # post-synaptic cell. For each post-synaptic cell, we select
-        # randomly ``pre_post_ratio`` no. of indices which fall within
-        # the range of vertex indices for the presynaptic cell
-        # (``start_index`` to ``start_index + count``). Moreover, for
-        # each such edge, we select a random compartment no. from the
-        # list of allowed compartments on the post-synaptic cell.
-        edge_count = 0
-        for edge in self.__celltype_graph.es:
-            pre = edge.source
-            post = edge.target
-            pre_celltype = self.__celltype_graph.vs[pre]
-            post_celltype = self.__celltype_graph.vs[post]
-            pre_start_index = pre_celltype['startindex']
-            post_start_index = post_celltype['startindex']
-            pre_count = int(pre_celltype['count'] * self.scale)
-            post_count = int(post_celltype['count'] * self.scale)
-            pre_post_ratio = edge['weight']
-            ps_comps = numpy.array(eval(edge['pscomps']), dtype=int)
-            config.LOGGER.debug('Connecting populations: pre - %s(%d), post - %s(%d), pre_post_ratio - %d' % (pre_celltype['label'], pre_count, post_celltype['label'], post_count, pre_post_ratio))
-            if (pre_post_ratio == 0) or (len(ps_comps) == 0):
-                continue
-            pre_cell_indices = numpy.random.randint(low=pre_start_index, 
-                                                    high=(pre_start_index + pre_count), 
-                                                    size=(post_count, pre_post_ratio))
-            post_comp_indices = numpy.random.randint(low=0, 
-                                                     high=len(ps_comps), 
-                                                     size=(post_count, pre_post_ratio))
-
-            edge_list = [(int(pre_cell_index), post_cell_index + post_start_index) 
-                         for post_cell_index in range(post_count)
-                         for pre_cell_index in pre_cell_indices[post_cell_index]]            
-
-            edge_start = len(cell_graph.es)
-            new_edge_count = len(edge_list)
-            edge_count += new_edge_count
-            cell_graph.add_edges(edge_list)
-            new_edges = cell_graph.es.select(range(edge_start, edge_start+new_edge_count))
-            new_edges['pretype'] = [pre_celltype['label']] * new_edge_count
-            new_edges['posttype'] = [post_celltype['label']] * new_edge_count
-            new_edges['pscomp'] = post_comp_indices.flatten()
-            new_edges['tauampa'] = [edge['tauampa'] ] * new_edge_count
-            new_edges['gampa'] = [edge['gampa']] * new_edge_count
-            new_edges['taunmda'] = [edge['taunmda']] * new_edge_count
-            new_edges['gnmda'] = [edge['gnmda']] * new_edge_count
-            new_edges['taugaba'] = [edge['taugaba']] * new_edge_count
-            # nRT->TCR and nRT->nRT GABA-ergic synapses have a slow component
-            if pre_celltype['label'] == 'nRT' and ( post_celltype['label'] == 'TCR' or post_celltype['label'] == 'nRT' ):
-                new_edges['taugabaslow'] = [edge['taugabaslow']] * new_edge_count
-            # nRT->TCR GABA-ergic synapses are a special case as the baseline conductance is uniformly distributed between 0.7 and 2.1 nS.
-            if  pre_celltype['label'] == 'nRT' and post_celltype['label'] == 'TCR':
-                g_gaba = numpy.random.random_sample(new_edge_count) * (self.nRT_g_gaba_high - self.nRT_g_gaba_low) + self.nRT_g_gaba_low
-            else:
-                g_gaba = [edge['ggaba']] * new_edge_count
-            new_edges['ggaba'] = g_gaba
-        print 'Edges:', edge_count
-        end = datetime.now()
-        delta = end - start
-        config.BENCHMARK_LOGGER.info('Cellgraph generated in %g s' % (delta.seconds + 1e-6 * delta.microseconds))
-        self.__cell_graph = cell_graph
-        return cell_graph
-
-    def save_celltype_graph(self, filename, format=None):
-        ig.write(self.__celltype_graph, filename, format=format)
-    
-    def save_cell_graph(self, filename, format=None):
-        ig.write(self.__cell_graph, filename, format)
-
-    def rescale_syn_conductance(self, pretype, posttype, conductance_type, scale_factor):
-        """Rescale the conductance for synaptic conductance of
-        conductance_type between pretype and posttype cells.
-
-        pretype -- label of presynaptic celltype - can be a list
-
-        posttype -- label of postsynaptic celltype - can be a list same in length as pretype
-
-        conductance_type -- key for the specific conductance between pre and post type, e.g. 'g_gaba' - can be a list of such keys.
-
-        scale_factor -- factor by which the conductance should be multiplied
-
-        """
-        if isinstance(pretype, str):
-            if isinstance(posttype, str):
-                pretype = [pretype]
-                posttype = [posttype]
-            else:
-                raise Exception('Both pretype and posttype must be either string or lists of same size.')
-        if isinstance(conductance_type, str):
-            conductance_type = [conductance_type]
-        assert len(pretype) == len(posttype)
-        for index in range(len(pretype)):
-            for edge in self.__cell_graph.es.select(pretype=pretype[index]).select(posttype=posttype[index]):
-                for conductance_name in conductance_type:
-                    edge[conductance_name] *= scale_factor
-            
-    def setup_model(self, container):
-        """
-        setup the actual MOOSE model from the cell_graph.
-        
-        container -- container for the cells in the network.
-        """
-        for handler in config.LOGGER.handlers:
-            handler.flush()
-        if self.__cell_graph is None:
-            raise Exception('cell_graph is empty. First call generate_celltype_graph and generate_cell_graph to instantiate it.')
-        start = datetime.now()
-        if isinstance(container, str):
-            if not config.context.exists(container):
-                container = moose.Neutral(container)
-        else:
-            if not isinstance(container, moose.PyMooseBase):
-                raise Exception('Container must be a MOOSE object.')
-
-        for vertex in self.__celltype_graph.vs:
-            cell_class = eval(vertex['label'])
-            cell_count = vertex['count']
-            for count in range(cell_count):
-                cell_path = '%s/%s_%d' % (container.path, vertex['label'], count)
-                cell = cell_class(cell_class.prototype, cell_path)
-                self.type_cell_map[vertex['label']].append(cell)
-        start1 = datetime.now()
-        delta = start1 - start
-        config.BENCHMARK_LOGGER.info('Time to create cells: %g' % (delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
-        # Connect the edges - as synapses
-            
-        for edge in self.__cell_graph.es:
-            source = edge.source
-            target = edge.target
-            pre_cell = self.vertex_cell_map[source]
-            post_cell = self.vertex_cell_map[target]
-            source_comp = pre_cell.comp[pre_cell.presyn]
-            target_comp = post_cell.comp[edge['pscomp']]
-            g_ampa = edge['gampa']
-            if g_ampa > 0.0 and not numpy.allclose(0.0, g_ampa):
-                pass
-                # source_comp.makeSynapse(target_comp, name='ampa',
-                #                         Ek=edge['ek_ampa'],
-                #                         Gbar=g_ampa,
-                #                         tau1=0.0,
-                #                         tau2=edge['tau_ampa'])
-            g_nmda = edge['gnmda']
-            if g_nmda > 0.0 and not numpy.allclose(0.0, g_nmda):
-                pass
-                # source_comp.makeSynapse(target_comp, classname='NMDAChan', 
-                #                         name='nmda',
-                #                         Ek=edge['ek_nmda'],
-                #                         tau1=edge['tau_nmda'],
-                #                         tau2=5e-3)
-            g_gaba = edge['ggaba']
-            if g_gaba > 0.0 and not numpy.allclose(0.0, g_gaba):
-                tau_gaba_slow = edge['taugabaslow']
-                if tau_gaba_slow > 0.0:
-                    pass
-                    # if not numpy.allclose(0.0, tau_gaba_slow):
-                    #     source_comp.makeSynapse(target_comp, name='gaba_slow',
-                    #                             Ek=edge['ek_gaba'],
-                    #                             tau1=tau_gaba_slow)
-                
-                # source_comp.makeSynapse(target_comp, name='gaba',
-                #                             Ek=edge['ek_gaba'],
-                #                             tau1=edge['tau_gaba'])
-        end = datetime.now()
-        delta = end - start1
-        config.BENCHMARK_LOGGER.info('Finished setting up synapse in: %g s' % (delta.seconds + 1e-6 * delta.microseconds))
-        for handler in config.LOGGER.handlers:
-            handler.flush()
-
-        delta = end - start
-        config.BENCHMARK_LOGGER.info('Finished setting up model in: %g s' % (delta.seconds + 1e-6 * delta.microseconds))
-        for handler in config.LOGGER.handlers:
-            handler.flush()
-           
-           
-    def run(self, time):
-        self.sim = Simulation('traub2005')
-        self.generate_celltype_graph()
-        # self.generate_cell_graph()
-        for handler in config.LOGGER.handlers:
-            handler.flush()
-        for handler in config.BENCHMARK_LOGGER.handlers:
-            handler.flush()
-        self.setup_model(self.sim.model)
-        for handler in config.LOGGER.handlers:
-            handler.flush()
-        for handler in config.BENCHMARK_LOGGER.handlers:
-            handler.flush()
-        self.sim.schedule()
-        for handler in config.LOGGER.handlers:
-            handler.flush()
-        for handler in config.BENCHMARK_LOGGER.handlers:
-            handler.flush()
-        self.sim.run(time)
-        for handler in config.LOGGER.handlers:
-            handler.flush()
-        for handler in config.BENCHMARK_LOGGER.handlers:
-            handler.flush()
-
-def testTraubFullNetData():
-    """
-    Do some checks to verify backward compatibility.
-    """
-    tn = TraubFullNetData()
-    print 'check pre_post_ratio:', tn.check_pre_post_ratio()
-    print 'check_tau_ampa:', tn.check_tau_ampa()
-    print 'check_tau_nmda:', tn.check_tau_nmda()
-    print 'check_tau_gaba:', tn.check_tau_gaba()
-    print 'check_allowed_comps:', tn.check_allowed_comps()
-
-if __name__ == '__main__':
-    ## commented out for testing TraubFullNetData
-    scale = 1.0
-    if len(sys.argv) > 1:
-        scale = float(sys.argv[1])
-    # network = TraubNet('nx_celltype_graph.gml', scale=scale)
-    network = TraubNet(None, scale=scale)
-
-    network.run(1.0)
-    network.save_celltype_graph('celltype_graph.gml', format='gml')
-    network.save_cell_graph('cell_graph.gml', format='gml')
-    #! commented out till here for testing TraubFullNetData !
-#    testTraubFullNetData()
 
 # 
-# ig_traubnet.py ends here
+# trbnetdata.py ends here
