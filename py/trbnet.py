@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Oct 27 01:58:04 2010 (+0530)
+# Last-Updated: Fri Oct 29 04:15:59 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 373
+#     Update #: 496
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -40,12 +40,21 @@
 #    model and see what was the connectivity for this cell. Thus model
 #    is part of the data.
 #
-# 4. I tried to write some test code: but I realized midway that this
-#    is rather circular. I am generating the graph using manually
-#    entered data (TraubFullNetData). I am trying to validate the
-#    celltype-graph against the celltype graph I generated earlier. So
-#    if there is an error it will keep propagating. The only
+# 4. Testing: I tried to write some test code: but I realized midway
+#    that this is rather circular. I am generating the graph using
+#    manually entered data (TraubFullNetData). I am trying to validate
+#    the celltype-graph against the celltype graph I generated
+#    earlier. So if there is an error it will keep propagating. The only
 #    reasonable test is manual check.
+#
+# 5. How to save the cell-graph?  After experimenting with
+#    igraph/networkx and gml, graphml, pickle, formats, I tend towards
+#    using simple adjacency matrices/edgelists with hdf5. Thus I can
+#    have one single file for all the data (network info as well as
+#    spikes).
+#
+#    More specifically, I'll save the final(post-scaling) g between
+#    each pair of cells connected through a synapse.
 #
 
 # Change log:
@@ -53,13 +62,16 @@
 # 2010-10-26 14:13:00 (+0530) finished implementation of methods
 # _generate_celltype_graph and _read_celltype_graph
 # 
-# 
-# 
+# 2010-10-27 09:50:17 (+0530) implemented a simple test function to
+# cross verify the celltype graph.
+#
+
 
 # Code:
 
 from collections import defaultdict
 import igraph as ig
+import numpy
 import config
 import moose
 
@@ -185,47 +197,123 @@ class TraubNet(object):
                     else:
                         self.celltype_graph.es[edge_count]['ggaba'] = tn.g_gaba_baseline[celltype.index][posttype.index]
                     edge_count += 1
-                    
+
     def _read_celltype_graph(self):
         """
         read the celltype graph from a graph file.
         """
         self.celltype_graph = ig.read(self.celltype_file, format=self.graph_format)
 
-    def test_generate_celltype_graph(self, celltype_file='celltype_graph.gml', format='gml'):
-        celltype_graph = ig.read(celltype_file, format=format)
-        self._generate_celltype_graph()
+    def scale_populations(self, scale):
+        """Scale the number of cells in each population by a factor."""
+        raise Exception('Not implemented')
+        if self.cell_graph is not None:
+            raise Warning('Cell-graph already instantiated. Cannot rescale.')
         for vertex in self.celltype_graph.vs:
-            original_vertex = celltype_graph.vs.select(label_eq=vertex['label'])
-            assert original_vertex 
-            assert original_vertex[0]['count'] == vertex['count']
+            vertex['count'] *= scale
+    
+    def scale_conductance(self, conductance_name, scale_dict):
+        """Scale a particular synaptic conductance between pairs of celltypes.
 
-        for edge in self.celltype_graph.es:
-            source = self.celltype_graph.vs[edge.source]
-            target = self.celltype_graph.vs[edge.target]
-            original_source = celltype_graph.vs.select(label_eq=source['label'])
-            original_target = celltype_graph.vs.select(label_eq=target['label'])
-            original_edge_id = celltype_graph.get_eid(original_source[0].index, original_target[0].index)
-            original_edge = celltype_graph.es[original_edge_id]
-            assert int(edge['weight'] * source['count']) == original_edge['weight']
-            assert edge['gampa'] == original_edge['gampa']
-            assert edge['gnmda'] == original_edge['gnmda']
-            assert edge['tauampa'] == original_edge['tauampa']
-            assert edge['taunmda'] == original_edge['taunmda']
-            assert edge['taugaba'] == original_edge['taugaba']
-            assert edge['pscomps'] == original_edge['pscomps']
-            assert edge['ekgaba'] == original_edge['ekgaba']
-            if source['label'] == 'nRT' and target['label'] == 'TCR':
-                assert edge['taugabaslow'] == original_edge['taugabaslow']
+        conductance_name -- key for the conductance to be scaled, e.g., 'ggaba'
+
+        scale_dict -- a dict mapping celltype-pairs (pre, post) to scale factor. example:
+                      {('SupPyrRS', 'SpinyStellate'): 0.5,
+                       ('SupPyrFRB', 'SupLTS'): 1.5}
+                       If either member of the tuple is '*', all celltypes are assumed.
+        """
+        for celltype_pair, scale_factor in scale_dict.items():
+            if not isinstance(celltype_pair, tuple): 
+                raise Warning('The keys in the scale_dict must be tuples of celltypes. Got %s of type %s instead' % (str(celltype_pair), type(celltype_pair)))
+            if celltype_pair[0] == '*':
+                pretype_seq = self.celltype_graph.vs
+            else:
+                pretype_seq = self.celltype_graph.vs.select(label_eq=celltype_pair[0])
+            if celltype_pair[1] == '*':
+                posttype_seq = self.celltype_graph.vs
+            else:
+                posttype_seq = self.celltype_graph.vs.select(label_eq=celltype_pair[1])
+            for pretype in pretype_seq:
+                for posttype in posttype_seq:
+                    try:
+                        edge_id = self.celltype_graph.get_eid(pretype.index, posttype.index)
+                        edge = self.celltype_graph.es[edge_id]
+                        if conductance_name in edge.attribute_names():
+                            edge[conductance_name] *= scale_factor
+                    except Exception, e:
+                        pass
+
+    def _instantiate_model(self):
+        raise Exception('TODO: implement this')
+
+def test_generate_celltype_graph(celltype_file='celltype_graph.gml', format='gml'):
+    celltype_graph = ig.read(celltype_file, format=format)
+    trbnet = TraubNet()
+    trbnet._generate_celltype_graph()
+    for vertex in trbnet.celltype_graph.vs:
+        original_vertex = celltype_graph.vs.select(label_eq=vertex['label'])
+        assert original_vertex 
+        assert original_vertex[0]['count'] == vertex['count']
+
+    for edge in trbnet.celltype_graph.es:
+        source = trbnet.celltype_graph.vs[edge.source]
+        target = trbnet.celltype_graph.vs[edge.target]
+        original_source = celltype_graph.vs.select(label_eq=source['label'])
+        original_target = celltype_graph.vs.select(label_eq=target['label'])
+        original_edge_id = celltype_graph.get_eid(original_source[0].index, original_target[0].index)
+        original_edge = celltype_graph.es[original_edge_id]
+        assert int(edge['weight'] * source['count']) == original_edge['weight']
+        assert edge['gampa'] == original_edge['gampa']
+        assert edge['gnmda'] == original_edge['gnmda']
+        assert edge['tauampa'] == original_edge['tauampa']
+        assert edge['taunmda'] == original_edge['taunmda']
+        assert edge['taugaba'] == original_edge['taugaba']
+        assert edge['pscomps'] == original_edge['pscomps']
+        assert edge['ekgaba'] == original_edge['ekgaba']
+        if source['label'] == 'nRT' and target['label'] == 'TCR':
+            assert edge['taugabaslow'] == original_edge['taugabaslow']
             
             
-                
+def test_scale_conductance():
+    netdata = TraubFullNetData()
+    trbnet = TraubNet()
+    trbnet._generate_celltype_graph()
+    scale_dict_ampa = {('*', '*'): 2.0}
+    scale_dict_nmda = {('*', 'SupLTS'): 0.2,
+                       ('*', 'SupBasket'): 0.2,
+                       ('*', 'SupAxoaxonic'): 0.2,
+                       ('*', 'DeepLTS'): 0.2,
+                       ('*', 'DeepBasket'): 0.2,
+                       ('*', 'DeepAxoaxonic'): 0.2,
+                       ('*', 'TCR'): 0.2,
+                       ('*', 'nRT'): 0.2}
+    
+    scale_dict_ampa_ss_low = {('SpinyStellate', 'SpinyStellate'): 0.25/2.0}
+    trbnet.scale_conductance('gampa', scale_dict_ampa)
+    trbnet.scale_conductance('gnmda', scale_dict_nmda)
+    trbnet.scale_conductance('gampa', scale_dict_ampa_ss_low)
+    # TODO: now compare g's for each edge with the expected value
+    for edge in trbnet.celltype_graph.es:
+        source = trbnet.celltype_graph.vs[edge.source]
+        target = trbnet.celltype_graph.vs[edge.target]
+        src_index = netdata.celltype.index(source['label'])
+        tgt_index = netdata.celltype.index(target['label'])
+        gampa_baseline = netdata.g_ampa_baseline[src_index][tgt_index]
+        gnmda_baseline = netdata.g_nmda_baseline[src_index][tgt_index]
+        low_nmda_posttypes = [x[1] for x in scale_dict_nmda.keys()]
+        if source['label'] == 'SpinyStellate' and target['label'] == 'SpinyStellate':
+            assert numpy.allclose([edge['gampa']], [gampa_baseline * 0.25])
+        else:
+            assert numpy.allclose([edge['gampa']], [gampa_baseline * 2.0])
+        if target['label'] in low_nmda_posttypes:
+            assert numpy.allclose([edge['gnmda']], [gnmda_baseline * 0.2])
+        else:
+            assert numpy.allclose([edge['gnmda']], [gnmda_baseline])
+    print 'test_scale_conductance: Successfully tested.'
         
 
 if __name__ == '__main__':
-    network = TraubNet()
-    # network.setup()
-    network.test_generate_celltype_graph()
-    
+    test_generate_celltype_graph()
+    test_scale_conductance()
 # 
 # trbnet.py ends here
