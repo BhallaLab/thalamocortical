@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # config.py --- 
 # 
 # Filename: config.py
@@ -6,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Oct 18 16:34:13 2010 (+0530)
-#           By: subha
-#     Update #: 113
+# Last-Updated: Tue Nov  9 11:52:12 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 148
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -52,10 +53,21 @@ import logging
 import moose
 
 timestamp = datetime.now()
+
+#---------------------------------------------------------------------
+# configuration for saving simulation data
+#---------------------------------------------------------------------
+
 data_dir = os.path.join('data', timestamp.strftime('%Y_%m_%d'))
 if not os.access(data_dir, os.F_OK):
     os.mkdir(data_dir)
 
+filename_suffix = '_%d_%s' % (os.getpid(), timestamp.strftime('%Y%m%d_%H%M%S'))
+DATA_FILENAME = os.path.join(data_dir, 'data%s.hf5' % (filename_suffix))
+MODEL_FILENAME = os.path.join(data_dir, 'network%s.hf5' % (filename_suffix))
+#---------------------------------------------------------------------
+# moose components
+#---------------------------------------------------------------------
 context = moose.PyMooseBase.getContext()
 lib = moose.Neutral('/library')
 root = moose.Neutral("/")
@@ -98,11 +110,13 @@ channel_map = {'AR': 'ar',
 
 channel_lib = {}
 
+#---------------------------------------------------------------------
 # Logging
+#---------------------------------------------------------------------
 def handleError(self, record):
     raise
 
-LOG_FILENAME = os.path.join(data_dir, 'traub2005_%d.log' % (os.getpid()))
+LOG_FILENAME = os.path.join(data_dir, 'traub2005%s.log' % (filename_suffix))
 LOG_LEVEL = logging.DEBUG
 logging.Handler.handleError = handleError
 logging.basicConfig(filename=LOG_FILENAME, level=LOG_LEVEL, format='%(asctime)s %(levelname)s %(name)s %(filename)s %(funcName)s: %(message)s', filemode='w')
@@ -118,6 +132,9 @@ uS = 1e-6 # micro Siemens to Siemens
 ms = 1e-3 # milli second to second
 mV = 1e-3 # milli Volt to Volt
 
+#---------------------------------------------------------------------
+# NEURON 
+#---------------------------------------------------------------------    
 # Locate the neuron binaries
 import subprocess
 neuron_bin = None
