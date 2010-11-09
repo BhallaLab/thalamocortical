@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Oct 29 04:15:59 2010 (+0530)
+# Last-Updated: Tue Nov  9 19:17:28 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 496
+#     Update #: 649
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -65,13 +65,20 @@
 # 2010-10-27 09:50:17 (+0530) implemented a simple test function to
 # cross verify the celltype graph.
 #
-
+# 2010-11-09 17:44:03 (+0530) introduced pysparse module to utilize
+# ll_mat for adjacency matrices for storing /g/.
+# added creation of these matrices as part of generate_cell_graph fn.
+# Updated scale_condunctance to take care of ggaba(nRT->TCR).
 
 # Code:
 
 from collections import defaultdict
+from datetime import datetime
 import igraph as ig
 import numpy
+import tables
+
+from pysparse.spmatrix import ll_mat
 import config
 import moose
 
@@ -106,6 +113,18 @@ from nRT import nRT
 # class Population(object):
 #     """Class to implement a homogeneous population"""
 
+class CellType(tables.IsDescription):
+    """The CellType class is data for each row in the celltype table.
+    name -- human readable name of the celltype
+
+    index -- index of the celltype in the table. Do we need explicit index??
+
+    count -- number of cells of this celltype.
+
+    """
+    name = tables.StringCol(16)
+    index = tables.UInt8Col()
+    count = tables.UInt16Col()
 
 class TraubNet(object):
     """Implements the full network in Traub et al 2005 model.
@@ -119,14 +138,30 @@ class TraubNet(object):
     populations -- a dictionary mapping each cell-class-name to a list
     of cells of that class.
 
+    index_cell_map -- dictionary mapping a global index to a cell instance
+
+    cell_index_map -- dictionary mapping a cell instance to a global index
+
     """
     def __init__(self, celltype_file=None, format=None, scale=None):
+        """
+        celltype_file -- A file containing the celltype-celltype-graph.
+
+        format -- format of the celltype and other graphs to be read or saved.
+
+        scale -- scale factor for all the populations.
+        """
         self.celltype_file = celltype_file
         self.scale = scale
         self.graph_format = format
         self.populations = defaultdict(list)
         self.celltype_graph = None
-        self.cellgraph = None
+        self.cell_graph = None
+        self.g_gaba_mat = None
+        self.g_ampa_mat = None
+        self.g_nmda_mat = None
+        self.index_cell_map = {}
+        self.cell_index_map = {}
     
     def setup_from_celltype_file(self, celltype_file=None, format=None, scale=None):
         """Set up the network from a celltype-celltype graph file.
@@ -135,10 +170,11 @@ class TraubNet(object):
 
         format -- format of the celltype_file
 
-        scale -- scale factor for teh network
+        scale -- scale factor for the network
         """
-        if self.cellgraph is not None:
-            return
+        if self.cell_graph is not None:
+            del self.cell_graph
+            self.cell_graph = None
         if celltype_file is not None:
             self.celltype_file = celltype_file
         if scale is not None:
@@ -169,6 +205,8 @@ class TraubNet(object):
         tn = TraubFullNetData()
         self.celltype_graph = ig.Graph(0, directed=True)
         self.celltype_graph.add_vertices(len(tn.celltype))
+        self.nRT_TCR_ggaba_low = tn.nRT_g_gaba_low
+        self.nRT_TCR_ggaba_high = tn.nRT_g_gaba_high
         edge_count = 0
         start_index = 0
         for celltype in self.celltype_graph.vs:
@@ -203,6 +241,68 @@ class TraubNet(object):
         read the celltype graph from a graph file.
         """
         self.celltype_graph = ig.read(self.celltype_file, format=self.graph_format)
+
+    def _generate_cell_graph(self):
+        start = datetime.now()
+        self.cell_graph = ig.Graph(0, directed=True)
+        total_count = 0
+        
+        for celltype in self.celltype_graph.vs:
+            celltype['startindex'] = total_count
+            cell_count = int(celltype['count'])
+            cell_class = eval(celltype['label'])
+            for ii in range(cell_count):
+                cell = cell_class(cell_class.prototype, '%s/%s_%d' % (self.network_container.path, celltype['label'], ii))
+                self.index_cell_map[total_count + ii] = cell
+                self.cell_index_map[cell.id] = total_count + ii
+            total_count += cell_count
+
+        self.g_gaba_mat = ll_mat(total_count, total_count, 1000000) # 3500 cells, with ~10% connection probability will have ~1e6 nonzero entries
+        self.g_ampa_mat = ll_mat(total_count, total_count, 1000000) # 3500 cells, with ~10% connection probability will have ~1e6 nonzero entries
+        self.g_nmda_mat = ll_mat(total_count, total_count, 1000000) # 3500 cells, with ~10% connection probability will have ~1e6 nonzero entries
+
+        for edge in self.celltype_graph.es:
+            pre = edge.source
+            post = edge.target
+            pretype = self.celltype_graph.vs[pre]
+            posttype = self.celltype_graph.vs[post]
+            prestart = int(pretype['startindex'])
+            poststart = int(posttype['startindex'])
+            precount = int(pretype['count'])
+            postcount = int(posttype['count'])
+            connprob = float(edge['weight'])
+            ps_comps = eval(edge['pscomps'])
+            config.LOGGER.debug('Connecting populations: pre=%s[:%d], post=%s[:%d], probability=%g' % (pretype['label'], posttype['label'], pretype['count'], posttype['count'], connprob))
+            if connprob <= 0 or len(ps_comps) == 0:
+                continue
+            # pre_indices[i] is the array of global indices of the
+            # presynaptic cells connecting to the i-th postsynaptic
+            # cell of posttype.
+            pre_indices = numpy.random.randint(low=prestart, high=prestart+precount, size=(postcount, int(connprob * precount)))
+            # comp_indices[i][j] is the index of the postsynaptic
+            # compartment in ps_comps for i-th postsynaptic
+            # compartment for j-th presynaptic cell connecting to
+            # postsynaptic cell
+            comp_indices = numpy.random.randint(low=0, high=len(ps_comps), size=(postcount, int(connprob * precount)))
+            # syn_list is the list of global index pairs for synapses
+            syn_list = numpy.array([[preindex, postindex + poststart]
+                         for postindex in range(postcount)
+                         for preindex in pre_indices[postindex]],
+                                   dtype='int32')
+            self.g_ampa_mat.put(float(edge['gampa']) * numpy.ones(len(syn_list)),
+                                syn_list[:, 0], syn_list[:,1])
+            self.g_nmda_mat.put(float(edge['gnmda']) * numpy.ones(len(syn_list)),
+                                syn_list[:, 0], syn_list[:,1])
+            if pretype['label'] == 'nRT' and posttype['label'] == 'TCR':
+                self.g_gaba_mat.put(numpy.random.random_sample(len(syn_list)) * (self.nRT_TCR_ggaba_high - self.nRT_TCR_ggaba_low) + self.nRT_TCR_ggaba_low,
+                                    syn_list[:,0],
+                                    syn_list[:,1])
+            else:
+                self.g_gaba_mat.put(float(edge['ggaba']) * numpy.ones(len(syn_list)),
+                                    syn_list[:,0], syn_list[:,1])
+            
+            
+        end = datetime.now()
 
     def scale_populations(self, scale):
         """Scale the number of cells in each population by a factor."""
@@ -239,12 +339,22 @@ class TraubNet(object):
                         edge_id = self.celltype_graph.get_eid(pretype.index, posttype.index)
                         edge = self.celltype_graph.es[edge_id]
                         if conductance_name in edge.attribute_names():
-                            edge[conductance_name] *= scale_factor
+                            if conductance_name == 'ggaba' and pretype['label'] == 'nRT' and posttype['label'] == 'TCR':
+                                self.nRT_TCR_ggaba_low *= scale_factor
+                                self.nRT_TCR_ggaba_high *= scale_factor
+                                edge[conductance_name] = 'uniform %f %f' % (self.nRT_TCR_ggaba_low, self.nRT_TCR_ggaba_high)
+                            else:
+                                edge[conductance_name] *= scale_factor
+
                     except Exception, e:
                         pass
 
     def _instantiate_model(self):
-        raise Exception('TODO: implement this')
+        for pretype in self.celltype_graph.vs:
+            for posttype in self.celltype_graph.vs:                
+                pass
+        raise Exception('TODO: finish implementing this')
+
 
 def test_generate_celltype_graph(celltype_file='celltype_graph.gml', format='gml'):
     celltype_graph = ig.read(celltype_file, format=format)

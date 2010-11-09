@@ -2429,3 +2429,63 @@ TypeError: sequence elements must be integer pairs
   Just finished writing the test and fixed all issues with attributes(keys) in
   GML specification (where underscore is illegal). Generated celltype graph
   passes the comparison with that generated bu ig_traubnet.py.
+
+* <2010-11-08 Mon 16:39> TODO: save network info and data in same file.
+  As noted in my blog, I should save the network connectivity info and the Vm
+  data. One optimization for space could be recording the spike-times.
+
+  But I think recording the Vm and Ca initially is important as I do not have
+  much prior knowledge of the data.
+
+  The following info can be usefule for the model:
+
+  1. celltype-graph data (already built into the code) -- will contain tau
+     values for each synapse type between each pair of populations.
+
+  2. adjacency list for each of:
+     g_gaba
+     g_nmda
+     g_ampa
+
+     The adjacency lists can be essentially a sparse matrices.
+
+  3. Save the Vm(0.0) and diff(Vm) for each cell. This increases the
+     compression efficiency dramatically.
+     
+  Also, as UPI POINTED OUT, A SIMULATION SHOULD FINISH OVERNIGHT. I have to
+  scale my model accordingly.
+* <2010-11-09 Tue 14:55> Saving model and data using PyTables.
+  I am not sure whether I should keep the network info and the data together
+  in the same hdf5 file or separate them into two files.
+
+  Initially I thought keeping them together will add to the integrity of the
+  data as the model and data will be staying together.
+
+  Then I thought the program will write the network to the file before
+  simulation, but will save data at the end of simulation. Thus there should
+  be two files.
+
+  At the end I decided that I should be writing the model and data together at
+  the end of simulation.
+
+  But another point could be to save data as soon as it is generated - do not
+  delay writing till the last moment.
+
+  What datastructure for the network?
+
+  Adjacency lists containing g values between cells.
+
+  But what should be the form of the adjacency list?
+
+  Assign a 32 bit int to each cell.
+
+  leftmost 8 bits for index into celltype list.  rightmost 8 bits for index
+  into poulation list for the same celltype.
+  
+  but if I try to represent it as a sparse matrix (scipy.sparse.lil_matrix?
+  coo_matrix?), the dimension of the matrix will be 2^32 X 2^32. Whereas, if I
+  index all the cells sequentially, it will be 3500 X 3500.
+  coo_matrix does not allow element access. So that is useless.
+  lil_matrix constructor encounters memory error. Thus, I think the fall back
+  is dicts.
+  
