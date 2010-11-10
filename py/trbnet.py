@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Nov  9 19:33:48 2010 (+0530)
+# Last-Updated: Wed Nov 10 10:08:17 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 651
+#     Update #: 654
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -304,6 +304,8 @@ class TraubNet(object):
             
             
         end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('cell-cell network generation in: %g s' % (delta.days * 86400 + delta.seconds + 1e6 * delta.microseconds))
 
     def scale_populations(self, scale):
         """Scale the number of cells in each population by a factor."""
