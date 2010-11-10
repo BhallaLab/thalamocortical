@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Nov  9 19:17:28 2010 (+0530)
+# Last-Updated: Tue Nov  9 19:33:48 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 649
+#     Update #: 651
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -78,7 +78,7 @@ import igraph as ig
 import numpy
 import tables
 
-from pysparse.spmatrix import ll_mat
+from pysparse.sparse.spmatrix import ll_mat
 import config
 import moose
 
@@ -162,6 +162,7 @@ class TraubNet(object):
         self.g_nmda_mat = None
         self.index_cell_map = {}
         self.cell_index_map = {}
+        self.network_container = moose.Neutral('/net')
     
     def setup_from_celltype_file(self, celltype_file=None, format=None, scale=None):
         """Set up the network from a celltype-celltype graph file.
