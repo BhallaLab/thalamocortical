@@ -305,7 +305,7 @@ class TraubNet(object):
             
         end = datetime.now()
         delta = end - start
-        config.BENCHMARK_LOGGER.info('cell-cell network generation in: %g s' % (delta.days * 86400 + delta.seconds + 1e6 * delta.microseconds))
+        config.BENCHMARK_LOGGER.info('cell-cell network generation in: %g s' % (delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))
 
     def scale_populations(self, scale):
         """Scale the number of cells in each population by a factor."""
