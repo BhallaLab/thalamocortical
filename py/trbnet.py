@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Nov 10 10:08:17 2010 (+0530)
+# Last-Updated: Wed Nov 10 11:30:34 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 654
+#     Update #: 657
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -273,7 +273,7 @@ class TraubNet(object):
             postcount = int(posttype['count'])
             connprob = float(edge['weight'])
             ps_comps = eval(edge['pscomps'])
-            config.LOGGER.debug('Connecting populations: pre=%s[:%d], post=%s[:%d], probability=%g' % (pretype['label'], posttype['label'], pretype['count'], posttype['count'], connprob))
+            config.LOGGER.debug('Connecting populations: pre=%s[:%d], post=%s[:%d], probability=%g' % (pretype['label'], pretype['count'], posttype['label'], posttype['count'], connprob))
             if connprob <= 0 or len(ps_comps) == 0:
                 continue
             # pre_indices[i] is the array of global indices of the
@@ -426,7 +426,9 @@ def test_scale_conductance():
         
 
 if __name__ == '__main__':
-    test_generate_celltype_graph()
-    test_scale_conductance()
+    net = TraubNet()
+    net._generate_celltype_graph()
+    net._generate_cell_graph()
+
 # 
 # trbnet.py ends here
