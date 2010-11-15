@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Nov 15 16:31:33 2010 (+0530)
+# Last-Updated: Mon Nov 15 16:41:54 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 668
+#     Update #: 670
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -273,7 +273,7 @@ class TraubNet(object):
             precount = int(pretype['count'])
             postcount = int(posttype['count'])
             connprob = float(edge['weight'])
-            ps_comps = eval(edge['pscomps'])
+            ps_comps = numpy.array(eval(edge['pscomps']))
             config.LOGGER.debug('Connecting populations: pre=%s[:%d], post=%s[:%d], probability=%g' % (pretype['label'], pretype['count'], posttype['label'], posttype['count'], connprob))
             if connprob <= 0 or len(ps_comps) == 0:
                 continue
@@ -291,7 +291,7 @@ class TraubNet(object):
                                     for postindex in range(postcount)
                                     for preindex in pre_indices[postindex]],
                                    dtype='int32')
-            self.ps_comp_mat.put(comp_indices.flatten(), syn_list[:,0], syn_list[:, 1])
+            self.ps_comp_mat.put(ps_comps[comp_indices.flatten()], syn_list[:,0], syn_list[:, 1])
             self.g_ampa_mat.put(float(edge['gampa']),
                                 syn_list[:, 0], syn_list[:,1])
             self.g_nmda_mat.put(float(edge['gnmda']),
