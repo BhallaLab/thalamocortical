@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Nov 10 11:30:34 2010 (+0530)
+# Last-Updated: Mon Nov 15 16:31:33 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 657
+#     Update #: 668
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -160,6 +160,7 @@ class TraubNet(object):
         self.g_gaba_mat = None
         self.g_ampa_mat = None
         self.g_nmda_mat = None
+        self.ps_comp_mat = None
         self.index_cell_map = {}
         self.cell_index_map = {}
         self.network_container = moose.Neutral('/net')
@@ -258,10 +259,10 @@ class TraubNet(object):
                 self.cell_index_map[cell.id] = total_count + ii
             total_count += cell_count
 
-        self.g_gaba_mat = ll_mat(total_count, total_count, 1000000) # 3500 cells, with ~10% connection probability will have ~1e6 nonzero entries
-        self.g_ampa_mat = ll_mat(total_count, total_count, 1000000) # 3500 cells, with ~10% connection probability will have ~1e6 nonzero entries
-        self.g_nmda_mat = ll_mat(total_count, total_count, 1000000) # 3500 cells, with ~10% connection probability will have ~1e6 nonzero entries
-
+        self.g_gaba_mat = ll_mat(total_count, total_count)
+        self.g_ampa_mat = ll_mat(total_count, total_count)
+        self.g_nmda_mat = ll_mat(total_count, total_count)
+        self.ps_comp_mat = ll_mat(total_count, total_count)
         for edge in self.celltype_graph.es:
             pre = edge.source
             post = edge.target
@@ -287,29 +288,27 @@ class TraubNet(object):
             comp_indices = numpy.random.randint(low=0, high=len(ps_comps), size=(postcount, int(connprob * precount)))
             # syn_list is the list of global index pairs for synapses
             syn_list = numpy.array([[preindex, postindex + poststart]
-                         for postindex in range(postcount)
-                         for preindex in pre_indices[postindex]],
+                                    for postindex in range(postcount)
+                                    for preindex in pre_indices[postindex]],
                                    dtype='int32')
-            self.g_ampa_mat.put(float(edge['gampa']) * numpy.ones(len(syn_list)),
+            self.ps_comp_mat.put(comp_indices.flatten(), syn_list[:,0], syn_list[:, 1])
+            self.g_ampa_mat.put(float(edge['gampa']),
                                 syn_list[:, 0], syn_list[:,1])
-            self.g_nmda_mat.put(float(edge['gnmda']) * numpy.ones(len(syn_list)),
+            self.g_nmda_mat.put(float(edge['gnmda']),
                                 syn_list[:, 0], syn_list[:,1])
             if pretype['label'] == 'nRT' and posttype['label'] == 'TCR':
                 self.g_gaba_mat.put(numpy.random.random_sample(len(syn_list)) * (self.nRT_TCR_ggaba_high - self.nRT_TCR_ggaba_low) + self.nRT_TCR_ggaba_low,
                                     syn_list[:,0],
                                     syn_list[:,1])
             else:
-                self.g_gaba_mat.put(float(edge['ggaba']) * numpy.ones(len(syn_list)),
+                self.g_gaba_mat.put(float(edge['ggaba']),
                                     syn_list[:,0], syn_list[:,1])
-            
-            
         end = datetime.now()
         delta = end - start
         config.BENCHMARK_LOGGER.info('cell-cell network generation in: %g s' % (delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))
 
     def scale_populations(self, scale):
         """Scale the number of cells in each population by a factor."""
-        raise Exception('Not implemented')
         if self.cell_graph is not None:
             raise Warning('Cell-graph already instantiated. Cannot rescale.')
         for vertex in self.celltype_graph.vs:
