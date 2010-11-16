@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Nov 15 16:41:54 2010 (+0530)
+# Last-Updated: Tue Nov 16 16:11:07 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 670
+#     Update #: 729
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -249,15 +249,9 @@ class TraubNet(object):
         start = datetime.now()
         self.cell_graph = ig.Graph(0, directed=True)
         total_count = 0
-        
         for celltype in self.celltype_graph.vs:
             celltype['startindex'] = total_count
             cell_count = int(celltype['count'])
-            cell_class = eval(celltype['label'])
-            for ii in range(cell_count):
-                cell = cell_class(cell_class.prototype, '%s/%s_%d' % (self.network_container.path, celltype['label'], ii))
-                self.index_cell_map[total_count + ii] = cell
-                self.cell_index_map[cell.id] = total_count + ii
             total_count += cell_count
 
         self.g_gaba_mat = ll_mat(total_count, total_count)
@@ -304,11 +298,48 @@ class TraubNet(object):
                                     syn_list[:,1])
             else:
                 self.g_gaba_mat.put(float(edge['ggaba']),
-                                    syn_list[:,0], syn_list[:,1])
+                                    syn_list[:,0], syn_list[:,1])                    
+
         end = datetime.now()
         delta = end - start
         config.BENCHMARK_LOGGER.info('cell-cell network generation in: %g s' % (delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))
 
+    def create_network(self):
+        """Instantiate the network in MOOSE"""
+        total_count = 0
+        for celltype in self.celltype_graph.vs:
+            cell_count = int(celltype['count'])
+            cell_class = eval(celltype['label'])
+            for ii in range(cell_count):
+                cell = cell_class(cell_class.prototype, '%s/%s_%d' % (self.network_container.path, celltype['label'], ii))
+                self.index_cell_map[total_count + ii] = cell
+                self.cell_index_map[cell.id] = total_count + ii
+            total_count += cell_count
+        for syn_edge in self.celltype_graph.es:
+            pretype = self.celltype_graph.vs[syn_edge.source]
+            posttype = self.celltype_graph.vs[syn_edge.target]
+            prestart = int(pretype['startindex'])
+            poststart = int(posttype['startindex'])
+            precount = int(pretype['count'])
+            postcount = int(posttype['count'])
+            for pre_index in range(prestart, prestart+precount):
+                precell = self.index_cell_map[pre_index]
+                precomp = precell.comp[precell.presyn]
+                for post_index in range(poststart, poststart+postcount):
+                    postcell = self.index_cell_map[post_index]
+                    postcomp = postcell.comp[self.ps_comp_mat[pre_index, post_index]]
+                    g_ampa = self.g_ampa_mat[pre_index, post_index]
+                    if g_ampa != 0.0:
+                        precomp.makeSynapse(postcomp, name='ampa', Ek=0.0, Gbar=self.g_ampa, tau1=0.0, tau2=syn_edge['tauampa'])
+                    g_nmda = self.g_nmda_mat[pre_index, post_index]
+                    if g_nmda != 0.0:
+                        precomp.makeSynapse(postcomp, name='nmda', Ek=0.0, tau1=syn_edge['taunmda'], tau2=5e-3)
+                    g_gaba = self.g_gaba_mat[pre_index, post_index]
+                    if g_gaba != 0.0:
+                        if syn_edge['taugabaslow'] > 0:
+                            precomp.makeSynapse(postcomp, name='gaba_slow', Ek=syn_edge['ekgaba'], tau1=syn_edge['taugabaslow'])
+                        precomp.makeSynapse(postcomp, name='gaba', Ek=syn_edge['ekgaba'], tau1=syn_edge['taugaba'])
+            
     def scale_populations(self, scale):
         """Scale the number of cells in each population by a factor."""
         if self.cell_graph is not None:
