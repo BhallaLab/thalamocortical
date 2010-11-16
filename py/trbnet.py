@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Nov 16 17:54:24 2010 (+0530)
+# Last-Updated: Tue Nov 16 18:55:47 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 743
+#     Update #: 744
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -331,7 +331,7 @@ class TraubNet(object):
                     postcomp = postcell.comp[self.ps_comp_mat[pre_index, post_index]]
                     g_ampa = self.g_ampa_mat[pre_index, post_index]
                     if g_ampa != 0.0:
-                        precomp.makeSynapse(postcomp, name='ampa', Ek=0.0, Gbar=self.g_ampa, tau1=syn_edge['tauampa'], tau2=0.0)
+                        precomp.makeSynapse(postcomp, name='ampa', Ek=0.0, Gbar=g_ampa, tau1=syn_edge['tauampa'], tau2=0.0)
                     g_nmda = self.g_nmda_mat[pre_index, post_index]
                     if g_nmda != 0.0:
                         precomp.makeSynapse(postcomp, name='nmda', className='NMDAChan', Ek=0.0, tau1=syn_edge['taunmda'], tau2=5e-3)
