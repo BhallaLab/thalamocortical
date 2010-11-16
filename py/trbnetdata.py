@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Oct 27 01:21:11 2010 (+0530)
+# Last-Updated: Wed Nov 17 01:26:33 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1108
+#     Update #: 1110
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -441,9 +441,9 @@ class TraubFullNetData(object):
             ]
         # ek_gaba depends only on the postsynaptic cell. ek_gaba[i] is for post synaptic cell of type celltype[i]
         self.ek_gaba = [-81e-3, -81e-3, -75e-3, -75e-3, -75e-3, -75e-3, -75e-3, -75e-3, -75e-3, -75e-3, -75e-3, -75e-3, -81e-3, -75e-3]
-        # nRT->nRT GABAergic connections are taken from a unform random distribution between 0.7 nS and 2.1 nS.
-        self.nRT_g_gaba_high = 2.1e-9
-        self.nRT_g_gaba_low = 0.7e-9
+        # nRT->TCR GABAergic connections are taken from a unform random distribution between 0.7 nS and 2.1 nS.
+        self.nRT_TCR_ggaba_high = 2.1e-9
+        self.nRT_TCR_ggaba_low = 0.7e-9
         
     def check_pre_post_ratio(self):
         """Check the pre-post ratio for each celltype pair"""
