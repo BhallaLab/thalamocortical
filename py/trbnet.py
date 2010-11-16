@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Nov 10 11:30:34 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 657
+# Last-Updated: Wed Nov 10 17:38:03 2010 (+0530)
+#           By: subha
+#     Update #: 668
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -227,14 +227,15 @@ class TraubNet(object):
                     self.celltype_graph.es[edge_count]['taugaba'] = tn.tau_gaba[celltype.index][posttype.index]
                     self.celltype_graph.es[edge_count]['pscomps'] = str(tn.allowed_comps[celltype.index][posttype.index])
                     self.celltype_graph.es[edge_count]['ekgaba'] = tn.ek_gaba[posttype.index]
+                    self.celltype_graph.es[edge_count]['ggaba'] = tn.g_gaba_baseline[celltype.index][posttype.index]
                     if celltype['label'] == 'nRT':
                         if posttype['label'] == 'TCR':
                             self.celltype_graph.es[edge_count]['taugabaslow'] = tn.nRT_TCR_tau_gaba_slow
+                            self.celltype_graph.es[edge_count]['ggaba'] = 'uniform %f %f' % (tn.nRT_g_gaba_low, tn.nRT_g_gaba_high) # How to specify distribution?
                         elif posttype['label'] == 'nRT':
                             self.celltype_graph.es[edge_count]['taugabaslow'] = tn.nRT_nRT_tau_gaba_slow
-                            self.celltype_graph.es[edge_count]['ggaba'] = 'uniform %f %f' % (tn.nRT_g_gaba_low, tn.nRT_g_gaba_high) # How to specify distribution?
-                    else:
-                        self.celltype_graph.es[edge_count]['ggaba'] = tn.g_gaba_baseline[celltype.index][posttype.index]
+                    
+                    print celltype['label'], posttype['label'], self.celltype_graph.es[edge_count]['ggaba']
                     edge_count += 1
 
     def _read_celltype_graph(self):
@@ -274,6 +275,7 @@ class TraubNet(object):
             connprob = float(edge['weight'])
             ps_comps = eval(edge['pscomps'])
             config.LOGGER.debug('Connecting populations: pre=%s[:%d], post=%s[:%d], probability=%g' % (pretype['label'], pretype['count'], posttype['label'], posttype['count'], connprob))
+            config.LOGGER.debug('ggaba= %s, type:%s' % (str(edge['ggaba']), edge['ggaba'].__class__.__name__))
             if connprob <= 0 or len(ps_comps) == 0:
                 continue
             # pre_indices[i] is the array of global indices of the
@@ -294,7 +296,7 @@ class TraubNet(object):
                                 syn_list[:, 0], syn_list[:,1])
             self.g_nmda_mat.put(float(edge['gnmda']) * numpy.ones(len(syn_list)),
                                 syn_list[:, 0], syn_list[:,1])
-            if pretype['label'] == 'nRT' and posttype['label'] == 'TCR':
+            if (pretype['label'] == 'nRT') and (posttype['label'] == 'TCR'):
                 self.g_gaba_mat.put(numpy.random.random_sample(len(syn_list)) * (self.nRT_TCR_ggaba_high - self.nRT_TCR_ggaba_low) + self.nRT_TCR_ggaba_low,
                                     syn_list[:,0],
                                     syn_list[:,1])
