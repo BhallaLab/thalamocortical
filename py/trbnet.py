@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Nov 16 18:55:47 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 744
+# Last-Updated: Wed Nov 17 00:02:05 2010 (+0530)
+#           By: subha
+#     Update #: 751
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -329,6 +329,9 @@ class TraubNet(object):
                 for post_index in range(poststart, poststart+postcount):
                     postcell = self.index_cell_map[post_index]
                     postcomp = postcell.comp[self.ps_comp_mat[pre_index, post_index]]
+                    print precomp, postcomp
+                    print precomp.path, postcomp.path
+                    print isinstance(precomp, moose.PyMooseBase), isinstance(postcomp, moose.PyMooseBase)
                     g_ampa = self.g_ampa_mat[pre_index, post_index]
                     if g_ampa != 0.0:
                         precomp.makeSynapse(postcomp, name='ampa', Ek=0.0, Gbar=g_ampa, tau1=syn_edge['tauampa'], tau2=0.0)
