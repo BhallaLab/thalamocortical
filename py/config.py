@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Nov  9 11:52:12 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 148
+# Last-Updated: Wed Nov 17 21:11:53 2010 (+0530)
+#           By: subha
+#     Update #: 150
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -63,8 +63,8 @@ if not os.access(data_dir, os.F_OK):
     os.mkdir(data_dir)
 
 filename_suffix = '_%d_%s' % (os.getpid(), timestamp.strftime('%Y%m%d_%H%M%S'))
-DATA_FILENAME = os.path.join(data_dir, 'data%s.hf5' % (filename_suffix))
-MODEL_FILENAME = os.path.join(data_dir, 'network%s.hf5' % (filename_suffix))
+DATA_FILENAME = os.path.join(data_dir, 'data%s.h5' % (filename_suffix))
+MODEL_FILENAME = os.path.join(data_dir, 'network%s.h5' % (filename_suffix))
 #---------------------------------------------------------------------
 # moose components
 #---------------------------------------------------------------------

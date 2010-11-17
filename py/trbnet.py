@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Nov 17 21:04:15 2010 (+0530)
+# Last-Updated: Wed Nov 17 21:11:20 2010 (+0530)
 #           By: subha
-#     Update #: 922
+#     Update #: 923
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -561,7 +561,7 @@ if __name__ == '__main__':
     net = TraubNet()
     net._generate_celltype_graph()
     net._generate_cell_graph()
-    # net.create_network()
+    net.create_network()
     net.save_network_model(config.MODEL_FILENAME)
     
 # 
