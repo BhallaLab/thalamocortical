@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Nov 17 18:28:55 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 899
+# Last-Updated: Wed Nov 17 21:04:15 2010 (+0530)
+#           By: subha
+#     Update #: 922
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -123,24 +123,24 @@ class CellType(tables.IsDescription):
 
     """
     name = tables.StringCol(16)
-    index = tables.UInt8Col()
-    count = tables.UInt16Col()
+    index = tables.Int8Col()
+    count = tables.Int16Col()
 
 class SynEdge(tables.IsDescription):
     """Describes an edge of celltype graph"""
-    source = tables.IntCol()    # Index of source celltype
-    target =  tables.IntCol()   # Index of destination celltype
-    weight =  tables.FloatCol() # connection probability from sourec to target
-    gampa = tables.FloatCol()   # max conductance for source -> target AMPA synapse
-    gnmda =  tables.FloatCol()  # max conductance for source -> target NMDA synapse
-    tauampa = tables.FloatCol() # decay time constant for source -> target AMPA synapse
-    taunmda =  tables.FloatCol() # decay time constant for source -> target NMDA synapse
-    tau2nmda =  tables.FloatCol() # rise time constant for source -> target NMDA synapse (from NEURON mod file)
-    taugaba =  tables.FloatCol()  # decay time constant for source -> target GABA synapse
-    taugabaslow =  tables.FloatCol() # slower decay time constant for source -> target GABA synapse
+    source = tables.Int8Col()    # Index of source celltype
+    target =  tables.Int8Col()   # Index of destination celltype
+    weight =  tables.Float64Col() # connection probability from sourec to target
+    gampa = tables.Float64Col()   # max conductance for source -> target AMPA synapse
+    gnmda =  tables.Float64Col()  # max conductance for source -> target NMDA synapse
+    tauampa = tables.Float64Col() # decay time constant for source -> target AMPA synapse
+    taunmda =  tables.Float64Col() # decay time constant for source -> target NMDA synapse
+    tau2nmda =  tables.Float64Col() # rise time constant for source -> target NMDA synapse (from NEURON mod file)
+    taugaba =  tables.Float64Col()  # decay time constant for source -> target GABA synapse
+    taugabaslow =  tables.Float64Col() # slower decay time constant for source -> target GABA synapse
     pscomps =  tables.UInt8Col(shape=(90, ))    # compartment nos in target cell where synapses are allowed
-    ekgaba = tables.FloatCol() # reversal potential for gaba synapses
-    ggaba =  tables.FloatCol(shape = (2, )) # gaba conductance (distributed uniformly between first and second entry)
+    ekgaba = tables.Float64Col() # reversal potential for gaba synapses
+    ggaba =  tables.Float64Col(shape=(2)) # gaba conductance (distributed uniformly between first and second entry)
     
 
 class TraubNet(object):
@@ -443,17 +443,18 @@ class TraubNet(object):
                 synedge['pscomps'][ii] = pscomp
                 ii +=  1
             synedge['ekgaba'] = edge['ekgaba']
+            print edge.source, edge.target, edge['ggaba'], type(edge['ggaba'])
+
             it =  None
             try:
                 it =  iter(edge['ggaba'])
             except TypeError:
-                synedge['ggaba'][0] = edge['ggaba']
-                synedge['ggaba'][1] = edge['ggaba']
+                synedge['ggaba'] = numpy.array([edge['ggaba'], edge['ggaba']])
+
             assert ((it is None) or (self.celltype_graph.vs[edge.source]['label'] == 'nRT'))
             if self.celltype_graph.vs[edge.source]['label'] == 'nRT':
                 if self.celltype_graph.vs[edge.target]['label'] == 'TCR':
-                    synedge['ggaba'][0] =  self.nRT_TCR_ggaba_low
-                    synedge['ggaba'][1] =  self.nRT_TCR_ggaba_high
+                    synedge['ggaba'] =  numpy.array([self.nRT_TCR_ggaba_low, self.nRT_TCR_ggaba_high])
                 synedge['taugabaslow'] = edge['taugabaslow']
             synedge.append()
         cellnet_group = h5file.createGroup(network_struct, 'cellnetwork', 'Cell-to-cell network structure')
