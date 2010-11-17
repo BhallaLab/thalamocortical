@@ -2508,3 +2508,10 @@ TypeError: sequence elements must be integer pairs
 
   ggaba - all 0
   
+  It had to be set to a numpy array of shape=(2,). This fixed it.
+  Now remaining:
+
+  1. Put in a function to read the network model from file and then to compare
+     it to the original.
+  2. Put in the code to do the simulation itself.
+  3. Save the data.
