@@ -2489,3 +2489,22 @@ TypeError: sequence elements must be integer pairs
   lil_matrix constructor encounters memory error. Thus, I think the fall back
   is dicts.
   
+* <2010-11-17 Wed 10:20> Network instantiation
+
+  On my laptop:
+
+  2010-11-17 02:12:19,270 INFO traub2005.benchmark trbnet.py _generate_cell_graph: cell-cell network generation in: 4.76215 s
+  2010-11-17 02:39:11,647 INFO traub2005.benchmark trbnet.py create_network: Finished network creation in: 1611.63 s
+
+  On ghevar:
+
+  2010-11-17 10:48:39,070 INFO traub2005.benchmark trbnet.py _generate_cell_graph: cell-cell network generation in: 4.083 s
+  2010-11-17 11:07:45,235 INFO traub2005.benchmark trbnet.py create_network: Finished network creation in: 1146.16 s
+
+* <2010-11-17 Wed 20:18> Added code to save model data
+  I added a function to save the network structure in a hdf5 file. I debugged
+  it till the whole thing ran without error. But saved file does not have
+  correct values:
+
+  ggaba - all 0
+  
