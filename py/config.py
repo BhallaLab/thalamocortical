@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Nov 17 21:11:53 2010 (+0530)
+# Last-Updated: Wed Nov 17 21:17:17 2010 (+0530)
 #           By: subha
-#     Update #: 150
+#     Update #: 151
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -62,7 +62,7 @@ data_dir = os.path.join('data', timestamp.strftime('%Y_%m_%d'))
 if not os.access(data_dir, os.F_OK):
     os.mkdir(data_dir)
 
-filename_suffix = '_%d_%s' % (os.getpid(), timestamp.strftime('%Y%m%d_%H%M%S'))
+filename_suffix = '_%s_%d' % (timestamp.strftime('%Y%m%d_%H%M%S'), os.getpid())
 DATA_FILENAME = os.path.join(data_dir, 'data%s.h5' % (filename_suffix))
 MODEL_FILENAME = os.path.join(data_dir, 'network%s.h5' % (filename_suffix))
 #---------------------------------------------------------------------
