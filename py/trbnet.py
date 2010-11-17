@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Nov 17 02:12:03 2010 (+0530)
+# Last-Updated: Wed Nov 17 18:28:55 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 780
+#     Update #: 899
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -125,6 +125,23 @@ class CellType(tables.IsDescription):
     name = tables.StringCol(16)
     index = tables.UInt8Col()
     count = tables.UInt16Col()
+
+class SynEdge(tables.IsDescription):
+    """Describes an edge of celltype graph"""
+    source = tables.IntCol()    # Index of source celltype
+    target =  tables.IntCol()   # Index of destination celltype
+    weight =  tables.FloatCol() # connection probability from sourec to target
+    gampa = tables.FloatCol()   # max conductance for source -> target AMPA synapse
+    gnmda =  tables.FloatCol()  # max conductance for source -> target NMDA synapse
+    tauampa = tables.FloatCol() # decay time constant for source -> target AMPA synapse
+    taunmda =  tables.FloatCol() # decay time constant for source -> target NMDA synapse
+    tau2nmda =  tables.FloatCol() # rise time constant for source -> target NMDA synapse (from NEURON mod file)
+    taugaba =  tables.FloatCol()  # decay time constant for source -> target GABA synapse
+    taugabaslow =  tables.FloatCol() # slower decay time constant for source -> target GABA synapse
+    pscomps =  tables.UInt8Col(shape=(90, ))    # compartment nos in target cell where synapses are allowed
+    ekgaba = tables.FloatCol() # reversal potential for gaba synapses
+    ggaba =  tables.FloatCol(shape = (2, )) # gaba conductance (distributed uniformly between first and second entry)
+    
 
 class TraubNet(object):
     """Implements the full network in Traub et al 2005 model.
@@ -394,12 +411,84 @@ class TraubNet(object):
                     except Exception, e:
                         pass
 
-    def _instantiate_model(self):
-        for pretype in self.celltype_graph.vs:
-            for posttype in self.celltype_graph.vs:                
-                pass
-        raise Exception('TODO: finish implementing this')
-
+    def save_network_model(self,  filename):
+        """Save the network structure in an hdf5 file"""
+        config.LOGGER.debug('Start saving teh network model')
+        starttime =  datetime.now()
+        compression_filter =  tables.Filters(complevel=9, complib='zlib', fletcher32=True)
+        h5file =  tables.openFile(filename,  mode = 'w',  title = 'Traub Network: timestamp: %s' % (config.timestamp.strftime('%Y-%M-%D %H:%M:%S')),  filters = compression_filter)
+        # Save the celltype information (vertices of the celltype graph)
+        network_struct =  h5file.createGroup(h5file.root, 'network', 'Network structure')
+        celltype_table =  h5file.createTable(network_struct, 'celltype', CellType,  'Information on each celltype population')
+        celltype =  celltype_table.row
+        for vertex in self.celltype_graph.vs:
+            celltype['name'] =  vertex['label']
+            celltype['index'] =  vertex.index
+            celltype['count'] =  vertex['count']
+            celltype.append()
+        synapse_table = h5file.createTable(network_struct,  'synapsetype',  SynEdge, 'Synapse information between celltype pairs')
+        synedge =  synapse_table.row
+        for edge in self.celltype_graph.es:
+            synedge['source'] = edge.source
+            synedge['target'] =  edge.target
+            synedge['weight'] = edge['weight']
+            synedge['gampa'] = edge['gampa']
+            synedge['gnmda'] = edge['gnmda']
+            synedge['tauampa'] = edge['tauampa']
+            synedge['taunmda'] = edge['taunmda']
+            synedge['tau2nmda'] =  5e-3
+            synedge['taugaba'] = edge['taugaba']
+            ii =  0
+            for pscomp in eval(edge['pscomps']): 
+                synedge['pscomps'][ii] = pscomp
+                ii +=  1
+            synedge['ekgaba'] = edge['ekgaba']
+            it =  None
+            try:
+                it =  iter(edge['ggaba'])
+            except TypeError:
+                synedge['ggaba'][0] = edge['ggaba']
+                synedge['ggaba'][1] = edge['ggaba']
+            assert ((it is None) or (self.celltype_graph.vs[edge.source]['label'] == 'nRT'))
+            if self.celltype_graph.vs[edge.source]['label'] == 'nRT':
+                if self.celltype_graph.vs[edge.target]['label'] == 'TCR':
+                    synedge['ggaba'][0] =  self.nRT_TCR_ggaba_low
+                    synedge['ggaba'][1] =  self.nRT_TCR_ggaba_high
+                synedge['taugabaslow'] = edge['taugabaslow']
+            synedge.append()
+        cellnet_group = h5file.createGroup(network_struct, 'cellnetwork', 'Cell-to-cell network structure')
+        gampa_array =  h5file.createCArray(cellnet_group, 'gampa', tables.FloatAtom(),  shape = (self.g_ampa_mat.nnz, 3))
+        ii =  0
+        for (index,  value) in self.g_ampa_mat.items():
+            gampa_array[ii,0] = index[0]
+            gampa_array[ii,1] =  index[1]
+            gampa_array[ii,2] = value
+            ii +=  1
+        gnmda_array =  h5file.createCArray(cellnet_group, 'gnmda', tables.FloatAtom(),  shape = (self.g_nmda_mat.nnz, 3))
+        ii =  0
+        for (index,  value) in self.g_nmda_mat.items():
+            gnmda_array[ii,0] = index[0]
+            gnmda_array[ii,1] =  index[1]
+            gnmda_array[ii,2] = value
+            ii +=  1
+        ggaba_array =  h5file.createCArray(cellnet_group, 'ggaba', tables.FloatAtom(),  shape=(self.g_ampa_mat.nnz, 3))
+        ii =  0
+        for (index,  value) in self.g_gaba_mat.items():
+            ggaba_array[ii,0] = index[0]
+            ggaba_array[ii,1] =  index[1]
+            ggaba_array[ii,2] = value
+            ii +=  1
+        pscomp_array =  h5file.createCArray(cellnet_group, 'pscomp',  tables.Int32Atom(),  shape=(self.ps_comp_mat.nnz, 3))
+        ii =  0
+        for (index,  value) in self.ps_comp_mat.items():
+            pscomp_array[ii,0] = index[0]
+            pscomp_array[ii,1] =  index[1]
+            pscomp_array[ii,2] = value
+            ii +=  1
+        h5file.close()
+        endtime =  datetime.now()
+        delta =  endtime -  starttime
+        config.BENCHMARK_LOGGER.info('Saved network model in:% g s' %  (delta.days *  86400 +  delta.seconds +  1e-6 * delta.microseconds))
 
 def test_generate_celltype_graph(celltype_file='celltype_graph.gml', format='gml'):
     celltype_graph = ig.read(celltype_file, format=format)
@@ -471,7 +560,8 @@ if __name__ == '__main__':
     net = TraubNet()
     net._generate_celltype_graph()
     net._generate_cell_graph()
-    net.create_network()
+    # net.create_network()
+    net.save_network_model(config.MODEL_FILENAME)
     
 # 
 # trbnet.py ends here
