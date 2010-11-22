@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Nov 22 14:08:33 2010 (+0530)
+# Last-Updated: Mon Nov 22 14:30:59 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 971
+#     Update #: 974
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -413,7 +413,7 @@ class TraubNet(object):
 
     def save_network_model(self,  filename):
         """Save the network structure in an hdf5 file"""
-        config.LOGGER.debug('Start saving teh network model')
+        config.LOGGER.debug('Start saving the network model')
         starttime =  datetime.now()
         compression_filter =  tables.Filters(complevel=9, complib='zlib', fletcher32=True)
         h5file =  tables.openFile(filename,  mode = 'w',  title = 'Traub Network: timestamp: %s' % (config.timestamp.strftime('%Y-%M-%D %H:%M:%S')),  filters = compression_filter)
@@ -492,6 +492,7 @@ class TraubNet(object):
         config.BENCHMARK_LOGGER.info('Saved network model in:% g s' %  (delta.days *  86400 +  delta.seconds +  1e-6 * delta.microseconds))
 
     def verify_saved_model(self, filename):
+        starttime = datetime.now()
         h5file =  tables.openFile(filename)
         celltypes =  h5file.getNode('/network', name='celltype')
         for row in celltypes.iterrows():
@@ -531,6 +532,10 @@ class TraubNet(object):
                     assert row['ggaba'][1] == self.nRT_TCR_ggaba_high
                 assert row['taugabaslow'] == edge['taugabaslow']
         h5file.close()
+        endtime = datetime.now()
+        delat = endtime - starttime
+        config.BENCHMARK_LOGGER.info('Finished verification of saved model in hdf5 in: %g s' % (delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
+        config.LOGGER.info('Verified model in: %s :: SUCCESS' %(filename))
 
 def test_generate_celltype_graph(celltype_file='celltype_graph.gml', format='gml'):
     celltype_graph = ig.read(celltype_file, format=format)
