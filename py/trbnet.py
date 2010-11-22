@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Nov 18 20:26:44 2010 (+0530)
+# Last-Updated: Mon Nov 22 11:30:36 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 951
+#     Update #: 960
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -555,6 +555,53 @@ def test_scale_conductance():
         else:
             assert numpy.allclose([edge['gnmda']], [gnmda_baseline])
     print 'test_scale_conductance: Successfully tested.'
+
+
+def test_reading_network(self, filename):
+    tndata =  TraubFullNetData()
+    tn =  TraubNet()
+    tn._generate_celltype_graph()
+    tn._generate_cell_graph()
+    h5file =  tables.openFile(filename)
+    celltypes =  h5file.getNode('/network', name='celltype')
+    for row in celltype.iterrows():
+        index =  row['index']
+        assert tn.celltype_graph.vs[index]['name'] == row['name']
+        assert tn.celltype_graph.vs[index]['count'] == row['count']
+    synedges =  h5file.getNode('/network', 'synapsetype')
+    for row in synedges.iterrows():
+        source = row['source']
+        target =  row['target']
+        egde = tn.es[tn.get_eid(source, target)]
+        assert edge['ekgaba'] == edge['ekgaba']
+        assert row['weight'] == edge['weight']
+        assert row['gampa'] == edge['gampa']
+        assert row['gnmda'] == edge['gnmda']
+        assert row['tauampa'] == edge['tauampa']
+        assert row['taunmda'] == edge['taunmda']
+        assert row['tau2nmda'] ==  5e-3
+        assert row['taugaba'] == edge['taugaba']
+        ii =  0
+        for pscomp in eval(edge['pscomps']): 
+            assert row['pscomps'][ii] == pscomp
+            ii +=  1
+        assert row['ekgaba'] == edge['ekgaba']
+
+        it =  None
+        try:
+            it =  iter(edge['ggaba'])
+        except TypeError:
+            assert row['ggaba'][0] == edge['ggaba']
+            assert row['ggaba'][0] == edge['ggaba']
+
+        assert ((it is None) or (self.celltype_graph.vs[edge.source]['label'] == 'nRT'))
+        if self.celltype_graph.vs[edge.source]['label'] == 'nRT':
+            if self.celltype_graph.vs[edge.target]['label'] == 'TCR':
+                assert row['ggaba'][0] ==  tn.nRT_TCR_ggaba_low
+                assert row['ggaba'][1] ==  tn.nRT_TCR_ggaba_high
+            assert row['taugabaslow'] == edge['taugabaslow']
+        
+    h5file.close()
         
 
 if __name__ == '__main__':
@@ -563,6 +610,7 @@ if __name__ == '__main__':
     net._generate_cell_graph()
     net.create_network()
     net.save_network_model(config.MODEL_FILENAME)
+    test_reading_network(config.MODEL_FILENAME)
     
 # 
 # trbnet.py ends here
