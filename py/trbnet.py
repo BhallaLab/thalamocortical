@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Nov 22 14:30:59 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 974
+# Last-Updated: Mon Nov 22 21:28:32 2010 (+0530)
+#           By: subha
+#     Update #: 975
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -503,7 +503,7 @@ class TraubNet(object):
         for row in synedges.iterrows():
             source = row['source']
             target =  row['target']
-            egde = self.es[self.celltype_graph.get_eid(source, target)]
+            egde = self.celltype_graph.es[self.celltype_graph.get_eid(source, target)]
             assert edge['ekgaba'] == edge['ekgaba']
             assert row['weight'] == edge['weight']
             assert row['gampa'] == edge['gampa']
