@@ -2515,3 +2515,16 @@ TypeError: sequence elements must be integer pairs
      it to the original.
   2. Put in the code to do the simulation itself.
   3. Save the data.
+* <2010-11-22 Mon 11:56> What to record?
+  Now I have finished the function to test the writing of hdf5 file for the
+  network structure by reading it back and comparing the values. Started test
+  run.
+
+  Next thing is to decide what to record. 
+
+  1. For a few cells, I would like to see the whole time series of Vm and CaConc. 
+
+  2. For the rest of the cells, I can at least record maintain the spike times.
+
+  I also came cross thsi neuro-timeseries analysis package:
+  python-nitime. Going through its manual to see if it will be of any use.
