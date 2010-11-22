@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Nov 22 12:22:32 2010 (+0530)
+# Last-Updated: Mon Nov 22 14:08:33 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 969
+#     Update #: 971
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -496,7 +496,7 @@ class TraubNet(object):
         celltypes =  h5file.getNode('/network', name='celltype')
         for row in celltypes.iterrows():
             index =  row['index']
-            assert self.celltype_graph.vs[index]['name'] == row['name']
+            assert self.celltype_graph.vs[index]['label'] == row['name']
             assert self.celltype_graph.vs[index]['count'] == row['count']
         synedges =  h5file.getNode('/network', 'synapsetype')
         for row in synedges.iterrows():
@@ -606,7 +606,7 @@ def test_reading_network(self, filename):
     celltypes =  h5file.getNode('/network', name='celltype')
     for row in celltypes.iterrows():
         index =  row['index']
-        assert tn.celltype_graph.vs[index]['name'] == row['name']
+        assert tn.celltype_graph.vs[index]['label'] == row['name']
         assert tn.celltype_graph.vs[index]['count'] == row['count']
     synedges =  h5file.getNode('/network', 'synapsetype')
     for row in synedges.iterrows():
