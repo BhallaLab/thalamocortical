@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Nov 23 17:49:45 2010 (+0530)
+# Last-Updated: Tue Nov 23 17:57:40 2010 (+0530)
 #           By: subha
-#     Update #: 990
+#     Update #: 994
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -286,7 +286,7 @@ class TraubNet(object):
             postcount = int(posttype['count'])
             connprob = float(edge['weight'])
             
-            ps_comps = numpy.array(eval(edge['pscomps']), dtype=int32)
+            ps_comps = numpy.array(eval(edge['pscomps']), dtype=numpy.uint8)
             config.LOGGER.debug('Connecting populations: pre=%s[:%d], post=%s[:%d], probability=%g' % (pretype['label'], pretype['count'], posttype['label'], posttype['count'], connprob))
             config.LOGGER.debug('ggaba= %s, type:%s' % (str(edge['ggaba']), edge['ggaba'].__class__.__name__))
             if connprob <= 0 or len(ps_comps) == 0:
@@ -304,7 +304,7 @@ class TraubNet(object):
             syn_list = numpy.array([[preindex, postindex + poststart]
                                     for postindex in range(postcount)
                                     for preindex in pre_indices[postindex]],
-                                   dtype='int32')
+                                   dtype=numpy.int32)
             config.LOGGER.debug(edge['pscomps'])
             self.ps_comp_mat.put(ps_comps[comp_indices.flatten()], syn_list[:,0], syn_list[:, 1])
             self.g_ampa_mat.put(float(edge['gampa']),
@@ -439,7 +439,7 @@ class TraubNet(object):
             synedge['tau2nmda'] =  5e-3
             synedge['taugaba'] = edge['taugaba']
             ii =  0
-            pscomps = numpy.zeros(90, dtype=uint8)
+            pscomps = numpy.zeros(90, dtype=numpy.uint8)
             for pscomp in eval(edge['pscomps']): 
                 pscomps[ii] = int(pscomp)
                 ii +=  1
@@ -538,7 +538,7 @@ class TraubNet(object):
                 assert row['taugabaslow'] == edge['taugabaslow']
         h5file.close()
         endtime = datetime.now()
-        delat = endtime - starttime
+        delta = endtime - starttime
         config.BENCHMARK_LOGGER.info('Finished verification of saved model in hdf5 in: %g s' % (delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
         config.LOGGER.info('Verified model in: %s :: SUCCESS' %(filename))
 
@@ -658,7 +658,7 @@ if __name__ == '__main__':
     net = TraubNet()
     net._generate_celltype_graph()
     net._generate_cell_graph()
-    # net.create_network()
+    net.create_network()
     net.save_network_model(config.MODEL_FILENAME)
     net.verify_saved_model(config.MODEL_FILENAME)
     
