@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Nov 23 14:30:16 2010 (+0530)
+# Last-Updated: Tue Nov 23 17:49:45 2010 (+0530)
 #           By: subha
-#     Update #: 977
+#     Update #: 990
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -286,7 +286,7 @@ class TraubNet(object):
             postcount = int(posttype['count'])
             connprob = float(edge['weight'])
             
-            ps_comps = numpy.array(eval(edge['pscomps']))
+            ps_comps = numpy.array(eval(edge['pscomps']), dtype=int32)
             config.LOGGER.debug('Connecting populations: pre=%s[:%d], post=%s[:%d], probability=%g' % (pretype['label'], pretype['count'], posttype['label'], posttype['count'], connprob))
             config.LOGGER.debug('ggaba= %s, type:%s' % (str(edge['ggaba']), edge['ggaba'].__class__.__name__))
             if connprob <= 0 or len(ps_comps) == 0:
@@ -439,9 +439,11 @@ class TraubNet(object):
             synedge['tau2nmda'] =  5e-3
             synedge['taugaba'] = edge['taugaba']
             ii =  0
+            pscomps = numpy.zeros(90, dtype=uint8)
             for pscomp in eval(edge['pscomps']): 
-                synedge['pscomps'][ii] = pscomp
+                pscomps[ii] = int(pscomp)
                 ii +=  1
+            synedge['pscomps'] = pscomps
             synedge['ekgaba'] = edge['ekgaba']
             print edge.source, edge.target, edge['ggaba'], type(edge['ggaba'])
 
@@ -514,7 +516,10 @@ class TraubNet(object):
             assert row['taugaba'] == edge['taugaba']
             ii =  0
             for pscomp in eval(edge['pscomps']): 
-                assert row['pscomps'][ii] == pscomp
+                try:
+                    assert row['pscomps'][ii] == pscomp
+                except AssertionError:
+                    config.LOGGER.debug('pscomp not same: %s <> %s in synapse from %s to %s' % (row['pscomps'][ii], pscomp, self.celltype_graph.vs[source]['label'], self.celltype_graph.vs[target]))
                 ii +=  1
             assert row['ekgaba'] == edge['ekgaba']
 
@@ -653,7 +658,7 @@ if __name__ == '__main__':
     net = TraubNet()
     net._generate_celltype_graph()
     net._generate_cell_graph()
-    net.create_network()
+    # net.create_network()
     net.save_network_model(config.MODEL_FILENAME)
     net.verify_saved_model(config.MODEL_FILENAME)
     
