@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Nov 23 17:57:40 2010 (+0530)
+# Last-Updated: Tue Nov 23 18:47:07 2010 (+0530)
 #           By: subha
-#     Update #: 994
+#     Update #: 1002
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -160,7 +160,7 @@ class TraubNet(object):
     cell_index_map -- dictionary mapping a cell instance to a global index
 
     """
-    def __init__(self, celltype_file=None, format=None, scale=None):
+    def __init__(self, celltype_file=None, format=None, scale=None, container=None):
         """
         celltype_file -- A file containing the celltype-celltype-graph.
 
@@ -180,8 +180,14 @@ class TraubNet(object):
         self.ps_comp_mat = None
         self.index_cell_map = {}
         self.cell_index_map = {}
-        self.network_container = moose.Neutral('/net')
-    
+        if container is None:
+            self.network_container = moose.Neutral('/net')
+        elif isinstance(container, str):
+            self.network_container = moose.Neutral(container)
+        elif isinstance(container, moose.Neutral):
+            self.network_container = container
+        else:
+            raise('Need a moose-object/string/None as container. Got %s of type %s' % (container, container.__class__.__name__))
     def setup_from_celltype_file(self, celltype_file=None, format=None, scale=None):
         """Set up the network from a celltype-celltype graph file.
 
