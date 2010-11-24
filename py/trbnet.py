@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Nov 23 18:47:07 2010 (+0530)
+# Last-Updated: Wed Nov 24 16:46:44 2010 (+0530)
 #           By: subha
-#     Update #: 1002
+#     Update #: 1149
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -171,7 +171,7 @@ class TraubNet(object):
         self.celltype_file = celltype_file
         self.scale = scale
         self.graph_format = format
-        self.populations = defaultdict(list)
+        # self.populations = defaultdict(list)
         self.celltype_graph = None
         self.cell_graph = None
         self.g_gaba_mat = None
@@ -233,12 +233,9 @@ class TraubNet(object):
         self.nRT_TCR_ggaba_low = tn.nRT_TCR_ggaba_low
         self.nRT_TCR_ggaba_high = tn.nRT_TCR_ggaba_high
         edge_count = 0
-        start_index = 0
         for celltype in self.celltype_graph.vs:
             celltype['label'] = tn.celltype[celltype.index]
             celltype['count'] = tn.cellcount[celltype.index]
-            celltype['start_index'] = start_index
-            start_index += celltype['count']
             for posttype in self.celltype_graph.vs:
                 pre_post_ratio = tn.pre_post_ratio[celltype.index][posttype.index]
                 if pre_post_ratio > 0:
@@ -372,7 +369,54 @@ class TraubNet(object):
         endtime = datetime.now()
         delta = endtime - starttime
         config.BENCHMARK_LOGGER.info('Finished network creation in: %g s' % (delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))
+
+    def get_maxdegree_cell_indices(self, celltype=None, size=None):
+        cell_dict = defaultdict(int)
+        if celltype is not None:
+            index = 0
+            for vertex in self.celltype_graph.vs:
+                if vertex['label'] == celltype:
+                    for ii in range(index, index + vertex['count']):
+                        for jj in range(self.g_gaba_mat.shape[1]):
+                            if self.g_gaba_mat[ii, jj] != 0.0:
+                                cell_dict[ii] += 1
+                            if self.g_ampa_mat[ii, jj] != 0.0:
+                                cell_dict[ii] += 1
+                            if self.g_nmda_mat[ii, jj] != 0.0:
+                                cell_dict[ii] += 1
+                    break
+                else:
+                    index += vertex['count']
+        else:
+            for ii in range(self.g_gaba_mat.shape[0]):
+                for jj in range(self.g_gaba_mat.shape[1]):
+                    if self.g_gaba_mat[ii, jj] != 0.0:
+                        cell_dict[ii] += 1
+                    if self.g_ampa_mat[ii, jj] != 0.0:
+                        cell_dict[ii] += 1
+                    if self.g_nmda_mat[ii, jj] != 0.0:
+                        cell_dict[ii] += 1
+        cells = sorted(cell_dict, key=lamda cellindex: cell_dict[cellindex], reverse=True)
+        if size is not None:
+            return cells
+        else:
+            return cells[:size]
+            
+    def setup_spike_recording(self, data_container):
+        for cell in self.cell_index_map.keys():
+            tab = cell.soma.insertRecorder(cell.name + '_spikes', 'Vm', data_container)
+            tab.stepMode = moose.TAB_SPIKE
+            tab.stepSize = 0.0
         
+    def setup_Vm_recording(self, data_container, numcellspertype=10):
+        for vertex in self.celltype_graph.vs:
+            cell_list = self.get_maxdegree_cell_indices(celltype=vertex['label'], size=numcellspertype)
+            for cellindex in cell_list:
+                cell = self.index_cell_map[cellindex]
+                cell.soma.insertRecorder(cell.name + '_Vm', 'Vm', data_container)
+        
+            
+
     def scale_populations(self, scale):
         """Scale the number of cells in each population by a factor."""
         if self.cell_graph is not None:
@@ -416,6 +460,78 @@ class TraubNet(object):
 
                     except Exception, e:
                         pass
+
+    def set_populations(self, filename):
+        """Read cellcounts from specified file and updates the
+        celltype-graph accordingly. The file should have space
+        separated values like:
+
+        name count
+
+        """
+        if filename is None:
+            return
+        with open(filename) as popcount_file:
+            for line in popcount_file.readlines():
+                cellname, count = line.split()
+                vertices = self.celltype_graph.vs.select(label_eq=cellname)
+                for vertex in vertices:
+                    vertex['count'] = int(count)
+
+    def tune_conductances(self, filename):
+        """Tune the conductances based on entries in file filename.
+        file should have space separated entries like this:
+
+        conductance-name sourcetype desttype scalefactor
+        """
+        if filename is None:
+            return
+        with open(filename) as synfile:
+            for line in synfile.readlines():
+                [g_name, source, dest, scale_factor] = line.split()
+                scale_factor = float(scale_factor)
+                source_vertices = self.celltype_graph.select(label_eq=source)
+                dest_vertices = self.celltype_graph.select(label_eq=dest)
+                for src_v in source_vertices:
+                    for dest_v in dest_vertices:
+                        synid = self.celltype_graph.get_eid(src_v, dest_v)
+                        if synid:
+                            syn = self.celltype_graph.es[synid]
+                            if g_name in syn.attribute_names():
+                                if g_name == 'ggaba' and source == 'nRT' and dest == 'TCR':
+                                    self.nRT_TCR_ggaba_low *= scale_factor
+                                    self.nRT_TCR_ggaba_high *= scale_factor
+                                    syn[g_name] = 'uniform %f %f' % (self.nRT_TCR_ggaba_low, self.nRT_TCR_ggaba_high)
+                                else:
+                                    syn[g_name] *= scale_factor
+
+    def set_conductances(self, filename):
+        """Set the conductances based on entries in file filename.
+        file should have space separated entries like this:
+
+        conductance-name sourcetype desttype value
+        """
+        if filename is None:
+            return
+        with open(filename) as synfile:
+            for line in synfile.readlines():
+                [g_name, source, dest, value] = line.split()
+                value = float(value)
+                source_vertices = self.celltype_graph.select(label_eq=source)
+                dest_vertices = self.celltype_graph.select(label_eq=dest)
+                for src_v in source_vertices:
+                    for dest_v in dest_vertices:
+                        synid = self.celltype_graph.get_eid(src_v, dest_v)
+                        if synid:
+                            syn = self.celltype_graph.es[synid]
+                            if g_name in syn.attribute_names():
+                                if g_name == 'ggaba' and source == 'nRT' and dest == 'TCR':
+                                    self.nRT_TCR_ggaba_low = value
+                                    self.nRT_TCR_ggaba_high = value
+                                    syn[g_name] = 'uniform %f %f' % (self.nRT_TCR_ggaba_low, self.nRT_TCR_ggaba_high)
+                                else:
+                                    syn[g_name] = value
+
 
     def save_network_model(self,  filename):
         """Save the network structure in an hdf5 file"""
