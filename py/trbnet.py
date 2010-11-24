@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Nov 24 17:21:53 2010 (+0530)
+# Last-Updated: Wed Nov 24 17:47:52 2010 (+0530)
 #           By: subha
-#     Update #: 1152
+#     Update #: 1153
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -567,7 +567,7 @@ class TraubNet(object):
                 ii +=  1
             synedge['pscomps'] = pscomps
             synedge['ekgaba'] = edge['ekgaba']
-            print edge.source, edge.target, edge['ggaba'], type(edge['ggaba'])
+            # print edge.source, edge.target, edge['ggaba'], type(edge['ggaba'])
 
             it =  None
             try:
