@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Nov 24 16:46:44 2010 (+0530)
+# Last-Updated: Wed Nov 24 17:21:53 2010 (+0530)
 #           By: subha
-#     Update #: 1149
+#     Update #: 1152
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -396,7 +396,7 @@ class TraubNet(object):
                         cell_dict[ii] += 1
                     if self.g_nmda_mat[ii, jj] != 0.0:
                         cell_dict[ii] += 1
-        cells = sorted(cell_dict, key=lamda cellindex: cell_dict[cellindex], reverse=True)
+        cells = sorted(cell_dict, key=lambda x: cell_dict[x], reverse=True)
         if size is not None:
             return cells
         else:
