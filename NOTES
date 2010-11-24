@@ -2528,3 +2528,8 @@ TypeError: sequence elements must be integer pairs
 
   I also came cross thsi neuro-timeseries analysis package:
   python-nitime. Going through its manual to see if it will be of any use.
+* <2010-11-24 Wed 17:13> Initial version of recording code
+  Put in the functions to setup recording on the network.
+  
+  I am recording full Vm for the 10 cells with maximum degree from each celltype.
+  Recording spike times for all cells.
