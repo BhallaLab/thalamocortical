@@ -2533,3 +2533,11 @@ TypeError: sequence elements must be integer pairs
   
   I am recording full Vm for the 10 cells with maximum degree from each celltype.
   Recording spike times for all cells.
+
+  I also added command line arg handling in trbsim.py --
+
+  -c cellcount-file : will modify the cellcounts
+
+  -s synscale-file : will scale the conductances of synapse types
+
+  -v g-value-file : will set the conductances of specified synapse types
