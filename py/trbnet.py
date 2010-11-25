@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Nov 24 17:47:52 2010 (+0530)
+# Last-Updated: Wed Nov 24 21:53:48 2010 (+0530)
 #           By: subha
-#     Update #: 1153
+#     Update #: 1154
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -336,7 +336,7 @@ class TraubNet(object):
             for ii in range(cell_count):
                 cell = cell_class(cell_class.prototype, '%s/%s_%d' % (self.network_container.path, celltype['label'], ii))
                 self.index_cell_map[total_count + ii] = cell
-                self.cell_index_map[cell.id] = total_count + ii
+                self.cell_index_map[cell] = total_count + ii
             total_count += cell_count
         for syn_edge in self.celltype_graph.es:
             pretype = self.celltype_graph.vs[syn_edge.source]
