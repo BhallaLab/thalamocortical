@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 24 10:04:47 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Nov 26 11:24:39 2010 (+0530)
+# Last-Updated: Fri Nov 26 11:27:38 2010 (+0530)
 #           By: subha
-#     Update #: 642
+#     Update #: 643
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -91,7 +91,7 @@ def get_comp(cell, index):
     if config.context.exists(path):
         return MyCompartment(path)
     else:
-        raise Exception(('Cell: %s , index: %d - no such compartment.' % (cell.path, index))
+        raise Exception('Cell: %s , index: %d - no such compartment.' % (cell.path, index))
 
 
 class TraubCell(moose.Cell):
