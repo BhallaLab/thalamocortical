@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Nov 24 21:53:48 2010 (+0530)
+# Last-Updated: Fri Nov 26 18:06:00 2010 (+0530)
 #           By: subha
-#     Update #: 1154
+#     Update #: 1165
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -289,9 +289,10 @@ class TraubNet(object):
             postcount = int(posttype['count'])
             connprob = float(edge['weight'])
             
-            ps_comps = numpy.array(eval(edge['pscomps']), dtype=numpy.uint8)
+            ps_comps = numpy.array(eval(edge['pscomps']), dtype=numpy.float)
             config.LOGGER.debug('Connecting populations: pre=%s[:%d], post=%s[:%d], probability=%g' % (pretype['label'], pretype['count'], posttype['label'], posttype['count'], connprob))
             config.LOGGER.debug('ggaba= %s, type:%s' % (str(edge['ggaba']), edge['ggaba'].__class__.__name__))
+            config.LOGGER.debug('allowed postsynaptic compartments: %s (after conversion: %s)' % (edge['pscomps'], ps_comps))
             if connprob <= 0 or len(ps_comps) == 0:
                 continue
             # pre_indices[i] is the array of global indices of the
@@ -351,6 +352,8 @@ class TraubNet(object):
                 for post_index in range(poststart, poststart+postcount):
                     postcell = self.index_cell_map[post_index]
                     postcompindex = int(self.ps_comp_mat[pre_index, post_index])
+                    if postcompindex > 255:
+                        raise Exception('%s->%s -- PS comp has absurd index %d' % (precell.path, postcell.path, postcompindex))
                     postcomp = postcell.comp[postcompindex]
                     if postcomp is None:
                         continue
