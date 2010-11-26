@@ -2541,3 +2541,5 @@ TypeError: sequence elements must be integer pairs
   -s synscale-file : will scale the conductances of synapse types
 
   -v g-value-file : will set the conductances of specified synapse types
+
+  -t simtime: will set the simulation time (1s default)
