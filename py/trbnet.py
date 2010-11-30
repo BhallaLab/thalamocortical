@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Nov 26 18:06:00 2010 (+0530)
+# Last-Updated: Tue Nov 30 14:49:59 2010 (+0530)
 #           By: subha
-#     Update #: 1165
+#     Update #: 1181
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -272,8 +272,9 @@ class TraubNet(object):
         for celltype in self.celltype_graph.vs:
             celltype['startindex'] = total_count
             cell_count = int(celltype['count'])
+            config.LOGGER.debug('%s - population size %d' % (celltype['label'], cell_count))
             total_count += cell_count
-
+        config.LOGGER.info('Total cell count: %d' % (total_count))
         self.g_gaba_mat = ll_mat(total_count, total_count)
         self.g_ampa_mat = ll_mat(total_count, total_count)
         self.g_nmda_mat = ll_mat(total_count, total_count)
@@ -293,24 +294,28 @@ class TraubNet(object):
             config.LOGGER.debug('Connecting populations: pre=%s[:%d], post=%s[:%d], probability=%g' % (pretype['label'], pretype['count'], posttype['label'], posttype['count'], connprob))
             config.LOGGER.debug('ggaba= %s, type:%s' % (str(edge['ggaba']), edge['ggaba'].__class__.__name__))
             config.LOGGER.debug('allowed postsynaptic compartments: %s (after conversion: %s)' % (edge['pscomps'], ps_comps))
-            if connprob <= 0 or len(ps_comps) == 0:
+            pre_per_post =  int(connprob * precount)
+            if (connprob <= 0) or (len(ps_comps) == 0) or (precount <= 0) or (postcount <= 0) or (pre_per_post <= 0):
                 continue
             # pre_indices[i] is the array of global indices of the
             # presynaptic cells connecting to the i-th postsynaptic
             # cell of posttype.
-            pre_indices = numpy.random.randint(low=prestart, high=prestart+precount, size=(postcount, int(connprob * precount)))
+            pre_indices = numpy.random.randint(low=prestart, high=prestart+precount, size=(postcount,pre_per_post))
             # comp_indices[i][j] is the index of the postsynaptic
             # compartment in ps_comps for i-th postsynaptic
             # compartment for j-th presynaptic cell connecting to
             # postsynaptic cell
-            comp_indices = numpy.random.randint(low=0, high=len(ps_comps), size=(postcount, int(connprob * precount)))
+            comp_indices = numpy.random.randint(low=0, high=len(ps_comps), size=(postcount, pre_per_post))
             # syn_list is the list of global index pairs for synapses
             syn_list = numpy.array([[preindex, postindex + poststart]
                                     for postindex in range(postcount)
                                     for preindex in pre_indices[postindex]],
                                    dtype=numpy.int32)
             config.LOGGER.debug(edge['pscomps'])
-            self.ps_comp_mat.put(ps_comps[comp_indices.flatten()], syn_list[:,0], syn_list[:, 1])
+            indices = comp_indices.flatten()
+            ps_comp_list = ps_comps[indices]
+            config.LOGGER.debug('ps_comps list has length: %d, syn_list has length: %d' % (len(ps_comp_list), len(syn_list)))
+            self.ps_comp_mat.put(ps_comp_list, syn_list[:,0], syn_list[:, 1])
             self.g_ampa_mat.put(float(edge['gampa']),
                                 syn_list[:, 0], syn_list[:,1])
             self.g_nmda_mat.put(float(edge['gnmda']),
@@ -585,34 +590,38 @@ class TraubNet(object):
                 synedge['taugabaslow'] = edge['taugabaslow']
             synedge.append()
         cellnet_group = h5file.createGroup(network_struct, 'cellnetwork', 'Cell-to-cell network structure')
-        gampa_array =  h5file.createCArray(cellnet_group, 'gampa', tables.FloatAtom(),  shape = (self.g_ampa_mat.nnz, 3))
-        ii =  0
-        for (index,  value) in self.g_ampa_mat.items():
-            gampa_array[ii,0] = index[0]
-            gampa_array[ii,1] =  index[1]
-            gampa_array[ii,2] = value
-            ii +=  1
-        gnmda_array =  h5file.createCArray(cellnet_group, 'gnmda', tables.FloatAtom(),  shape = (self.g_nmda_mat.nnz, 3))
-        ii =  0
-        for (index,  value) in self.g_nmda_mat.items():
-            gnmda_array[ii,0] = index[0]
-            gnmda_array[ii,1] =  index[1]
-            gnmda_array[ii,2] = value
-            ii +=  1
-        ggaba_array =  h5file.createCArray(cellnet_group, 'ggaba', tables.FloatAtom(),  shape=(self.g_ampa_mat.nnz, 3))
-        ii =  0
-        for (index,  value) in self.g_gaba_mat.items():
-            ggaba_array[ii,0] = index[0]
-            ggaba_array[ii,1] =  index[1]
-            ggaba_array[ii,2] = value
-            ii +=  1
-        pscomp_array =  h5file.createCArray(cellnet_group, 'pscomp',  tables.Int32Atom(),  shape=(self.ps_comp_mat.nnz, 3))
-        ii =  0
-        for (index,  value) in self.ps_comp_mat.items():
-            pscomp_array[ii,0] = index[0]
-            pscomp_array[ii,1] =  index[1]
-            pscomp_array[ii,2] = value
-            ii +=  1
+        if self.g_ampa_mat.nnz > 0:
+            gampa_array =  h5file.createCArray(cellnet_group, 'gampa', tables.FloatAtom(),  shape=(self.g_ampa_mat.nnz, 3))
+            ii =  0
+            for (index,  value) in self.g_ampa_mat.items():
+                gampa_array[ii,0] = index[0]
+                gampa_array[ii,1] =  index[1]
+                gampa_array[ii,2] = value
+                ii +=  1
+        if self.g_nmda_mat.nnz > 0:
+            gnmda_array =  h5file.createCArray(cellnet_group, 'gnmda', tables.FloatAtom(),  shape=(self.g_nmda_mat.nnz, 3))
+            ii =  0
+            for (index,  value) in self.g_nmda_mat.items():
+                gnmda_array[ii,0] = index[0]
+                gnmda_array[ii,1] =  index[1]
+                gnmda_array[ii,2] = value
+                ii +=  1
+        if self.g_gaba_mat.nnz > 0:
+            ggaba_array =  h5file.createCArray(cellnet_group, 'ggaba', tables.FloatAtom(),  shape=(self.g_gaba_mat.nnz, 3))
+            ii =  0
+            for (index,  value) in self.g_gaba_mat.items():
+                ggaba_array[ii,0] = index[0]
+                ggaba_array[ii,1] =  index[1]
+                ggaba_array[ii,2] = value
+                ii +=  1
+        if self.ps_comp_mat.nnz > 0:
+            pscomp_array =  h5file.createCArray(cellnet_group, 'pscomp',  tables.Int32Atom(),  shape=(self.ps_comp_mat.nnz, 3))
+            ii =  0
+            for (index,  value) in self.ps_comp_mat.items():
+                pscomp_array[ii,0] = index[0]
+                pscomp_array[ii,1] =  index[1]
+                pscomp_array[ii,2] = value
+                ii +=  1
         h5file.close()
         endtime =  datetime.now()
         delta =  endtime -  starttime
