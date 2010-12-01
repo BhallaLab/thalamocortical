@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Nov 30 14:49:59 2010 (+0530)
+# Last-Updated: Wed Dec  1 10:26:39 2010 (+0530)
 #           By: subha
-#     Update #: 1181
+#     Update #: 1185
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -481,7 +481,10 @@ class TraubNet(object):
             return
         with open(filename) as popcount_file:
             for line in popcount_file.readlines():
-                cellname, count = line.split()
+                tokens = line.split()
+                if not tokens:
+                    continue
+                cellname, count = tokens
                 vertices = self.celltype_graph.vs.select(label_eq=cellname)
                 for vertex in vertices:
                     vertex['count'] = int(count)
