@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Dec  1 10:26:39 2010 (+0530)
+# Last-Updated: Wed Dec  1 14:17:30 2010 (+0530)
 #           By: subha
-#     Update #: 1185
+#     Update #: 1189
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -499,7 +499,10 @@ class TraubNet(object):
             return
         with open(filename) as synfile:
             for line in synfile.readlines():
-                [g_name, source, dest, scale_factor] = line.split()
+                tokens = line.split()
+                if not tokens:
+                    continue
+                [g_name, source, dest, scale_factor] = tokens                
                 scale_factor = float(scale_factor)
                 source_vertices = self.celltype_graph.select(label_eq=source)
                 dest_vertices = self.celltype_graph.select(label_eq=dest)
@@ -526,7 +529,10 @@ class TraubNet(object):
             return
         with open(filename) as synfile:
             for line in synfile.readlines():
-                [g_name, source, dest, value] = line.split()
+                tokens = line.split()
+                if not tokens:
+                    continue
+                [g_name, source, dest, value] = tokens
                 value = float(value)
                 source_vertices = self.celltype_graph.select(label_eq=source)
                 dest_vertices = self.celltype_graph.select(label_eq=dest)
