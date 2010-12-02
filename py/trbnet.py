@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Dec  1 14:17:30 2010 (+0530)
+# Last-Updated: Thu Dec  2 12:14:57 2010 (+0530)
 #           By: subha
-#     Update #: 1189
+#     Update #: 1193
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -481,6 +481,8 @@ class TraubNet(object):
             return
         with open(filename) as popcount_file:
             for line in popcount_file.readlines():
+                if line.strip().startwith('#'):
+                    continue
                 tokens = line.split()
                 if not tokens:
                     continue
@@ -499,6 +501,8 @@ class TraubNet(object):
             return
         with open(filename) as synfile:
             for line in synfile.readlines():
+                if line.strip().startwith('#'):
+                    continue
                 tokens = line.split()
                 if not tokens:
                     continue
@@ -529,6 +533,8 @@ class TraubNet(object):
             return
         with open(filename) as synfile:
             for line in synfile.readlines():
+                if line.strip().startwith('#'):
+                    continue
                 tokens = line.split()
                 if not tokens:
                     continue
