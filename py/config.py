@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Dec  2 11:13:18 2010 (+0530)
+# Last-Updated: Thu Dec  2 11:31:47 2010 (+0530)
 #           By: subha
-#     Update #: 153
+#     Update #: 155
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -73,8 +73,8 @@ lib = moose.Neutral('/library')
 root = moose.Neutral("/")
 clockjob = moose.ClockJob('sched/cj')
 clockjob.autoschedule = 0
-simdt = 2e-4
-plotdt = 2e-4
+simdt = 0.5e-4
+plotdt = 0.5e-4
 gldt = 1e-2
 vmin = -120e-3
 vmax = 40e-3
