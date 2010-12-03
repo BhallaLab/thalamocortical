@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Dec  2 12:20:12 2010 (+0530)
+# Last-Updated: Fri Dec  3 19:19:35 2010 (+0530)
 #           By: subha
-#     Update #: 1194
+#     Update #: 1200
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -423,7 +423,8 @@ class TraubNet(object):
                 cell = self.index_cell_map[cellindex]
                 cell.soma.insertRecorder(cell.name + '_Vm', 'Vm', data_container)
         
-            
+    def setup_stimulus(self, cellnames, onset_time, duration, probe_onset, probe_duration):
+        """Setup the stimulus protocol."""
 
     def scale_populations(self, scale):
         """Scale the number of cells in each population by a factor."""

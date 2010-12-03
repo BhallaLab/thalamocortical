@@ -2543,3 +2543,13 @@ TypeError: sequence elements must be integer pairs
   -v g-value-file : will set the conductances of specified synapse types
 
   -t simtime: will set the simulation time (1s default)
+* <2010-12-03 Fri 19:49> Got the first run finished
+  But it was all spontaneous activity - the stimulus protocol has not been
+  implemented yet. 
+
+  However I note some points (considering Upi's paper):
+
+  - Stimulus pattern optimization:
+  + background size: 1300
+  + probe pulses: 6-7 pulses
+  + interpulse interval: 10-20 ms
