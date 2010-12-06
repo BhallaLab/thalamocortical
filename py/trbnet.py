@@ -423,8 +423,35 @@ class TraubNet(object):
                 cell = self.index_cell_map[cellindex]
                 cell.soma.insertRecorder(cell.name + '_Vm', 'Vm', data_container)
         
-    def setup_stimulus(self, cellnames, onset_time, duration, probe_onset, probe_duration):
-        """Setup the stimulus protocol."""
+    def setup_stimulus(self, stim_container, celltype, bg_count, bg_onset, bg_width, bg_interval, probe_delay, probe_width, probe_interval):
+        """Setup the stimulus protocol.
+
+        stim_container -- container object for stimulating electrodes
+
+        celltype -- type of cells we are looking at
+
+        bg_onset -- start time for background stimulus
+
+        bg_width -- width of background pulses
+
+        bg_interval -- if paired pulse, then the interval between the two pulses (beginning of second - beginning of first), 0 for single pulse
+
+        probe_delay -- time to start the (background + probe) stimulus from the start of background only stimulus
+
+        probe_width -- width of the probe pulse (should be same as background!).
+
+        probe_interval -- if paired pulse, this is the interpulse interval, if 0 a single pulse is applied.
+
+        """
+        if not isinstance(stim_container, moose.Neutral) and isinstance(stim_container, str):
+            self.stim_container = moose.Neutral(stim_container)
+        else:
+            raise Error('Stimulus container must be a string or a Neutral object')
+        celltype_vertex_set = self.celltype_graph.vs.select(label_eq=celltype)
+        for vertex in celltype_vertex_set:
+            startindex = int(vertex['startindex'])
+            count = int(vertex['count'])
+            cell_indices = numpy.random.randint(low=startindex, high=startindex+count, size=bg_count+1)
 
     def scale_populations(self, scale):
         """Scale the number of cells in each population by a factor."""
