@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Dec  3 19:19:35 2010 (+0530)
+# Last-Updated: Tue Dec  7 18:40:17 2010 (+0530)
 #           By: subha
-#     Update #: 1200
+#     Update #: 1209
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -422,6 +422,7 @@ class TraubNet(object):
             for cellindex in cell_list:
                 cell = self.index_cell_map[cellindex]
                 cell.soma.insertRecorder(cell.name + '_Vm', 'Vm', data_container)
+                cell.soma.insertCaRecorder(cell.name + '_Ca', data_container)
         
     def setup_stimulus(self, stim_container, celltype, bg_count, bg_onset, bg_width, bg_interval, probe_delay, probe_width, probe_interval):
         """Setup the stimulus protocol.
@@ -452,6 +453,10 @@ class TraubNet(object):
             startindex = int(vertex['startindex'])
             count = int(vertex['count'])
             cell_indices = numpy.random.randint(low=startindex, high=startindex+count, size=bg_count+1)
+            for index in cell_indices:
+                raise NotImplementedError()
+                cell = self.index_cell_map[index]
+                stim = moose.PulseGen(cell.name + '_inject', self.stim_container)
 
     def scale_populations(self, scale):
         """Scale the number of cells in each population by a factor."""
