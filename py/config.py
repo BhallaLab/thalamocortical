@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Dec  2 11:31:47 2010 (+0530)
-#           By: subha
-#     Update #: 155
+# Last-Updated: Tue Dec 14 14:36:37 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 168
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -53,7 +53,23 @@ import logging
 import moose
 
 timestamp = datetime.now()
+mypid = os.getpid()
+rngseed = None
 
+def reseed(seed):
+    """This is intended to be a single point of reseeding the
+    RNG. numpy.random.seed should not be called anywhere else in the
+    simulation setup.
+
+
+    seed -- seed to be used for the simulation.
+    """
+    global rngseed
+    if rngseed is not None:
+        raise Warning('Random number generator already seeded with: %s' % (str(seed)))
+    rngseed = seed
+    numpy.random.seed(rngseed)
+    
 #---------------------------------------------------------------------
 # configuration for saving simulation data
 #---------------------------------------------------------------------
@@ -62,7 +78,7 @@ data_dir = os.path.join('data', timestamp.strftime('%Y_%m_%d'))
 if not os.access(data_dir, os.F_OK):
     os.mkdir(data_dir)
 
-filename_suffix = '_%s_%d' % (timestamp.strftime('%Y%m%d_%H%M%S'), os.getpid())
+filename_suffix = '_%s_%d' % (timestamp.strftime('%Y%m%d_%H%M%S'), mypid)
 DATA_FILENAME = os.path.join(data_dir, 'data%s.h5' % (filename_suffix))
 MODEL_FILENAME = os.path.join(data_dir, 'network%s.h5' % (filename_suffix))
 #---------------------------------------------------------------------
