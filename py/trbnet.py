@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Dec  7 18:40:17 2010 (+0530)
-#           By: subha
-#     Update #: 1209
+# Last-Updated: Tue Dec 14 14:40:43 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 1211
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -595,6 +595,7 @@ class TraubNet(object):
         starttime =  datetime.now()
         compression_filter =  tables.Filters(complevel=9, complib='zlib', fletcher32=True)
         h5file =  tables.openFile(filename,  mode = 'w',  title = 'Traub Network: timestamp: %s' % (config.timestamp.strftime('%Y-%M-%D %H:%M:%S')),  filters = compression_filter)
+        h5file._v_attrs.rngseed = config.rngseed
         # Save the celltype information (vertices of the celltype graph)
         network_struct =  h5file.createGroup(h5file.root, 'network', 'Network structure')
         celltype_table =  h5file.createTable(network_struct, 'celltype', CellType,  'Information on each celltype population')
