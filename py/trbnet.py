@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Dec 14 20:06:39 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 1212
+# Last-Updated: Wed Dec 15 20:10:33 2010 (+0530)
+#           By: subha
+#     Update #: 1215
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -416,9 +416,12 @@ class TraubNet(object):
             tab.stepMode = moose.TAB_SPIKE
             tab.stepSize = 0.0
         
-    def setup_Vm_recording(self, data_container, numcellspertype=10):
+    def setup_Vm_recording(self, data_container, numcellspertype=10, random=True):
         for vertex in self.celltype_graph.vs:
-            cell_list = self.get_maxdegree_cell_indices(celltype=vertex['label'], size=numcellspertype)
+            if random:
+                cell_list = self.get_maxdegree_cell_indices(celltype=vertex['label'], size=numcellspertype)
+            else:
+                cell_list = self.index_cell_map.keys()
             for cellindex in cell_list:
                 cell = self.index_cell_map[cellindex]
                 cell.soma.insertRecorder(cell.name + '_Vm', 'Vm', data_container)
