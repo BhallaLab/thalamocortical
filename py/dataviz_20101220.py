@@ -7,9 +7,9 @@
 # Copyright (C) 2010 Subhasis Ray, all rights reserved.
 # Created: Wed Dec 15 10:16:41 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Dec 21 16:57:48 2010 (+0530)
+# Last-Updated: Tue Dec 21 21:14:06 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 283
+#     Update #: 298
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -50,7 +50,7 @@ from pysparse.sparse.pysparseMatrix import PysparseMatrix
 import tables
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-
+from scipy.linalg import block_diag
 from PyQt4 import QtCore, QtGui
 
 
@@ -153,13 +153,14 @@ class TraubDataViz(FigureCanvas):
         same time display all the cells - organized in a grid grouped
         on the basis of depth and celltype.
 
-        """
+        """        
         # Raster plot for the spike trains: we are skipping the animation for the time being.
         if self.spiketrain_dict:
-            for cellname, spiketrain in self.spiketrain_dict.items():
-                y_values = np.array([self.cell_index_map[cellname]] * len(spiketrain))
-                self.spike_axes.plot(spiketrain, y_values, '.')
-                # self.spike_axes.scatter(spiketrain, y_values, s=1, c=y_values, vmin=0.0, vmax=len(y_values))
+            colorcount = 4
+            colorvec = [[color % colorcount + 1.0] for color in range(self.spike_matrix.shape[0])]
+            colormatrix = block_diag(*colorvec) / colorcount
+            self.image = self.spike_axes.imshow(np.dot(self.spike_matrix.transpose(), colormatrix).transpose(), interpolation='nearest')
+            self.colorbar = self.figure.colorbar(self.image)
         print 'finished spike plot'
         count = 0
         # for key, value in self.vm_dict.items():
