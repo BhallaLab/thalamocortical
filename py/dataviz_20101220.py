@@ -7,9 +7,9 @@
 # Copyright (C) 2010 Subhasis Ray, all rights reserved.
 # Created: Wed Dec 15 10:16:41 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Dec 21 11:57:40 2010 (+0530)
+# Last-Updated: Tue Dec 21 16:57:48 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 222
+#     Update #: 283
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -46,7 +46,7 @@ import sys
 import time
 
 import numpy as np
-from pysparse.sparse.spmatrix import ll_mat
+from pysparse.sparse.pysparseMatrix import PysparseMatrix
 import tables
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
@@ -98,15 +98,16 @@ class TraubDataViz(FigureCanvas):
             try:
                 count = 0
                 for train in h5file.root.spiketimes:
-                    self.spiketrain_dict[train.name] = train[:]
-                    cell_name = train.name[:train.rfind('_')]
+                    cell_name = train.name[:train.name.rfind('_')]
+                    self.spiketrain_dict[cell_name] = train[:]
                     self.cell_index_map[cell_name] = count
                     self.index_cell_map[count] = cell_name
+                    count += 1
             except tables.NoSuchNodeError:
                 print 'No node called /spiketimes'
             try:
                 for vm_array in h5file.root.Vm:
-                    cell_name = vm_array.name[vm_array.name.rfind('_')]
+                    cell_name = vm_array.name[:vm_array.name.rfind('_')]
                     self.vm_dict[cell_name] = vm_array[:]
             except tables.NoSuchNodeError:
                 print 'No node called /Vm'
@@ -119,7 +120,7 @@ class TraubDataViz(FigureCanvas):
                 print 'No node called /Ca'
         print 'SIMULATION DONE ON', self.timestamp, '-- SIMTIME:', self.simtime, ', SIMDT:', self.simdt, ', PLOTDT:', self.plotdt
         
-        if len(self.vm_dict) > 0:
+        if self.vm_dict:
             for cell_name, vm_array in self.vm_dict.items():
                 self.frame_count = len(vm_array)
                 break
@@ -128,9 +129,16 @@ class TraubDataViz(FigureCanvas):
         if not self.simtime:
             self.simtime = 1.0
         self.timepoints = np.linspace(0, self.simtime, self.frame_count)
-        if not self.spiketrain_dict.empty():
-            spike_mat = ll_mat(len(self.timepoints), len(self.spiketrain_dict.keys))
-            for key, value in 
+        if self.spiketrain_dict:
+            spike_mat = PysparseMatrix(nrow=len(self.spiketrain_dict.keys()), ncol=len(self.timepoints))
+            for index in range(len(self.index_cell_map.keys())):
+                cell_name = self.index_cell_map[index]
+                try:
+                    spiketrain = self.spiketrain_dict[cell_name]
+                    spike_mat.put(1.0,  np.array([index] * len(spiketrain), dtype='int32'), np.cast['int32'](spiketrain/self.plotdt + 0.5))
+                except KeyError:
+                    print 'No cell corresponding to index', index
+            self.spike_matrix = spike_mat.getNumpyArray()
         self.vm_axes.set_xlim(self.simtime)
         self.ca_axes.set_xlim(self.simtime)
 
@@ -147,18 +155,22 @@ class TraubDataViz(FigureCanvas):
 
         """
         # Raster plot for the spike trains: we are skipping the animation for the time being.
+        if self.spiketrain_dict:
+            for cellname, spiketrain in self.spiketrain_dict.items():
+                y_values = np.array([self.cell_index_map[cellname]] * len(spiketrain))
+                self.spike_axes.plot(spiketrain, y_values, '.')
+                # self.spike_axes.scatter(spiketrain, y_values, s=1, c=y_values, vmin=0.0, vmax=len(y_values))
+        print 'finished spike plot'
         count = 0
-        for key, value in self.spiketrain_dict.items():
-            self.spike_axes.scatter(self.timepoints, value)
-        count = 0
-        for key, value in self.vm_dict.items():
-            self.vm_axes.plot(self.timepoints, value+count*0.2, label=key)
-            count += 1
-        count = 0
-        for key, value in self.ca_dict.items():
-            self.ca_axes.plot(self.timepoints, value+count*0.2, label=key)
-            count +=1
+        # for key, value in self.vm_dict.items():
+        #     self.vm_axes.plot(self.timepoints, value+count*0.2, label=key)
+        #     count += 1
+        # count = 0
+        # for key, value in self.ca_dict.items():
+        #     self.ca_axes.plot(self.timepoints, value+count*0.2, label=key)
+        #     count +=1
         self.draw()
+        self.figure.savefig(self.datafilename + '_.png')
 
 # The BlitQt is modified from the matplotlib example -- left here as a
 # reference when modifying code in future.
