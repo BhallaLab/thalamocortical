@@ -7,9 +7,9 @@
 # Copyright (C) 2010 Subhasis Ray, all rights reserved.
 # Created: Wed Dec 15 10:16:41 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Dec 17 18:51:57 2010 (+0530)
+# Last-Updated: Tue Dec 21 11:29:22 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 195
+#     Update #: 218
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -38,6 +38,7 @@ import sys
 import time
 
 import numpy as np
+from pysparse.sparse.spmatrix import ll_mat
 import tables
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
@@ -52,8 +53,11 @@ class TraubDataViz(FigureCanvas):
     def __init__(self, filename):
         FigureCanvas.__init__(self, Figure())
         self.spike_axes = self.figure.add_subplot(131)
+        self.spike_axes.set_title('Spike trains')
         self.vm_axes =  self.figure.add_subplot(132)
+        self.vm_axes.set_title('Vm')
         self.ca_axes = self.figure.add_subplot(133)
+        self.ca_axes.set_title('[Ca2+]')
         self.spike_axes_bg = self.copy_from_bbox(self.spike_axes.bbox)
         self.vm_axes_bg = self.copy_from_bbox(self.vm_axes.bbox)
         self.ca_axes_bg = self.copy_from_bbox(self.ca_axes.bbox)
@@ -68,6 +72,8 @@ class TraubDataViz(FigureCanvas):
         self.timestamp = None
         self.frame_count = 0
         self.timepoints = []
+        self.cell_index_map = {}
+        self.index_cell_map = {}
         self._read_data()
         self.draw()
         
@@ -82,19 +88,25 @@ class TraubDataViz(FigureCanvas):
             except AttributeError, e:
                 print e
             try:
+                count = 0
                 for train in h5file.root.spiketimes:
                     self.spiketrain_dict[train.name] = train[:]
+                    cell_name = train.name[:train.rfind('_')]
+                    self.cell_index_map[cell_name] = count
+                    self.index_cell_map[count] = cell_name
             except tables.NoSuchNodeError:
                 print 'No node called /spiketimes'
             try:
                 for vm_array in h5file.root.Vm:
-                    self.vm_dict[vm_array.name] = vm_array[:]
+                    cell_name = vm_array.name[vm_array.name.rfind('_')]
+                    self.vm_dict[cell_name] = vm_array[:]
             except tables.NoSuchNodeError:
                 print 'No node called /Vm'
             
             try:
                 for ca_array in h5file.root.Ca:
-                    self.ca_dict[ca_array.name] = ca_array[:]
+                    cell_name = ca_array.name[:ca_array.name.rfind('_')]
+                    self.ca_dict[cell_name] = ca_array[:]
             except tables.NoSuchNodeError:
                 print 'No node called /Ca'
         print 'SIMULATION DONE ON', self.timestamp, '-- SIMTIME:', self.simtime, ', SIMDT:', self.simdt, ', PLOTDT:', self.plotdt
@@ -108,6 +120,9 @@ class TraubDataViz(FigureCanvas):
         if not self.simtime:
             self.simtime = 1.0
         self.timepoints = np.linspace(0, self.simtime, self.frame_count)
+        if not self.spiketrain_dict.empty():
+            spike_mat = ll_mat(len(self.timepoints), len(self.spiketrain_dict.keys))
+            for key, value in 
         self.vm_axes.set_xlim(self.simtime)
         self.ca_axes.set_xlim(self.simtime)
 
@@ -123,6 +138,10 @@ class TraubDataViz(FigureCanvas):
         on the basis of depth and celltype.
 
         """
+        # Raster plot for the spike trains: we are skipping the animation for the time being.
+        count = 0
+        for key, value in self.spiketrain_dict.items():
+            self.spike_axes.scatter(self.timepoints, value)
         count = 0
         for key, value in self.vm_dict.items():
             self.vm_axes.plot(self.timepoints, value+count*0.2, label=key)
@@ -132,7 +151,9 @@ class TraubDataViz(FigureCanvas):
             self.ca_axes.plot(self.timepoints, value+count*0.2, label=key)
             count +=1
         self.draw()
-        
+
+# The BlitQt is modified from the matplotlib example -- left here as a
+# reference when modifying code in future.
 class BlitQT(FigureCanvas):
 
     def __init__(self):
