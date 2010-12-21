@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Dec 15 20:10:33 2010 (+0530)
-#           By: subha
-#     Update #: 1215
+# Last-Updated: Tue Dec 21 11:36:54 2010 (+0530)
+#           By: Subhasis Ray
+#     Update #: 1240
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -411,12 +411,22 @@ class TraubNet(object):
             return cells[:size]
             
     def setup_spike_recording(self, data_container):
+        """Create tables to record spike times for each cell.
+
+        The tables are created under {data_container}/spikes"""
+        spike_container = moose.Neutral('spikes', data_container)
         for cell in self.cell_index_map.keys():
-            tab = cell.soma.insertRecorder(cell.name + '_spikes', 'Vm', data_container)
+            tab = cell.soma.insertRecorder(cell.name, 'Vm', spike_container)
             tab.stepMode = moose.TAB_SPIKE
             tab.stepSize = 0.0
         
     def setup_Vm_recording(self, data_container, numcellspertype=10, random=True):
+        """Create tables to record Vm and [Ca2+] from a fixed number of cells of each type.
+
+        The tables recording Vm are created under {data_container}/Vm and
+        those for recording [Ca2+] are created under {data_container}/Ca."""
+        vm_container = moose.Neutral('Vm', data_container)
+        ca_container = moose.Neutral('Ca', data_container)
         for vertex in self.celltype_graph.vs:
             if random:
                 cell_list = self.get_maxdegree_cell_indices(celltype=vertex['label'], size=numcellspertype)
@@ -424,15 +434,25 @@ class TraubNet(object):
                 cell_list = self.index_cell_map.keys()
             for cellindex in cell_list:
                 cell = self.index_cell_map[cellindex]
-                cell.soma.insertRecorder(cell.name + '_Vm', 'Vm', data_container)
-                cell.soma.insertCaRecorder(cell.name + '_Ca', data_container)
+                cell.soma.insertRecorder(cell.name, 'Vm', vm_container)
+                cell.soma.insertCaRecorder(cell.name, ca_container)
         
-    def setup_stimulus(self, stim_container, celltype, bg_count, bg_onset, bg_width, bg_interval, probe_delay, probe_width, probe_interval):
+    def setup_stimulus(self, stim_container, celltype, stim_onset, bg_count, bg_onset, bg_width, bg_interval, probe_delay, probe_width, probe_interval):
         """Setup the stimulus protocol.
+
+        The protocol is as follows:
+
+        Let the system stabilize for stim_onset seconds. 
+
+        Then turn the stim_gate on: which gates the triggers.
+
+        The bg_trigger will tr
 
         stim_container -- container object for stimulating electrodes
 
         celltype -- type of cells we are looking at
+
+        stim_onset -- when we consider the system stabilized and start stimulus
 
         bg_onset -- start time for background stimulus
 
@@ -452,6 +472,16 @@ class TraubNet(object):
         else:
             raise Error('Stimulus container must be a string or a Neutral object')
         celltype_vertex_set = self.celltype_graph.vs.select(label_eq=celltype)
+        self.stimulus_gate = moose.PulseGen('stim_gate', self.stim_container)
+        self.stimulus_gate.trigMode = 0 # Free running
+        self.stimulus_gate.firstDelay = stim_onset
+        self.stimulus_gate.firstWidth = 1e9 # Keep it on
+        self.stimulus_gate.firstLevel = 1.0
+
+        self.stimulus_background = moose.PulseGen('stim_background', self.stim_container)
+        self.stimulus_background.firstLevel = 5e-12 # 5 pA background?
+        self.probe = moose.PulseGen('stim_probe', self.stim_container)
+        self.stimulus_background.connect(self.)
         for vertex in celltype_vertex_set:
             startindex = int(vertex['startindex'])
             count = int(vertex['count'])
