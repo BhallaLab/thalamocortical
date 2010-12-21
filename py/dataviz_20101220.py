@@ -7,9 +7,9 @@
 # Copyright (C) 2010 Subhasis Ray, all rights reserved.
 # Created: Wed Dec 15 10:16:41 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Dec 21 11:58:12 2010 (+0530)
+# Last-Updated: Tue Dec 21 11:57:40 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 219
+#     Update #: 222
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -36,8 +36,8 @@
 # same name as the cell it is recording from. Depending on table name
 # suffix is as bad as filename extensions in Windows - one has to be
 # consistent with the assumptions about table names between the
-# simulation code and the data analysis code.  Hence forking this away
-# into code for analyzing newer data.
+# simulation code and the data analysis code.
+#    Hence forking this away into code for analyzing older data.
 
 # Code:
 
