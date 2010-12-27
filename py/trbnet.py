@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Dec 27 12:05:49 2010 (+0530)
+# Last-Updated: Mon Dec 27 12:32:34 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1308
+#     Update #: 1309
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -115,6 +115,9 @@ from nRT import nRT
 
 class CellType(tables.IsDescription):
     """The CellType class is data for each row in the celltype table.
+
+    This is the datastructure used for saving celltype info hdf5 format.
+    
     name -- human readable name of the celltype
 
     index -- index of the celltype in the table. Do we need explicit index??
@@ -127,7 +130,8 @@ class CellType(tables.IsDescription):
     count = tables.Int16Col()
 
 class SynEdge(tables.IsDescription):
-    """Describes an edge of celltype graph"""
+    """Describes an edge of celltype graph. This is used for saving
+    synase information in HDF5 file."""
     source = tables.Int8Col()    # Index of source celltype
     target =  tables.Int8Col()   # Index of destination celltype
     weight =  tables.Float64Col() # connection probability from sourec to target
