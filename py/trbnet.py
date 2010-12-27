@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Dec 22 17:28:36 2010 (+0530)
+# Last-Updated: Mon Dec 27 12:05:49 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1290
+#     Update #: 1308
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -171,7 +171,7 @@ class TraubNet(object):
         self.celltype_file = celltype_file
         self.scale = scale
         self.graph_format = format
-        # self.populations = defaultdict(list)
+        self.populations = defaultdict(list)
         self.celltype_graph = None
         self.cell_graph = None
         self.g_gaba_mat = None
@@ -188,6 +188,7 @@ class TraubNet(object):
             self.network_container = container
         else:
             raise('Need a moose-object/string/None as container. Got %s of type %s' % (container, container.__class__.__name__))
+        
     def setup_from_celltype_file(self, celltype_file=None, format=None, scale=None):
         """Set up the network from a celltype-celltype graph file.
 
@@ -343,6 +344,7 @@ class TraubNet(object):
                 cell = cell_class(cell_class.prototype, '%s/%s_%d' % (self.network_container.path, celltype['label'], ii))
                 self.index_cell_map[total_count + ii] = cell
                 self.cell_index_map[cell] = total_count + ii
+                self.populations[celltype['label']].append(total_count + ii)
             total_count += cell_count
         for syn_edge in self.celltype_graph.es:
             pretype = self.celltype_graph.vs[syn_edge.source]
@@ -437,7 +439,7 @@ class TraubNet(object):
                 cell.soma.insertRecorder(cell.name, 'Vm', vm_container)
                 cell.soma.insertCaRecorder(cell.name, ca_container)
         
-    def setup_stimulus(self, stim_container, celltype, stim_onset, stim_interval, bg_delay, pulse_width, isi, level=5e-12, bg_count=10):
+    def setup_stimulus(self, stim_container='/stim', , stim_onset=0.5, stim_interval=, bg_delay, pulse_width, isi=10e-3, level=5e-12, bg_count=100, probe_count=10):
         """Setup the stimulus protocol.
 
         The protocol is as follows:
@@ -474,11 +476,13 @@ class TraubNet(object):
         bg_count -- number of cells stimulated by background pulse.
 
         """
-        if not isinstance(stim_container, moose.Neutral) and isinstance(stim_container, str):
+        if  isinstance(stim_container, str):
             self.stim_container = moose.Neutral(stim_container)
+        elif isinstance(stim_container, moose.Neutral):
+            self.stim_container = stim_container
         else:
-            raise Error('Stimulus container must be a string or a Neutral object')
-        celltype_vertex_set = self.celltype_graph.vs.select(label_eq=celltype)
+            print isinstance(stim_container, moose.Neutral)
+            raise Exception('Stimulus container must be a string or a Neutral object: got %s', stim_container.__class__.__name__)
         self.root_gate = moose.PulseGen('root_gate', self.stim_container)
         self.root_gate.trigMode = 0 # Free running
         self.root_gate.firstDelay = stim_onset
@@ -486,28 +490,41 @@ class TraubNet(object):
         self.root_gate.firstLevel = 1.0                
         self.stim_gate = moose.PulseGen('stim_gate', self.stim_container)
         self.stim_gate.firstDelay = stim_interval
+        self.stim_gate.firstLevel = 1.0
         self.stim_gate.firstWidth = (bg_delay + pulse_width + isi) * 2
-        
+        self.stim_gate.trigMode = 2
         self.stim_bg = moose.PulseGen('stim_background', self.stim_container)
         self.stim_bg.firstLevel = level
         self.stim_bg.secondLevel = level
         self.stim_bg.firstDelay = bg_delay
+        self.stim_bg.firstWidth = pulse_width
         self.stim_bg.secondDelay = isi
+        self.stim_bg.secondWidth = pulse_width
+        
+        self.stim_bg.trigMode = 2
         self.stim_probe = moose.PulseGen('stim_probe', self.stim_container)
         self.stim_probe.firstLevel = level
         self.stim_probe.secondLevel = level
-        self.stim_probe.firstDelay = 2 * self.bg_delay + bg_width + isi
+        self.stim_probe.firstDelay = 2 * bg_delay + pulse_width + isi
+        self.stim_probe.secondDelay = isi
+        self.stim_probe.firstWidth = pulse_width
+        self.stim_probe.secondWidth = pulse_width            
+        self.stim_probe.trigMode = 2
         self.root_gate.connect('outputSrc', self.stim_gate, 'input')
         self.stim_gate.connect('outputSrc', self.stim_bg, 'input')
         self.stim_gate.connect('outputSrc', self.stim_probe, 'input')
-        for vertex in celltype_vertex_set:
-            startindex = int(vertex['startindex'])
-            count = int(vertex['count'])
-            cell_indices = numpy.random.randint(low=startindex, high=startindex+count, size=bg_count+1)
-            for index in cell_indices:
-                raise NotImplementedError()
-                cell = self.index_cell_map[index]
-                stim = moose.PulseGen(cell.name + '_inject', self.stim_container)
+        cell_indices = []
+        if celltype == 'any':
+            cell_indices = numpy.random.randint(low=0, high=len(self.index_cell_map.keys()), size=bg_count+1)
+        else:
+            celltype_vertex_set = self.celltype_graph.vs.select(label_eq=celltype)
+            for vertex in celltype_vertex_set:
+                startindex = int(vertex['startindex'])
+                count = int(vertex['count'])
+                np.concatenate((cell_indices, numpy.random.randint(low=startindex, high=startindex+count, size=bg_count+1)))
+        for index in cell_indices:
+            cell = self.index_cell_map[index]
+            stim = moose.PulseGen(cell.name + '_inject', self.stim_container)
 
     def scale_populations(self, scale):
         """Scale the number of cells in each population by a factor."""
