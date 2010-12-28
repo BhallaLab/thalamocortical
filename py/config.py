@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Dec 15 11:58:00 2010 (+0530)
+# Last-Updated: Tue Dec 28 10:49:46 2010 (+0530)
 #           By: subha
-#     Update #: 169
+#     Update #: 170
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -50,6 +50,8 @@ import sys
 import os
 from datetime import datetime
 import logging
+import numpy
+
 import moose
 
 timestamp = datetime.now()
