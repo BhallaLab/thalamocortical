@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Dec 27 12:46:32 2010 (+0530)
+# Last-Updated: Tue Dec 28 15:55:16 2010 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1316
+#     Update #: 1346
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -69,6 +69,9 @@
 # ll_mat for adjacency matrices for storing /g/.
 # added creation of these matrices as part of generate_cell_graph fn.
 # Updated scale_condunctance to take care of ggaba(nRT->TCR).
+#
+# 2010-12-28 14:26:47 (+0530) fixed serious mistake in get_maxdegree_cell_indices.
+
 
 # Code:
 
@@ -385,6 +388,11 @@ class TraubNet(object):
         config.BENCHMARK_LOGGER.info('Finished network creation in: %g s' % (delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))
 
     def get_maxdegree_cell_indices(self, celltype=None, size=None):
+        """Get the cells with maximum connectivity - disregarding the strength of the synapse.
+
+        returns the {size} cells of type {celltype} sorted by degree.
+        
+        """
         cell_dict = defaultdict(int)
         if celltype is not None:
             index = 0
@@ -411,7 +419,7 @@ class TraubNet(object):
                     if self.g_nmda_mat[ii, jj] != 0.0:
                         cell_dict[ii] += 1
         cells = sorted(cell_dict, key=lambda x: cell_dict[x], reverse=True)
-        if size is not None:
+        if size is None:
             return cells
         else:
             return cells[:size]
@@ -426,18 +434,32 @@ class TraubNet(object):
             tab.stepMode = moose.TAB_SPIKE
             tab.stepSize = 0.0
         
-    def setup_Vm_recording(self, data_container, numcellspertype=10, random=True):
+    def setup_Vm_recording(self, data_container, celltype, numcells=10, random=True):
         """Create tables to record Vm and [Ca2+] from a fixed number of cells of each type.
 
         The tables recording Vm are created under {data_container}/Vm and
-        those for recording [Ca2+] are created under {data_container}/Ca."""
+        those for recording [Ca2+] are created under {data_container}/Ca.
+
+        celltype -- the class of cells to record from.
+        
+        numcells -- number of cells to record from. If 'all', select all cells.
+
+        random -- if true, randomly select {numcells} cells. if false, select only the maxdegree cells.    
+        
+        """
         vm_container = moose.Neutral('Vm', data_container)
         ca_container = moose.Neutral('Ca', data_container)
-        for vertex in self.celltype_graph.vs:
-            if random:
+        if celltype == 'all':
+            vs = self.celltype_graph.vs
+        else:
+            vs = self.celltype_graph.vs.select(label_eq=celltype)
+        for vertex in vs:
+            if not random:
                 cell_list = self.get_maxdegree_cell_indices(celltype=vertex['label'], size=numcellspertype)
             else:
-                cell_list = self.index_cell_map.keys()
+                pop = self.populations[celltype]                
+                high = len(pop)
+                cell_list = pop[numpy.randint(low=0, high=high, size=numcells)]
             for cellindex in cell_list:
                 cell = self.index_cell_map[cellindex]
                 cell.soma.insertRecorder(cell.name, 'Vm', vm_container)
@@ -864,7 +886,7 @@ def test_scale_conductance():
     print 'test_scale_conductance: Successfully tested.'
 
 
-def test_reading_network(self, filename):
+def test_reading_network(filename):
     tn =  TraubNet()
     tn._generate_celltype_graph()
     tn._generate_cell_graph()
@@ -908,7 +930,6 @@ def test_reading_network(self, filename):
             assert row['taugabaslow'] == edge['taugabaslow']
         
     h5file.close()
-        
 
 if __name__ == '__main__':
     net = TraubNet()

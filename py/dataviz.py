@@ -7,9 +7,9 @@
 # Copyright (C) 2010 Subhasis Ray, all rights reserved.
 # Created: Wed Dec 15 10:16:41 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Dec 21 11:58:12 2010 (+0530)
+# Last-Updated: Wed Feb  9 17:58:42 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 219
+#     Update #: 295
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -52,7 +52,10 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
 from PyQt4 import QtCore, QtGui
-
+import pylab
+import mpl_toolkits.mplot3d.axes3d as p3
+from matplotlib import cm
+from matplotlib.colors import colorConverter
 
 ITERS = 1000
 
@@ -99,7 +102,7 @@ class TraubDataViz(FigureCanvas):
                 count = 0
                 for train in h5file.root.spiketimes:
                     self.spiketrain_dict[train.name] = train[:]
-                    cell_name = train.name[:train.rfind('_')]
+                    cell_name = train.name[:train.name.rfind('_')]
                     self.cell_index_map[cell_name] = count
                     self.index_cell_map[count] = cell_name
             except tables.NoSuchNodeError:
@@ -128,9 +131,11 @@ class TraubDataViz(FigureCanvas):
         if not self.simtime:
             self.simtime = 1.0
         self.timepoints = np.linspace(0, self.simtime, self.frame_count)
-        if not self.spiketrain_dict.empty():
-            spike_mat = ll_mat(len(self.timepoints), len(self.spiketrain_dict.keys))
-            for key, value in 
+        if not self.spiketrain_dict:
+            pass
+            # spike_mat = ll_mat(len(self.timepoints), len(self.spiketrain_dict.keys))
+            # for key, value in self.spiketrain_dict.items():
+                
         self.vm_axes.set_xlim(self.simtime)
         self.ca_axes.set_xlim(self.simtime)
 
@@ -211,14 +216,29 @@ class BlitQT(FigureCanvas):
             self.draw()
             self.figure.savefig('frame_%d.png' % (self.cnt))
 
-if __name__ == '__main__':
-    app = QtGui.QApplication(sys.argv)
-    if len(sys.argv) > 1:
-        widget = TraubDataViz(sys.argv[1])
-        widget.visualize()
-        widget.show()
+# if __name__ == '__main__':
+#     app = QtGui.QApplication(sys.argv)
+#     if len(sys.argv) > 1:
+#         widget = TraubDataViz(sys.argv[1])
+#         widget.visualize()
+#         widget.show()
 
-    sys.exit(app.exec_())
+#     sys.exit(app.exec_())
+
+color_list = ['b', 'r', 'g', 'm', 'y', 'c', 'k']
+color_convert = lambda x: colorConverter.to_rgb(x)
+if __name__ == '__main__':    
+    data = []
+    for i in range(14):
+        data.append(np.random.rand(2, 1000))
+    fig = pylab.figure()
+    ax = p3.Axes3D(fig)
+    for ii in range(14):
+        color = color_convert(color_list[ii%len(color_list)])
+        print color
+        ax.scatter3D(data[i][0], data[i][1], ii/14.0, c=color)
+    # pylab.colorbar()
+    pylab.show()
     
 # 
 # dataviz.py ends here
