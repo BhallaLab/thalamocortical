@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Apr 14 22:07:51 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 683
+# Last-Updated: Wed Feb  9 21:15:34 2011 (+0530)
+#           By: subha
+#     Update #: 684
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -227,7 +227,7 @@ class KCaChannel(KChannel):
         KChannel.__init__(self, name, parent, xpower, ypower, Ek=Ek)
         self.connected_to_ca = False
         self.Zpower = zpower
-        self.zGate = moose.HHGate('zGate', self)
+        # self.zGate = moose.HHGate('zGate', self)
         self.zGate.A.xmin = KCaChannel.ca_min
         self.zGate.A.xdivs = KCaChannel.ca_divs
         self.zGate.A.xmax = KCaChannel.ca_max
