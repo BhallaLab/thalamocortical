@@ -7,9 +7,9 @@
 # Copyright (C) 2010 Subhasis Ray, all rights reserved.
 # Created: Wed Dec 15 10:16:41 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Feb 10 13:48:39 2011 (+0530)
+# Last-Updated: Thu Feb 10 22:23:11 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 307
+#     Update #: 407
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -44,6 +44,7 @@
 import os
 import sys
 import time
+import re
 
 import numpy as np
 from pysparse.sparse.spmatrix import ll_mat
@@ -52,7 +53,110 @@ from PyQt4 import QtCore, QtGui
 
 ITERS = 1000
 
+def train_to_cellname(trainname):
+    """Extract the name of the generator cell from a spike/Vm/Ca train name"""
+    return trainname[:trainname.rfind('_')]
+
 class TraubData:
+    """Data model for exploring simulation data.
+
+    datafilename -- path of the data file
+
+    h5f -- hdf5 file object
+    """
+    def __init__(self, filename):
+        self.datafilename = filename
+        self.h5f = None
+        self.spiketrain_names = []
+        self.Vm_names = []
+        self.Ca_names = []
+        self.simtime = None
+        self.simdt = None
+        self.plotdt = None
+        self.timestamp = None
+        
+        try:
+            self.h5f = tables.openFile(self.datafilename)            
+        except Exception, e:
+            raise e
+        try:
+            self.simtime = self.h5f.root._v_attrs.simtime
+            self.simdt = self.h5f.root._v_attrs.simdt
+            self.plotdt = self.h5f.root._v_attrs.plotdt
+        except AttributeError, e:
+            print e
+        
+        try:
+            for train in self.h5f.root.spikes:
+                self.spiketrain_names.append(train.name)
+        except tables.NoSuchNodeError:
+            print 'No node called /spikes'
+        try:
+            for vm_array in self.h5f.root.Vm:
+                self.Vm_names.append(vm_array.name)
+        except tables.NoSuchNodeError:
+            print 'No node called /Vm'
+
+        try:
+            for ca_array in self.h5f.root.Ca:
+                self.Ca_names.append(cell_name)
+        except tables.NoSuchNodeError:
+            print 'No node called /Ca'
+
+    def get_data_by_re(self, pattern, datatype):
+        """Returns data for cells whose name match regular expression 'pattern'"""
+        ret = []
+        regex = re.compile(pattern)
+        if datatype == 'spike':
+            target_node = '/spikes'
+        elif datatype == 'Vm' or datatype == 'vm':
+            target_node = '/Vm'
+        elif datatype == 'Ca' or datatype == 'ca':
+            target_node = '/Ca'
+        else:
+            raise Exception('Invalid datatype specified: %s' %(datatype))
+                            
+        try:
+            ret = [data for data in self.h5f.getNode(target_node) if regex.match(data.name)]
+        except tables.NoSuchNodeError:
+            print 'No such node: %s' % (target_node)
+        return ret
+                
+    def __del__(self):
+        if self.h5f and self.h5f.isopen():
+            self.h5f.close()
+
+
+class GuiModel(QtCore.QObject):
+    """data_handler -- TraubData object accessing the files.
+
+    ca_cells -- 
+    """
+    def __init__(self, *args):
+        QtCore.QObject.__init__(self, *args)
+        self.data_handler = None
+        self.ca_cells = []
+        self.vm_cells = []
+        self.spike_cells = []
+        
+    def openFile(self, filename):
+        """Open a new data file given by filename."""
+        self.data_handler = TraubData(filename)
+        # Clear the lists of arrays to be plotted
+        self.ca_cells = []
+        self.vm_cells = []
+        self.spike_cells = []
+        
+        
+class DataVizGui(QtGui.QMainWindow):
+    def __init__(self, *args):
+        QtGui.QMainWindow.__init__(self, *args)
+        
+
+
+
+            
+class __TraubData:
     """Class for visualizing data saved in custom HDF5 files in Traub model simulations.
 
     spike_train_dict -- a dict which will contain the spike trains in the file as {cell_name: spike_time_array} after loading a data file.
@@ -162,65 +266,6 @@ class TraubData:
             count +=1
         self.draw()
 
-# The BlitQt is modified from the matplotlib example -- left here as a
-# reference when modifying code in future.
-class BlitQT(FigureCanvas):
-
-    def __init__(self):
-        FigureCanvas.__init__(self, Figure())
-
-        self.ax = self.figure.add_subplot(111)
-        self.draw()
-
-        self.old_size = self.ax.bbox.width, self.ax.bbox.height
-        self.ax_background = self.copy_from_bbox(self.ax.bbox)
-        self.cnt = 0
-        self.data = np.random.rand(350, 100)
-        self.im = self.ax.imshow(self.data, aspect='auto', interpolation='nearest', animated=True)
-        self.cbar = self.figure.colorbar(self.im)
-
-        self.draw()
-        self.tstart = time.time()
-        self.startTimer(10)
-
-    def timerEvent(self, evt):
-        # The following lines from the example were causing the screen to become blank.
-        # Hence I commented them out. -- Subha
-        
-        # current_size = self.ax.bbox.width, self.ax.bbox.height
-        # if self.old_size != current_size:
-        #     self.old_size = current_size
-        #     self.ax.clear()
-        #     # self.ax.grid()
-        #     self.draw()
-        #     self.ax_background = self.copy_from_bbox(self.ax.bbox)
-
-        self.restore_region(self.ax_background, bbox=self.ax.bbox)
-
-        # update the data
-        self.im.set_data(np.random.rand(350, 100))
-        # just draw the animated artist -- not needed when updating everything -- Subha
-        # self.ax.draw_artist(self.sin_line)
-        # self.ax.draw_artist(self.cos_line)
-        # just redraw the axes rectangle
-        self.blit(self.ax.bbox)
-        if self.cnt==ITERS:
-            # print the timing info and quit
-            print 'FPS:' , ITERS/(time.time()-self.tstart)
-            sys.exit()
-        else:
-            self.cnt += 1
-            self.draw()
-            self.figure.savefig('frame_%d.png' % (self.cnt))
-
-# if __name__ == '__main__':
-#     app = QtGui.QApplication(sys.argv)
-#     if len(sys.argv) > 1:
-#         widget = TraubDataViz(sys.argv[1])
-#         widget.visualize()
-#         widget.show()
-
-#     sys.exit(app.exec_())
 
 color_list = ['b', 'r', 'g', 'm', 'y', 'c', 'k']
 color_convert = lambda x: colorConverter.to_rgb(x)
