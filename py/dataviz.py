@@ -7,9 +7,9 @@
 # Copyright (C) 2010 Subhasis Ray, all rights reserved.
 # Created: Wed Dec 15 10:16:41 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Feb  9 17:58:42 2011 (+0530)
+# Last-Updated: Thu Feb 10 13:48:39 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 295
+#     Update #: 307
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -48,30 +48,27 @@ import time
 import numpy as np
 from pysparse.sparse.spmatrix import ll_mat
 import tables
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-
 from PyQt4 import QtCore, QtGui
-import pylab
-import mpl_toolkits.mplot3d.axes3d as p3
-from matplotlib import cm
-from matplotlib.colors import colorConverter
 
 ITERS = 1000
 
-class TraubDataViz(FigureCanvas):
-    """Class for visualizing data saved in custom HDF5 files in Traub model simulations."""
+class TraubData:
+    """Class for visualizing data saved in custom HDF5 files in Traub model simulations.
+
+    spike_train_dict -- a dict which will contain the spike trains in the file as {cell_name: spike_time_array} after loading a data file.
+
+    vm_dict -- a dict which will contain the membrain potential Vm in the file as {cell_name: array_of_Vm_values_over_simulation_time} after loading a file.
+
+    ca_dict -- a dict which will contain the [Ca2+] in the file as {cell_name: array_of_[Ca2+]_values_over_simulation_time} after loading a file.
+
+    plotdt -- plotting time step specified in the data file
+
+    simdt -- simulation time step as specified in the data file.
+
+    timepoints -- an array with simulation time value for each entry in the Vm/Ca arrays.
+    
+    """
     def __init__(self, filename):
-        FigureCanvas.__init__(self, Figure())
-        self.spike_axes = self.figure.add_subplot(131)
-        self.spike_axes.set_title('Spike trains')
-        self.vm_axes =  self.figure.add_subplot(132)
-        self.vm_axes.set_title('Vm')
-        self.ca_axes = self.figure.add_subplot(133)
-        self.ca_axes.set_title('[Ca2+]')
-        self.spike_axes_bg = self.copy_from_bbox(self.spike_axes.bbox)
-        self.vm_axes_bg = self.copy_from_bbox(self.vm_axes.bbox)
-        self.ca_axes_bg = self.copy_from_bbox(self.ca_axes.bbox)
         self.datafilename = filename
         self.spiketrain_dict = {}
         self.vm_dict = {}
