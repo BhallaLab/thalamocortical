@@ -7,9 +7,9 @@
 # Copyright (C) 2010 Subhasis Ray, all rights reserved.
 # Created: Wed Dec 15 10:16:41 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Feb 14 16:52:38 2011 (+0530)
+# Last-Updated: Mon Feb 14 20:22:10 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 636
+#     Update #: 700
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -191,61 +191,20 @@ class GuiModel(QtCore.QObject):
         self.emit(QtCore.SIGNAL('file_loaded(string)'), filename)
         
 
-    # def addTables(self, table_list, table_type):
-    #     target = None
-    #     source = None
-    #     if table_type.lower() == 'ca':
-    #         target = self.selected_ca
-    #         source = self.available_ca
-    #     elif table_type.lower() == 'vm':
-    #         target = self.selected_vm
-    #         source = self.available_vm
-    #     elif table_type.lower() == 'spike':
-    #         target = self.selected_spikes
-    #         source = self.available_spikes
-    #     else:
-    #         raise Exception('No such table type: %s' % table_type)
-        
-    #     for table in table_list:
-    #         source.remove(table)
-    #         target.append(table)
-    #     self.emit(QtCore.SIGNAL('tablelist_updated()'))
-        
-
-    # def removeTables(self, table_list, table_type):
-    #     target = None
-    #     source = None
-    #     if table_type.lower() == 'ca':
-    #         source = self.selected_ca
-    #         target = self.available_ca
-    #     elif table_type.lower() == 'vm':
-    #         source = self.selected_vm
-    #         target = self.available_vm
-    #     elif table_type.lower() == 'spike':
-    #         source = self.selected_spikes
-    #         target = self.available_spikes
-    #     else:
-    #         raise Exception('No such table type: %s' % table_type)
-        
-    #     for table in table_list:
-    #         source.remove(table)
-    #         target.append(table)
-    #         target.sort()
-    #     self.emit(QtCore.SIGNAL('tablelist_updated()'))
-        
-
 class DataVizGui(QtGui.QMainWindow):
     def __init__(self, *args):
         QtGui.QMainWindow.__init__(self, *args)
         self.setDockOptions(self.AllowNestedDocks | self.AllowTabbedDocks | self.ForceTabbedDocks | self.AnimatedDocks)
         self.setDockNestingEnabled(True)
         self.gui_model = GuiModel()
-        # self.make_table_lists()
-        self.plot = Qwt.QwtPlot()
-        self.setCentralWidget(self.plot)
+        self.make_table_lists()
+        self.plot_panel = QtGui.QTabWidget(self)
+        self.setCentralWidget(self.plot_panel)
+        self.plot = Qwt.QwtPlot(self.plot_panel)
+        self.plot_panel.addTab(self.plot, 'plot')
         self.make_actions()
         self.make_menu()
-
+        self.toolbar = self.make_toolbar()
         
     def make_actions(self):
         self.fopen_action = QtGui.QAction(self.tr('&Open'), self)
@@ -260,13 +219,14 @@ class DataVizGui(QtGui.QMainWindow):
         self.show_selected_ca_action = QtGui.QAction('Show selected Ca tables', self)
         self.show_selected_vm_action = QtGui.QAction('Show selected Vm tables', self)
         self.show_selected_spike_action = QtGui.QAction('Show selected spike tables', self)
+        self.select_by_regex_action = QtGui.QAction('Select by regex', self)
+        
         
         
     def make_menu(self):
         self.file_menu = QtGui.QMenu('&File', self)
         self.file_menu.addAction(self.fopen_action)
         self.file_menu.addAction(self.quit_action)
-
         self.view_menu = QtGui.QMenu('&View', self)
         self.view_menu.addAction(self.show_available_tables_action)
         self.view_menu.addAction(self.show_selected_tables_action)
@@ -310,6 +270,7 @@ class DataVizGui(QtGui.QMainWindow):
             view.setDropIndicatorShown(True)
             view.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
             self.tables_docks.append(QtGui.QDockWidget(view.objectName(), self))
+            self.tables_docks[-1].setWidget(view)
             self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.tables_docks[-1])
         
     def popup_fopen(self):
@@ -324,123 +285,14 @@ class DataVizGui(QtGui.QMainWindow):
         print 'Quitting'
         if self.gui_model.data_handler:
             del self.gui_model.data_handler
-            print 'Deleted gui model object'
         QtGui.qApp.quit()
 
             
-class __TraubData:
-    """Class for visualizing data saved in custom HDF5 files in Traub model simulations.
-
-    spike_train_dict -- a dict which will contain the spike trains in the file as {cell_name: spike_time_array} after loading a data file.
-
-    vm_dict -- a dict which will contain the membrain potential Vm in the file as {cell_name: array_of_Vm_values_over_simulation_time} after loading a file.
-
-    ca_dict -- a dict which will contain the [Ca2+] in the file as {cell_name: array_of_[Ca2+]_values_over_simulation_time} after loading a file.
-
-    plotdt -- plotting time step specified in the data file
-
-    simdt -- simulation time step as specified in the data file.
-
-    timepoints -- an array with simulation time value for each entry in the Vm/Ca arrays.
-    
-    """
-    def __init__(self, filename):
-        self.datafilename = filename
-        self.spiketrain_dict = {}
-        self.vm_dict = {}
-        self.ca_dict = {}
-        self.spike_matrix = None
-        self.simtime = None
-        self.simdt = None
-        self.plotdt = None
-        self.timestamp = None
-        self.frame_count = 0
-        self.timepoints = []
-        self.cell_index_map = {}
-        self.index_cell_map = {}
-        self._read_data()
-        self.draw()
-        
-    def _read_data(self):
-        """Read spiketime serieses, Vm serieses and [Ca2+] serieses from data file."""
-        with tables.openFile(self.datafilename) as h5file:
-            try:
-                self.simtime = h5file.root._v_attrs.simtime
-                self.simdt = h5file.root._v_attrs.simdt
-                self.plotdt = h5file.root._v_attrs.plotdt
-                self.timestamp = h5file.root._v_attrs.timestamp
-            except AttributeError, e:
-                print e
-            try:
-                count = 0
-                for train in h5file.root.spiketimes:
-                    self.spiketrain_dict[train.name] = train[:]
-                    cell_name = train.name[:train.name.rfind('_')]
-                    self.cell_index_map[cell_name] = count
-                    self.index_cell_map[count] = cell_name
-            except tables.NoSuchNodeError:
-                print 'No node called /spiketimes'
-            try:
-                for vm_array in h5file.root.Vm:
-                    cell_name = vm_array.name[vm_array.name.rfind('_')]
-                    self.vm_dict[cell_name] = vm_array[:]
-            except tables.NoSuchNodeError:
-                print 'No node called /Vm'
-            
-            try:
-                for ca_array in h5file.root.Ca:
-                    cell_name = ca_array.name[:ca_array.name.rfind('_')]
-                    self.ca_dict[cell_name] = ca_array[:]
-            except tables.NoSuchNodeError:
-                print 'No node called /Ca'
-        print 'SIMULATION DONE ON', self.timestamp, '-- SIMTIME:', self.simtime, ', SIMDT:', self.simdt, ', PLOTDT:', self.plotdt
-        
-        if len(self.vm_dict) > 0:
-            for cell_name, vm_array in self.vm_dict.items():
-                self.frame_count = len(vm_array)
-                break
-        elif self.simtime and self.plotdt:
-            self.frame_count = int(self.simtime / self.plotdt + 0.5)
-        if not self.simtime:
-            self.simtime = 1.0
-        self.timepoints = np.linspace(0, self.simtime, self.frame_count)
-        if not self.spiketrain_dict:
-            pass
-            # spike_mat = ll_mat(len(self.timepoints), len(self.spiketrain_dict.keys))
-            # for key, value in self.spiketrain_dict.items():
-                
-        self.vm_axes.set_xlim(self.simtime)
-        self.ca_axes.set_xlim(self.simtime)
-
-    def visualize(self):
-        """Visualize the data.
-
-        There are three groups -- a set of [Ca2+] recordings, set of
-        Vm recordings for the same cells, and spike times for all
-        cells.
-
-        I'll display the Vm and [Ca2+] in side by side plots. At the
-        same time display all the cells - organized in a grid grouped
-        on the basis of depth and celltype.
-
-        """
-        # Raster plot for the spike trains: we are skipping the animation for the time being.
-        count = 0
-        for key, value in self.spiketrain_dict.items():
-            self.spike_axes.scatter(self.timepoints, value)
-        count = 0
-        for key, value in self.vm_dict.items():
-            self.vm_axes.plot(self.timepoints, value+count*0.2, label=key)
-            count += 1
-        count = 0
-        for key, value in self.ca_dict.items():
-            self.ca_axes.plot(self.timepoints, value+count*0.2, label=key)
-            count +=1
-        self.draw()
 
 
 if __name__ == '__main__':
-    app = QtGui.QApplication([])
+    app = QtGui.QApplication(sys.argv)
+    QtGui.qApp = app
     mainwin = DataVizGui()
     app.lastWindowClosed.connect(mainwin.do_quit)
     mainwin.show()
