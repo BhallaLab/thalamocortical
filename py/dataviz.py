@@ -7,9 +7,9 @@
 # Copyright (C) 2010 Subhasis Ray, all rights reserved.
 # Created: Wed Dec 15 10:16:41 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Feb 14 20:22:10 2011 (+0530)
+# Last-Updated: Tue Feb 15 16:23:56 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 700
+#     Update #: 746
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -106,7 +106,7 @@ class TraubData:
 
         try:
             for ca_array in self.h5f.root.Ca:
-                self.Ca_names.append(cell_name)
+                self.Ca_names.append(ca_array.name)
         except tables.NoSuchNodeError:
             print 'No node called /Ca'
 
@@ -121,11 +121,11 @@ class TraubData:
         """
         ret = None
         target_node = None
-        if datatype.lowercase() == 'ca':
+        if datatype.lower() == 'ca':
             target_node = '/Ca'
-        elif datatype.lowercase() == 'vm':
+        elif datatype.lower() == 'vm':
             target_node = '/Vm'
-        elif datatype.lowercase() == 'spike':
+        elif datatype.lower() == 'spike':
             target_node = '/spikes'
         else:
             print 'Invalid data type: %s' % (datatype)
@@ -189,6 +189,31 @@ class GuiModel(QtCore.QObject):
         self.available_vm.setStringList(self.data_handler.Vm_names)
         self.available_ca.setStringList(self.data_handler.Ca_names)
         self.emit(QtCore.SIGNAL('file_loaded(string)'), filename)
+
+    def select_by_re(self, pattern, datatype):
+        if not self.data_handler:
+            return
+        data = self.data_handler.get_data_by_re(pattern, datatype)
+        if datatype.lower() == 'ca':
+            selected_model = self.selected_ca
+            available_model = self.available_ca
+        elif datatype.lower() == 'vm':
+            selected_model = self.selected_vm
+            available_model = self.available_vm
+        elif datatpe.lower() == 'spike':
+            selected_model = self.selected_spikes
+            available_model = self.available_spikes
+        else:
+            raise Exception('Invalid datatype passed: %s' % (datatype))
+        selected_items = [item.name for item in data]
+        selected_model.setStringList(selected_items)
+        stringlist = available_model.stringList()
+        row = 0
+        for item in stringlist:
+            if str(item) in selected_items:
+                available_model.removeRows(row, 1)
+            row += 1
+            
         
 
 class DataVizGui(QtGui.QMainWindow):
@@ -221,6 +246,17 @@ class DataVizGui(QtGui.QMainWindow):
         self.show_selected_spike_action = QtGui.QAction('Show selected spike tables', self)
         self.select_by_regex_action = QtGui.QAction('Select by regex', self)
         
+        
+    def make_toolbar(self):
+        self.toolbar = self.addToolBar('ToolBar')
+        self.regex_form = QtGui.QLineEdit('')
+        self.toolbar.addWidget(self.regex_form)
+        self.datatype_combo = QtGui.QComboBox(self.toolbar)
+        self.datatype_combo.addItem('Ca')
+        self.datatype_combo.addItem('Vm')
+        self.datatype_combo.addItem('spikes')
+        self.toolbar.addWidget(self.datatype_combo)
+        self.toolbar.addAction(self.select_by_regex_action)
         
         
     def make_menu(self):
@@ -280,6 +316,13 @@ class DataVizGui(QtGui.QMainWindow):
         if file_dialog.exec_():
             filenames = file_dialog.selectedFiles()
             self.gui_model.openFile(str(filenames[0]))
+            self.connect(self.select_by_regex_action, QtCore.SIGNAL('triggered()'), self.select_by_re)
+            
+    def select_by_re(self):
+        regex = str(self.regex_form.text())
+        datatype = str(self.datatype_combo.currentText())
+        self.gui_model.select_by_re(regex, datatype)
+            
 
     def do_quit(self):
         print 'Quitting'
