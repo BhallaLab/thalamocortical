@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Dec 28 10:49:46 2010 (+0530)
-#           By: subha
-#     Update #: 170
+# Last-Updated: Tue Feb 15 11:04:31 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 171
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -45,6 +45,11 @@
 # 
 
 # Code:
+
+# These are for memory profiling with heapy
+from guppy import hpy
+heapy = hpy
+# Up to here
 
 import sys
 import os
