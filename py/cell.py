@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 24 10:04:47 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Nov 26 11:27:38 2010 (+0530)
-#           By: subha
-#     Update #: 643
+# Last-Updated: Tue Feb 15 11:17:39 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 644
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -47,7 +47,7 @@
 import sys
 from collections import defaultdict
 import numpy as np
-from enthought.mayavi import mlab
+# from enthought.mayavi import mlab
 import moose
 import config
 import pymoose
