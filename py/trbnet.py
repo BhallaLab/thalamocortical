@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Dec 28 15:55:16 2010 (+0530)
+# Last-Updated: Tue Feb 15 10:22:02 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1346
+#     Update #: 1351
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -457,9 +457,10 @@ class TraubNet(object):
             if not random:
                 cell_list = self.get_maxdegree_cell_indices(celltype=vertex['label'], size=numcellspertype)
             else:
-                pop = self.populations[celltype]                
+                pop = numpy.array(self.populations[celltype])
                 high = len(pop)
-                cell_list = pop[numpy.randint(low=0, high=high, size=numcells)]
+                indices = numpy.random.randint(low=0, high=high, size=numcells)
+                cell_list = pop[indices]
             for cellindex in cell_list:
                 cell = self.index_cell_map[cellindex]
                 cell.soma.insertRecorder(cell.name, 'Vm', vm_container)

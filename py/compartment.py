@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  8 16:43:33 2010 (+0530)
-#           By: subha
-#     Update #: 229
+# Last-Updated: Tue Feb 15 10:46:05 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 238
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -143,12 +143,16 @@ class MyCompartment(moose.Compartment):
     def insertCaRecorder(self, object_name, data_container):
         """Creates a table for recording [Ca2+] under data_container"""
         ca_table = None
-        ca_conc_path = self.path + '/' + object_name
+        ca_table_path = data_container.path + '/' + object_name
+        if config.context.exists(ca_table_path):
+            return moose.Table(ca_table_path)
+        ca_conc_path = self.path + '/CaPool'
         if config.context.exists(ca_conc_path):
             ca_conc = moose.CaConc(ca_conc_path)
-            ca_table = moose.Table(object_name, data_container)
+            ca_table = moose.Table(ca_table_path)
             ca_table.stepMode = 3
-            ca_conc.connect('Ca', ca_table, 'inputRequest')
+            if not ca_conc.connect('Ca', ca_table, 'inputRequest'):
+                print 'Error connecting [Ca2+] on', ca_conc.path, 'to', ca_table.path
 
         return ca_table
 
