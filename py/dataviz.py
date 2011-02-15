@@ -7,9 +7,9 @@
 # Copyright (C) 2010 Subhasis Ray, all rights reserved.
 # Created: Wed Dec 15 10:16:41 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Feb 15 16:23:56 2011 (+0530)
+# Last-Updated: Wed Feb 16 00:24:31 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 746
+#     Update #: 823
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -54,7 +54,7 @@ import re
 import numpy as np
 from pysparse.sparse.spmatrix import ll_mat
 import tables
-from PyQt4 import QtCore, QtGui
+from PyQt4 import Qt, QtCore, QtGui
 from PyQt4 import Qwt5 as Qwt
 
 
@@ -130,7 +130,7 @@ class TraubData:
         else:
             print 'Invalid data type: %s' % (datatype)
             return None
-        ret = [self.h5f.getNode(target_node + '/' + name) for name in names]
+        ret = [self.h5f.getNode(str(target_node), str(name)) for name in names]
         return ret
 
     def get_data_by_re(self, pattern, datatype):
@@ -200,7 +200,7 @@ class GuiModel(QtCore.QObject):
         elif datatype.lower() == 'vm':
             selected_model = self.selected_vm
             available_model = self.available_vm
-        elif datatpe.lower() == 'spike':
+        elif datatype.lower() == 'spike':
             selected_model = self.selected_spikes
             available_model = self.available_spikes
         else:
@@ -225,8 +225,26 @@ class DataVizGui(QtGui.QMainWindow):
         self.make_table_lists()
         self.plot_panel = QtGui.QTabWidget(self)
         self.setCentralWidget(self.plot_panel)
-        self.plot = Qwt.QwtPlot(self.plot_panel)
-        self.plot_panel.addTab(self.plot, 'plot')
+        self.spike_plot_tab = QtGui.QFrame(self.plot_panel)
+        self.vm_plot_tab = QtGui.QFrame(self.plot_panel)
+        self.ca_plot_tab = QtGui.QFrame(self.plot_panel)
+        layout = QtGui.QHBoxLayout(self)        
+        self.spike_plot = Qwt.QwtPlot(self.spike_plot_tab)
+        layout.addWidget(self.spike_plot)
+        self.spike_plot_tab.setLayout(layout)
+        layout = QtGui.QHBoxLayout(self)
+        self.vm_plot = Qwt.QwtPlot(self.vm_plot_tab)
+        layout.addWidget(self.vm_plot)
+        self.vm_plot_tab.setLayout(layout)
+        layout = QtGui.QHBoxLayout(self)        
+        self.ca_plot = Qwt.QwtPlot(self.ca_plot_tab)
+        layout.addWidget(self.ca_plot)
+        self.ca_plot_tab.setLayout(layout)
+        
+        self.plot_panel.addTab(self.spike_plot_tab, 'Spikes')
+        self.plot_panel.addTab(self.vm_plot_tab, 'Vm')
+        self.plot_panel.addTab(self.ca_plot_tab, '[Ca2+]')
+
         self.make_actions()
         self.make_menu()
         self.toolbar = self.make_toolbar()
@@ -245,7 +263,8 @@ class DataVizGui(QtGui.QMainWindow):
         self.show_selected_vm_action = QtGui.QAction('Show selected Vm tables', self)
         self.show_selected_spike_action = QtGui.QAction('Show selected spike tables', self)
         self.select_by_regex_action = QtGui.QAction('Select by regex', self)
-        
+        self.plot_action = QtGui.QAction('Plot', self)
+        self.connect(self.plot_action, QtCore.SIGNAL('triggered()'), self.do_plot)
         
     def make_toolbar(self):
         self.toolbar = self.addToolBar('ToolBar')
@@ -254,10 +273,10 @@ class DataVizGui(QtGui.QMainWindow):
         self.datatype_combo = QtGui.QComboBox(self.toolbar)
         self.datatype_combo.addItem('Ca')
         self.datatype_combo.addItem('Vm')
-        self.datatype_combo.addItem('spikes')
+        self.datatype_combo.addItem('spike')
         self.toolbar.addWidget(self.datatype_combo)
         self.toolbar.addAction(self.select_by_regex_action)
-        
+        self.toolbar.addAction(self.plot_action)
         
     def make_menu(self):
         self.file_menu = QtGui.QMenu('&File', self)
@@ -297,17 +316,22 @@ class DataVizGui(QtGui.QMainWindow):
         self.available_vm_view.setModel(self.gui_model.available_vm)
         self.available_spikes_view.setModel(self.gui_model.available_spikes)
         self.tables_docks = []
-        self.list_views = [self.selected_ca_view, self.selected_vm_view,
-                 self.selected_spikes_view, self.available_ca_view,
+        self.selected_data_views = [self.selected_ca_view, self.selected_vm_view,
+                 self.selected_spikes_view]
+        self.available_data_views = [self.available_ca_view,
                  self.available_vm_view, self.available_spikes_view]
-        for view in self.list_views:
+        for view in self.selected_data_views + self.available_data_views:
             view.setAcceptDrops(True)
             view.setDragEnabled(True)
             view.setDropIndicatorShown(True)
             view.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
             self.tables_docks.append(QtGui.QDockWidget(view.objectName(), self))
             self.tables_docks[-1].setWidget(view)
-            self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.tables_docks[-1])
+            if view.objectName().startsWith('selected'):
+                self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.tables_docks[-1])
+            else:
+                self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.tables_docks[-1])
+                
         
     def popup_fopen(self):
         file_dialog = QtGui.QFileDialog(self)
@@ -322,6 +346,23 @@ class DataVizGui(QtGui.QMainWindow):
         regex = str(self.regex_form.text())
         datatype = str(self.datatype_combo.currentText())
         self.gui_model.select_by_re(regex, datatype)
+
+    def do_plot(self):
+        self.plot_spike_raster()
+
+    def plot_spike_raster(self):
+        cellnames = self.gui_model.selected_spikes.stringList()
+        data = self.gui_model.data_handler.get_data_by_name(cellnames, 'spike')
+        ii = 0
+        self.spike_plot.clear()
+        for table in data:
+            ii += 1
+            curve = Qwt.QwtPlotCurve(table.name)
+            curve.setStyle(Qwt.QwtPlotCurve.NoCurve)
+            curve.setSymbol(Qwt.QwtSymbol(Qwt.QwtSymbol.VLine, Qt.QBrush(), Qt.QPen(Qt.Qt.red, 1), Qt.QSize(7, 7)))
+            curve.setData(np.array(table), np.ones(len(table))*ii)            
+            curve.attach(self.spike_plot)
+        self.spike_plot.replot()
             
 
     def do_quit(self):
