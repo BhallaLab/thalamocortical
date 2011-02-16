@@ -7,9 +7,9 @@
 # Copyright (C) 2010 Subhasis Ray, all rights reserved.
 # Created: Wed Dec 15 10:16:41 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Feb 16 00:24:31 2011 (+0530)
+# Last-Updated: Wed Feb 16 17:01:41 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 823
+#     Update #: 881
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -163,6 +163,43 @@ class TraubData:
 
         
 
+class CellListModel(QtGui.QStringListModel):
+    def __init__(self, *args):
+        QtGui.QStringListModel.__init__(self, *args)
+        self.sister = None
+        
+    def set_sister(self, sister):
+        self.sister = sister
+
+    def supportedDropActions(self):
+        return Qt.Qt.MoveAction
+
+        
+class CellSelectionListView(QtGui.QTableView):
+    """List view subclassed to put some restrictions on drag and drop"""
+    def __init__(self, *args):
+        QtGui.QListView.__init__(self, *args)
+        self.setDragDropMode(QtGui.QAbstractItemView.DragDrop | QtGui.QAbstractItemView.InternalMove)
+        self.setAcceptDrops(True)
+        self.setDragEnabled(True)
+        self.setDropIndicatorShown(True)
+        self.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
+        self.sister = None
+        self.horizontalHeader().hide()
+        
+    def set_sister(self, sister):
+        """Set the assocaited listview - only drag and drop from/to sister is allowed"""
+        self.sister = sister
+        sister.sister = self
+
+    def dragMoveEvent(self, event):
+        if event.source().objectName() == self.objectName() or event.source().objectName() == self.sister.objectName():
+            event.accept()
+        else:
+            event.ignore()
+            
+    
+        
 class GuiModel(QtCore.QObject):
     """data_handler -- TraubData object accessing the files.
 
@@ -175,12 +212,12 @@ class GuiModel(QtCore.QObject):
     def __init__(self, *args):
         QtCore.QObject.__init__(self, *args)
         self.data_handler = None
-        self.selected_ca = QtGui.QStringListModel()
-        self.selected_vm = QtGui.QStringListModel()
-        self.selected_spikes = QtGui.QStringListModel()
-        self.available_ca = QtGui.QStringListModel()
-        self.available_vm = QtGui.QStringListModel()
-        self.available_spikes = QtGui.QStringListModel()
+        self.selected_ca = CellListModel()
+        self.selected_vm = CellListModel()
+        self.selected_spikes = CellListModel()
+        self.available_ca = CellListModel()
+        self.available_vm = CellListModel()
+        self.available_spikes = CellListModel()
         
     def openFile(self, filename):
         """Open a new data file given by filename."""
@@ -214,8 +251,8 @@ class GuiModel(QtCore.QObject):
                 available_model.removeRows(row, 1)
             row += 1
             
-        
 
+        
 class DataVizGui(QtGui.QMainWindow):
     def __init__(self, *args):
         QtGui.QMainWindow.__init__(self, *args)
@@ -228,15 +265,15 @@ class DataVizGui(QtGui.QMainWindow):
         self.spike_plot_tab = QtGui.QFrame(self.plot_panel)
         self.vm_plot_tab = QtGui.QFrame(self.plot_panel)
         self.ca_plot_tab = QtGui.QFrame(self.plot_panel)
-        layout = QtGui.QHBoxLayout(self)        
+        layout = QtGui.QHBoxLayout()        
         self.spike_plot = Qwt.QwtPlot(self.spike_plot_tab)
         layout.addWidget(self.spike_plot)
         self.spike_plot_tab.setLayout(layout)
-        layout = QtGui.QHBoxLayout(self)
+        layout = QtGui.QHBoxLayout()
         self.vm_plot = Qwt.QwtPlot(self.vm_plot_tab)
         layout.addWidget(self.vm_plot)
         self.vm_plot_tab.setLayout(layout)
-        layout = QtGui.QHBoxLayout(self)        
+        layout = QtGui.QHBoxLayout()        
         self.ca_plot = Qwt.QwtPlot(self.ca_plot_tab)
         layout.addWidget(self.ca_plot)
         self.ca_plot_tab.setLayout(layout)
@@ -295,13 +332,15 @@ class DataVizGui(QtGui.QMainWindow):
         self.menuBar().addMenu(self.view_menu)
         
     def make_table_lists(self):
-        self.selected_ca_view = QtGui.QListView(self)
-        self.selected_vm_view = QtGui.QListView(self)
-        self.selected_spikes_view = QtGui.QListView(self)
-        self.available_ca_view = QtGui.QListView(self)
-        self.available_vm_view = QtGui.QListView(self)
-        self.available_spikes_view = QtGui.QListView(self)
-
+        self.selected_ca_view = CellSelectionListView(self)
+        self.selected_vm_view = CellSelectionListView(self)
+        self.selected_spikes_view = CellSelectionListView(self)
+        self.available_ca_view = CellSelectionListView(self)
+        self.available_vm_view = CellSelectionListView(self)
+        self.available_spikes_view = CellSelectionListView(self)
+        self.selected_ca_view.set_sister(self.available_ca_view)
+        self.selected_vm_view.set_sister(self.available_vm_view)
+        self.selected_spikes_view.set_sister(self.available_spikes_view)
         self.selected_ca_view.setObjectName('selected_ca')
         self.selected_vm_view.setObjectName('selected_vm')
         self.selected_spikes_view.setObjectName('selected_spikes')
@@ -321,10 +360,6 @@ class DataVizGui(QtGui.QMainWindow):
         self.available_data_views = [self.available_ca_view,
                  self.available_vm_view, self.available_spikes_view]
         for view in self.selected_data_views + self.available_data_views:
-            view.setAcceptDrops(True)
-            view.setDragEnabled(True)
-            view.setDropIndicatorShown(True)
-            view.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
             self.tables_docks.append(QtGui.QDockWidget(view.objectName(), self))
             self.tables_docks[-1].setWidget(view)
             if view.objectName().startsWith('selected'):
