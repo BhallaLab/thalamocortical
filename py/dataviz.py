@@ -7,9 +7,9 @@
 # Copyright (C) 2010 Subhasis Ray, all rights reserved.
 # Created: Wed Dec 15 10:16:41 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Feb 16 17:01:41 2011 (+0530)
+# Last-Updated: Wed Feb 16 17:46:09 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 881
+#     Update #: 894
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -384,6 +384,8 @@ class DataVizGui(QtGui.QMainWindow):
 
     def do_plot(self):
         self.plot_spike_raster()
+        self.plot_vm()
+        self.plot_ca()
 
     def plot_spike_raster(self):
         cellnames = self.gui_model.selected_spikes.stringList()
@@ -398,7 +400,34 @@ class DataVizGui(QtGui.QMainWindow):
             curve.setData(np.array(table), np.ones(len(table))*ii)            
             curve.attach(self.spike_plot)
         self.spike_plot.replot()
+
+    def plot_vm(self):
+        cellnames = self.gui_model.selected_vm.stringList()
+        data = self.gui_model.data_handler.get_data_by_name(cellnames, 'vm')
+        self.vm_plot.clear()
+        ii = 0
+        for table in data:
+            ii += 1
+            curve = Qwt.QwtPlotCurve(table.name)
+            # curve.setStyle(Qwt.QwtPlotCurve.NoCurve)
+            # curve.setSymbol(Qwt.QwtSymbol(Qwt.QwtSymbol.VLine, Qt.QBrush(), Qt.QPen(Qt.Qt.red, 1), Qt.QSize(7, 7)))
+            curve.setData(np.linspace(0, self.gui_model.data_handler.simtime, len(table)), np.array(table))            
+            curve.attach(self.vm_plot)
+        self.vm_plot.replot()
             
+    def plot_ca(self):
+        cellnames = self.gui_model.selected_ca.stringList()
+        data = self.gui_model.data_handler.get_data_by_name(cellnames, 'ca')
+        self.ca_plot.clear()
+        ii = 0
+        for table in data:
+            ii += 1
+            curve = Qwt.QwtPlotCurve(table.name)
+            # curve.setStyle(Qwt.QwtPlotCurve.NoCurve)
+            # curve.setSymbol(Qwt.QwtSymbol(Qwt.QwtSymbol.VLine, Qt.QBrush(), Qt.QPen(Qt.Qt.red, 1), Qt.QSize(7, 7)))
+            curve.setData(np.linspace(0, self.gui_model.data_handler.simtime, len(table)), np.array(table))            
+            curve.attach(self.ca_plot)
+        self.ca_plot.replot()
 
     def do_quit(self):
         print 'Quitting'
