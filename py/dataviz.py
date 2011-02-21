@@ -7,9 +7,9 @@
 # Copyright (C) 2010 Subhasis Ray, all rights reserved.
 # Created: Wed Dec 15 10:16:41 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Feb 16 17:46:09 2011 (+0530)
+# Last-Updated: Tue Feb 22 00:11:25 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 894
+#     Update #: 898
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -395,8 +395,13 @@ class DataVizGui(QtGui.QMainWindow):
         for table in data:
             ii += 1
             curve = Qwt.QwtPlotCurve(table.name)
-            curve.setStyle(Qwt.QwtPlotCurve.NoCurve)
-            curve.setSymbol(Qwt.QwtSymbol(Qwt.QwtSymbol.VLine, Qt.QBrush(), Qt.QPen(Qt.Qt.red, 1), Qt.QSize(7, 7)))
+            #curve.setStyle(Qwt.QwtPlotCurve.NoCurve)
+            if ii % 2 == 0:
+                pen = Qt.QPen(Qt.Qt.red, 1)
+            else:
+                pen = Qt.QPen(Qt.Qt.blue, 1)
+            curve.setSymbol(Qwt.QwtSymbol(Qwt.QwtSymbol.VLine, Qt.QBrush(), pen, Qt.QSize(7, 7)))
+            curve.setPen(pen)            
             curve.setData(np.array(table), np.ones(len(table))*ii)            
             curve.attach(self.spike_plot)
         self.spike_plot.replot()
