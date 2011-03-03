@@ -7,9 +7,9 @@
 # Copyright (C) 2010 Subhasis Ray, all rights reserved.
 # Created: Wed Dec 15 10:16:41 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Feb 22 00:11:25 2011 (+0530)
+# Last-Updated: Thu Mar  3 23:46:53 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 898
+#     Update #: 1110
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -43,23 +43,91 @@
 # and going for simple 2D rasters with option for selecting tables and
 # scrolling (using Qt).
 #
+# 2011-03-03 23:46:42 (+0530) -- h5py browsing tree is functional.
 
 # Code:
 
 import os
 import sys
 import time
+from datetime import datetime
 import re
 
 import numpy as np
 from pysparse.sparse.spmatrix import ll_mat
 import tables
+import h5py
 from PyQt4 import Qt, QtCore, QtGui
 from PyQt4 import Qwt5 as Qwt
 
 
 ITERS = 1000
 
+class H5Handle:
+    """Generic handler for hdf5 files.
+    
+    """    
+    def __init__(self, filename, mode='r'):
+        self.file = h5py.File(filename, mode)
+
+    def getNode(self, path):
+        tokens = path.split('/')
+        current = self.file
+        for element in tokens:
+            current = current[element]
+        return current
+        
+    def getArray(self, path):
+        node = self.getNode(path)
+        if isinstance(node, h5py.DataSet):
+            return numpy.array(node)
+
+    def __del__(self):
+        self.file.close()
+
+class H5TreeWidgetItem(QtGui.QTreeWidgetItem):
+    def __init__(self, parent, h5node):
+        QtGui.QTreeWidgetItem.__init__(self, parent)
+        self.h5node = h5node
+        if isinstance(h5node, h5py.File):
+            self.setText(0, QtCore.QString(h5node.filename))
+        else:
+            self.setText(0, QtCore.QString(h5node))
+
+    def childCount(self):
+        ret = len(self.h5node)
+        print ret
+        return ret
+
+    def hasChildren(self, index):
+        ret = (len(self.h5node) > 0)
+        print ret
+        return ret
+    
+    def index(self):
+        print 'here'
+        QtCore.qDebug('Here')
+
+class H5TreeWidget(QtGui.QTreeWidget):
+    def __init__(self, *args):
+        QtGui.QTreeWidget.__init__(self, *args)
+        self.fhandles = []
+        
+    def addH5Handle(self, handle):
+        if not handle in self.fhandles:
+            self.fhandles.append(handle)
+            item = H5TreeWidgetItem(self, handle)
+            self.addTopLevelItem(item)
+            item.setText(0, QtCore.QString(handle.filename))
+            self.addTree(item, handle)
+            
+    def addTree(self, currentItem, node):
+        if isinstance(node, h5py.Group) or isinstance(node, h5py.File):
+            for child in node:
+                item = H5TreeWidgetItem(currentItem, child)
+                self.addTree(item, node[child])
+    
+        
 def train_to_cellname(trainname):
     """Extract the name of the generator cell from a spike/Vm/Ca train name"""
     return trainname[:trainname.rfind('_')]
@@ -161,7 +229,106 @@ class TraubData:
             print 'closed file'
 
 
-        
+class ScrollBar(QtGui.QScrollBar):
+    """Zoom scrollbar after realtime_plot example in Qwt"""
+    def __init__(self, orientation, parent, minBase=None, maxBase=None):
+        QtGui.QScrollBar.__init__(self, orientation, parent)
+        self.init()
+        if (minBase is not None) and (maxBase is not None):
+            self.setBase(minBase, maxbase)
+            self.moveSlider(minBase, maxBase)
+
+    def init(self):
+        self.d_inverted = self.orientation() == Qt.Qt.Vertical
+        self.d_baseTicks = 1000000
+        self.d_minBase = 0.0
+        self.d_maxBase = 1.0
+        self.moveSlider(self.d_minBase, self.d_maxBase)
+        self.connect(self, QtCore.SIGNAL('sliderMoved(int)'), self.catchSliderMoved)
+        self.connect(self, QtCore.SIGNAL('valueChanged(int)'), self.catchValueChanged)
+
+    def setInverted(inverted):
+        if self.d_inverted != inverted:
+            self.d_inverted = inverted
+            self.moveSlider(self.minSliderValue(), self.maxSliderValue())
+
+    def isInverted(self):
+        return self.d_inverted
+
+    def setBase(self, minvalue, maxvalue):
+        if (minvalue != self.d_minBase) or (maxvalue != self.d_maxBase):
+            self.d_minBase = minvalue
+            self.d_maxBase = maxvalue
+            self.moveSlider(self.minSliderValue(), self.maxSliderValue())
+
+    def moveSlider(self, minvalue, maxvalue):
+        sliderTicks = QtCore.qRound((maxvalue - minvalue)/(self.d_maxBase - self.d_minBase)* self.d_baseTicks)
+
+        self.blockSignals(True)
+        self.setRange(sliderTicks/2, self.d_baseTicks - sliderTicks / 2)
+        steps = sliderTicks/200
+        if steps <= 0:
+            steps = 1
+        self.setSingleStep(steps)
+        self.setPageStep(sliderTicks)
+        tick = self.mapToTick(minvalue + (maxvalue - minvalue)/2)
+        if self.isInverted():
+            tick = self.d_baseTicks - tick
+        self.setSliderPosition(tick)
+        self.blockSignals(False)
+
+    def minBaseValue(self):
+        return self.d_minBase
+
+    def maxBaseValue(self):
+        return self.d_maxBase
+
+    def sliderRange(self, value):
+        if self.isInverted():
+            value = self.d_baseTicks - value
+        visibleTicks = self.pageStep()
+        minvalue = self.mapFromTick(value - visibleTicks/2)
+        maxvalue = self.mapFromTick(value + visibleTicks/2)
+        return (minvalue, maxvalue)
+
+    def minSliderValue(self):
+        minvalue, maxvalue, = self.sliderRange(self.value())
+        return minvalue
+    
+    def maxSliderValue(self):
+        minvalue, maxvalue, = self.sliderRange(self.value())
+        return maxvalue
+
+    def mapToTick(self, v):
+        return int((v- self.d_minBase) / (self.d_maxBase - self.d_minBase) * self.d_baseTicks)
+
+    def mapFromTick(self, tick):
+        return self.d_minBase + (self.d_maxBase - d_minBase) * tick / self.d_baseTick
+
+    def catchValueChanged(self, value):
+        (minvalue, maxvalue) = self.sliderRange(self, value)
+        self.emit(QtCore.SIGNAL('valueChanged(QOrientation, double, double)'), self.orientation(), minvalue, maxvalue)
+
+    def catchSliderMoved(self, value):
+        (minvalue, maxvalue) = self.sliderRange(self, value)
+        self.emit(QtCore.SIGNAL('sliderMoved(QOrientation, double, double)'), self.orientation(), minvalue, maxvalue)
+
+
+    def extent(self):
+        opt = QtGui.QStyleOptioSlider()
+        opt.init(self)
+        opt.setSubControls(QtGui.QStyle.SC_None)
+        opt.setOrientation(self.orientation())
+        opt.setMinimum(self.minimum())
+        opt.setMaximum(self.maximum())
+        opt.setSliderPosition(self.sliderPosition())
+        opt.setSliderValue(self.value())
+        opt.setSingleStep(self.singleStep())
+        opt.setPageStep(self.pageStep())
+        opt.setUpsideDown(self.invertedAppearance())
+        if self.orientation() == Qt.Qt.Horizontal:
+            opt.setState(opt.state() | QtGui.QStyle.State_Horizontal)
+        return self.style().pixelMetric(QtGui.QStyle.PM_ScrollBarExtent, opt, self)
 
 class CellListModel(QtGui.QStringListModel):
     def __init__(self, *args):
@@ -267,6 +434,8 @@ class DataVizGui(QtGui.QMainWindow):
         self.ca_plot_tab = QtGui.QFrame(self.plot_panel)
         layout = QtGui.QHBoxLayout()        
         self.spike_plot = Qwt.QwtPlot(self.spike_plot_tab)
+        # self.scrollbar = ScrollBar(Qt.Qt.Vertical, self.spike_plot)
+        
         layout.addWidget(self.spike_plot)
         self.spike_plot_tab.setLayout(layout)
         layout = QtGui.QHBoxLayout()
@@ -389,9 +558,14 @@ class DataVizGui(QtGui.QMainWindow):
 
     def plot_spike_raster(self):
         cellnames = self.gui_model.selected_spikes.stringList()
+        t1 = datetime.now()
         data = self.gui_model.data_handler.get_data_by_name(cellnames, 'spike')
+        t2 = datetime.now()
+        delt = t2 - t1
+        print 'Time to read data:', delt.seconds + delt.microseconds * 1e-6
         ii = 0
         self.spike_plot.clear()
+        t1 = datetime.now()
         for table in data:
             ii += 1
             curve = Qwt.QwtPlotCurve(table.name)
@@ -405,6 +579,9 @@ class DataVizGui(QtGui.QMainWindow):
             curve.setData(np.array(table), np.ones(len(table))*ii)            
             curve.attach(self.spike_plot)
         self.spike_plot.replot()
+        t2 = datetime.now()
+        delt = t2 - t1
+        print 'Time to plot data:', delt.seconds + delt.microseconds * 1e-6
 
     def plot_vm(self):
         cellnames = self.gui_model.selected_vm.stringList()
@@ -446,8 +623,12 @@ class DataVizGui(QtGui.QMainWindow):
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     QtGui.qApp = app
-    mainwin = DataVizGui()
-    app.lastWindowClosed.connect(mainwin.do_quit)
+    # mainwin = DataVizGui()
+    mainwin = QtGui.QMainWindow()
+    handle = h5py.File('data/data_20110215_112900_1335.h5', 'r')
+    tree = H5TreeWidget(mainwin)    
+    tree.addH5Handle(handle)
+    mainwin.setCentralWidget(tree)
     mainwin.show()
     app.exec_()
 # 
