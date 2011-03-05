@@ -7,9 +7,9 @@
 # Copyright (C) 2010 Subhasis Ray, all rights reserved.
 # Created: Wed Dec 15 10:16:41 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Mar  3 23:46:53 2011 (+0530)
+# Last-Updated: Fri Mar  4 17:55:00 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1110
+#     Update #: 1167
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -56,78 +56,35 @@ import re
 import numpy as np
 from pysparse.sparse.spmatrix import ll_mat
 import tables
-import h5py
-from PyQt4 import Qt, QtCore, QtGui
 from PyQt4 import Qwt5 as Qwt
 
 
 ITERS = 1000
 
-class H5Handle:
-    """Generic handler for hdf5 files.
     
-    """    
-    def __init__(self, filename, mode='r'):
-        self.file = h5py.File(filename, mode)
 
-    def getNode(self, path):
-        tokens = path.split('/')
-        current = self.file
-        for element in tokens:
-            current = current[element]
-        return current
-        
-    def getArray(self, path):
-        node = self.getNode(path)
-        if isinstance(node, h5py.DataSet):
-            return numpy.array(node)
+class UniqueListModel(QtGui.QStringListModel):
+    """The model for displaying list of unique data tables.
 
-    def __del__(self):
-        self.file.close()
-
-class H5TreeWidgetItem(QtGui.QTreeWidgetItem):
-    def __init__(self, parent, h5node):
-        QtGui.QTreeWidgetItem.__init__(self, parent)
-        self.h5node = h5node
-        if isinstance(h5node, h5py.File):
-            self.setText(0, QtCore.QString(h5node.filename))
-        else:
-            self.setText(0, QtCore.QString(h5node))
-
-    def childCount(self):
-        ret = len(self.h5node)
-        print ret
-        return ret
-
-    def hasChildren(self, index):
-        ret = (len(self.h5node) > 0)
-        print ret
-        return ret
+    Ideally this should be a table model which allows for displaying
+    multiple properties of each table in columns, and sorting
+    according to them. But for the time being I am taking the quickest
+    option.
+    """
     
-    def index(self):
-        print 'here'
-        QtCore.qDebug('Here')
-
-class H5TreeWidget(QtGui.QTreeWidget):
     def __init__(self, *args):
-        QtGui.QTreeWidget.__init__(self, *args)
-        self.fhandles = []
+        QtGui.QStringList.__init__(self, *args)
         
-    def addH5Handle(self, handle):
-        if not handle in self.fhandles:
-            self.fhandles.append(handle)
-            item = H5TreeWidgetItem(self, handle)
-            self.addTopLevelItem(item)
-            item.setText(0, QtCore.QString(handle.filename))
-            self.addTree(item, handle)
-            
-    def addTree(self, currentItem, node):
-        if isinstance(node, h5py.Group) or isinstance(node, h5py.File):
-            for child in node:
-                item = H5TreeWidgetItem(currentItem, child)
-                self.addTree(item, node[child])
+    def setData(self, index, value, role):
+        """Allow setting data only if it is not already included."""
+        if index.isValid() and role == Qt.Qt.EditRole and value not in self.stringList():
+            self.stringList().replace(index.row(), value.toString())
+            self.emit('dataChanged(const QModelIndex&, const QModelIndex&)', index, index)
+            return True
+        return False
     
         
+                
 def train_to_cellname(trainname):
     """Extract the name of the generator cell from a spike/Vm/Ca train name"""
     return trainname[:trainname.rfind('_')]
