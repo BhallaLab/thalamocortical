@@ -7,9 +7,9 @@
 # Copyright (C) 2010 Subhasis Ray, all rights reserved.
 # Created: Wed Dec 15 10:16:41 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Mar  5 17:11:59 2011 (+0530)
+# Last-Updated: Sat Mar  5 20:44:45 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1344
+#     Update #: 1410
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -44,6 +44,17 @@
 # scrolling (using Qt).
 #
 # 2011-03-03 23:46:42 (+0530) -- h5py browsing tree is functional.
+#
+# 2011-03-05 19:10:31 (+0530) -- tested the model and view classes
+# UniqueListModel and UniqueListView for allowing only unique
+# tables.
+#
+# The datatables are compared as strings, so we should use filename as
+# part of the item identity. But I just realized that for a fullproof
+# code, we need to have the file path in every item, otherwise, how do
+# we discriminate between data_array_A in file X and data_array_B in
+# file Y? What about the same in files /home/subha/X and
+# /home/guest/X? So I need a special listwidgetitem.
 
 # Code:
 
@@ -56,7 +67,8 @@ from PyQt4 import QtGui, QtCore, Qt
 
 ITERS = 1000
 
-    
+
+
 
 class UniqueListModel(QtGui.QStringListModel):
     """The model for displaying list of unique data tables.
@@ -68,10 +80,10 @@ class UniqueListModel(QtGui.QStringListModel):
     """
     
     def __init__(self, *args):
-        QtGui.QStringListModel.__init__(self, *args)
+        QtGui.QStringListModel.__init__(self, *args)        
 
     def supportedDropActions(self):
-        return Qt.Qt.MoveAction
+        return Qt.Qt.MoveAction | Qt.Qt.CopyAction
     
     def flags(self, index):
         defaults = Qt.Qt.ItemIsSelectable | Qt.Qt.ItemIsEnabled
@@ -80,27 +92,48 @@ class UniqueListModel(QtGui.QStringListModel):
         else:
             return Qt.Qt.ItemIsDropEnabled | defaults
 
+    def data(self, index, role):
+        text = self.stringList()[index.row()]
+        # print text
+        if role == Qt.Qt.DisplayRole:
+            tname_start = text.lastIndexOf('/')
+            table_name = text.right(tname_start)
+            return table_name
+        elif role == Qt.Qt.ToolTipRole:
+            return text
+        else:
+            return QtGui.QStringListModel.data(self, index, role)
+
     def dropMimeData(self, data, action, row, column, parent):
-        startrow = row
-        print data
         if not data.hasFormat('application/x-qabstractitemmodeldatalist'):
             return False
         bytearray = data.data('application/x-qabstractitemmodeldatalist')
         data_items = self.decode_data(bytearray)
-        unique_entries = []
-        for item in data_items:
-            table_path = item[Qt.Qt.DisplayRole]
-            print table_path.toString()
-            if table_path.toString() in self.stringList():
-                print table_path.toString(), 'already in'
-                continue
-            unique_entries.append(table_path)
-        if unique_entries:
-            self.insertRows(row, len(unique_entries))
-            for ii in range(len(unique_entries)):
-                print 'setting data for row', ii, ':', unique_entries[ii]
-                self.setData(self.index(row + ii), unique_entries[ii], Qt.Qt.DisplayRole)
-        return True
+        if action == Qt.Qt.MoveAction:
+            QtGui.QStringListModel.dropMimeData(self,data, action, row, column, parent)
+            return True
+        if action == Qt.Qt.CopyAction:
+            unique_entries = []
+            for item in data_items:
+                table_path = item[Qt.Qt.ToolTipRole].toString()
+                print 'table path:', table_path
+                if table_path in self.stringList():
+                    print table_path, 'already in'
+                    continue
+                unique_entries.append(table_path)
+            if unique_entries:
+                if row < 0 or row >= self.rowCount():
+                    row = self.rowCount()
+                self.insertRows(row, len(unique_entries))
+                for ii in range(len(unique_entries)):
+                    tname_start = unique_entries[ii].lastIndexOf('/')
+                    table_name = unique_entries[ii].right(tname_start)
+                    print 'setting data for row', row + ii, ':', unique_entries[ii]
+                    self.setData(self.index(row + ii), QtCore.QVariant(unique_entries[ii]), Qt.Qt.ToolTipRole)
+                    self.setData(self.index(row + ii), QtCore.QVariant(table_name), Qt.Qt.DisplayRole)
+            # self.emit(QtCore.SIGNAL('dataChanged(const QModelIndex&, const QModelIndex&)'), self.index(row), self.index(row+len(unique_entries)))
+                return True
+            return False
         
         # if text in self.stringList():
         #     return False
@@ -142,19 +175,21 @@ class UniqueListView(QtGui.QListView):
         QtGui.QListView.__init__(self, *args)
         self.setDragDropOverwriteMode(False)
         self.allowedDropSources = set()
+        self.allowedDropSources.add(self)
 
     def addAllowedDropSources(self, widget):
         self.allowedDropSources.add(widget)
         
     def dropEvent(self, event):
-        print event.source()
-        for item in self.allowedDropSources:
-            print 'Allowd sources: ', item
-            print event.source() == item
-        if (event.source() == self) or (event.source() in self.allowedDropSources):
-            print 'Handling event'
+        # print event.source()
+        # for item in self.allowedDropSources:
+        #     print 'Allowd sources: ', item
+        #     print event.source() == item
+        if event.source() in self.allowedDropSources:
+            if event.source() == self:
+                event.setDropAction(Qt.Qt.MoveAction)
             QtGui.QListView.dropEvent(self, event)
-
+            
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     QtGui.qApp = app
