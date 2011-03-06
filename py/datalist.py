@@ -7,9 +7,9 @@
 # Copyright (C) 2010 Subhasis Ray, all rights reserved.
 # Created: Wed Dec 15 10:16:41 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Mar  5 20:44:45 2011 (+0530)
+# Last-Updated: Sun Mar  6 12:25:48 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1410
+#     Update #: 1416
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -197,7 +197,7 @@ if __name__ == '__main__':
     mainwin = QtGui.QMainWindow()
     frame = QtGui.QFrame(mainwin)
     mainwin.setCentralWidget(frame)
-    data1 = QtCore.QStringList(['a', 'b', 'c', 'd'])    
+    data1 = QtCore.QStringList(['/p/q/r/a', '/mn/b', '/ij/c', '/zx/d'])
     model1 = UniqueListModel(data1)
     view1 = UniqueListView(frame)
     view1.setModel(model1)
@@ -207,7 +207,7 @@ if __name__ == '__main__':
     view1.setDropIndicatorShown(True)
     view1.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
  
-    data2 = QtCore.QStringList(['c', 'd', 'e', 'f'])
+    data2 = QtCore.QStringList(['/ij/c', '/yz/d', 'e', 'f'])
     model2 = UniqueListModel(data2)
     view2 = UniqueListView(frame)
     view2.setModel(model2)
