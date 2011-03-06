@@ -7,9 +7,9 @@
 # Copyright (C) 2010 Subhasis Ray, all rights reserved.
 # Created: Wed Dec 15 10:16:41 2010 (+0530)
 # Version: 
-# Last-Updated: Sun Mar  6 12:47:47 2011 (+0530)
+# Last-Updated: Sun Mar  6 14:00:42 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1422
+#     Update #: 1425
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -55,6 +55,16 @@
 # we discriminate between data_array_A in file X and data_array_B in
 # file Y? What about the same in files /home/subha/X and
 # /home/guest/X? So I need a special listwidgetitem.
+#
+# 2011-03-06 13:46:55 (+0530) I tested the code this morning and
+# realized that handling of unix style file path was not correct. I
+# had misunderstood the QString.right() function. Also, there was this
+# issue with setting data. I was setting display role to be the
+# trimmed table name and tooltip role to be the full path. But the
+# actual data in the string list of the model is set via display
+# role. Just overriding the data() function to return trimmed table
+# name for displayrole is sufficient. The previous commit contains
+# these corrections.
 
 # Code:
 
