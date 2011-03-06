@@ -7,9 +7,9 @@
 # Copyright (C) 2010 Subhasis Ray, all rights reserved.
 # Created: Wed Dec 15 10:16:41 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Mar  4 17:55:00 2011 (+0530)
+# Last-Updated: Sun Mar  6 14:14:15 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1167
+#     Update #: 1169
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -44,6 +44,11 @@
 # scrolling (using Qt).
 #
 # 2011-03-03 23:46:42 (+0530) -- h5py browsing tree is functional.
+#
+# 2011-03-06 14:12:59 (+0530) -- This has now been split into
+# multipple files in the dataviz directory. Also, all data
+# visualization code is being shifted to cortical/dataviz directory as
+# they are independent of the simulation.
 
 # Code:
 
