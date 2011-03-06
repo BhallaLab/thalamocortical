@@ -7,9 +7,9 @@
 # Copyright (C) 2010 Subhasis Ray, all rights reserved.
 # Created: Wed Dec 15 10:16:41 2010 (+0530)
 # Version: 
-# Last-Updated: Sun Mar  6 12:25:48 2011 (+0530)
+# Last-Updated: Sun Mar  6 12:47:47 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1416
+#     Update #: 1422
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -96,8 +96,8 @@ class UniqueListModel(QtGui.QStringListModel):
         text = self.stringList()[index.row()]
         # print text
         if role == Qt.Qt.DisplayRole:
-            tname_start = text.lastIndexOf('/')
-            table_name = text.right(tname_start)
+            tname_start = text.lastIndexOf('/')        
+            table_name = text.mid(tname_start+1)
             return table_name
         elif role == Qt.Qt.ToolTipRole:
             return text
@@ -127,10 +127,9 @@ class UniqueListModel(QtGui.QStringListModel):
                 self.insertRows(row, len(unique_entries))
                 for ii in range(len(unique_entries)):
                     tname_start = unique_entries[ii].lastIndexOf('/')
-                    table_name = unique_entries[ii].right(tname_start)
+                    table_name = unique_entries[ii].mid(tname_start+1)
                     print 'setting data for row', row + ii, ':', unique_entries[ii]
-                    self.setData(self.index(row + ii), QtCore.QVariant(unique_entries[ii]), Qt.Qt.ToolTipRole)
-                    self.setData(self.index(row + ii), QtCore.QVariant(table_name), Qt.Qt.DisplayRole)
+                    self.setData(self.index(row + ii), QtCore.QVariant(unique_entries[ii]))
             # self.emit(QtCore.SIGNAL('dataChanged(const QModelIndex&, const QModelIndex&)'), self.index(row), self.index(row+len(unique_entries)))
                 return True
             return False
