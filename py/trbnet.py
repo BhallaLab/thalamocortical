@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Feb 15 10:22:02 2011 (+0530)
+# Last-Updated: Fri Apr 29 15:11:20 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1351
+#     Update #: 1383
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -102,6 +102,7 @@ from tuftedRS import TuftedRS
 from nontuftedRS import NontuftedRS
 from tcr import TCR
 from nRT import nRT
+import synapse
 
 
 # Is it a good idea to have a separate population class? What is the
@@ -135,6 +136,7 @@ class CellType(tables.IsDescription):
 class SynEdge(tables.IsDescription):
     """Describes an edge of celltype graph. This is used for saving
     synase information in HDF5 file."""
+    # I think I should just subclass instead of keeping multiple alternate data entries
     source = tables.Int8Col()    # Index of source celltype
     target =  tables.Int8Col()   # Index of destination celltype
     weight =  tables.Float64Col() # connection probability from sourec to target
@@ -148,7 +150,7 @@ class SynEdge(tables.IsDescription):
     pscomps =  tables.UInt8Col(shape=(90, ))    # compartment nos in target cell where synapses are allowed
     ekgaba = tables.Float64Col() # reversal potential for gaba synapses
     ggaba =  tables.Float64Col(shape=(2)) # gaba conductance (distributed uniformly between first and second entry)
-    
+    prelease = tables.Float64Col() # Baseline synaptic release probability for this pair
 
 class TraubNet(object):
     """Implements the full network in Traub et al 2005 model.
@@ -258,6 +260,7 @@ class TraubNet(object):
                     new_edge['pscomps'] = str(tn.allowed_comps[celltype.index][posttype.index])
                     new_edge['ekgaba'] = tn.ek_gaba[posttype.index]
                     new_edge['ggaba'] = tn.g_gaba_baseline[celltype.index][posttype.index]
+                    new_edge['prelease'] = tn.p_release[celltype.index][posttype.index]
                     if celltype['label'] == 'nRT':
                         if posttype['label'] == 'TCR':
                             new_edge['taugabaslow'] = tn.nRT_TCR_tau_gaba_slow
@@ -356,6 +359,14 @@ class TraubNet(object):
         for syn_edge in self.celltype_graph.es:
             pretype = self.celltype_graph.vs[syn_edge.source]
             posttype = self.celltype_graph.vs[syn_edge.target]
+            delay = synapse.SYNAPTIC_DELAY_DEFAULT
+            p_release = syn_edge['prelease']
+            if pretype in ['nRT', 'TCR']:            
+                if posttype not in ['nRT', 'TCR']:
+                    delay = synapse.SYNAPTIC_DELAY_THALAMOCORTICAL
+            else:
+                if posttype in ['nRT', 'TCR']:
+                    delay = synapse.SYNAPTIC_DELAY_CORTICOTHALAMIC
             prestart = int(pretype['startindex'])
             poststart = int(posttype['startindex'])
             precount = int(pretype['count'])
@@ -374,15 +385,15 @@ class TraubNet(object):
                                             
                     g_ampa = self.g_ampa_mat[pre_index, post_index]
                     if g_ampa != 0.0:                        
-                        precomp.makeSynapse(postcomp, name='ampa', Ek=0.0, Gbar=g_ampa, tau1=syn_edge['tauampa'], tau2=0.0)
+                        precomp.makeSynapse(postcomp, name='ampa', Ek=0.0, Gbar=g_ampa, tau1=syn_edge['tauampa'], tau2=0.0, Pr=p_release, delay=delay)
                     g_nmda = self.g_nmda_mat[pre_index, post_index]
                     if g_nmda != 0.0:
-                        precomp.makeSynapse(postcomp, name='nmda', classname='NMDAChan', Ek=0.0, tau1=syn_edge['taunmda'], tau2=5e-3)
+                        precomp.makeSynapse(postcomp, name='nmda', classname='NMDAChan', Ek=0.0, tau1=syn_edge['taunmda'], tau2=5e-3, Pr=p_release, delay=delay)
                     g_gaba = self.g_gaba_mat[pre_index, post_index]
                     if g_gaba != 0.0:
                         if syn_edge['taugabaslow'] > 0.0:
-                            precomp.makeSynapse(postcomp, name='gaba_slow', Ek=syn_edge['ekgaba'], tau1=syn_edge['taugabaslow'], tau2=0.0)
-                        precomp.makeSynapse(postcomp, name='gaba', Ek=syn_edge['ekgaba'], tau1=syn_edge['taugaba'], tau2=0.0)
+                            precomp.makeSynapse(postcomp, name='gaba_slow', Ek=syn_edge['ekgaba'], tau1=syn_edge['taugabaslow'], tau2=0.0, Pr=p_release, delay=delay)
+                        precomp.makeSynapse(postcomp, name='gaba', Ek=syn_edge['ekgaba'], tau1=syn_edge['taugaba'], tau2=0.0, Pr=p_release, delay=delay)
         endtime = datetime.now()
         delta = endtime - starttime
         config.BENCHMARK_LOGGER.info('Finished network creation in: %g s' % (delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))

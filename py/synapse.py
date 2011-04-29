@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 25 15:22:11 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Mar 31 18:13:08 2010 (+0530)
+# Last-Updated: Fri Apr 29 14:13:16 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 172
+#     Update #: 182
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -20,26 +20,11 @@
 # netCDF/HDF5?). But given the small size of this data, I don't see
 # much savings in that.
 # 
+#
 
 # Change log:
 # 
-# 
-# 
-# 
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as
-# published by the Free Software Foundation; either version 3, or
-# (at your option) any later version.
-# 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License
-# along with this program; see the file COPYING.  If not, write to
-# the Free Software Foundation, Inc., 51 Franklin Street, Fifth
-# Floor, Boston, MA 02110-1301, USA.
+#  2011-04-29 12:32:24 (+0530) - adding Pr and delay 
 # 
 # 
 
@@ -617,6 +602,9 @@ SYNAPTIC_DELAY_DEFAULT = 0.05e-3
 SYNAPTIC_DELAY_THALAMOCORTICAL = 1e-3
 SYNAPTIC_DELAY_CORTICOTHALAMIC = 5e-3
 
+PR = defaultdict(lambda : defaultdict.(lambda: 1.0)) # Returns probability 1 for all undefined pairs.
+PR['SpinyStellate']['SupPyrFRB'] = 0.79 # Silver RA, Lubke J, Sakmann B, Feldmeyer D (2003) Science 302:1981–1984.
+PR['SpinyStellate']['SupPyrRS'] = 0.79 # Silver RA, Lubke J, Sakmann B, Feldmeyer D (2003) Science 302:1981–1984.
 
 THRESHOLD_DEFAULT = 0.0
 
