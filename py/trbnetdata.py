@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Nov 17 14:31:59 2010 (+0530)
+# Last-Updated: Fri Apr 29 18:37:23 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1111
+#     Update #: 1145
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -82,12 +82,12 @@ class TraubFullNetData(object):
 
     """
     def __init__(self):
-        self.celltype = ['SupPyrRS',
-                         'SupPyrFRB',
-                         'SupBasket',
-                         'SupAxoaxonic',
-                         'SupLTS',
-                         'SpinyStellate',                          
+        self.celltype = ['SupPyrRS',    # L2/3 excitatory neuron
+                         'SupPyrFRB',   # L2/3 excitatory neuron
+                         'SupBasket',   # L2/3 Inhibitory GABAergic interneuron
+                         'SupAxoaxonic',# L2/3 Inhibitory GABAergic Chandelier interneuron
+                         'SupLTS',      # L2/3 Low-Threshold-Spiking Inhibitory GABAergic interneuron
+                         'SpinyStellate',      # L4 excitatory cells - get inputs from thalamus
                          'TuftedIB',
                          'TuftedRS',
                          'DeepBasket',
@@ -226,6 +226,35 @@ class TraubFullNetData(object):
             [      0.0,       0.0,     0.0,     0.0,     0.0,     0.0,     0.0,     0.0,      0.0,      0.0,     0.0,       0.0, 0.0,    0.0 ],
             [      0.0,       0.0,     0.0,     0.0,     0.0,     0.0,     0.0,     0.0,      0.0,      0.0,     0.0,       0.0, 0.0,    0.0 ],
             [      0.0,       0.0,     0.0,     0.0,     0.0,     0.0,     0.0,     0.0,      0.0,      0.0,     0.0,       0.0, 0.0, 0.3e-9 ]]
+
+        # Release probabilities [ L2/3 Pyramid to L2/3 Pyramid :
+        # Feldmeyer, Lu"bke and Sakmann, 2006 ]
+
+        # L4 spiny->L2/3 Pyramidal: Sarid et al, Silver 2003
+        
+        # L2/3 Basket-> L4 spiny : Sun, Q.-Q., Huguenard, J.R. &
+        # Prince, D.A. Barrel Cortex Microcircuits: Thalamocortical
+        # Feedforward Inhibition in Spiny Stellate Cells Is Mediated
+        # by a Small Number of Fast-Spiking
+        # Interneurons. J. Neurosci. 26, 1219-1230 (2006).
+
+        # L4->L5 85% (Feldmeyer and Sakmann, 2000) spiny->tuftedIB, tuftedRS
+
+        self.p_release = [
+            [   0.97,    0.97,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
+            [   0.97,    0.97,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
+            [   1.0,    1.0,    1.0,    1.0,    1.0,    0.96,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
+            [   1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
+            [   1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
+            [   0.8,    0.8,    1.0,    1.0,    1.0,    0.95,    0.85,    0.85,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
+            [   1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
+            [   1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
+            [   1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
+            [   1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
+            [   1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
+            [   1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
+            [   1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
+            [   1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ]]
 
         self.allowed_comps = [
             [# SupPyrRS

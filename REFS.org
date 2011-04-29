@@ -1,0 +1,40 @@
+
+* Koester and Johnston 2005
+ - Multiple release sites for the same connection have similar release
+   probability.
+ - Same release probability Pr at all N sites, quantal content q
+   varies between sites, q_1 ... q_N. CV(q) = 0.2.
+
+* Schubert, Ko"tter and Staiger
+ - has a lot of information on connectivity, especially Figure 4.
+
+* Feldmeyer, Lu"bke and Sakmann 2006
+ - L2/3 Pyramidal to Pyramidal connections
+   N = 2-4
+   Average failure rate: 3.2 +/- 7.8 %,    Pr > 98% for 75% pairs
+   V_0 = -76 +/- 4 mV
+   V_th = -35 mV
+** EPSP:
+   tau_rise = 0.7 +/- 0.2 ms
+   tau_decay = 15.7 +/- 4.5 ms
+   amplitude = 1.0 +/- 0.7 mV
+   
+** EPSC:
+   tau_rise = 0.35 +/- 0.6 ms
+   tau_decay = 3.7 +/- 1.2 ms
+   amplitude = 58 +/- 35 pA
+
+
+   
+
+* Leora Sarid, Randy Bruno, Bert Sakmann, Idan Segev, and Dirk Feldmeyer
+  They modeled L4->L2/3 connections but the synaptic release
+  probabilities were incorporated as stochastic input, not as
+  facilitating synapse model. 
+
+  Good info on EPSP models thoough.
+
+* Alex Loebel, Gilad Silberberg, Daniela Helbig, Henry Markram, Misha Tsodyks and Magnus J. E. Richardson
+  L5 Pyr->Pyr depression model in terms of variability of N, the
+  number of release sites.
+

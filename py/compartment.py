@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Feb 15 10:46:05 2011 (+0530)
+# Last-Updated: Fri Apr 29 15:22:18 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 238
+#     Update #: 247
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -197,7 +197,8 @@ class MyCompartment(moose.Compartment):
                     tau1=1e-3, 
                     tau2=2e-3,
                     weight=1.0,
-                    delay=0.0):
+                    delay=0.0,
+                    Pr=1.0):
         """Make a synaptic connection from this compartment to target
         compartment and set the properties of the synaptic connection
         as specified in the parametrs.
@@ -214,7 +215,12 @@ class MyCompartment(moose.Compartment):
         synapse.tau1 = tau1
         synapse.tau2 = tau2
         target.connect('channel', synapse, 'channel')
-        spikegen = moose.SpikeGen(self.path + '/spike')
+        spikegen = None
+        if Pr > 0:
+            spikegen = moose.StochSpikeGen(self.path + '/spike_%s' % (synapse.parent.path()))
+            spikegen.Pr = Pr
+        else:
+            spikegen = moose.SpikeGen(self.path + '/spike_%s' % (synapse.parent.path()))
         spikegen.threshold = threshold
         spikegen.absRefract = absRefract
         self.connect('VmSrc', spikegen, 'Vm')
