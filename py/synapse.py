@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Thu Feb 25 15:22:11 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Apr 29 14:13:16 2011 (+0530)
+# Last-Updated: Mon May  2 11:24:13 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 182
+#     Update #: 183
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -602,7 +602,7 @@ SYNAPTIC_DELAY_DEFAULT = 0.05e-3
 SYNAPTIC_DELAY_THALAMOCORTICAL = 1e-3
 SYNAPTIC_DELAY_CORTICOTHALAMIC = 5e-3
 
-PR = defaultdict(lambda : defaultdict.(lambda: 1.0)) # Returns probability 1 for all undefined pairs.
+PR = defaultdict(lambda : defaultdict(lambda: 1.0)) # Returns probability 1 for all undefined pairs.
 PR['SpinyStellate']['SupPyrFRB'] = 0.79 # Silver RA, Lubke J, Sakmann B, Feldmeyer D (2003) Science 302:1981–1984.
 PR['SpinyStellate']['SupPyrRS'] = 0.79 # Silver RA, Lubke J, Sakmann B, Feldmeyer D (2003) Science 302:1981–1984.
 
