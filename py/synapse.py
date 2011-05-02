@@ -1,4 +1,5 @@
 # synapse.py --- 
+# -*- coding: utf-8 -*-
 # 
 # Filename: synapse.py
 # Description: 
@@ -6,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Feb 25 15:22:11 2010 (+0530)
 # Version: 
-# Last-Updated: Mon May  2 11:24:13 2011 (+0530)
+# Last-Updated: Mon May  2 11:27:28 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 183
+#     Update #: 184
 # URL: 
 # Keywords: 
 # Compatibility: 
