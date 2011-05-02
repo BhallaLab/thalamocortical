@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Apr 29 15:11:20 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 1383
+# Last-Updated: Mon May  2 08:18:20 2011 (+0530)
+#           By: subha
+#     Update #: 1402
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -345,6 +345,7 @@ class TraubNet(object):
 
     def create_network(self):
         """Instantiate the network in MOOSE"""
+        config.LOGGER.debug('Creating network')
         starttime = datetime.now()
         total_count = 0
         for celltype in self.celltype_graph.vs:
@@ -356,6 +357,7 @@ class TraubNet(object):
                 self.cell_index_map[cell] = total_count + ii
                 self.populations[celltype['label']].append(total_count + ii)
             total_count += cell_count
+        config.LOGGER.debug('##')
         for syn_edge in self.celltype_graph.es:
             pretype = self.celltype_graph.vs[syn_edge.source]
             posttype = self.celltype_graph.vs[syn_edge.target]
@@ -371,7 +373,9 @@ class TraubNet(object):
             poststart = int(posttype['startindex'])
             precount = int(pretype['count'])
             postcount = int(posttype['count'])
+            config.LOGGER.debug('###')
             for pre_index in range(prestart, prestart+precount):
+                config.LOGGER.debug('####')
                 precell = self.index_cell_map[pre_index]
                 precomp = precell.comp[precell.presyn]
                 for post_index in range(poststart, poststart+postcount):
@@ -382,18 +386,20 @@ class TraubNet(object):
                     postcomp = postcell.comp[postcompindex]
                     if postcomp is None:
                         continue
-                                            
+                    config.LOGGER.debug('Precomp: %s, postcomp: %s' % (precomp.path, postcomp.path))                                            
+                    syn_suffix = '_%d_%d_%d' % (pre_index, post_index, postcompindex)
+
                     g_ampa = self.g_ampa_mat[pre_index, post_index]
                     if g_ampa != 0.0:                        
-                        precomp.makeSynapse(postcomp, name='ampa', Ek=0.0, Gbar=g_ampa, tau1=syn_edge['tauampa'], tau2=0.0, Pr=p_release, delay=delay)
+                        precomp.makeSynapse(postcomp, name='ampa%s' % (syn_suffix), Ek=0.0, Gbar=g_ampa, tau1=syn_edge['tauampa'], tau2=0.0, Pr=p_release, delay=delay)
                     g_nmda = self.g_nmda_mat[pre_index, post_index]
                     if g_nmda != 0.0:
-                        precomp.makeSynapse(postcomp, name='nmda', classname='NMDAChan', Ek=0.0, tau1=syn_edge['taunmda'], tau2=5e-3, Pr=p_release, delay=delay)
+                        precomp.makeSynapse(postcomp, name='nmda%s' % (syn_suffix), classname='NMDAChan', Ek=0.0, tau1=syn_edge['taunmda'], tau2=5e-3, Pr=p_release, delay=delay)
                     g_gaba = self.g_gaba_mat[pre_index, post_index]
                     if g_gaba != 0.0:
                         if syn_edge['taugabaslow'] > 0.0:
-                            precomp.makeSynapse(postcomp, name='gaba_slow', Ek=syn_edge['ekgaba'], tau1=syn_edge['taugabaslow'], tau2=0.0, Pr=p_release, delay=delay)
-                        precomp.makeSynapse(postcomp, name='gaba', Ek=syn_edge['ekgaba'], tau1=syn_edge['taugaba'], tau2=0.0, Pr=p_release, delay=delay)
+                            precomp.makeSynapse(postcomp, name='gaba_slow%s' % (syn_suffix), Ek=syn_edge['ekgaba'], tau1=syn_edge['taugabaslow'], tau2=0.0, Pr=p_release, delay=delay)
+                        precomp.makeSynapse(postcomp, name='gaba%s' % (syn_suffix), Ek=syn_edge['ekgaba'], tau1=syn_edge['taugaba'], tau2=0.0, Pr=p_release, delay=delay)
         endtime = datetime.now()
         delta = endtime - starttime
         config.BENCHMARK_LOGGER.info('Finished network creation in: %g s' % (delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))

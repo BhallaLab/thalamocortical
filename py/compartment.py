@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Apr 29 15:22:18 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 247
+# Last-Updated: Mon May  2 08:21:57 2011 (+0530)
+#           By: subha
+#     Update #: 264
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -208,6 +208,7 @@ class MyCompartment(moose.Compartment):
         called. So these must be assigned afterwards.
 
         """
+        config.LOGGER.debug('Creating synapse: %s->%s: %s of class %s' % (self.path, target.path, name, classname))
         classobj = eval('moose.' + classname)
         synapse = classobj(name, target)
         synapse.Ek = Ek # TODO set value according to original model
@@ -216,11 +217,21 @@ class MyCompartment(moose.Compartment):
         synapse.tau2 = tau2
         target.connect('channel', synapse, 'channel')
         spikegen = None
-        if Pr > 0:
-            spikegen = moose.StochSpikeGen(self.path + '/spike_%s' % (synapse.parent.path()))
-            spikegen.Pr = Pr
+        if Pr < 1.0:
+            count = 1
+            path = '%s/sspike_%s' % (self.path, name)
+            while config.context.exists(path):
+                path = '%s/sspike_%s_%d' % (self.path, name, count)
+                count += 1
+            spikegen = moose.StochSpikeGen(path)
+            spikegen.pr = Pr
         else:
-            spikegen = moose.SpikeGen(self.path + '/spike_%s' % (synapse.parent.path()))
+            count = 1
+            path = '%s/spike_%s' % (self.path, name)
+            while config.context.exists(path):
+                path = '%s/spike_%s_%d' % (self.path, name, count)
+                count += 1
+            spikegen = moose.SpikeGen(path)
         spikegen.threshold = threshold
         spikegen.absRefract = absRefract
         self.connect('VmSrc', spikegen, 'Vm')
