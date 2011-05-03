@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue May  3 10:50:01 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 1404
+# Last-Updated: Wed May  4 03:23:36 2011 (+0530)
+#           By: subha
+#     Update #: 1407
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -395,7 +395,7 @@ class TraubNet(object):
                     g_nmda = self.g_nmda_mat[pre_index, post_index]
                     if g_nmda != 0.0:
                         synchan = precomp.makeSynapse(postcomp, name='nmda%s' % (syn_suffix), classname='NMDAChan', Ek=0.0, tau1=syn_edge['taunmda'], tau2=5e-3, Pr=p_release, delay=delay)
-                        synchan.MgConc = trbnetdata.MgConc
+                        synchan.MgConc = TraubFullNetData.MgConc
                     g_gaba = self.g_gaba_mat[pre_index, post_index]
                     if g_gaba != 0.0:
                         if syn_edge['taugabaslow'] > 0.0:
