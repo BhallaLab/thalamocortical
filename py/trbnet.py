@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon May  2 08:18:20 2011 (+0530)
-#           By: subha
-#     Update #: 1402
+# Last-Updated: Tue May  3 10:50:01 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 1404
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -394,7 +394,8 @@ class TraubNet(object):
                         precomp.makeSynapse(postcomp, name='ampa%s' % (syn_suffix), Ek=0.0, Gbar=g_ampa, tau1=syn_edge['tauampa'], tau2=0.0, Pr=p_release, delay=delay)
                     g_nmda = self.g_nmda_mat[pre_index, post_index]
                     if g_nmda != 0.0:
-                        precomp.makeSynapse(postcomp, name='nmda%s' % (syn_suffix), classname='NMDAChan', Ek=0.0, tau1=syn_edge['taunmda'], tau2=5e-3, Pr=p_release, delay=delay)
+                        synchan = precomp.makeSynapse(postcomp, name='nmda%s' % (syn_suffix), classname='NMDAChan', Ek=0.0, tau1=syn_edge['taunmda'], tau2=5e-3, Pr=p_release, delay=delay)
+                        synchan.MgConc = trbnetdata.MgConc
                     g_gaba = self.g_gaba_mat[pre_index, post_index]
                     if g_gaba != 0.0:
                         if syn_edge['taugabaslow'] > 0.0:
