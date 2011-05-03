@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed May  4 03:23:36 2011 (+0530)
+# Last-Updated: Wed May  4 04:05:23 2011 (+0530)
 #           By: subha
-#     Update #: 1407
+#     Update #: 1435
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -192,11 +192,12 @@ class TraubNet(object):
         if container is None:
             self.network_container = moose.Neutral('/net')
         elif isinstance(container, str):
-            self.network_container = moose.Neutral(container)
+            self.network_container = moose.Neutral('%s/net', container)
         elif isinstance(container, moose.Neutral):
-            self.network_container = container
+            self.network_container = moose.Neutral('net', container)
         else:
             raise('Need a moose-object/string/None as container. Got %s of type %s' % (container, container.__class__.__name__))
+        self.ectopic_container = moose.Neutral('ectopic_spikes', sef.network_container.parent)
         
     def setup_from_celltype_file(self, celltype_file=None, format=None, scale=None):
         """Set up the network from a celltype-celltype graph file.
@@ -246,6 +247,7 @@ class TraubNet(object):
         for celltype in self.celltype_graph.vs:
             celltype['label'] = tn.celltype[celltype.index]
             celltype['count'] = tn.cellcount[celltype.index]
+            celltype['ectopicinterval'] = tn.ectopic_interval[celltype.index]
             for posttype in self.celltype_graph.vs:
                 pre_post_ratio = tn.pre_post_ratio[celltype.index][posttype.index]
                 if pre_post_ratio > 0:
@@ -405,6 +407,18 @@ class TraubNet(object):
         delta = endtime - starttime
         config.BENCHMARK_LOGGER.info('Finished network creation in: %g s' % (delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))
 
+    def setup_ectopic_input(self):
+        config.LOGGER.debug('Setting up ectopic input')
+        for celltype in self.celltype_graph.vs:
+            for ii in self.populations[celltype['label']]:
+                cell = self.index_cell_map[ii]
+
+                randspike = moose.RandomSpike('ectopic_%s' % (cell.name), self.ectopic_container)
+                randspike.rate = 1/celltype['ectopicinterval']
+                randspike.minAmp = 0.4e-9
+                randspike.maxAmp = 0.4e-9
+                randomspike.connect('outputSrc', cell.comp[cell.presyn], 'injectMsg')
+
     def get_maxdegree_cell_indices(self, celltype=None, size=None):
         """Get the cells with maximum connectivity - disregarding the strength of the synapse.
 
@@ -451,6 +465,10 @@ class TraubNet(object):
             tab = cell.soma.insertRecorder(cell.name, 'Vm', spike_container)
             tab.stepMode = moose.TAB_SPIKE
             tab.stepSize = 0.0
+        for spike in self.ectopic_container.children():
+            tab = moose.Table(spike.name, data_container)
+            tab.stepMode = 3
+            spike.connect('state', tab, 'inputRequest')
         
     def setup_Vm_recording(self, data_container, celltype, numcells=10, random=True):
         """Create tables to record Vm and [Ca2+] from a fixed number of cells of each type.
