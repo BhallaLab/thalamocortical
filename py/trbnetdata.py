@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Wed May  4 03:23:13 2011 (+0530)
+# Last-Updated: Wed May  4 04:06:30 2011 (+0530)
 #           By: subha
-#     Update #: 1150
+#     Update #: 1153
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -475,6 +475,7 @@ class TraubFullNetData(object):
         # nRT->TCR GABAergic connections are taken from a unform random distribution between 0.7 nS and 2.1 nS.
         self.nRT_TCR_ggaba_high = 2.1e-9
         self.nRT_TCR_ggaba_low = 0.7e-9
+        self.ectopic_interval = [10.0, 10.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, 1.0, 1.0, -1.0]
         
     def check_pre_post_ratio(self):
         """Check the pre-post ratio for each celltype pair"""
