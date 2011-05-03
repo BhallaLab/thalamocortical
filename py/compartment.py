@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Mon May  2 08:21:57 2011 (+0530)
-#           By: subha
-#     Update #: 264
+# Last-Updated: Tue May  3 09:48:09 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 273
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -217,20 +217,12 @@ class MyCompartment(moose.Compartment):
         synapse.tau2 = tau2
         target.connect('channel', synapse, 'channel')
         spikegen = None
-        if Pr < 1.0:
-            count = 1
-            path = '%s/sspike_%s' % (self.path, name)
-            while config.context.exists(path):
-                path = '%s/sspike_%s_%d' % (self.path, name, count)
-                count += 1
+        if Pr < 1.0: 
+            path = '%s/sspike_%s_%s' % (self.path, moose.Neutral(target.parent).name, target.name)
             spikegen = moose.StochSpikeGen(path)
             spikegen.pr = Pr
         else:
-            count = 1
-            path = '%s/spike_%s' % (self.path, name)
-            while config.context.exists(path):
-                path = '%s/spike_%s_%d' % (self.path, name, count)
-                count += 1
+            path = '%s/spike_%s_%s' % (self.path, moose.Neutral(target.parent).name, target.name)
             spikegen = moose.SpikeGen(path)
         spikegen.threshold = threshold
         spikegen.absRefract = absRefract
