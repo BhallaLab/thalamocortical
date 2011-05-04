@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed May  4 04:05:23 2011 (+0530)
-#           By: subha
-#     Update #: 1435
+# Last-Updated: Wed May  4 13:23:42 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 1437
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -466,8 +466,9 @@ class TraubNet(object):
             tab.stepMode = moose.TAB_SPIKE
             tab.stepSize = 0.0
         for spike in self.ectopic_container.children():
-            tab = moose.Table(spike.name, data_container)
-            tab.stepMode = 3
+            tab = moose.Table(spike.name, spike_container)
+            tab.stepMode = moose.TAB_SPIKE
+            tab.stepSize = 0.0
             spike.connect('state', tab, 'inputRequest')
         
     def setup_Vm_recording(self, data_container, celltype, numcells=10, random=True):
