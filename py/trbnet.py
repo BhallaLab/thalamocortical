@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed May  4 14:04:19 2011 (+0530)
+# Last-Updated: Wed May  4 14:10:31 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1438
+#     Update #: 1439
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -359,7 +359,6 @@ class TraubNet(object):
                 self.cell_index_map[cell] = total_count + ii
                 self.populations[celltype['label']].append(total_count + ii)
             total_count += cell_count
-        config.LOGGER.debug('##')
         for syn_edge in self.celltype_graph.es:
             pretype = self.celltype_graph.vs[syn_edge.source]
             posttype = self.celltype_graph.vs[syn_edge.target]
@@ -375,9 +374,7 @@ class TraubNet(object):
             poststart = int(posttype['startindex'])
             precount = int(pretype['count'])
             postcount = int(posttype['count'])
-            config.LOGGER.debug('###')
             for pre_index in range(prestart, prestart+precount):
-                config.LOGGER.debug('####')
                 precell = self.index_cell_map[pre_index]
                 precomp = precell.comp[precell.presyn]
                 for post_index in range(poststart, poststart+postcount):
@@ -388,7 +385,6 @@ class TraubNet(object):
                     postcomp = postcell.comp[postcompindex]
                     if postcomp is None:
                         continue
-                    config.LOGGER.debug('Precomp: %s, postcomp: %s' % (precomp.path, postcomp.path))                                            
                     syn_suffix = '_%d_%d_%d' % (pre_index, post_index, postcompindex)
 
                     g_ampa = self.g_ampa_mat[pre_index, post_index]
