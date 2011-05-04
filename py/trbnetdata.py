@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Tue May  3 10:49:32 2011 (+0530)
+# Last-Updated: Tue May  3 12:38:23 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1149
+#     Update #: 1152
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -474,6 +474,7 @@ class TraubFullNetData(object):
         self.nRT_TCR_ggaba_high = 2.1e-9
         self.nRT_TCR_ggaba_low = 0.7e-9
         self.MgConc = 1.5 # mM = M/m^3
+        self.ectopic_interval = [10.0, 10.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, 1.0, 1.0, -1.0]
         
     def check_pre_post_ratio(self):
         """Check the pre-post ratio for each celltype pair"""
