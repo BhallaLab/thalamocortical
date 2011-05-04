@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed May  4 13:23:42 2011 (+0530)
+# Last-Updated: Wed May  4 14:04:19 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1437
+#     Update #: 1438
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -197,7 +197,7 @@ class TraubNet(object):
             self.network_container = moose.Neutral('net', container)
         else:
             raise('Need a moose-object/string/None as container. Got %s of type %s' % (container, container.__class__.__name__))
-        self.ectopic_container = moose.Neutral('ectopic_spikes', sef.network_container.parent)
+        self.ectopic_container = moose.Neutral('ectopic_spikes', self.network_container.parent)
         
     def setup_from_celltype_file(self, celltype_file=None, format=None, scale=None):
         """Set up the network from a celltype-celltype graph file.
