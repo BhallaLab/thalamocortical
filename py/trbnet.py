@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed May  4 14:10:31 2011 (+0530)
+# Last-Updated: Thu May  5 22:56:16 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1439
+#     Update #: 1442
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -408,12 +408,11 @@ class TraubNet(object):
         for celltype in self.celltype_graph.vs:
             for ii in self.populations[celltype['label']]:
                 cell = self.index_cell_map[ii]
-
                 randspike = moose.RandomSpike('ectopic_%s' % (cell.name), self.ectopic_container)
                 randspike.rate = 1/celltype['ectopicinterval']
                 randspike.minAmp = 0.4e-9
                 randspike.maxAmp = 0.4e-9
-                randomspike.connect('outputSrc', cell.comp[cell.presyn], 'injectMsg')
+                randspike.connect('outputSrc', cell.comp[cell.presyn], 'injectMsg')
 
     def get_maxdegree_cell_indices(self, celltype=None, size=None):
         """Get the cells with maximum connectivity - disregarding the strength of the synapse.
@@ -461,7 +460,8 @@ class TraubNet(object):
             tab = cell.soma.insertRecorder(cell.name, 'Vm', spike_container)
             tab.stepMode = moose.TAB_SPIKE
             tab.stepSize = 0.0
-        for spike in self.ectopic_container.children():
+        for ch in self.ectopic_container.children():
+            spike = moose.Neutral(ch)
             tab = moose.Table(spike.name, spike_container)
             tab.stepMode = moose.TAB_SPIKE
             tab.stepSize = 0.0
