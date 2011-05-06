@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Tue May  3 09:48:09 2011 (+0530)
+# Last-Updated: Fri May  6 11:38:02 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 273
+#     Update #: 278
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -227,7 +227,10 @@ class MyCompartment(moose.Compartment):
         spikegen.threshold = threshold
         spikegen.absRefract = absRefract
         self.connect('VmSrc', spikegen, 'Vm')
-        spikegen.connect('event', synapse, 'synapse')
+        if not spikegen.connect('event', synapse, 'synapse'):
+            raise Exception('Error creating connection: %s->%s' % (spikegen.path, synapse.path))
+        else:
+            config.LOGGER.debug('Connected: %s->%s' % (spikegen.path, synapse.path))
 
         # We had an awkward situation here: the weight and delay
         # vectors were not updated until reset/setDelay/setWeight was
@@ -240,6 +243,7 @@ class MyCompartment(moose.Compartment):
         num_synapse = synapse.numSynapses
         synapse.delay[num_synapse - 1] = delay
         synapse.weight[num_synapse - 1] = weight
+        config.LOGGER.debug('Created synapse: %s with delay: %f weight: %f, numsynapse: %d' % (synapse.path, synapse.delay[num_synapse - 1], synapse.weight[num_synapse - 1], num_synapse))
         return synapse
         
 
