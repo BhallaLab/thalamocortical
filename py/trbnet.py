@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Thu May  5 22:56:16 2011 (+0530)
+# Last-Updated: Fri May  6 15:35:34 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1442
+#     Update #: 1444
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -499,7 +499,7 @@ class TraubNet(object):
                 cell.soma.insertRecorder(cell.name, 'Vm', vm_container)
                 cell.soma.insertCaRecorder(cell.name, ca_container)
         
-    def setup_stimulus(self, stim_container='/stim', stim_onset=0.5, stim_interval=0.2, bg_delay=0.05, pulse_width=60e-6, isi=10e-3, level=5e-12, bg_count=100, probe_count=10):
+    def setup_stimulus(self, celltype='any', stim_onset=0.5, stim_interval=0.2, bg_delay=0.05, pulse_width=60e-6, isi=10e-3, level=5e-12, bg_count=100, probe_count=10, stim_container='/stim'):
         """Setup the stimulus protocol.
 
         The protocol is as follows:

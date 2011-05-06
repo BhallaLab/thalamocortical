@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Aug 10 15:45:05 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Dec  9 23:53:15 2010 (+0530)
+# Last-Updated: Fri May  6 10:20:51 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 767
+#     Update #: 768
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -72,7 +72,7 @@ has_mayavi = False
 import networkx as nx
 
 import config
-import synapse
+
 
 class TraubNet(object):
     """
