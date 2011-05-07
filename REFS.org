@@ -38,3 +38,8 @@
   L5 Pyr->Pyr depression model in terms of variability of N, the
   number of release sites.
 
+* Depression:
+  Occurs in cortico-thalamic synapses (Diasynou Fioravante and Wade G
+  Regehr, Short-term forms of presynaptic plasticity, Current Opinion
+  in Neurobiology 2011, 21:1–6, DOI 10.1016/j.conb.2011.02.003)
+

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri May  6 15:35:34 2011 (+0530)
+# Last-Updated: Fri May  6 23:36:50 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1444
+#     Update #: 1445
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -512,7 +512,7 @@ class TraubNet(object):
         generator. probe_trigger will trigger the probe pulse
         generator.
 
-        stim_container -- container object for stimulating electrodes
+        stim_container -- container object for stimulating-electrodes
 
         celltype -- type of cells we are looking at
 
