@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri May  6 23:36:50 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 1445
+# Last-Updated: Sat May  7 09:38:41 2011 (+0530)
+#           By: subha
+#     Update #: 1447
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -412,7 +412,10 @@ class TraubNet(object):
                 randspike.rate = 1/celltype['ectopicinterval']
                 randspike.minAmp = 0.4e-9
                 randspike.maxAmp = 0.4e-9
-                randspike.connect('outputSrc', cell.comp[cell.presyn], 'injectMsg')
+                randspike.reset = 1
+                randspike.resetValue = 0.0
+                success = randspike.connect('outputSrc', cell.comp[cell.presyn], 'injectMsg')
+                config.LOGGER.debug('Connected %s to %s: %s' % (randspike.path, cell.comp[cell.presyn].path, str(success)))
 
     def get_maxdegree_cell_indices(self, celltype=None, size=None):
         """Get the cells with maximum connectivity - disregarding the strength of the synapse.
