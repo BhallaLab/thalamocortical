@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Feb 15 11:16:43 2011 (+0530)
+# Last-Updated: Tue May 10 09:53:41 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 172
+#     Update #: 173
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -95,7 +95,7 @@ context = moose.PyMooseBase.getContext()
 lib = moose.Neutral('/library')
 root = moose.Neutral("/")
 clockjob = moose.ClockJob('sched/cj')
-clockjob.autoschedule = 0
+clockjob.autoschedule = 1
 simdt = 0.5e-4
 plotdt = 1e-3
 gldt = 1e-2
