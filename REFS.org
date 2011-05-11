@@ -43,3 +43,24 @@
   Regehr, Short-term forms of presynaptic plasticity, Current Opinion
   in Neurobiology 2011, 21:1–6, DOI 10.1016/j.conb.2011.02.003)
 
+* Lefort, S., Tomm, C., Floyd Sarria, J.-C. & Petersen, C.C.H. The Excitatory Neuronal Network of the C2 Barrel Column in Mouse Primary Somatosensory Cortex. Neuron 61, 301-316 (2009).
+  Information on connectivity, but not release probability or synaptic
+  parameters.
+
+* Morrison, A., Diesmann, M. & Gerstner, W. Phenomenological models of synaptic plasticity based on spike timing. Biol Cybern 98, 459-478 (2008).
+  Review of short term plasticity (facilitation and depression)
+
+* Thomson, A.M. Activity-dependent properties of synaptic transmission at two classes of connections made by rat neocortical pyramidal axons in vitro. J. Physiol. (Lond.) 502 ( Pt 1), 131-147 (1997).
+  This does not give the quantal parameters but says that
+  Pyramid-Pyramid short term plasticities and pyramid-interneuron
+  short term plasticities remain similar across different areas and
+  different cells.
+
+* Pan, B. & Zucker, R.S. A General Model of Synaptic Transmission and Short-Term Plasticity. Neuron 62, 539-554 (2009).
+
+  Makes a detailed model of pre and postsynaptic mechanisms for short
+  term plasticity in cray fish neurons.
+
+  The above two papers introduced me to the new keywords: phasic and tonic synapse.
+
+
