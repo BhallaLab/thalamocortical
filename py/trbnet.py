@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Sat May  7 09:38:41 2011 (+0530)
-#           By: subha
-#     Update #: 1447
+# Last-Updated: Thu May 19 11:06:15 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 1448
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -749,6 +749,7 @@ class TraubNet(object):
             synedge['taunmda'] = edge['taunmda']
             synedge['tau2nmda'] =  5e-3
             synedge['taugaba'] = edge['taugaba']
+            synedge['prelease'] = edge['prelease']
             ii =  0
             pscomps = numpy.zeros(90, dtype=numpy.uint8)
             for pscomp in eval(edge['pscomps']): 
