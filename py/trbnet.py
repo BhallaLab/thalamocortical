@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri May 20 10:36:36 2011 (+0530)
+# Last-Updated: Fri May 20 10:46:52 2011 (+0530)
 #           By: subha
-#     Update #: 1500
+#     Update #: 1516
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -502,7 +502,8 @@ class TraubNet(object):
                 cell.soma.insertRecorder(cell.name, 'Vm', vm_container)
                 cell.soma.insertCaRecorder(cell.name, ca_container)
         
-    def setup_stimulus(self, celltype='any', 
+    def setup_stimulus(self, bg_celltype='any', 
+                       probe_celltype='any',
                        stim_onset=1.0, 
                        bg_interval=0.5, 
                        pulse_width=60e-6, 
@@ -585,26 +586,36 @@ class TraubNet(object):
         self.stim_probe.trigMode = moose.EXT_GATE
         self.stim_gate.connect('outputSrc', self.stim_bg, 'input')
         self.stim_gate.connect('outputSrc', self.stim_probe, 'input')
-        cell_indices = []
+        bg_cell_indices = []
         probe_cell_indices = []
-        if celltype == 'any':
-            cell_indices = numpy.random.randint(low=0, high=len(self.index_cell_map.keys()), size=bg_count+probe_count)
+        if bg_celltype == 'any':
+            bg_cell_indices = numpy.random.randint(low=0, high=len(self.index_cell_map.keys()), size=bg_count)
         else:
-            celltype_vertex_set = self.celltype_graph.vs.select(label_eq=celltype)
+            celltype_vertex_set = self.celltype_graph.vs.select(label_eq=bg_celltype)
             for vertex in celltype_vertex_set:
                 startindex = int(vertex['startindex'])
                 count = int(vertex['count'])
-                np.concatenate((cell_indices, numpy.random.randint(low=startindex, high=startindex+count, size=bg_count+probe_count)))
-        protocol_file = open('protocol_'+ config.filename_suffix)        
+                np.concatenate((bg_cell_indices, numpy.random.randint(low=startindex, high=startindex+count, size=bg_count)))
+
+        probe_cell_indices = []
+        if probe_celltype == 'any':
+            probe_cell_indices = numpy.random.randint(low=0, high=len(self.index_cell_map.keys()), size=probe_count)
+        else:
+            celltype_vertex_set = self.celltype_graph.vs.select(label_eq=probe_celltype)
+            for vertex in celltype_vertex_set:
+                startindex = int(vertex['startindex'])
+                count = int(vertex['count'])
+                np.concatenate((bg_cell_indices, numpy.random.randint(low=startindex, high=startindex+count, size=probe_count)))
+        protocol_file = open('protocol_'+ config.filename_suffix)
         protocol_file.write('onset: %g\nbg_interval: %g\nisi: %g\nwidth: %g\nlevel: %g\n' % (stim_onset, bg_interval, isi, pulse_width, level))
         protocol_file.write('background_cells:\n')
-        for index in range(bg_count):            
-            cell = self.index_cell_map[cell_indices[index]]
+        for index in bg_cell_indices:            
+            cell = self.index_cell_map[index]
             self.stim_bg.connect('outputSrc', cell, 'injectMsg')
             protocol_file.write('%s\n' % (cell.path))
         protocol_file.write('probe_cells:\n')
-        for index in range(bg_count, bg_count + probe_count):
-            cell = self.index_cell_map[cell_indices[index]]
+        for index in probe_cell_indices:
+            cell = self.index_cell_map[index]
             self.stim_probe.connect('outputSrc', cell, 'injectMsg')
             protocol_file.write('%s\n' % (cell.path))
         protocol_file.close()
