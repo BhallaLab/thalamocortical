@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Thu May 19 11:06:15 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 1448
+# Last-Updated: Fri May 20 10:36:36 2011 (+0530)
+#           By: subha
+#     Update #: 1500
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -502,10 +502,28 @@ class TraubNet(object):
                 cell.soma.insertRecorder(cell.name, 'Vm', vm_container)
                 cell.soma.insertCaRecorder(cell.name, ca_container)
         
-    def setup_stimulus(self, celltype='any', stim_onset=0.5, stim_interval=0.2, bg_delay=0.05, pulse_width=60e-6, isi=10e-3, level=5e-12, bg_count=100, probe_count=10, stim_container='/stim'):
+    def setup_stimulus(self, celltype='any', 
+                       stim_onset=1.0, 
+                       bg_interval=0.5, 
+                       pulse_width=60e-6, 
+                       isi=10e-3, 
+                       level=5e-12, 
+                       bg_count=100, 
+                       probe_count=10, 
+                       stim_container='/stim'):
         """Setup the stimulus protocol.
 
         The protocol is as follows:
+
+     ->|  |<- stim_onset
+           __________________________________ gate
+        __|
+        ->|    |<- bg_interval
+
+        _______||____||____||____||____||____  background
+        
+        _____________||__________||__________  probe
+
 
         Let the system stabilize for stim_onset seconds.
 
@@ -522,73 +540,74 @@ class TraubNet(object):
         stim_onset -- when we consider the system stabilized and start
         stimulus
 
-        stim_interval -- interval between two stimulus sessions
-
-        bg_delay -- start time for background stimulus after
-        stim_onset, this is also the time between successive
-        applications of background.
+        bg_interval -- interval between two stimulus sessions
 
         pulse_width -- width of background pulses
 
-        isi -- if paired pulse, then the interval between the
-        two pulses (beginning of second - beginning of first), 0 for
+        isi -- if paired pulse, then the interval between the two
+        pulses (beginning of second - beginning of first), 0 for
         single pulse.
 
-        level -- current injection value
+        level -- current injection value.
 
         bg_count -- number of cells stimulated by background pulse.
 
+        probe_count -- number of cells to be probed.
+
         """
-        raise NotImplementedError()
         if  isinstance(stim_container, str):
             self.stim_container = moose.Neutral(stim_container)
         elif isinstance(stim_container, moose.Neutral):
             self.stim_container = stim_container
         else:
-            print isinstance(stim_container, moose.Neutral)
             raise Exception('Stimulus container must be a string or a Neutral object: got %s', stim_container.__class__.__name__)
-        self.root_gate = moose.PulseGen('root_gate', self.stim_container)
-        self.root_gate.trigMode = 0 # Free running
-        self.root_gate.firstDelay = stim_onset
-        self.root_gate.firstWidth = 1e9 # Keep it on forever
-        self.root_gate.firstLevel = 1.0                
         self.stim_gate = moose.PulseGen('stim_gate', self.stim_container)
-        self.stim_gate.firstDelay = stim_interval
-        self.stim_gate.firstLevel = 1.0
-        self.stim_gate.firstWidth = (bg_delay + pulse_width + isi) * 2
-        self.stim_gate.trigMode = 2
-        self.stim_bg = moose.PulseGen('stim_background', self.stim_container)
+        self.stim_gate.trigMode = moose.FREE_RUN
+        self.stim_gate.firstDelay = stim_onset
+        self.stim_gate.firstWidth = 1e9 # Keep it on forever
+        self.stim_gate.firstLevel = 1.0                
+        self.stim_bg = moose.PulseGen('stim_bg', self.stim_container)
         self.stim_bg.firstLevel = level
         self.stim_bg.secondLevel = level
-        self.stim_bg.firstDelay = bg_delay
+        self.stim_bg.firstDelay = bg_interval
         self.stim_bg.firstWidth = pulse_width
         self.stim_bg.secondDelay = isi
-        self.stim_bg.secondWidth = pulse_width
-        
-        self.stim_bg.trigMode = 2
+        self.stim_bg.secondWidth = pulse_width        
+        self.stim_bg.trigMode = moose.EXT_GATE
+
         self.stim_probe = moose.PulseGen('stim_probe', self.stim_container)
         self.stim_probe.firstLevel = level
         self.stim_probe.secondLevel = level
-        self.stim_probe.firstDelay = 2 * bg_delay + pulse_width + isi
+        self.stim_probe.firstDelay = 2 * bg_interval + pulse_width + isi
         self.stim_probe.secondDelay = isi
         self.stim_probe.firstWidth = pulse_width
         self.stim_probe.secondWidth = pulse_width            
-        self.stim_probe.trigMode = 2
-        self.root_gate.connect('outputSrc', self.stim_gate, 'input')
+        self.stim_probe.trigMode = moose.EXT_GATE
         self.stim_gate.connect('outputSrc', self.stim_bg, 'input')
         self.stim_gate.connect('outputSrc', self.stim_probe, 'input')
         cell_indices = []
+        probe_cell_indices = []
         if celltype == 'any':
-            cell_indices = numpy.random.randint(low=0, high=len(self.index_cell_map.keys()), size=bg_count+1)
+            cell_indices = numpy.random.randint(low=0, high=len(self.index_cell_map.keys()), size=bg_count+probe_count)
         else:
             celltype_vertex_set = self.celltype_graph.vs.select(label_eq=celltype)
             for vertex in celltype_vertex_set:
                 startindex = int(vertex['startindex'])
                 count = int(vertex['count'])
-                np.concatenate((cell_indices, numpy.random.randint(low=startindex, high=startindex+count, size=bg_count+1)))
-        for index in cell_indices:
-            cell = self.index_cell_map[index]
-            stim = moose.PulseGen(cell.name + '_inject', self.stim_container)
+                np.concatenate((cell_indices, numpy.random.randint(low=startindex, high=startindex+count, size=bg_count+probe_count)))
+        protocol_file = open('protocol_'+ config.filename_suffix)        
+        protocol_file.write('onset: %g\nbg_interval: %g\nisi: %g\nwidth: %g\nlevel: %g\n' % (stim_onset, bg_interval, isi, pulse_width, level))
+        protocol_file.write('background_cells:\n')
+        for index in range(bg_count):            
+            cell = self.index_cell_map[cell_indices[index]]
+            self.stim_bg.connect('outputSrc', cell, 'injectMsg')
+            protocol_file.write('%s\n' % (cell.path))
+        protocol_file.write('probe_cells:\n')
+        for index in range(bg_count, bg_count + probe_count):
+            cell = self.index_cell_map[cell_indices[index]]
+            self.stim_probe.connect('outputSrc', cell, 'injectMsg')
+            protocol_file.write('%s\n' % (cell.path))
+        protocol_file.close()
 
     def scale_populations(self, scale):
         """Scale the number of cells in each population by a factor."""
