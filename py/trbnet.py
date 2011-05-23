@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon May 23 15:42:58 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 1537
+# Last-Updated: Mon May 23 09:13:13 2011 (+0530)
+#           By: subha
+#     Update #: 1538
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -693,7 +693,7 @@ class TraubNet(object):
         concentration will cause an additive change in the reversal
         potential for that ion."""
         config.LOGGER.info('%s Ek += %g' % (channel_class.__name__, value))
-        self.tweaks_doc.append('%s.Ek += %g' % (channel_class.__name__, value)
+        self.tweaks_doc.append('%s.Ek += %g' % (channel_class.__name__, value))
         for cell in self.cell_index_map.keys():
             for comp in cell.comp[1:]:
                 for chan in comp.channels:
