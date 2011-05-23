@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri May 20 10:46:52 2011 (+0530)
-#           By: subha
-#     Update #: 1516
+# Last-Updated: Mon May 23 15:42:58 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 1537
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -198,6 +198,7 @@ class TraubNet(object):
         else:
             raise('Need a moose-object/string/None as container. Got %s of type %s' % (container, container.__class__.__name__))
         self.ectopic_container = moose.Neutral('ectopic_spikes', self.network_container.parent)
+        self.tweaks_doc = []
         
     def setup_from_celltype_file(self, celltype_file=None, format=None, scale=None):
         """Set up the network from a celltype-celltype graph file.
@@ -467,7 +468,7 @@ class TraubNet(object):
             spike = moose.Neutral(ch)
             tab = moose.Table(spike.name, spike_container)
             tab.stepMode = moose.TAB_SPIKE
-            tab.stepSize = 0.0
+            tab.stepSize = 0.2e-9
             spike.connect('state', tab, 'inputRequest')
         
     def setup_Vm_recording(self, data_container, celltype, numcells=10, random=True):
@@ -686,6 +687,19 @@ class TraubNet(object):
                 for vertex in vertices:
                     vertex['count'] = int(count)
 
+    def tweak_Ek(self, channel_class, value):
+        """Adds value to channel's reversal potential. According
+        Nernst equation, a multiplicative change in ionic
+        concentration will cause an additive change in the reversal
+        potential for that ion."""
+        config.LOGGER.info('%s Ek += %g' % (channel_class.__name__, value))
+        self.tweaks_doc.append('%s.Ek += %g' % (channel_class.__name__, value)
+        for cell in self.cell_index_map.keys():
+            for comp in cell.comp[1:]:
+                for chan in comp.channels:
+                    if isinstance(chan, channel_class):
+                        chan.Ek += value
+
     def tune_conductances(self, filename):
         """Tune the conductances based on entries in file filename.
         file should have space separated entries like this:
@@ -718,6 +732,7 @@ class TraubNet(object):
                                 else:
                                     syn[g_name] *= scale_factor
 
+                                    
     def set_conductances(self, filename):
         """Set the conductances based on entries in file filename.
         file should have space separated entries like this:
@@ -758,6 +773,7 @@ class TraubNet(object):
         compression_filter =  tables.Filters(complevel=9, complib='zlib', fletcher32=True)
         h5file =  tables.openFile(filename,  mode = 'w',  title = 'Traub Network: timestamp: %s' % (config.timestamp.strftime('%Y-%M-%D %H:%M:%S')),  filters = compression_filter)
         h5file.root._v_attrs.rngseed = config.rngseed
+        h5file.root._v_attrs.notes = '\n'.join(self.tweaks_doc)
         # Save the celltype information (vertices of the celltype graph)
         network_struct =  h5file.createGroup(h5file.root, 'network', 'Network structure')
         celltype_table =  h5file.createTable(network_struct, 'celltype', CellType,  'Information on each celltype population')
