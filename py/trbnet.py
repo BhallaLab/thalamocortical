@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon May 23 09:13:13 2011 (+0530)
+# Last-Updated: Fri Jun  3 20:17:33 2011 (+0530)
 #           By: subha
-#     Update #: 1538
+#     Update #: 1551
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -105,6 +105,31 @@ from nRT import nRT
 import synapse
 
 
+layer_to_celltype = {
+    '1': [],
+    '2/3': ['SupPyrRS', 'SupPyrFRB', 'SupBasket', 'SupAxoaxonic', 'SupLTS'],
+    '4': ['SpinyStellate'],
+    '5': ['TuftedIB', 'TuftedRS'],
+    '6': ['NontuftedRS', 'DeepBasket', 'DeepAxoaxonic', 'DeepLTS'],
+    'Thalamus': ['nRT', 'TCR']
+}
+
+celltype_to_layer = {
+    'SupPyrRS': ['2/3'],
+    'SupPyrFRB': ['2/3'],
+    'SupBasket': ['2/3'],
+    'SupAxoaxonic': ['2/3'],
+    'SupLTS': ['2/3'],
+    'SpinyStellate': ['4'],
+    'TuftedIB': ['5'],
+    'TuftedRS': ['5'],
+    'NonTuftedRS': ['6'],
+    'DeepBasket': ['6'],
+    'DeepAxoaxonic': ['6'],
+    'DeepLTS': ['6'],
+    'nRT': ['Thalamus'],
+    'TCR': ['Thalamus']
+}
 # Is it a good idea to have a separate population class? What is the
 # use?  When it comes to connectivity, the connectivity information is
 # one level above the population. If a population is self contained,
@@ -695,7 +720,8 @@ class TraubNet(object):
         config.LOGGER.info('%s Ek += %g' % (channel_class.__name__, value))
         self.tweaks_doc.append('%s.Ek += %g' % (channel_class.__name__, value))
         for cell in self.cell_index_map.keys():
-            for comp in cell.comp[1:]:
+	    for ii in range(1, cell.num_comp):
+                comp = cell.comp[ii]
                 for chan in comp.channels:
                     if isinstance(chan, channel_class):
                         chan.Ek += value
@@ -729,8 +755,10 @@ class TraubNet(object):
                                     self.nRT_TCR_ggaba_low *= scale_factor
                                     self.nRT_TCR_ggaba_high *= scale_factor
                                     syn[g_name] = 'uniform %f %f' % (self.nRT_TCR_ggaba_low, self.nRT_TCR_ggaba_high)
+
                                 else:
                                     syn[g_name] *= scale_factor
+                                self.tweaks_doc.append('%s[%s->%s] *= %g' % (source, dest, scale_factor))
 
                                     
     def set_conductances(self, filename):
