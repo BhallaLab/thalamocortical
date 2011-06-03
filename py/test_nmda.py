@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Mar 22 16:58:57 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Mar 29 16:15:07 2010 (+0530)
+# Last-Updated: Fri May 27 10:11:24 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 131
+#     Update #: 132
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -97,6 +97,9 @@ def testNMDAChan(simtime=100e-3, simdt=1e-5, plotdt=1e-5):
     gNMDA.connect('inputRequest', nmda, 'Gk')
 
     context.setClock(0, simdt)
+    context.setClock(1, simdt)
+    context.setClock(2, simdt)
+    context.setClock(3, plotdt)
     context.reset()
     context.step(simtime)
     gNMDA.dumpFile('gNMDA.dat', False)
