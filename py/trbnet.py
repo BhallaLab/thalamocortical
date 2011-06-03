@@ -695,7 +695,8 @@ class TraubNet(object):
         config.LOGGER.info('%s Ek += %g' % (channel_class.__name__, value))
         self.tweaks_doc.append('%s.Ek += %g' % (channel_class.__name__, value))
         for cell in self.cell_index_map.keys():
-            for comp in cell.comp[1:]:
+	    for ii in range(1, cell.num_comp):
+                comp = cell.comp[ii]
                 for chan in comp.channels:
                     if isinstance(chan, channel_class):
                         chan.Ek += value
