@@ -64,3 +64,16 @@
   The above two papers introduced me to the new keywords: phasic and tonic synapse.
 
 
+
+* Lübke, J. & Feldmeyer, D. Excitatory signal flow and connectivity in a cortical column: focus on barrel cortex. Brain Struct Funct 212, 3-17 (2007).
+This review attempts to summarize recent advances in the study of
+individual microcircuits and their functional relevance within the
+framework of a cortical column, with emphasis on excitatory signal
+flow.
+
+** In the barrel cortex, a cortical column contains
+   approximately 10,000–20,000 neurons distributed over six
+   laminae (Keller and Carlson 1999).
+
+** Excitatory cells : 80-85%
+* Feldmeyer, D. & Sakmann, B. Synaptic efficacy and reliability of excitatory connections between the principal neurones of the input (layer 4) and output layer (layer 5) of the neocortex. The Journal of Physiology 525, 31 -39 (2000).
