@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Wed May  4 04:06:30 2011 (+0530)
-#           By: subha
-#     Update #: 1153
+# Last-Updated: Tue Jun  7 14:51:09 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 1169
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -90,14 +90,15 @@ class TraubFullNetData(object):
                          'SupAxoaxonic',# L2/3 Inhibitory GABAergic Chandelier interneuron
                          'SupLTS',      # L2/3 Low-Threshold-Spiking Inhibitory GABAergic interneuron
                          'SpinyStellate',      # L4 excitatory cells - get inputs from thalamus
-                         'TuftedIB',
-                         'TuftedRS',
-                         'DeepBasket',
-                         'DeepAxoaxonic',
-                         'DeepLTS',
-                         'NontuftedRS',
-                         'TCR',
-                         'nRT']
+                         'TuftedIB',    # L5 excitatory
+                         'TuftedRS',    # L5 excitatory
+                         'DeepBasket',  # L5 inhibitory
+                         'DeepAxoaxonic',       # L5 inhibitory
+                         'DeepLTS',     # L5 inhibitory
+                         'NontuftedRS', # L6 excitatory
+                         'TCR',         # Thalamic excitatory
+                         'nRT'  # Thalamic excitatory
+                         ]
 
         self.cellcount = [1000,
                           50,
@@ -240,7 +241,11 @@ class TraubFullNetData(object):
         # by a Small Number of Fast-Spiking
         # Interneurons. J. Neurosci. 26, 1219-1230 (2006).
 
-        # L4->L5 85% (Feldmeyer and Sakmann, 2000) spiny->tuftedIB, tuftedRS
+        # L4->L4 95% (Feldmeyer and Sakmann, 2000) spiny->spiny
+
+        # L5->L5 85% (Feldmeyer and Sakmann, 2000) tuftedIB, tuftedRS
+
+        # Arbitraily setting L4->L5 excitatory to 85%
 
         self.p_release = [
             [   0.97,    0.97,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
@@ -248,9 +253,9 @@ class TraubFullNetData(object):
             [   1.0,    1.0,    1.0,    1.0,    1.0,    0.96,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
             [   1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
             [   1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
-            [   0.8,    0.8,    1.0,    1.0,    1.0,    0.95,    0.85,    0.85,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
-            [   1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
-            [   1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
+            [   0.8,    0.8,    1.0,    1.0,    1.0,    0.95,   0.85,  0.85,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
+            [   1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    0.85,   0.85,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
+            [   1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    0.85,   0.85,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
             [   1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
             [   1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
             [   1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],

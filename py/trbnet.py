@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Jun  3 20:17:33 2011 (+0530)
-#           By: subha
-#     Update #: 1551
+# Last-Updated: Tue Jun  7 15:09:00 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 1556
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -725,6 +725,12 @@ class TraubNet(object):
                 for chan in comp.channels:
                     if isinstance(chan, channel_class):
                         chan.Ek += value
+
+    def set_unknown_prelease(self, value):
+        self.tweaks_doc.append('prelease = 1.0 <- %g' % (value))
+        for syn in self.celltype_graph.es:
+            if syn['prelease'] == 1.0:
+                syn['prelease'] = value
 
     def tune_conductances(self, filename):
         """Tune the conductances based on entries in file filename.
