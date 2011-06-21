@@ -13,9 +13,9 @@ NEURON {
 	NONSPECIFIC_CURRENT i
 	GLOBAL gfac
 : for network debugging
-:	USEION nmda1 WRITE inmda1 VALENCE 0
-:	USEION nmda2 WRITE inmda2 VALENCE 0
-:	RANGE srcgid, targid, comp, synid
+	USEION nmda1 WRITE inmda1 VALENCE 0
+	USEION nmda2 WRITE inmda2 VALENCE 0
+	RANGE srcgid, targid, comp, synid
 }
 
 UNITS {
@@ -32,7 +32,7 @@ PARAMETER {
 	e = 0	(mV)
 	weight = 2.5e-8 (uS)	: example conductance scale from Traub 2005 et al
 			 	: gNMDA_suppyrRS_to_suppyrRS (double check units)
-	NMDA_saturation_fact=1e10 (1) : 80e0 (1) : this saturation factor is multiplied into
+	NMDA_saturation_fact= 80e0 (1) : this saturation factor is multiplied into
 		: the conductance scale, weight, for testing against the
 		: instantaneous conductance, to see if it should be limited.
 : FORTRAN nmda subroutine constants and variables here end with underbar 
@@ -54,12 +54,12 @@ ASSIGNED {
 	B1_ (1)
 	B2_ (1)
 	Mg_unblocked (1)
-:	inmda1 (nA)
-:	inmda2 (nA)
-:	srcgid
-:	targid
-:	comp
-:	synid
+	inmda1 (nA)
+	inmda2 (nA)
+	srcgid
+	targid
+	comp
+	synid
 }
 
 STATE {
@@ -81,12 +81,10 @@ BREAKPOINT {
 	SOLVE state METHOD cnexp
 	g = A + B
 	if (g > NMDA_saturation_fact * weight) { g = NMDA_saturation_fact * weight }
-	g = g*gfac
-	printf("NMDA:%g %g %g %g %g\n", t, v, g * Mg_unblocked, k, Mg_unblocked)
-	printf("###%g\t%g\t%g\t%g\t%g\t%g\t%g\n", A1_, A2_, B1_, B2_, A_, BB1_, BB2_)
-	i = g*Mg_unblocked*(v - e)
-:	inmda1 = g
-:	inmda2 = -g
+	g = g*Mg_unblocked*gfac
+	i = g*(v - e)
+	inmda1 = g
+	inmda2 = -g
 }
 
 DERIVATIVE state {
