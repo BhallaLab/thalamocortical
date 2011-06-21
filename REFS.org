@@ -77,3 +77,12 @@ flow.
 
 ** Excitatory cells : 80-85%
 * Feldmeyer, D. & Sakmann, B. Synaptic efficacy and reliability of excitatory connections between the principal neurones of the input (layer 4) and output layer (layer 5) of the neocortex. The Journal of Physiology 525, 31 -39 (2000).
+* Senn, W., Markram, H. & Tsodyks, M. An algorithm for modifying neurotransmitter release probability based on pre- and postsynaptic spike timing. Neural Comput 13, 35-67 (2001).
+  Too detailed model based on probabilities ... STDP is not that
+  important in my case as STDP happens at the time scale of minutes.
+
+* Jahr, C. & Stevens, C. A quantitative description of NMDA receptor-channel kinetic behavior. J. Neurosci. 10, 1830-1837 (1990).
+  This looks like a more useful - Izhikevich used a formulation
+  similar to depression model in this paper. But facilitation is
+  additive rather than multiplicative in this paper.
+

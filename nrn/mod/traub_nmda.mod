@@ -82,7 +82,7 @@ BREAKPOINT {
 	g = A + B
 	if (g > NMDA_saturation_fact * weight) { g = NMDA_saturation_fact * weight }
 	g = g*gfac
-	printf("NMDA:%g %g %g %g\n", v, g * Mg_unblocked, k, Mg_unblocked)
+	printf("NMDA:%g %g %g %g %g\n", t, v, g * Mg_unblocked, k, Mg_unblocked)
 	printf("###%g\t%g\t%g\t%g\t%g\t%g\t%g\n", A1_, A2_, B1_, B2_, A_, BB1_, BB2_)
 	i = g*Mg_unblocked*(v - e)
 :	inmda1 = g
