@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Fri May  6 11:38:02 2011 (+0530)
+# Last-Updated: Tue Jun 28 12:08:42 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 278
+#     Update #: 284
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -217,13 +217,8 @@ class MyCompartment(moose.Compartment):
         synapse.tau2 = tau2
         target.connect('channel', synapse, 'channel')
         spikegen = None
-        if Pr < 1.0: 
-            path = '%s/sspike_%s_%s' % (self.path, moose.Neutral(target.parent).name, target.name)
-            spikegen = moose.StochSpikeGen(path)
-            spikegen.pr = Pr
-        else:
-            path = '%s/spike_%s_%s' % (self.path, moose.Neutral(target.parent).name, target.name)
-            spikegen = moose.SpikeGen(path)
+        path = '%s/spike_%s_%s' % (self.path, moose.Neutral(target.parent).name, target.name)
+        spikegen = moose.SpikeGen(path)
         spikegen.threshold = threshold
         spikegen.absRefract = absRefract
         self.connect('VmSrc', spikegen, 'Vm')
@@ -240,10 +235,13 @@ class MyCompartment(moose.Compartment):
         # 2010-03-29 After making a mandatory call to updateNumSynapse()
         # in getNumSynapses(), this is fixed. 
 
-        num_synapse = synapse.numSynapses
-        synapse.delay[num_synapse - 1] = delay
-        synapse.weight[num_synapse - 1] = weight
-        config.LOGGER.debug('Created synapse: %s with delay: %f weight: %f, numsynapse: %d' % (synapse.path, synapse.delay[num_synapse - 1], synapse.weight[num_synapse - 1], num_synapse))
+        num_synapses = synapse.numSynapses
+        synapse.delay[num_synapses - 1] = delay
+        synapse.weight[num_synapses - 1] = weight
+        if config.stochastic:
+            synapse.initPr[num_synapses - 1] = Pr
+
+        config.LOGGER.debug('Created synapse: %s with delay: %f weight: %f, numsynapse: %d' % (synapse.path, synapse.delay[num_synapses - 1], synapse.weight[num_synapses - 1], num_synapses))
         return synapse
         
 
