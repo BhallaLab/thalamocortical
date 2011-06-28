@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Tue May 10 09:53:41 2011 (+0530)
+# Last-Updated: Tue Jun 28 12:00:46 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 173
+#     Update #: 177
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -62,6 +62,7 @@ import moose
 timestamp = datetime.now()
 mypid = os.getpid()
 rngseed = None
+stochastic = False # If set to True, the synapses are stochastic, otherwise the deterministic ones are used.
 
 def reseed(seed):
     """This is intended to be a single point of reseeding the
@@ -154,6 +155,7 @@ benchmarking=True # Dump benchmarking information
 uS = 1e-6 # micro Siemens to Siemens
 ms = 1e-3 # milli second to second
 mV = 1e-3 # milli Volt to Volt
+
 
 #---------------------------------------------------------------------
 # NEURON 

@@ -78,7 +78,8 @@ INITIAL {
 }
 
 BREAKPOINT {
-	SOLVE state METHOD cnexp
+    SOLVE state METHOD cnexp
+    printf("#%g\n", weight)
 	g = A + B
 	if (g > NMDA_saturation_fact * weight) { g = NMDA_saturation_fact * weight }
 	g = g*gfac
@@ -91,13 +92,16 @@ DERIVATIVE state {
 	Mg_factor()
 	B' = -B/tau
 	A' = k
-}
-
-NET_RECEIVE(weight (uS)) {
+    }
+    
+    NET_RECEIVE(weight (uS)) {
+	printf(">>>%g\n", weight)
 	if (flag>=1) {
 		: self event arrived, terminate ramp up
 	: remove one event's contribution to the slope, k
-		k = k - weight/time_interval
+	k = k - weight/time_interval
+	printf(">>>>%g\n", weight)
+
 	: Transfer the conductance over from A to B
 		B = B + weight
 		A = A - weight
