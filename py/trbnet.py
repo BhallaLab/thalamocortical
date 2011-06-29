@@ -374,11 +374,11 @@ class TraubNet(object):
     def create_network(self):
         """Instantiate the network in MOOSE"""
         config.LOGGER.debug('Creating network')
-        synchan_class_name = 'SynChan'
-        nmdachan_class_name = 'NMDAChan'
+        synchan_classname = 'SynChan'
+        nmdachan_classname = 'NMDAChan'
         if config.stochastic:
-            synchan_class_name = 'STPSynChan'
-            nmdachan_class_name = 'STPNMDAChan'
+            synchan_classname = 'STPSynChan'
+            nmdachan_classname = 'STPNMDAChan'
         starttime = datetime.now()
         total_count = 0
         for celltype in self.celltype_graph.vs:
