@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Jun 28 12:08:42 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 284
+# Last-Updated: Fri Jul  1 11:22:13 2011 (+0530)
+#           By: subha
+#     Update #: 289
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -217,8 +217,7 @@ class MyCompartment(moose.Compartment):
         synapse.tau2 = tau2
         target.connect('channel', synapse, 'channel')
         spikegen = None
-        path = '%s/spike_%s_%s' % (self.path, moose.Neutral(target.parent).name, target.name)
-        spikegen = moose.SpikeGen(path)
+        spikegen = moose.SpikeGen('%s/spike' % (self.path))
         spikegen.threshold = threshold
         spikegen.absRefract = absRefract
         self.connect('VmSrc', spikegen, 'Vm')
