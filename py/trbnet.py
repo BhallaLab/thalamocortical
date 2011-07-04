@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Jul  1 15:36:04 2011 (+0530)
+# Last-Updated: Mon Jul  4 15:52:58 2011 (+0530)
 #           By: subha
-#     Update #: 1571
+#     Update #: 1572
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -426,7 +426,7 @@ class TraubNet(object):
                     g_gaba = self.g_gaba_mat[pre_index, post_index]
                     if g_gaba != 0.0:
                         if syn_edge['taugabaslow'] > 0.0:
-                            precomp.makeSynapse(postcomp, name='gaba_slow_%s' % (pretype), classname=synchanclassname, Ek=syn_edge['ekgaba'], tau1=syn_edge['taugabaslow'], tau2=0.0, Pr=p_release, delay=delay)
+                            precomp.makeSynapse(postcomp, name='gaba_slow_%s' % (pretype), classname=synchan_classname, Ek=syn_edge['ekgaba'], tau1=syn_edge['taugabaslow'], tau2=0.0, Pr=p_release, delay=delay)
                         precomp.makeSynapse(postcomp, name='gaba_%s' % (pretype), classname=synchan_classname, Ek=syn_edge['ekgaba'], tau1=syn_edge['taugaba'], tau2=0.0, Pr=p_release, delay=delay)
         endtime = datetime.now()
         delta = endtime - starttime
