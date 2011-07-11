@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Jul  4 15:52:58 2011 (+0530)
+# Last-Updated: Mon Jul 11 12:26:20 2011 (+0530)
 #           By: subha
-#     Update #: 1572
+#     Update #: 1576
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -321,16 +321,16 @@ class TraubNet(object):
         for edge in self.celltype_graph.es:
             pre = edge.source
             post = edge.target
-            pretype = self.celltype_graph.vs[pre]
-            posttype = self.celltype_graph.vs[post]
-            prestart = int(pretype['startindex'])
-            poststart = int(posttype['startindex'])
-            precount = int(pretype['count'])
-            postcount = int(posttype['count'])
+            pretype_vertex = self.celltype_graph.vs[pre]
+            posttype_vertex = self.celltype_graph.vs[post]
+            prestart = int(pretype_vertex['startindex'])
+            poststart = int(posttype_vertex['startindex'])
+            precount = int(pretype_vertex['count'])
+            postcount = int(posttype_vertex['count'])
             connprob = float(edge['weight'])
             
             ps_comps = numpy.array(eval(edge['pscomps']), dtype=numpy.float)
-            config.LOGGER.debug('Connecting populations: pre=%s[:%d], post=%s[:%d], probability=%g' % (pretype['label'], pretype['count'], posttype['label'], posttype['count'], connprob))
+            config.LOGGER.debug('Connecting populations: pre=%s[:%d], post=%s[:%d], probability=%g' % (pretype_vertex['label'], pretype_vertex['count'], posttype_vertex['label'], posttype_vertex['count'], connprob))
             config.LOGGER.debug('ggaba= %s, type:%s' % (str(edge['ggaba']), edge['ggaba'].__class__.__name__))
             config.LOGGER.debug('allowed postsynaptic compartments: %s (after conversion: %s)' % (edge['pscomps'], ps_comps))
             pre_per_post =  int(connprob * precount)
@@ -359,7 +359,7 @@ class TraubNet(object):
                                 syn_list[:, 0], syn_list[:,1])
             self.g_nmda_mat.put(float(edge['gnmda']),
                                 syn_list[:, 0], syn_list[:,1])
-            if (pretype['label'] == 'nRT') and (posttype['label'] == 'TCR'):
+            if (pretype_vertex['label'] == 'nRT') and (posttype_vertex['label'] == 'TCR'):
                 self.g_gaba_mat.put(numpy.random.random_sample(len(syn_list)) * (self.nRT_TCR_ggaba_high - self.nRT_TCR_ggaba_low) + self.nRT_TCR_ggaba_low,
                                     syn_list[:,0],
                                     syn_list[:,1])
@@ -391,20 +391,20 @@ class TraubNet(object):
                 self.populations[celltype['label']].append(total_count + ii)
             total_count += cell_count
         for syn_edge in self.celltype_graph.es:
-            pretype = self.celltype_graph.vs[syn_edge.source]
-            posttype = self.celltype_graph.vs[syn_edge.target]
+            pretype_vertex = self.celltype_graph.vs[syn_edge.source]
+            posttype_vertex = self.celltype_graph.vs[syn_edge.target]
             delay = synapse.SYNAPTIC_DELAY_DEFAULT
             p_release = syn_edge['prelease']
-            if pretype in ['nRT', 'TCR']:            
-                if posttype not in ['nRT', 'TCR']:
+            if pretype_vertex['label'] in ['nRT', 'TCR']:            
+                if posttype_vertex['label'] not in ['nRT', 'TCR']:
                     delay = synapse.SYNAPTIC_DELAY_THALAMOCORTICAL
             else:
-                if posttype in ['nRT', 'TCR']:
+                if posttype_vertex['label'] in ['nRT', 'TCR']:
                     delay = synapse.SYNAPTIC_DELAY_CORTICOTHALAMIC
-            prestart = int(pretype['startindex'])
-            poststart = int(posttype['startindex'])
-            precount = int(pretype['count'])
-            postcount = int(posttype['count'])
+            prestart = int(pretype_vertex['startindex'])
+            poststart = int(posttype_vertex['startindex'])
+            precount = int(pretype_vertex['count'])
+            postcount = int(posttype_vertex['count'])
             for pre_index in range(prestart, prestart+precount):
                 precell = self.index_cell_map[pre_index]
                 precomp = precell.comp[precell.presyn]
@@ -418,16 +418,16 @@ class TraubNet(object):
                         continue
                     g_ampa = self.g_ampa_mat[pre_index, post_index]
                     if g_ampa != 0.0:                        
-                        precomp.makeSynapse(postcomp, name='ampa_%s' % (pretype), classname=synchan_classname, Ek=0.0, Gbar=g_ampa, tau1=syn_edge['tauampa'], tau2=0.0, Pr=p_release, delay=delay)
+                        precomp.makeSynapse(postcomp, name='ampa_%s' % (pretype_vertex['label']), classname=synchan_classname, Ek=0.0, Gbar=g_ampa, tau1=syn_edge['tauampa'], tau2=0.0, Pr=p_release, delay=delay)
                     g_nmda = self.g_nmda_mat[pre_index, post_index]
                     if g_nmda != 0.0:
-                        synchan = precomp.makeSynapse(postcomp, name='nmda_%s' % (pretype), classname=nmdachan_classname, Ek=0.0, tau1=syn_edge['taunmda'], tau2=5e-3, Pr=p_release, delay=delay)
+                        synchan = precomp.makeSynapse(postcomp, name='nmda_%s' % (pretype_vertex['label']), classname=nmdachan_classname, Ek=0.0, tau1=syn_edge['taunmda'], tau2=5e-3, Pr=p_release, delay=delay)
                         synchan.MgConc = TraubFullNetData.MgConc
                     g_gaba = self.g_gaba_mat[pre_index, post_index]
                     if g_gaba != 0.0:
                         if syn_edge['taugabaslow'] > 0.0:
-                            precomp.makeSynapse(postcomp, name='gaba_slow_%s' % (pretype), classname=synchan_classname, Ek=syn_edge['ekgaba'], tau1=syn_edge['taugabaslow'], tau2=0.0, Pr=p_release, delay=delay)
-                        precomp.makeSynapse(postcomp, name='gaba_%s' % (pretype), classname=synchan_classname, Ek=syn_edge['ekgaba'], tau1=syn_edge['taugaba'], tau2=0.0, Pr=p_release, delay=delay)
+                            precomp.makeSynapse(postcomp, name='gaba_slow_%s' % (pretype_vertex['label']), classname=synchan_classname, Ek=syn_edge['ekgaba'], tau1=syn_edge['taugabaslow'], tau2=0.0, Pr=p_release, delay=delay)
+                        precomp.makeSynapse(postcomp, name='gaba_%s' % (pretype_vertex), classname=synchan_classname, Ek=syn_edge['ekgaba'], tau1=syn_edge['taugaba'], tau2=0.0, Pr=p_release, delay=delay)
         endtime = datetime.now()
         delta = endtime - starttime
         config.BENCHMARK_LOGGER.info('Finished network creation in: %g s' % (delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))
@@ -670,20 +670,20 @@ class TraubNet(object):
             if not isinstance(celltype_pair, tuple): 
                 raise Warning('The keys in the scale_dict must be tuples of celltypes. Got %s of type %s instead' % (str(celltype_pair), type(celltype_pair)))
             if celltype_pair[0] == '*':
-                pretype_seq = self.celltype_graph.vs
+                pretype_vertex_seq = self.celltype_graph.vs
             else:
-                pretype_seq = self.celltype_graph.vs.select(label_eq=celltype_pair[0])
+                pretype_vertex_seq = self.celltype_graph.vs.select(label_eq=celltype_pair[0])
             if celltype_pair[1] == '*':
-                posttype_seq = self.celltype_graph.vs
+                posttype_vertex_seq = self.celltype_graph.vs
             else:
-                posttype_seq = self.celltype_graph.vs.select(label_eq=celltype_pair[1])
-            for pretype in pretype_seq:
-                for posttype in posttype_seq:
+                posttype_vertex_seq = self.celltype_graph.vs.select(label_eq=celltype_pair[1])
+            for pretype_vertex in pretype_vertex_seq:
+                for posttype_vertex in posttype_vertex_seq:
                     try:
-                        edge_id = self.celltype_graph.get_eid(pretype.index, posttype.index)
+                        edge_id = self.celltype_graph.get_eid(pretype_vertex.index, posttype_vertex.index)
                         edge = self.celltype_graph.es[edge_id]
                         if conductance_name in edge.attribute_names():
-                            if conductance_name == 'ggaba' and pretype['label'] == 'nRT' and posttype['label'] == 'TCR':
+                            if conductance_name == 'ggaba' and pretype_vertex['label'] == 'nRT' and posttype_vertex['label'] == 'TCR':
                                 self.nRT_TCR_ggaba_low *= scale_factor
                                 self.nRT_TCR_ggaba_high *= scale_factor
                                 edge[conductance_name] = 'uniform %f %f' % (self.nRT_TCR_ggaba_low, self.nRT_TCR_ggaba_high)
