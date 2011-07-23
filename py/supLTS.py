@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Sep 23 00:18:00 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  8 17:40:54 2010 (+0530)
-#           By: subha
-#     Update #: 132
+# Last-Updated: Sat Jul 23 11:47:32 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 136
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -49,6 +49,10 @@ class SupLTS(TraubCell):
     ca_dep_chans = ['KAHP_SLOWER', 'KC_FAST']
     num_comp = 59
     presyn = 59
+    # level maps level number to the set of compartments belonging to it
+    level = TraubCell.readlevels("SupLTS.levels")
+    # depth stores a map between level number and the depth of the compartments.
+    depth = None    
     proto_file = 'SupLTS.p'
     prototype = TraubCell.read_proto(proto_file, "SupLTS", chan_params)
     def __init__(self, *args):

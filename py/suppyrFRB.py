@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Sep 21 01:45:00 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  8 16:53:49 2010 (+0530)
-#           By: subha
-#     Update #: 135
+# Last-Updated: Fri Jul 22 17:13:57 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 140
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -65,7 +65,24 @@ class SupPyrFRB(TraubCell):
     num_comp = 74
     presyn = 72
     proto_file = 'SupPyrFRB.p'
-    prototype = TraubCell.read_proto(proto_file, "SupPyrFRB", chan_params)
+    # level maps level number to the set of compartments belonging to it
+    level = TraubCell.readlevels("SupPyrFRB.levels")
+    # depth stores a map between level number and the depth of the compartments.
+    depth = {
+        1: 850 * 1e-6,
+        2: 885 * 1e-6,
+        3: 920 * 1e-6,
+        4: 955 * 1e-6,
+        5: 825 * 1e-6,
+        6: 775 * 1e-6,
+        7: 725 * 1e-6,
+        8: 690 * 1e-6,
+        9: 655 * 1e-6,
+        10: 620 * 1e-6,
+        11: 585 * 1e-6,
+        12: 550 * 1e-6,
+        }
+    prototype = TraubCell.read_proto(proto_file, "SupPyrFRB", level_dict=level, depth_dict=depth, params=chan_params)
 
     def __init__(self, *args):
         TraubCell.__init__(self, *args)

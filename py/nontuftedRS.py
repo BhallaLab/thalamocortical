@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 11:34:27 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  8 16:52:41 2010 (+0530)
-#           By: subha
-#     Update #: 30
+# Last-Updated: Sat Jul 23 12:28:09 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 33
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -65,8 +65,25 @@ class NontuftedRS(TraubCell):
         }
     num_comp = 50
     presyn = 48
+    level = TraubCell.readlevels('NontuftedRS.levels')
+    depth = {
+        1: 2200 * 1e-6,
+        2: 2245 * 1e-6,
+        3: 2290 * 1e-6,
+        4: 2335 * 1e-6,
+        5: 2175 * 1e-6,
+        6: 2125 * 1e-6,
+        7: 2075 * 1e-6,
+        8: 2025 * 1e-6,
+        9: 1975 * 1e-6,
+        10: 1925 * 1e-6,
+        11: 1875 * 1e-6,
+        12: 1825 * 1e-6,
+        13: 1775 * 1e-6,
+        14: 1725 * 1e-6
+        }
     proto_file = 'NontuftedRS.p'
-    prototype = TraubCell.read_proto(proto_file, 'NontuftedRS', chan_params)
+    prototype = TraubCell.read_proto(proto_file, 'NontuftedRS', level_dict=level, depth_dict=depth, params=chan_params)
     ca_dep_chans = ['KAHP_DP', 'KC']
     def __init__(self, *args):
         TraubCell.__init__(self, *args)

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 11:11:39 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  8 16:51:42 2010 (+0530)
-#           By: subha
-#     Update #: 41
+# Last-Updated: Sat Jul 23 11:54:00 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 42
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -66,6 +66,11 @@ class DeepAxoaxonic(TraubCell):
     ca_dep_chans = ['KC_FAST']
     num_comp = 59
     presyn = 59
+    # level maps level number to the set of compartments belonging to it
+    level = TraubCell.readlevels("DeepAxoaxonic.levels")
+    # depth stores a map between level number and the depth of the compartments.
+    depth = None
+    
     proto_file = "DeepAxoaxonic.p"
     prototype = TraubCell.read_proto(proto_file, "DeepAxoaxonic", chan_params)
     ca_dep_chans = ['KC_FAST']
