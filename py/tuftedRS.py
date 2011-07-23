@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 13:42:14 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  8 16:54:39 2010 (+0530)
-#           By: subha
-#     Update #: 31
+# Last-Updated: Sat Jul 23 12:40:27 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 34
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -66,8 +66,29 @@ class TuftedRS(TraubCell):
     ca_dep_chans = ['KAHP_DP', 'KC']
     num_comp = 61
     presyn = 60
+    level = TraubCell.readlevels('TuftedRS.levels')
+    depth = {
+        1: 1800 * 1e-6,
+        2: 1845 * 1e-6,
+        3: 1890 * 1e-6,
+        4: 1935 * 1e-6,
+        5: 1760 * 1e-6,
+        6: 1685 * 1e-6,
+        7: 1610 * 1e-6,
+        8: 1535 * 1e-6,
+        9: 1460 * 1e-6,
+        10: 1385 * 1e-6,
+        11: 1310 * 1e-6,
+        12: 1235 * 1e-6,
+        13: 1160 * 1e-6,
+        14: 1085 * 1e-6,
+        15: 1010 * 1e-6,
+        16: 935 * 1e-6,
+        17: 860 * 1e-6,
+        18: 790 * 1e-6,
+        }
     proto_file = 'TuftedRS.p'
-    prototype = TraubCell.read_proto(proto_file, "TuftedRS", chan_params)
+    prototype = TraubCell.read_proto(proto_file, "TuftedRS", level_dict=level, depth_dict=depth, params=chan_params)
     ca_dep_chans = ['KAHP_DP', 'KC']
 
     def __init__(self, *args):

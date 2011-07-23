@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 10:14:07 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  8 16:54:12 2010 (+0530)
-#           By: subha
-#     Update #: 44
+# Last-Updated: Sat Jul 23 12:22:35 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 46
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -66,6 +66,8 @@ class TCR(TraubCell):
     ca_dep_chans = ['KAHP_SLOWER', 'KC']
     num_comp = 137
     presyn = 135
+    level = TraubCell.readlevels('TCR.levels')
+    depth = None
     proto_file = 'TCR.p'
     prototype = TraubCell.read_proto(proto_file, "TCR", chan_params)
     def __init__(self, *args):

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 14:30:33 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  8 16:51:56 2010 (+0530)
-#           By: subha
-#     Update #: 54
+# Last-Updated: Sat Jul 23 11:52:24 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 56
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -66,6 +66,8 @@ class DeepBasket(TraubCell):
     ca_dep_chans = ['KC_FAST']
     num_comp = 59
     presyn = 59
+    level = TraubCell.readlevels('DeepBasket.levels')
+    depth = None
     proto_file = 'DeepBasket.p'
     prototype = TraubCell.read_proto(proto_file, "DeepBasket", chan_params)
     def __init__(self, *args):

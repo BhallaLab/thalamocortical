@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 24 10:04:47 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Feb 15 11:17:39 2011 (+0530)
+# Last-Updated: Sat Jul 23 12:40:04 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 644
+#     Update #: 699
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -96,13 +96,13 @@ def get_comp(cell, index):
 
 class TraubCell(moose.Cell):
     channel_lib = init_channel_lib()
-                     
+
     def __init__(self, *args):
         # print 'TraubCell.__init__:', args
         moose.Cell.__init__(self, *args)
         # print 'Cell.__init__ done'
-        
-    
+
+
     # Dynamic access to a compartment by index.  It mimics a python
     # list 'comp' via underlying function call to get_comp(cell,
     # index)
@@ -117,7 +117,7 @@ class TraubCell(moose.Cell):
         raise NotImplementedError, "function pfile_name not implemented"
 
     @classmethod
-    def read_proto(cls, filename, cellname, params=None):
+    def read_proto(cls, filename, cellname, level_dict=None, depth_dict=None, params=None):
         """Read a prototype cell from .p file into library.  
 
         Each cell type class should initialize its prototype with a
@@ -149,7 +149,17 @@ class TraubCell(moose.Cell):
             config.LOGGER.debug(__name__ + ' cell exists: ' + cellpath)
         ret = moose.Cell(cellpath)
         # TraubCell.generate_morphology(ret)
-	config.LOGGER.debug('Returning cell %s' % (ret.path))
+        if (depth_dict is not None) and (level_dict is not None):
+            for level, comp_nos in level_dict.items():
+                try:
+                    depth = depth_dict[level]
+                    for comp_no in comp_nos:
+                        comp = get_comp(ret, comp_no)
+                        comp.z = depth
+                except KeyError:
+                       print 'No depth info for level %s' % (level)
+
+        config.LOGGER.debug('Returning cell %s' % (ret.path))
         for handler in config.LOGGER.handlers:
             handler.flush()
         return ret
@@ -186,7 +196,30 @@ class TraubCell(moose.Cell):
             elif isinstance(channel, CaPool):
                 channel.tau = chan_params['TauCa']
 
-    
+    @classmethod
+    def readlevels(cls, filename):
+        """Read the mapping between levels and compartment numbers and
+        return a defaultdict with level no. as key and set of
+        compartments in it as value.
+
+        The file filename should have two columns:
+
+        comp_no level_no
+
+        """
+        ret = defaultdict(set)
+        with(open(filename, 'r')) as level_file:
+            for line in level_file:
+                tokens = line.split()
+                if not tokens:
+                    continue
+                if len(tokens) != 2:
+                    print filename, ' - Tokens: ', tokens, len(tokens)
+                    sys.exit(0)
+                ret[int(tokens[1])].add(int(tokens[0]))
+        return ret
+
+
 
     def _ca_tau(self):
         raise NotImplementedError("You must set tau for [Ca2+] decay in the method _ca_tau() in subclass.")
@@ -280,7 +313,7 @@ class TraubCell(moose.Cell):
             for neighbour in nid_list:
                 config.LOGGER.debug('Adding (%s, %s)' % (comp, neighbour))
                 edges.add((comp, neighbour))
-        
+
         # Generate random initial positions for all the compartments
         init_pos = np.ones((len(nodes), 3)) * 0.5 - np.random.rand(len(nodes), 3) 
         width = 1.0
@@ -330,6 +363,6 @@ class TraubCell(moose.Cell):
         points = mlab.points3d(pos[:,0], pos[:, 1], pos[:, 2])
         mlab.show()
         raise Exception('Stop here for testing')
-                                       
+
 # 
 # cell.py ends here

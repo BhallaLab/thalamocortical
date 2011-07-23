@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  8 17:37:56 2010 (+0530)
-#           By: subha
-#     Update #: 669
+# Last-Updated: Fri Jul 22 17:10:08 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 699
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -66,7 +66,25 @@ class SupPyrRS(TraubCell):
     num_comp = 74
     presyn = 72
     proto_file = "SupPyrRS.p"
-    prototype = TraubCell.read_proto(proto_file, "SupPyrRS", chan_params)
+    # level maps level number to the set of compartments belonging to it
+    level = TraubCell.readlevels("SupPyrRS.levels")
+    # depth stores a map between level number and the depth of the compartments.
+    depth = {
+        1: 850.0 * 1e-6,
+        2: 885.0 * 1e-6,
+        3: 920.0 * 1e-6,
+        4: 955.0 * 1e-6,
+        5: 825.0 * 1e-6,
+        6: 775.0 * 1e-6,
+        7: 725.0 * 1e-6,
+        8: 690.0 * 1e-6,
+        9: 655.0 * 1e-6,
+        10: 620.0 * 1e-6,
+        11: 585.0 * 1e-6,
+        12: 550.0 * 1e-6
+        }
+    prototype = TraubCell.read_proto(proto_file, "SupPyrRS", level_dict=level, depth_dict=depth, params=chan_params)
+    
     def __init__(self, *args):
         # start = datetime.now()
         TraubCell.__init__(self, *args)
@@ -75,7 +93,8 @@ class SupPyrRS(TraubCell):
         # end = datetime.now()
         # delta = end - start
         # config.BENCHMARK_LOGGER.info('created cell in: %g s' % (delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
-	
+        
+
     def _topology(self):
         raise Exception, 'Deprecated'
     
