@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 15:18:24 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  8 16:52:51 2010 (+0530)
-#           By: subha
-#     Update #: 77
+# Last-Updated: Sat Jul 23 12:24:31 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 78
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -65,6 +65,8 @@ class nRT(TraubCell):
     }
     num_comp = 59
     presyn = 59
+    level = TraubCell.readlevels('nRT.levels')
+    depth = None
     proto_file = 'nRT.p'
     prototype = TraubCell.read_proto(proto_file, "nRT", chan_params)
     ca_dep_chans = ['KAHP_SLOWER','KC']

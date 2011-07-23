@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Oct  6 16:52:28 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  8 17:41:59 2010 (+0530)
-#           By: subha
-#     Update #: 46
+# Last-Updated: Sat Jul 23 11:49:06 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 47
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -66,6 +66,11 @@ class SupBasket(TraubCell):
     ca_dep_chans = ['KC_FAST']
     num_comp = 59
     presyn = 59
+    # level maps level number to the set of compartments belonging to it
+    level = TraubCell.readlevels("SupBasket.levels")
+    # depth stores a map between level number and the depth of the compartments.
+    depth = None    
+
     proto_file = 'SupBasket.p'
     prototype = TraubCell.read_proto(proto_file, 'SupBasket', chan_params)
     def __init__(self, *args):

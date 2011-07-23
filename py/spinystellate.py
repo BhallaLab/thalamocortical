@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Sep 29 11:43:22 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  8 17:39:25 2010 (+0530)
-#           By: subha
-#     Update #: 519
+# Last-Updated: Sat Jul 23 12:30:48 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 522
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -48,8 +48,10 @@ class SpinyStellate(TraubCell):
     ca_dep_chans = ['KAHP_SLOWER', 'KC_FAST']
     num_comp = 59
     presyn = 57
+    level = TraubCell.readlevels('SpinyStellate.levels')
+    depth = None
     proto_file = 'SpinyStellate.p'
-    prototype = TraubCell.read_proto("SpinyStellate.p", "SpinyStellate", chan_params)
+    prototype = TraubCell.read_proto("SpinyStellate.p", "SpinyStellate", level_dict=level, depth_dict=depth, params=chan_params)
     def __init__(self, *args):
         # start = datetime.now()
         # for arg in args: print arg
