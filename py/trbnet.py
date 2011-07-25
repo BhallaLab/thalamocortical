@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Jul 12 12:12:37 2011 (+0530)
-#           By: subha
-#     Update #: 1581
+# Last-Updated: Mon Jul 25 15:17:59 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 1640
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -214,6 +214,8 @@ class TraubNet(object):
         self.ps_comp_mat = None
         self.index_cell_map = {}
         self.cell_index_map = {}
+        self.electrodes = []
+        self.electrode_container = moose.Neutral('/lfp')
         if container is None:
             self.network_container = moose.Neutral('/net')
         elif isinstance(container, str):
@@ -445,6 +447,40 @@ class TraubNet(object):
                 randspike.resetValue = 0.0
                 success = randspike.connect('outputSrc', cell.comp[cell.presyn], 'injectMsg')
                 config.LOGGER.debug('Connected %s to %s: %s' % (randspike.path, cell.comp[cell.presyn].path, str(success)))
+
+    def setup_lfp_recording(self, name, depth, data_container):
+        """Setup electrodes for recording LFP."""
+        electrode = moose.Efield(name, self.electrode_container)
+        self.electrodes.append(electrode)
+        electrode.x = 0.0
+        electrode.y = 0.0
+        electrode.z = depth
+        for celltype in self.celltype_graph.vs:
+            cellclass = eval(celltype['label'])
+            if not hasattr(cellclass, 'depth') or cellclass.depth is  None:
+                continue
+            # first collect the indices of all the compartments that affect lfp
+            comp_indices = []
+            for level_no in cellclass.depth.keys():
+                print
+                print level_no, '-->',
+                for comp_no in cellclass.level[level_no]:
+                    print comp_no, ',',
+                    comp_indices.append(comp_no)
+            # then connect all such compartments in all cells of this type to the electrode object.
+            for ii in self.populations[celltype['label']]:
+                cell = self.index_cell_map[ii]
+                print 'cell:', cell.path, 'comps:', comp_indices
+                for jj in comp_indices:
+                    result = cell.comp[jj].connect('ImSrc', electrode, 'currentDest')
+                    config.LOGGER.debug('Connected %s compartment [pos=(%g, %g, %g)] to electrode: %s' % (cell.comp[jj].path, cell.comp[jj].x, cell.comp[jj].y, cell.comp[jj].z, str(result)))
+
+        lfp_container = moose.Neutral('lfp', data_container)
+        lfp_table = moose.Table(name, lfp_container)
+        lfp_table.stepMode = 3
+        electrode.connect('potential', lfp_table, 'inputRequest')
+        config.LOGGER.debug('Created electrode: %s at depth %g m' % (name, depth))
+                               
 
     def get_maxdegree_cell_indices(self, celltype=None, size=None):
         """Get the cells with maximum connectivity - disregarding the strength of the synapse.
