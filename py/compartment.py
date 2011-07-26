@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Jul  1 11:22:13 2011 (+0530)
-#           By: subha
-#     Update #: 289
+# Last-Updated: Tue Jul 26 15:01:02 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 293
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -52,7 +52,7 @@ class MyCompartment(moose.Compartment):
     def connect(self, src_field, target, dst_field):
         if src_field == 'raxial':
             self.raxial_list.append(target)
-        moose.Compartment.connect(self, src_field, target, dst_field)
+        return moose.context.connect(self.id, src_field, target.id, dst_field)
 
     def setSpecificRm(self, RM):
         self.Rm = RM / self.sarea()
