@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Jul 26 17:16:13 2011 (+0530)
+# Last-Updated: Wed Jul 27 11:22:08 2011 (+0530)
 #           By: subha
-#     Update #: 1655
+#     Update #: 1661
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -472,12 +472,9 @@ class TraubNet(object):
                 cell = self.index_cell_map[ii]
                 print 'cell:', cell.path, 'comps:', comp_indices
                 for jj in comp_indices:
-                    assert(moose.context.exists(cell.comp[jj].path))
-                    comp = moose.Compartment(cell.comp[jj].path)
-                    moose.context.runG('addmsg %s/ImSrc %s/currentDest' % (comp.path, electrode.path))
-                    # print '%%%%%%%%%%%%%', cell.comp[jj].path, cell.comp[jj].id, comp.path
-                    # result = comp.connect('ImSrc', electrode, 'currentDest')
-                    # config.LOGGER.debug('Connected %s %s [pos=(%g, %g, %g)] to %s %s: %s' % (comp.className, comp.path, comp.x, comp.y, comp.z, electrode.className, electrode.path, str(result)))
+                    comp = cell.comp[jj]
+                    result = comp.connect('ImSrc', electrode, 'currentDest')
+                    config.LOGGER.debug('Connected %s %s [pos=(%g, %g, %g)] to %s %s: %s' % (comp.className, comp.path, comp.x, comp.y, comp.z, electrode.className, electrode.path, str(result)))
 
         lfp_container = moose.Neutral('lfp', data_container)
         lfp_table = moose.Table(name, lfp_container)
