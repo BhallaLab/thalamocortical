@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Jul 26 15:01:02 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 293
+# Last-Updated: Wed Jul 27 09:52:06 2011 (+0530)
+#           By: subha
+#     Update #: 297
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -48,11 +48,6 @@ class MyCompartment(moose.Compartment):
         self._xarea = None
         self._sarea = None
         self.raxial_list = []
-
-    def connect(self, src_field, target, dst_field):
-        if src_field == 'raxial':
-            self.raxial_list.append(target)
-        return moose.context.connect(self.id, src_field, target.id, dst_field)
 
     def setSpecificRm(self, RM):
         self.Rm = RM / self.sarea()
@@ -176,17 +171,6 @@ class MyCompartment(moose.Compartment):
         self.pulsegen.connect('outputSrc', self, 'injectMsg')
         return self.pulsegen
 
-    def traubConnect(self, child):
-        # Check for common neighbours within a single hop
-        # This is enough to avoid delta connections
-        my_neighbours = self.neighbours('raxial') + self.neighbours('axial')
-        child_neighbours = child.neighbours('raxial') + child.neighbours('axial')
-        for item in my_neighbours:
-            if item in child_neighbours:
-                return
-        self.connect('axial', child, 'raxial')
-        print 'Connecting', self.name, 'to', child.name
-            
     def makeSynapse(self, target, 
                     classname='SynChan', 
                     name='synapse', 
