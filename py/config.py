@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Jul 22 16:39:42 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 178
+# Last-Updated: Wed Jul 27 11:51:08 2011 (+0530)
+#           By: subha
+#     Update #: 180
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -97,6 +97,7 @@ lib = moose.Neutral('/library')
 root = moose.Neutral("/")
 clockjob = moose.ClockJob('sched/cj')
 clockjob.autoschedule = 1
+solver = 'hsolve'
 simdt = 0.5e-4
 plotdt = 1e-3
 gldt = 1e-2

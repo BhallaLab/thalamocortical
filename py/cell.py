@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 24 10:04:47 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Jul 23 12:40:04 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 699
+# Last-Updated: Wed Jul 27 11:52:46 2011 (+0530)
+#           By: subha
+#     Update #: 703
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -100,6 +100,7 @@ class TraubCell(moose.Cell):
     def __init__(self, *args):
         # print 'TraubCell.__init__:', args
         moose.Cell.__init__(self, *args)
+        self.method = config.solver # To override hsolve and use ee
         # print 'Cell.__init__ done'
 
 
