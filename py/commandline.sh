@@ -6,9 +6,9 @@ pushd /data/subha/cortical/py
 outfile=nohup_`date '+%Y%m%d_%H%M%S'`
 
 #export PYTHONPATH="$PYTHONPATH":"/usr/local/lib/python2.6/site-packages":"/usr/local/lib/python2.6/site-packages/numpy/core/"
-echo "PYTHONPATH=$PYTHONPATH" >> $outfile
-echo "SHELL=$SHELL" >> $outfile
+#echo "PYTHONPATH=$PYTHONPATH" >> $outfile
+#echo "SHELL=$SHELL" >> $outfile
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH":/usr/local/lib
 #python2.6 trbsim.py -c cellcount.csv -t 0.005 -x 0.8 --reseed --stochastic >> $outfile 2>&1 &
-python2.6 trbsim.py -d 0.25e-3 -p 1e-3 -t 5.0 -x 0.8 --reseed --stochastic >> $outfile 2>&1 &
+python2.6 trbsim.py -d 0.25e-3 -p 1e-3 -t 5.0 -x 0.8 --reseed --stochastic 2>&1 | gzip -c > "$outfile.gz" &
 popd
