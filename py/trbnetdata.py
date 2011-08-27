@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Jun  7 14:51:09 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 1169
+# Last-Updated: Sat Aug 27 16:02:39 2011 (+0530)
+#           By: subha
+#     Update #: 1175
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -229,6 +229,9 @@ class TraubFullNetData(object):
             [      0.0,       0.0,     0.0,     0.0,     0.0,     0.0,     0.0,     0.0,      0.0,      0.0,     0.0,       0.0, 0.0,    0.0 ],
             [      0.0,       0.0,     0.0,     0.0,     0.0,     0.0,     0.0,     0.0,      0.0,      0.0,     0.0,       0.0, 0.0,    0.0 ],
             [      0.0,       0.0,     0.0,     0.0,     0.0,     0.0,     0.0,     0.0,      0.0,      0.0,     0.0,       0.0, 0.0, 0.3e-9 ]]
+
+        self.frac_nRT_TCR_gaba_fast = 0.625
+        self.frac_nRT_nRT_gaba_fast = 0.56
 
         # Release probabilities [ L2/3 Pyramid to L2/3 Pyramid :
         # Feldmeyer, Lu"bke and Sakmann, 2006 ]
