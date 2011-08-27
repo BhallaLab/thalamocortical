@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Aug 26 15:09:00 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 1667
+# Last-Updated: Sat Aug 27 16:17:53 2011 (+0530)
+#           By: subha
+#     Update #: 1698
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -271,6 +271,8 @@ class TraubNet(object):
         self.celltype_graph.add_vertices(len(tn.celltype))
         self.nRT_TCR_ggaba_low = tn.nRT_TCR_ggaba_low
         self.nRT_TCR_ggaba_high = tn.nRT_TCR_ggaba_high
+        self.frac_nRT_TCR_ggaba_fast = tn.frac_nRT_TCR_gaba_fast
+        self.frac_nRT_nRT_ggaba_fast = tn.frac_nRT_nRT_gaba_fast
         edge_count = 0
         for celltype in self.celltype_graph.vs:
             celltype['label'] = tn.celltype[celltype.index]
@@ -420,16 +422,56 @@ class TraubNet(object):
                         continue
                     g_ampa = self.g_ampa_mat[pre_index, post_index]
                     if g_ampa != 0.0:                        
-                        precomp.makeSynapse(postcomp, name='ampa_from_%s' % (pretype_vertex['label']), classname=synchan_classname, Ek=0.0, Gbar=g_ampa, tau1=syn_edge['tauampa'], tau2=syn_edge['tauampa'], Pr=p_release, delay=delay)
+                        precomp.makeSynapse(postcomp, 
+                                            name='ampa_from_%s' % (pretype_vertex['label']), 
+                                            classname=synchan_classname, 
+                                            Ek=0.0, 
+                                            Gbar=g_ampa, 
+                                            tau1=syn_edge['tauampa'], 
+                                            tau2=syn_edge['tauampa'], 
+                                            Pr=p_release, 
+                                            delay=delay)
                     g_nmda = self.g_nmda_mat[pre_index, post_index]
                     if g_nmda != 0.0:
-                        synchan = precomp.makeSynapse(postcomp, name='nmda_from_%s' % (pretype_vertex['label']), classname=nmdachan_classname, Ek=0.0, tau1=syn_edge['taunmda'], tau2=5e-3, Pr=p_release, delay=delay)
+                        synchan = precomp.makeSynapse(postcomp, 
+                                                      name='nmda_from_%s' % (pretype_vertex['label']), 
+                                                      classname=nmdachan_classname, 
+                                                      Ek=0.0, 
+                                                      tau1=syn_edge['taunmda'], 
+                                                      tau2=5e-3, 
+                                                      Pr=p_release, 
+                                                      delay=delay)
                         synchan.MgConc = TraubFullNetData.MgConc
                     g_gaba = self.g_gaba_mat[pre_index, post_index]
                     if g_gaba != 0.0:
+                        g_gaba_slow = 0.0
                         if syn_edge['taugabaslow'] > 0.0:
-                            precomp.makeSynapse(postcomp, name='gaba_slow_from_%s' % (pretype_vertex['label']), classname=synchan_classname, Ek=syn_edge['ekgaba'], tau1=syn_edge['taugabaslow'], tau2=0.0, Pr=p_release, delay=delay)
-                        precomp.makeSynapse(postcomp, name='gaba_from_%s' % (pretype_vertex['label']), classname=synchan_classname, Ek=syn_edge['ekgaba'], tau1=syn_edge['taugaba'], tau2=syn_edge['taugaba'], Pr=p_release, delay=delay)
+                            if pretype_vertex['label'] == 'nRT':
+                                if posttype_vertex['label'] == 'nRT':                                
+                                    g_gaba_slow = g_gaba * (1 - self.frac_nRT_nRT_gaba_fast)
+                                    g_gaba = g_gaba * self.frac_nRT_nRT_gaba_fast
+                                elif posttype_vertex['label'] == 'TCR':
+                                    g_gaba_slow = g_gaba *  (1 - self.frac_nRT_TCR_gaba_fast)
+                                    g_gaba = g_gaba * self.frac_nRT_TCR_gaba_fast
+                                precomp.makeSynapse(postcomp, 
+                                                    name='gaba_slow_from_%s' % (pretype_vertex['label']), 
+                                                    classname=synchan_classname, 
+                                                    Ek=syn_edge['ekgaba'], 
+                                                    Gbar=g_gaba_slow, 
+                                                    tau1=syn_edge['taugabaslow'], 
+                                                    tau2=0.0, 
+                                                    Pr=p_release, 
+                                                    delay=delay)                               
+
+                        precomp.makeSynapse(postcomp, 
+                                            name='gaba_from_%s' % (pretype_vertex['label']), 
+                                            classname=synchan_classname, 
+                                            Ek=syn_edge['ekgaba'], 
+                                            Gbar=g_gaba,
+                                            tau1=syn_edge['taugaba'], 
+                                            tau2=0.0, 
+                                            Pr=p_release, 
+                                            delay=delay)
         endtime = datetime.now()
         delta = endtime - starttime
         config.BENCHMARK_LOGGER.info('Finished network creation in: %g s' % (delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))
