@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Jul 27 11:22:08 2011 (+0530)
-#           By: subha
-#     Update #: 1661
+# Last-Updated: Fri Aug 26 15:09:00 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 1667
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -282,7 +282,7 @@ class TraubNet(object):
                     self.celltype_graph.add_edges((celltype.index, posttype.index))
                     new_edge = self.celltype_graph.es[edge_count]
                     new_edge['weight'] = 1.0 * pre_post_ratio / celltype['count']
-                    new_edge['gampa'] = tn.g_ampa_baseline[celltype.index][posttype.index]
+                    new_edge['gampa'] = tn.g_ampa_baseline[celltype.index][posttype.index] * tn.tau_ampa[celltype.index][posttype.index] / numpy.e # This is how gmax is related to c (baseline conductance scaling factor) for AMPA in traub model
                     new_edge['gnmda'] = tn.g_nmda_baseline[celltype.index][posttype.index]
                     new_edge['tauampa'] = tn.tau_ampa[celltype.index][posttype.index]
                     new_edge['taunmda'] = tn.tau_nmda[celltype.index][posttype.index]
@@ -420,7 +420,7 @@ class TraubNet(object):
                         continue
                     g_ampa = self.g_ampa_mat[pre_index, post_index]
                     if g_ampa != 0.0:                        
-                        precomp.makeSynapse(postcomp, name='ampa_from_%s' % (pretype_vertex['label']), classname=synchan_classname, Ek=0.0, Gbar=g_ampa, tau1=syn_edge['tauampa'], tau2=0.0, Pr=p_release, delay=delay)
+                        precomp.makeSynapse(postcomp, name='ampa_from_%s' % (pretype_vertex['label']), classname=synchan_classname, Ek=0.0, Gbar=g_ampa, tau1=syn_edge['tauampa'], tau2=syn_edge['tauampa'], Pr=p_release, delay=delay)
                     g_nmda = self.g_nmda_mat[pre_index, post_index]
                     if g_nmda != 0.0:
                         synchan = precomp.makeSynapse(postcomp, name='nmda_from_%s' % (pretype_vertex['label']), classname=nmdachan_classname, Ek=0.0, tau1=syn_edge['taunmda'], tau2=5e-3, Pr=p_release, delay=delay)
@@ -429,7 +429,7 @@ class TraubNet(object):
                     if g_gaba != 0.0:
                         if syn_edge['taugabaslow'] > 0.0:
                             precomp.makeSynapse(postcomp, name='gaba_slow_from_%s' % (pretype_vertex['label']), classname=synchan_classname, Ek=syn_edge['ekgaba'], tau1=syn_edge['taugabaslow'], tau2=0.0, Pr=p_release, delay=delay)
-                        precomp.makeSynapse(postcomp, name='gaba_from_%s' % (pretype_vertex['label']), classname=synchan_classname, Ek=syn_edge['ekgaba'], tau1=syn_edge['taugaba'], tau2=0.0, Pr=p_release, delay=delay)
+                        precomp.makeSynapse(postcomp, name='gaba_from_%s' % (pretype_vertex['label']), classname=synchan_classname, Ek=syn_edge['ekgaba'], tau1=syn_edge['taugaba'], tau2=syn_edge['taugaba'], Pr=p_release, delay=delay)
         endtime = datetime.now()
         delta = endtime - starttime
         config.BENCHMARK_LOGGER.info('Finished network creation in: %g s' % (delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))
@@ -741,6 +741,7 @@ class TraubNet(object):
         if filename is None:
             return
         with open(filename) as popcount_file:
+            config.LOGGER.info('Reading cell counts from: %s' % (filename))
             for line in popcount_file.readlines():
                 if line.strip().startswith('#'):
                     continue
@@ -751,6 +752,7 @@ class TraubNet(object):
                 vertices = self.celltype_graph.vs.select(label_eq=cellname)
                 for vertex in vertices:
                     vertex['count'] = int(count)
+                    config.LOGGER.info('%s population size: %d' % (cellname, vertex['count']))
 
     def tweak_Ek(self, channel_class, value):
         """Adds value to channel's reversal potential. According
