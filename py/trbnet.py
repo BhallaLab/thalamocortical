@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Aug 27 16:17:53 2011 (+0530)
+# Last-Updated: Sun Aug 28 13:40:56 2011 (+0530)
 #           By: subha
-#     Update #: 1698
+#     Update #: 1702
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -448,11 +448,11 @@ class TraubNet(object):
                         if syn_edge['taugabaslow'] > 0.0:
                             if pretype_vertex['label'] == 'nRT':
                                 if posttype_vertex['label'] == 'nRT':                                
-                                    g_gaba_slow = g_gaba * (1 - self.frac_nRT_nRT_gaba_fast)
-                                    g_gaba = g_gaba * self.frac_nRT_nRT_gaba_fast
+                                    g_gaba_slow = g_gaba * (1 - self.frac_nRT_nRT_ggaba_fast)
+                                    g_gaba = g_gaba * self.frac_nRT_nRT_ggaba_fast
                                 elif posttype_vertex['label'] == 'TCR':
-                                    g_gaba_slow = g_gaba *  (1 - self.frac_nRT_TCR_gaba_fast)
-                                    g_gaba = g_gaba * self.frac_nRT_TCR_gaba_fast
+                                    g_gaba_slow = g_gaba *  (1 - self.frac_nRT_TCR_ggaba_fast)
+                                    g_gaba = g_gaba * self.frac_nRT_TCR_ggaba_fast
                                 precomp.makeSynapse(postcomp, 
                                                     name='gaba_slow_from_%s' % (pretype_vertex['label']), 
                                                     classname=synchan_classname, 
