@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jun  5 13:59:40 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Feb 17 17:27:01 2010 (+0530)
+# Last-Updated: Thu Sep  1 11:35:11 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 3
+#     Update #: 7
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -47,7 +47,10 @@
 import config
 from subprocess import call
 import pylab
-import gzip 
+import gzip
+import numpy
+from scipy import signal
+
 def almost_equal(left, right, epsilon=1e-6):
     """check if two floats are almost equal"""
     if left == right:
@@ -89,6 +92,10 @@ def do_plot(class_name, mus_t, mus_ca, mus_vm, nrn_t=None, nrn_ca=None, nrn_vm=N
     pylab.legend()
     pylab.show()
 
+def nxcorr(a, b, mode):
+    a = (a - mean(a)) / (std(a)*len(a))
+    b = (b - mean(b))/std(b)
+    return numpy.correlate(a, b, mode=mode)
 
 if __name__ == '__main__':
     read_nrn_data('asa')
