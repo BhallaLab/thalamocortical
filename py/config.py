@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Jul 27 11:51:08 2011 (+0530)
+# Last-Updated: Sat Sep  3 16:57:40 2011 (+0530)
 #           By: subha
-#     Update #: 180
+#     Update #: 181
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -56,6 +56,11 @@ import os
 from datetime import datetime
 import logging
 import numpy
+has_pylab = True
+try:
+    import pylab
+except ImportError:
+    has_pylab = False
 
 import moose
 

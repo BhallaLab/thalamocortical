@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Sep 21 01:45:00 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Jul 22 17:13:57 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 140
+# Last-Updated: Sat Sep  3 17:01:02 2011 (+0530)
+#           By: subha
+#     Update #: 141
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -183,30 +183,29 @@ class SupPyrFRB(TraubCell):
         print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
         # sim.dump_data('data')
         # mycell.dump_cell('suppyrFRB.txt')
-        
-        mus_vm = pylab.array(vm_table) * 1e3
-        nrn_vm = pylab.loadtxt('../nrn/mydata/Vm_suppyrFRB.plot')
-        nrn_t = nrn_vm[:, 0]
-        mus_t = linspace(0, sim.simtime*1e3, len(mus_vm))
-        nrn_vm = nrn_vm[:, 1]
-        nrn_ca = pylab.loadtxt('../nrn/mydata/Ca_suppyrFRB.plot')
-        nrn_ca = nrn_ca[:,1]
-        title = 'SupPyrFRB cell'
-        pylab.title(title)
-        pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
-        pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
-#         if ca_table:
-#             ca_array = pylab.array(ca_table)
-#             pylab.plot(nrn_t, -nrn_ca, 'r-', label='nrn (-)ca')
-#             pylab.plot(mus_t, -ca_array, 'b-.', label='mus (-)ca')
-#             print pylab.amax(ca_table)
-        pylab.legend()
-        pylab.show()
+        if config.has_pylab:
+            mus_vm = config.pylab.array(vm_table) * 1e3
+            nrn_vm = config.pylab.loadtxt('../nrn/mydata/Vm_suppyrFRB.plot')
+            nrn_t = nrn_vm[:, 0]
+            mus_t = linspace(0, sim.simtime*1e3, len(mus_vm))
+            nrn_vm = nrn_vm[:, 1]
+            nrn_ca = config.pylab.loadtxt('../nrn/mydata/Ca_suppyrFRB.plot')
+            nrn_ca = nrn_ca[:,1]
+            title = 'SupPyrFRB cell'
+            config.pylab.title(title)
+            config.pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
+            config.pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
+    #         if ca_table:
+    #             ca_array = config.pylab.array(ca_table)
+    #             config.pylab.plot(nrn_t, -nrn_ca, 'r-', label='nrn (-)ca')
+    #             config.pylab.plot(mus_t, -ca_array, 'b-.', label='mus (-)ca')
+    #             print config.pylab.amax(ca_table)
+            config.pylab.legend()
+            config.pylab.show()
         
         
 # test main --
 from simulation import Simulation
-import pylab
 from subprocess import call
 
 if __name__ == "__main__":

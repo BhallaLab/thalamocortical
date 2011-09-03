@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Sep 23 00:18:00 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Jul 23 11:47:32 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 136
+# Last-Updated: Sat Sep  3 17:01:46 2011 (+0530)
+#           By: subha
+#     Update #: 138
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -214,20 +214,20 @@ class SupLTS(TraubCell):
         print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
         sim.dump_data('data')
         mycell.dump_cell('supLTS.txt')
-        
-        mus_vm = pylab.array(vm_table) * 1e3
-        nrn_vm = pylab.loadtxt('../nrn/mydata/Vm_supLTS.plot.gz')
-        nrn_t = nrn_vm[:, 0]
-        mus_t = linspace(0, sim.simtime*1e3, len(mus_vm))
-        nrn_vm = nrn_vm[:, 1]
-        nrn_ca = pylab.loadtxt('../nrn/mydata/Ca_supLTS.plot')
-        nrn_ca = nrn_ca[:,1]
-        title = 'SupLTS:'
-        pylab.title(title)
-        pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
-        pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
-        pylab.legend()
-        pylab.show()
+        if config.has_pylab:
+            mus_vm = config.pylab.array(vm_table) * 1e3
+            nrn_vm = config.pylab.loadtxt('../nrn/mydata/Vm_supLTS.plot.gz')
+            nrn_t = nrn_vm[:, 0]
+            mus_t = linspace(0, sim.simtime*1e3, len(mus_vm))
+            nrn_vm = nrn_vm[:, 1]
+            nrn_ca = config.pylab.loadtxt('../nrn/mydata/Ca_supLTS.plot')
+            nrn_ca = nrn_ca[:,1]
+            title = 'SupLTS:'
+            config.pylab.title(title)
+            config.pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
+            config.pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
+            config.pylab.legend()
+            config.pylab.show()
 
 
 import unittest
@@ -297,7 +297,6 @@ class SupLTSTestCase(unittest.TestCase):
         
 # test main --
 from simulation import Simulation
-import pylab
 from subprocess import call
 
 if __name__ == "__main__":

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 19:32:34 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  8 16:52:18 2010 (+0530)
+# Last-Updated: Sat Sep  3 17:04:24 2011 (+0530)
 #           By: subha
-#     Update #: 42
+#     Update #: 44
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -128,22 +128,21 @@ class DeepLTS(TraubCell):
         sim.run(200e-3)
         sim.dump_data('data')
         mycell.dump_cell('deepLTS.txt')
-        
-        mus_vm = pylab.array(vm_table) * 1e3
-        mus_t = linspace(0, sim.simtime * 1e3, len(mus_vm))
-        mus_ca = pylab.array(ca_table)
-        nrn_vm = pylab.loadtxt('../nrn/mydata/Vm_supLTS.plot')
-        nrn_t = nrn_vm[:, 0]
-        nrn_vm = nrn_vm[:, 1]
-        pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
-        pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
-        pylab.legend()
-        pylab.show()
+        if config.has_pylab:
+            mus_vm = config.pylab.array(vm_table) * 1e3
+            mus_t = linspace(0, sim.simtime * 1e3, len(mus_vm))
+            mus_ca = config.pylab.array(ca_table)
+            nrn_vm = config.pylab.loadtxt('../nrn/mydata/Vm_supLTS.plot')
+            nrn_t = nrn_vm[:, 0]
+            nrn_vm = nrn_vm[:, 1]
+            config.pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
+            config.pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
+            config.pylab.legend()
+            config.pylab.show()
 
         
 # test main --
 from simulation import Simulation
-import pylab
 from subprocess import call
 if __name__ == "__main__":
     DeepLTS.test_single_cell()
