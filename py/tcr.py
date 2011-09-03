@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 10:14:07 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Jul 23 12:22:35 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 46
+# Last-Updated: Sat Sep  3 17:06:30 2011 (+0530)
+#           By: subha
+#     Update #: 48
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -160,20 +160,20 @@ class TCR(TraubCell):
         delta = t2 - t1
         print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
         sim.dump_data('data')
-        mus_vm = pylab.array(vm_table) * 1e3
-        nrn_vm = pylab.loadtxt('../nrn/mydata/Vm_TCR.plot')
-        nrn_t = nrn_vm[:, 0]
-        mus_t = linspace(0, nrn_t[-1], len(mus_vm))
-        nrn_vm = nrn_vm[:, 1]
-        pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
-        pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
-        pylab.legend()
-        pylab.show()
+        if config.has_pylab:
+            mus_vm = config.pylab.array(vm_table) * 1e3
+            nrn_vm = config.pylab.loadtxt('../nrn/mydata/Vm_TCR.plot')
+            nrn_t = nrn_vm[:, 0]
+            mus_t = linspace(0, nrn_t[-1], len(mus_vm))
+            nrn_vm = nrn_vm[:, 1]
+            config.pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
+            config.pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
+            config.pylab.legend()
+            config.pylab.show()
         
         
 # test main --
 from simulation import Simulation
-import pylab
 from subprocess import call
 if __name__ == "__main__":
     # call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_TCR.hoc'], cwd='../nrn')
