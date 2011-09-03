@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 11:11:39 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Jul 23 11:54:00 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 42
+# Last-Updated: Sat Sep  3 17:04:55 2011 (+0530)
+#           By: subha
+#     Update #: 44
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -129,28 +129,27 @@ class DeepAxoaxonic(TraubCell):
         print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
         sim.dump_data('data')
         mycell.dump_cell('deepaxax.txt')
-        
-        mus_vm = pylab.array(vm_table) * 1e3
-        nrn_vm = pylab.loadtxt('../nrn/mydata/Vm_deepaxax.plot')
-        nrn_t = nrn_vm[:, 0]
-        mus_t = linspace(0, nrn_t[-1], len(mus_vm))
-        nrn_vm = nrn_vm[:, 1]
-        nrn_ca = pylab.loadtxt('../nrn/mydata/Ca_deepaxax.plot')
-        nrn_ca = nrn_ca[:,1]
-        pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
-        pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
-#         if ca_table:
-#             ca_array = pylab.array(ca_table)
-#             pylab.plot(nrn_t, -nrn_ca, 'r-', label='nrn (-)ca')
-#             pylab.plot(mus_t, -ca_array, 'b-.', label='mus (-)ca')
-#             print pylab.amax(ca_table)
-        pylab.legend()
-        pylab.show()
+        if config.has_pylab:
+            mus_vm = config.pylab.array(vm_table) * 1e3
+            nrn_vm = config.pylab.loadtxt('../nrn/mydata/Vm_deepaxax.plot')
+            nrn_t = nrn_vm[:, 0]
+            mus_t = linspace(0, nrn_t[-1], len(mus_vm))
+            nrn_vm = nrn_vm[:, 1]
+            nrn_ca = config.pylab.loadtxt('../nrn/mydata/Ca_deepaxax.plot')
+            nrn_ca = nrn_ca[:,1]
+            config.pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
+            config.pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
+    #         if ca_table:
+    #             ca_array = config.pylab.array(ca_table)
+    #             config.pylab.plot(nrn_t, -nrn_ca, 'r-', label='nrn (-)ca')
+    #             config.pylab.plot(mus_t, -ca_array, 'b-.', label='mus (-)ca')
+    #             print config.pylab.amax(ca_table)
+            config.pylab.legend()
+            config.pylab.show()
         
         
 # test main --
 from simulation import Simulation
-import pylab
 from subprocess import call
 if __name__ == "__main__":
     # call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_deepaxax.hoc'], cwd='../nrn')
