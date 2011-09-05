@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Sep  5 10:08:56 2011 (+0530)
-#           By: subha
-#     Update #: 1703
+# Last-Updated: Mon Sep  5 10:34:18 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 1705
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -77,7 +77,7 @@
 
 from collections import defaultdict
 from datetime import datetime
-import igraph as ig
+import igraph
 import numpy
 import tables
 
@@ -267,7 +267,7 @@ class TraubNet(object):
 
         """
         tn = TraubFullNetData()
-        self.celltype_graph = ig.Graph(0, directed=True)
+        self.celltype_graph = igraph.Graph(0, directed=True)
         self.celltype_graph.add_vertices(len(tn.celltype))
         self.nRT_TCR_ggaba_low = tn.nRT_TCR_ggaba_low
         self.nRT_TCR_ggaba_high = tn.nRT_TCR_ggaba_high
@@ -306,11 +306,11 @@ class TraubNet(object):
         """
         read the celltype graph from a graph file.
         """
-        self.celltype_graph = ig.read(self.celltype_file, format=self.graph_format)
+        self.celltype_graph = igraph.read(self.celltype_file, format=self.graph_format)
 
     def _generate_cell_graph(self):
         start = datetime.now()
-        self.cell_graph = ig.Graph(0, directed=True)
+        self.cell_graph = igraph.Graph(0, directed=True)
         total_count = 0
         for celltype in self.celltype_graph.vs:
             celltype['startindex'] = total_count
