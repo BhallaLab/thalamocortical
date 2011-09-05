@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Jul 27 09:52:06 2011 (+0530)
-#           By: subha
-#     Update #: 297
+# Last-Updated: Mon Sep  5 10:50:04 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 301
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -192,7 +192,6 @@ class MyCompartment(moose.Compartment):
         called. So these must be assigned afterwards.
 
         """
-        config.LOGGER.debug('Creating synapse: %s->%s: %s of class %s' % (self.path, target.path, name, classname))
         classobj = eval('moose.' + classname)
         synapse = classobj(name, target)
         synapse.Ek = Ek # TODO set value according to original model
@@ -208,7 +207,7 @@ class MyCompartment(moose.Compartment):
         if not spikegen.connect('event', synapse, 'synapse'):
             raise Exception('Error creating connection: %s->%s' % (spikegen.path, synapse.path))
         else:
-            config.LOGGER.debug('Connected: %s->%s' % (spikegen.path, synapse.path))
+            config.LOGGER.debug('Connected %s->%s' % (spikegen.path, synapse.path))
 
         # We had an awkward situation here: the weight and delay
         # vectors were not updated until reset/setDelay/setWeight was
@@ -217,14 +216,11 @@ class MyCompartment(moose.Compartment):
         # instead of (num_synapse - 1).
         # 2010-03-29 After making a mandatory call to updateNumSynapse()
         # in getNumSynapses(), this is fixed. 
-
         num_synapses = synapse.numSynapses
         synapse.delay[num_synapses - 1] = delay
         synapse.weight[num_synapses - 1] = weight
         if config.stochastic:
             synapse.initPr[num_synapses - 1] = Pr
-
-        config.LOGGER.debug('Created synapse: %s with delay: %f weight: %f, numsynapse: %d' % (synapse.path, synapse.delay[num_synapses - 1], synapse.weight[num_synapses - 1], num_synapses))
         return synapse
         
 
