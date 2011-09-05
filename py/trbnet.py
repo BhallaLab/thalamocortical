@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Sun Aug 28 13:40:56 2011 (+0530)
+# Last-Updated: Mon Sep  5 10:08:56 2011 (+0530)
 #           By: subha
-#     Update #: 1702
+#     Update #: 1703
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -512,7 +512,7 @@ class TraubNet(object):
             # then connect all such compartments in all cells of this type to the electrode object.
             for ii in self.populations[celltype['label']]:
                 cell = self.index_cell_map[ii]
-                print 'cell:', cell.path, 'comps:', comp_indices
+                # print 'cell:', cell.path, 'comps:', comp_indices
                 for jj in comp_indices:
                     comp = cell.comp[jj]
                     result = comp.connect('ImSrc', electrode, 'currentDest')
