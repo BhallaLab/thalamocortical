@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Sep  5 10:34:18 2011 (+0530)
+# Last-Updated: Mon Sep  5 11:05:26 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1705
+#     Update #: 1709
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -516,7 +516,10 @@ class TraubNet(object):
                 for jj in comp_indices:
                     comp = cell.comp[jj]
                     result = comp.connect('ImSrc', electrode, 'currentDest')
-                    config.LOGGER.debug('Connected %s %s [pos=(%g, %g, %g)] to %s %s: %s' % (comp.className, comp.path, comp.x, comp.y, comp.z, electrode.className, electrode.path, str(result)))
+                    if not result:
+                        raise Exception('Failed to connect %s->%s' % (comp.path, electrode.path))
+                    # else:
+                    #     config.LOGGER.debug('Connected %s %s [pos=(%g, %g, %g)] to %s %s: %s' % (comp.className, comp.path, comp.x, comp.y, comp.z, electrode.className, electrode.path, str(result)))
 
         lfp_container = moose.Neutral('lfp', data_container)
         lfp_table = moose.Table(name, lfp_container)
