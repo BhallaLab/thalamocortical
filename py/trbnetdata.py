@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Aug 27 16:02:39 2011 (+0530)
-#           By: subha
-#     Update #: 1175
+# Last-Updated: Wed Sep  7 16:49:27 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 1176
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -97,7 +97,7 @@ class TraubFullNetData(object):
                          'DeepLTS',     # L5 inhibitory
                          'NontuftedRS', # L6 excitatory
                          'TCR',         # Thalamic excitatory
-                         'nRT'  # Thalamic excitatory
+                         'nRT'          # Thalamic excitatory
                          ]
 
         self.cellcount = [1000,

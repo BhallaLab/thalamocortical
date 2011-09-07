@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Sep  3 16:57:40 2011 (+0530)
-#           By: subha
-#     Update #: 181
+# Last-Updated: Wed Sep  7 18:06:25 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 240
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -54,8 +54,11 @@
 import sys
 import os
 from datetime import datetime
+import ConfigParser as configparser
 import logging
 import numpy
+# Try to import matplotlib. Code using matplotlib should be excluded
+# based on has_pylab flag.
 has_pylab = True
 try:
     import pylab
@@ -82,6 +85,8 @@ def reseed(seed):
         raise Warning('Random number generator already seeded with: %s' % (str(seed)))
     rngseed = seed
     numpy.random.seed(rngseed)
+
+    
     
 #---------------------------------------------------------------------
 # configuration for saving simulation data
@@ -182,6 +187,30 @@ except Exception, e:
 finally:
     if not neuron_bin:
         print 'config.py: could not locate nrngui. Set variable neuron_bin to the full path to it in this file. Otherwise the .plot files in the data directory will be used for plotting'
+
+#---------------------------------------------------------------------
+# Try to read runcontrol file using ConfigParser module. This should
+# be in a format similar to MS Windows .INI files.
+#---------------------------------------------------------------------
+
+# The following are known only at runtime. Not to be in configuration file.
+#
+# 'timestamp': timstamp,
+# 'mypid': mypid,
+runconfig = configparser.SafeConfigParser()
+runconfig.read(['defaults.ini', 'custom.ini'])
+try:
+    rngseed = int(runconfig.get('DEFAULT', 'rngseed'))
+except ValueError:
+    rngseed = None
+to_reseed = runconfig.get('DEFAULT', 'reseed') in ['Yes', 'yes', 'True', 'true', '1']
+stochastic = runconfig.get('DEFAULT', 'stochastic') in ['Yes', 'yes', 'True', 'true', '1']
+solver = runconfig.get('DEFAULT', 'solver')
+simtime = float(runconfig.get('scheduling', 'simtime'))
+simdt = float(runconfig.get('scheduling', 'simdt'))
+plotdt = float(runconfig.get('scheduling', 'plotdt'))
+clockjob.autoschedule = runconfig.get('scheduling', 'autoschedule') in ['Yes', 'yes', 'True', 'true', '1']
+default_releasep = float(runconfig.get('synapse', 'releasep')) 
 
 
 # 
