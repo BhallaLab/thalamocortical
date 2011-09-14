@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Sep  7 18:06:25 2011 (+0530)
+# Last-Updated: Thu Sep  8 15:13:20 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 240
+#     Update #: 247
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -198,14 +198,19 @@ finally:
 # 'timestamp': timstamp,
 # 'mypid': mypid,
 runconfig = configparser.SafeConfigParser()
+runconfig.optionxform = str
 runconfig.read(['defaults.ini', 'custom.ini'])
+for section in runconfig.sections():    
+    for key, value in runconfig.items(section):
+        LOGGER.debug('%s: %s = %s' % (section, key, value))
+        
 try:
-    rngseed = int(runconfig.get('DEFAULT', 'rngseed'))
+    rngseed = int(runconfig.get('numeric', 'rngseed'))
 except ValueError:
     rngseed = None
-to_reseed = runconfig.get('DEFAULT', 'reseed') in ['Yes', 'yes', 'True', 'true', '1']
-stochastic = runconfig.get('DEFAULT', 'stochastic') in ['Yes', 'yes', 'True', 'true', '1']
-solver = runconfig.get('DEFAULT', 'solver')
+to_reseed = runconfig.get('numeric', 'reseed') in ['Yes', 'yes', 'True', 'true', '1']
+stochastic = runconfig.get('numeric', 'stochastic') in ['Yes', 'yes', 'True', 'true', '1']
+solver = runconfig.get('numeric', 'solver')
 simtime = float(runconfig.get('scheduling', 'simtime'))
 simdt = float(runconfig.get('scheduling', 'simdt'))
 plotdt = float(runconfig.get('scheduling', 'plotdt'))
