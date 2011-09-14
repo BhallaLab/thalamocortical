@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Sep  5 11:05:26 2011 (+0530)
+# Last-Updated: Wed Sep 14 16:34:51 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1709
+#     Update #: 1735
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -70,7 +70,12 @@
 # added creation of these matrices as part of generate_cell_graph fn.
 # Updated scale_condunctance to take care of ggaba(nRT->TCR).
 #
-# 2010-12-28 14:26:47 (+0530) fixed serious mistake in get_maxdegree_cell_indices.
+# 2010-12-28 14:26:47 (+0530) fixed serious mistake in
+# get_maxdegree_cell_indices.
+#
+# 2011-09-08 11:10:12 (+0530) changed set_population to use
+# ConfigParser object from config.py in stead of a custom cellcount
+# file.
 
 
 # Code:
@@ -573,7 +578,7 @@ class TraubNet(object):
         for cell in self.cell_index_map.keys():
             tab = cell.soma.insertRecorder(cell.name, 'Vm', spike_container)
             tab.stepMode = moose.TAB_SPIKE
-            tab.stepSize = 0.0
+            tab.stepSize = -20e-3
         for ch in self.ectopic_container.children():
             spike = moose.Neutral(ch)
             tab = moose.Table(spike.name, spike_container)
@@ -775,7 +780,7 @@ class TraubNet(object):
                     except Exception, e:
                         pass
 
-    def set_populations(self, filename):
+    def set_populations(self):
         """Read cellcounts from specified file and updates the
         celltype-graph accordingly. The file should have space
         separated values like:
@@ -783,21 +788,11 @@ class TraubNet(object):
         name count
 
         """
-        if filename is None:
-            return
-        with open(filename) as popcount_file:
-            config.LOGGER.info('Reading cell counts from: %s' % (filename))
-            for line in popcount_file.readlines():
-                if line.strip().startswith('#'):
-                    continue
-                tokens = line.split()
-                if not tokens:
-                    continue
-                cellname, count = tokens
-                vertices = self.celltype_graph.vs.select(label_eq=cellname)
-                for vertex in vertices:
-                    vertex['count'] = int(count)
-                    config.LOGGER.info('%s population size: %d' % (cellname, vertex['count']))
+        for celltype, count in config.runconfig.items('cellcount'):
+            vertices = self.celltype_graph.vs.select(label_eq=celltype)
+            for vertex in vertices:
+                vertex['count'] = int(count)
+                config.LOGGER.info('%s population size: %d' % (celltype, vertex['count']))
 
     def tweak_Ek(self, channel_class, value):
         """Adds value to channel's reversal potential. According
@@ -895,6 +890,14 @@ class TraubNet(object):
         h5file =  tables.openFile(filename,  mode = 'w',  title = 'Traub Network: timestamp: %s' % (config.timestamp.strftime('%Y-%M-%D %H:%M:%S')),  filters = compression_filter)
         h5file.root._v_attrs.rngseed = config.rngseed
         h5file.root._v_attrs.notes = '\n'.join(self.tweaks_doc)
+        # Save simulation configuration data. I am saving it both in
+        # data file as well as network file as often the data file is
+        # too large and may not be available if the simulation is
+        # cancelled midway.
+        runconfig = h5file.createGroup(h5file.root, 'runconfig', 'Simulation settings')
+        for section in config.runconfig.sections():
+            sectiontab = h5file.createTable(runconfig, section, config.runconfig.items(section))        
+        
         # Save the celltype information (vertices of the celltype graph)
         network_struct =  h5file.createGroup(h5file.root, 'network', 'Network structure')
         celltype_table =  h5file.createTable(network_struct, 'celltype', CellType,  'Information on each celltype population')
