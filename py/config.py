@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Sep  8 15:13:20 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 247
+# Last-Updated: Fri Sep 23 13:43:02 2011 (+0530)
+#           By: subha
+#     Update #: 272
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -86,7 +86,15 @@ def reseed(seed):
     rngseed = seed
     numpy.random.seed(rngseed)
 
-    
+moose_rngseed = None
+
+def moose_reseed(seed):
+    """This is for changing the moose' built-in RNG"""
+    global moose_rngseed
+    if moose_rngseed is not None:
+        raise Warning('Random number generator already seeded with: %s' % (str(seed)))
+    moose_rngseed = seed
+    moose.PyMooseBase.getContext().srandom(seed)
     
 #---------------------------------------------------------------------
 # configuration for saving simulation data
@@ -208,6 +216,13 @@ try:
     rngseed = int(runconfig.get('numeric', 'rngseed'))
 except ValueError:
     rngseed = None
+try:
+    __seed = int(runconfig.get('numeric', 'moose_rngseed'))
+    moose_reseed(__seed)
+    LOGGER.info('MOOSE RNG SEED SET TO %d' % (moose_rngseed))
+except ValueError:
+    moose_rngseed = None
+
 to_reseed = runconfig.get('numeric', 'reseed') in ['Yes', 'yes', 'True', 'true', '1']
 stochastic = runconfig.get('numeric', 'stochastic') in ['Yes', 'yes', 'True', 'true', '1']
 solver = runconfig.get('numeric', 'solver')
@@ -216,6 +231,12 @@ simdt = float(runconfig.get('scheduling', 'simdt'))
 plotdt = float(runconfig.get('scheduling', 'plotdt'))
 clockjob.autoschedule = runconfig.get('scheduling', 'autoschedule') in ['Yes', 'yes', 'True', 'true', '1']
 default_releasep = float(runconfig.get('synapse', 'releasep')) 
+if to_reseed:
+    reseed(mypid)
+    LOGGER.info('NUMPY RNG SEED SET TO %d' % (rngseed))
+elif rngseed is not None:
+    reseed(rngseed)
+    LOGGER.info('NUMPY RNG SEED SET TO %d' % (rngseed))
 
 
 # 
