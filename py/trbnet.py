@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Sep 14 16:34:51 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 1735
+# Last-Updated: Mon Sep 26 21:07:56 2011 (+0530)
+#           By: subha
+#     Update #: 1739
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -504,6 +504,7 @@ class TraubNet(object):
         electrode.z = depth
         for celltype in self.celltype_graph.vs:
             cellclass = eval(celltype['label'])
+            # nRT and TCR cells will be ignored
             if not hasattr(cellclass, 'depth') or cellclass.depth is  None:
                 continue
             # first collect the indices of all the compartments that affect lfp
