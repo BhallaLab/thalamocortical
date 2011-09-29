@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Sep 26 21:07:56 2011 (+0530)
-#           By: subha
-#     Update #: 1739
+# Last-Updated: Thu Sep 29 10:04:00 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 1740
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -612,8 +612,11 @@ class TraubNet(object):
             else:
                 pop = numpy.array(self.populations[celltype])
                 high = len(pop)
-                indices = numpy.random.randint(low=0, high=high, size=numcells)
-                cell_list = pop[indices]
+                if high > numcells:
+                    indices = numpy.random.randint(low=0, high=high, size=numcells)
+                    cell_list = pop[indices]
+                else:
+                    cell_list = pop
             for cellindex in cell_list:
                 cell = self.index_cell_map[cellindex]
                 cell.soma.insertRecorder(cell.name, 'Vm', vm_container)
