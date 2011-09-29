@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Sep 29 10:04:00 2011 (+0530)
+# Last-Updated: Thu Sep 29 12:29:49 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1740
+#     Update #: 1811
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -885,7 +885,36 @@ class TraubNet(object):
                                 else:
                                     syn[g_name] = value
 
+    def randomize_passive_properties(self, initVm_sd, Rm_sd, Cm_sd, Ra_sd):
+        """Make the initial membrane potential of each cell deviate
+        from the Em by sd as standard deviation. Where initVm_sd is
+        the absolute sd of initVm. For the rest, the sd's are assumed
+        to be fractions of mean."""
+        config.LOGGER.debug('START Randomizing passive properties')
+        for celltype in self.celltype_graph.vs:
+            indices = self.populations[celltype['label']]
+            if indices:
+                cell0 = self.index_cell_map[indices[0]]
+                initVm_mean = cell0.soma.Em
+                initVm = numpy.random.normal(loc=initVm_mean, scale=initVm_sd*initVm_mean, size=len(indices))
+                # Make a list of Rm of all the compartments in this celltype.
+                # Thiese will be used as mean for the normal distribution for each compartment.
+                mean_values = [(cell0.comp[ii].Rm, cell0.comp[ii].Cm, cell0.comp[ii].Ra) for ii in range(1, cell0.num_comp+1)]
+                randomized_values = [(numpy.random.normal(loc=mean_values[ii][0], scale=Rm_sd * mean_values[ii][0], size=len(indices)),
+                                      numpy.random.normal(loc=mean_values[ii][1], scale=Cm_sd * mean_values[ii][1], size=len(indices)),
+                                      numpy.random.normal(loc=mean_values[ii][2], scale=Ra_sd * mean_values[ii][2], size=len(indices)))
+                                     for ii in range(len(mean_values))]
+                for index in indices:
+                    cell = self.index_cell_map[index]
+                    for comp_index in range(1, cell.num_comp+1):
+                        cell.comp[comp_index].initVm = initVm[index]
+                        cell.comp[comp_index].Rm = randomized_values[comp_index][0][index]
+                        cell.comp[comp_index].Cm = randomized_values[comp_index][1][index]
+                        cell.comp[comp_index].Ra = randomized_values[comp_index][2][index]
+        config.LOGGER.debug('END Randomizing passive properties')
 
+    
+                        
     def save_network_model(self,  filename):
         """Save the network structure in an hdf5 file"""
         config.LOGGER.debug('Start saving the network model')
