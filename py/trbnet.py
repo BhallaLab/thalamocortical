@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Sep 29 23:22:57 2011 (+0530)
+# Last-Updated: Thu Sep 29 23:25:34 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1845
+#     Update #: 1846
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -910,7 +910,7 @@ class TraubNet(object):
                     for comp_index in range(cell.num_comp):
                         print comp_index, index
                         # Add 1 because compartment index starts from 1 instead of 0.
-                        cell.comp[comp_index+1].initVm = randomized_initVm[index]
+                        cell.comp[comp_index+1].initVm = randomized_initVm[ii]
                         cell.comp[comp_index+1].Rm = randomized_values[comp_index][0][ii]
                         cell.comp[comp_index+1].Cm = randomized_values[comp_index][1][ii]
                         cell.comp[comp_index+1].Ra = randomized_values[comp_index][2][ii]
