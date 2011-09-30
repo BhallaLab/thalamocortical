@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Sep 30 11:16:41 2011 (+0530)
+# Last-Updated: Fri Sep 30 12:15:31 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1921
+#     Update #: 1937
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -907,12 +907,12 @@ class TraubNet(object):
                                       numpy.random.normal(loc=mean_values[ii][1], scale=Cm_sd * mean_values[ii][1], size=len(indices)),
                                       numpy.random.normal(loc=mean_values[ii][2], scale=Ra_sd * mean_values[ii][2], size=len(indices)))
                                      for ii in range(len(mean_values))]
-                print celltype['label'], len(randomized_values), len(randomized_values[0]), len(randomized_values[0][0])
+                # print celltype['label'], len(randomized_values), len(randomized_values[0]), len(randomized_values[0][0])
                 ii = 0
                 for index in indices:
                     cell = self.index_cell_map[index]
                     for comp_index in range(cell.num_comp):
-                        print comp_index, index
+                        # print comp_index, index
                         # Add 1 because compartment index starts from 1 instead of 0.
                         cell.comp[comp_index+1].initVm = randomized_initVm[ii]
                         cell.comp[comp_index+1].Rm = randomized_values[comp_index][0][ii]
@@ -938,22 +938,26 @@ class TraubNet(object):
                 conductances = []
                 for comp_no in range(1, cell0.num_comp+1):
                     comp = cell0.comp[comp_no]
-                    chan_ids = moose.context.getWildcardList(comp.path + '/#[TYPE=HHChannel]')
+                    chan_ids = moose.context.getWildcardList(comp.path + '/#[TYPE=HHChannel]', True)
                     channels.append([moose.HHChannel(chan_id) for chan_id in chan_ids])
                     # create a list of normal distributions for each channel in the current compartment and append it to the list of conductances
                     conductances.append([numpy.random.normal(loc=channel.Gbar,
                                                              scale=channel.Gbar * conductance_dict[channel.name],
                                                              size=len(indices))
-                                         for channel in channels[-1] if channel.Gk > 0.0])
+                                         for channel in channels[-1] if channel.Gbar > 0.0])
+                # print 'Channel Gbar: Shape:', len(conductances), len(conductances[0]), len(conductances[0][0])
                 for comp_no in range(cell0.num_comp):
                     jj = 0
+                    # print 'Second dim of', comp_no, '=', len(conductances[comp_no])
                     for protochannel in channels[comp_no]:
                         if protochannel.Gbar <= 0.0:
                             continue
+                        # print 'Third dim of', comp_no, jj, '=', len(conductances[comp_no][jj])
                         ii = 0
                         for index in indices:
                             cell = self.index_cell_map[index]
                             channel = moose.HHChannel('%s/%s' % (cell.comp[comp_no+1].path, protochannel.name))
+                            print comp_no, jj, ii
                             channel.Gbar = conductances[comp_no][jj][ii]
                             ii += 1
                     jj += 1
