@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Sep 29 23:25:34 2011 (+0530)
+# Last-Updated: Fri Sep 30 11:16:41 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 1846
+#     Update #: 1921
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -885,11 +885,15 @@ class TraubNet(object):
                                 else:
                                     syn[g_name] = value
 
-    def randomize_passive_properties(self, initVm_sd, Rm_sd, Cm_sd, Ra_sd):
+    def randomize_passive_properties(self):
         """Make the initial membrane potential of each cell deviate
         from the Em/Rm/Cm/Ra by sd as standard deviation. Where the
         sd's are assumed to be fractions of mean (the default values)."""
         config.LOGGER.debug('START Randomizing passive properties')
+        initVm_sd = float(config.runconfig.get('sd_passive', 'initVm'))
+        Rm_sd = float(config.runconfig.get('sd_passive', 'Rm'))
+        Cm_sd = float(config.runconfig.get('sd_passive', 'Cm'))
+        Ra_sd = float(config.runconfig.get('sd_passive', 'Ra'))
         for celltype in self.celltype_graph.vs:
             indices = self.populations[celltype['label']]
             if indices:
@@ -916,6 +920,44 @@ class TraubNet(object):
                         cell.comp[comp_index+1].Ra = randomized_values[comp_index][2][ii]
                     ii += 1
         config.LOGGER.debug('END Randomizing passive properties')
+
+
+    def randomize_active_conductances(self):
+        """Change the active conductances to be distributed normally
+        around the original value with a standard deviation specified
+        in the configuration file as a fraction of the original value."""
+        config.LOGGER.debug('START randomize_active_conductances')
+        conductance_dict = {}
+        for conductance_name, value in config.runconfig.items('sd_active'):
+            conductance_dict[conductance_name] = float(value)
+        for celltype in self.celltype_graph.vs:
+            indices = self.populations[celltype['label']]
+            if indices:
+                cell0 = self.index_cell_map[indices[0]]
+                channels = []
+                conductances = []
+                for comp_no in range(1, cell0.num_comp+1):
+                    comp = cell0.comp[comp_no]
+                    chan_ids = moose.context.getWildcardList(comp.path + '/#[TYPE=HHChannel]')
+                    channels.append([moose.HHChannel(chan_id) for chan_id in chan_ids])
+                    # create a list of normal distributions for each channel in the current compartment and append it to the list of conductances
+                    conductances.append([numpy.random.normal(loc=channel.Gbar,
+                                                             scale=channel.Gbar * conductance_dict[channel.name],
+                                                             size=len(indices))
+                                         for channel in channels[-1] if channel.Gk > 0.0])
+                for comp_no in range(cell0.num_comp):
+                    jj = 0
+                    for protochannel in channels[comp_no]:
+                        if protochannel.Gbar <= 0.0:
+                            continue
+                        ii = 0
+                        for index in indices:
+                            cell = self.index_cell_map[index]
+                            channel = moose.HHChannel('%s/%s' % (cell.comp[comp_no+1].path, protochannel.name))
+                            channel.Gbar = conductances[comp_no][jj][ii]
+                            ii += 1
+                    jj += 1
+        config.LOGGER.debug('END randomize_active_conductances')
 
     
                         
