@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Sep  5 10:50:04 2011 (+0530)
+# Last-Updated: Thu Oct  6 08:36:22 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 301
+#     Update #: 303
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -206,8 +206,9 @@ class MyCompartment(moose.Compartment):
         self.connect('VmSrc', spikegen, 'Vm')
         if not spikegen.connect('event', synapse, 'synapse'):
             raise Exception('Error creating connection: %s->%s' % (spikegen.path, synapse.path))
-        else:
-            config.LOGGER.debug('Connected %s->%s' % (spikegen.path, synapse.path))
+        # This is too much of log info. Hence commenting out.
+        # else:
+        #     config.LOGGER.debug('Connected %s->%s' % (spikegen.path, synapse.path))
 
         # We had an awkward situation here: the weight and delay
         # vectors were not updated until reset/setDelay/setWeight was
