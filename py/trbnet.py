@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Sep 30 12:15:31 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 1937
+# Last-Updated: Fri Oct  7 14:00:06 2011 (+0530)
+#           By: subha
+#     Update #: 1950
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -85,7 +85,7 @@ from datetime import datetime
 import igraph
 import numpy
 import tables
-
+import ConfigParser
 from pysparse.sparse.spmatrix import ll_mat
 import config
 import moose
@@ -890,16 +890,24 @@ class TraubNet(object):
         from the Em/Rm/Cm/Ra by sd as standard deviation. Where the
         sd's are assumed to be fractions of mean (the default values)."""
         config.LOGGER.debug('START Randomizing passive properties')
-        initVm_sd = float(config.runconfig.get('sd_passive', 'initVm'))
-        Rm_sd = float(config.runconfig.get('sd_passive', 'Rm'))
-        Cm_sd = float(config.runconfig.get('sd_passive', 'Cm'))
-        Ra_sd = float(config.runconfig.get('sd_passive', 'Ra'))
+        try:
+            initVm_sd = float(config.runconfig.get('sd_passive', 'initVm'))
+            Rm_sd = float(config.runconfig.get('sd_passive', 'Rm'))
+            Cm_sd = float(config.runconfig.get('sd_passive', 'Cm'))
+            Ra_sd = float(config.runconfig.get('sd_passive', 'Ra'))
+        except ConfigParser.NoOptionError:
+            config.LOGGER.info('Passive properties unchanged.')
+            return
+        if Rm_sd == 0.0 or Ra_sd == 0.0 or Cm_sd == 0.0 or initVm_sd == 0.0:
+            config.LOGGER.info('Passive properties unchanged.')
+            return
+
         for celltype in self.celltype_graph.vs:
             indices = self.populations[celltype['label']]
             if indices:
                 cell0 = self.index_cell_map[indices[0]]
                 initVm_mean = cell0.soma.Em
-                randomized_initVm = numpy.random.normal(loc=initVm_mean, scale=initVm_sd*numpy.abs(initVm_mean), size=len(indices))                
+                randomized_initVm = numpy.random.normal(loc=initVm_mean, scale=initVm_sd*numpy.abs(initVm_mean), size=len(indices))
                 # Make a list of Rm of all the compartments in this celltype.
                 # Thiese will be used as mean for the normal distribution for each compartment.
                 mean_values = [(cell0.comp[ii].Rm, cell0.comp[ii].Cm, cell0.comp[ii].Ra) for ii in range(1, cell0.num_comp+1)]
@@ -979,7 +987,9 @@ class TraubNet(object):
         # cancelled midway.
         runconfig = h5file.createGroup(h5file.root, 'runconfig', 'Simulation settings')
         for section in config.runconfig.sections():
-            sectiontab = h5file.createTable(runconfig, section, config.runconfig.items(section))        
+            table_contents = config.runconfig.items(section)
+            if table_contents:
+                sectiontab = h5file.createTable(runconfig, section, table_contents)        
         
         # Save the celltype information (vertices of the celltype graph)
         network_struct =  h5file.createGroup(h5file.root, 'network', 'Network structure')
