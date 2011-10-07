@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  7 14:00:06 2011 (+0530)
+# Last-Updated: Fri Oct  7 19:02:42 2011 (+0530)
 #           By: subha
-#     Update #: 1950
+#     Update #: 2048
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -83,13 +83,14 @@
 from collections import defaultdict
 from datetime import datetime
 import igraph
+import h5py
 import numpy
 import tables
 import ConfigParser
 from pysparse.sparse.spmatrix import ll_mat
 import config
 import moose
-
+import pymoose
 from trbnetdata import TraubFullNetData
 
 # The cell classes
@@ -965,14 +966,65 @@ class TraubNet(object):
                         for index in indices:
                             cell = self.index_cell_map[index]
                             channel = moose.HHChannel('%s/%s' % (cell.comp[comp_no+1].path, protochannel.name))
-                            print comp_no, jj, ii
+                            # print comp_no, jj, ii
                             channel.Gbar = conductances[comp_no][jj][ii]
                             ii += 1
                     jj += 1
         config.LOGGER.debug('END randomize_active_conductances')
 
     
-                        
+    def save_cell_network(self, filename):
+        """Save network model directly from MOOSE structure, rather
+        than going through the graph-based version."""
+        config.LOGGER.debug('START: save_cell_network to %s' % (filename))
+        h5file =  h5py.File(filename,  'w')
+        h5file.attrs['TITLE'] = 'Traub Network: timestamp: %s' % (config.timestamp.strftime('%Y-%M-%D %H:%M:%S'))
+        h5file.attrs['notes'] = '\n'.join(self.tweaks_doc)
+        # Save simulation configuration data. I am saving it both in
+        # data file as well as network file as often the data file is
+        # too large and may not be available if the simulation is
+        # cancelled midway.
+        runconfig = h5file.create_group('runconfig')
+        runconfig.attrs['TITLE'] = 'Simulation settings'
+        for section in config.runconfig.sections():
+            table_contents = config.runconfig.items(section)
+            if table_contents:
+                sectiontab = runconfig.create_dataset(section, data=numpy.rec.array(table_contents))
+        
+        # Save the celltype information (vertices of the celltype graph)
+        network_struct =  h5file.create_group('network')
+        network_struct.attrs['TITLE'] = 'Network structure'
+        synapse_dtype = numpy.dtype([('source','S32'), 
+                                     ('dest', 'S32'), 
+                                     ('type', 'S4'), 
+                                     ('Gbar', 'f4'),
+                                     ('tau1', 'f4'), 
+                                     ('tau2', 'f4'), 
+                                     ('Ek', 'f4')])
+        path_start = len('/model/net/')
+        synchans = []
+        for vertex in self.celltype_graph.vs:
+            for cell_index in self.populations[vertex['label']]:
+                cell = self.index_cell_map[cell_index]
+                presyn_comp = cell.comp[cell.presyn]     
+                spikegen = moose.SpikeGen('spike', presyn_comp)
+                for synchan_id in spikegen.neighbours('event', moose.OUTGOING):
+                    synchan = moose.SynChan(synchan_id)
+                    post_comp = moose.Compartment(synchan.parent)
+                    synchans.append((presyn_comp.path[path_start:], 
+                                     post_comp.path[path_start:], 
+                                     synchan.name.partition('_')[0], 
+                                     synchan.Gbar,
+                                     synchan.tau1,
+                                     synchan.tau2,
+                                     synchan.Ek))
+        if synchans:
+            dataset = numpy.rec.array(synchans, dtype=synapse_dtype)
+            network_struct.create_dataset('synapse', data=dataset, compression='gzip')
+        h5file.close()
+        config.LOGGER.debug('END: save_cell_network')
+
+
     def save_network_model(self,  filename):
         """Save the network structure in an hdf5 file"""
         config.LOGGER.debug('Start saving the network model')
