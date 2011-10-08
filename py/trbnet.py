@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  7 19:02:42 2011 (+0530)
+# Last-Updated: Sat Oct  8 14:32:07 2011 (+0530)
 #           By: subha
-#     Update #: 2048
+#     Update #: 2049
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -939,6 +939,8 @@ class TraubNet(object):
         conductance_dict = {}
         for conductance_name, value in config.runconfig.items('sd_active'):
             conductance_dict[conductance_name] = float(value)
+        if not conductance_dict:
+            return
         for celltype in self.celltype_graph.vs:
             indices = self.populations[celltype['label']]
             if indices:
