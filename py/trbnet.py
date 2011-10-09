@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Sun Oct  9 14:17:34 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 2107
+# Last-Updated: Sun Oct  9 14:33:55 2011 (+0530)
+#           By: subha
+#     Update #: 2109
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -498,9 +498,8 @@ class TraubNet(object):
                 success = randspike.connect('outputSrc', cell.comp[cell.presyn], 'injectMsg')
                 config.LOGGER.debug('Connected %s to %s: %s' % (randspike.path, cell.comp[cell.presyn].path, str(success)))
 
-    def setup_current_injection_test(self, inject_values, first_delay, data_container):
+    def setup_current_injection_test(self, inject_values, first_delay, width, data_container):
         """Set up a test for each cell with a set of current injections."""
-        width = 50e-3        
         pulsegen = moose.PulseGen('inject_test', self.instrumentation)
         pulsegen.setCount(len(inject_values))
         for index in range(len(inject_values)):
