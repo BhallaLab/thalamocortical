@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Oct  8 14:32:07 2011 (+0530)
-#           By: subha
-#     Update #: 2049
+# Last-Updated: Sun Oct  9 11:36:07 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 2101
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -221,16 +221,18 @@ class TraubNet(object):
         self.index_cell_map = {}
         self.cell_index_map = {}
         self.electrodes = []
-        self.electrode_container = moose.Neutral('/lfp')
-        if container is None:
-            self.network_container = moose.Neutral('/net')
-        elif isinstance(container, str):
-            self.network_container = moose.Neutral('%s/net', container)
-        elif isinstance(container, moose.Neutral):
-            self.network_container = moose.Neutral('net', container)
-        else:
-            raise('Need a moose-object/string/None as container. Got %s of type %s' % (container, container.__class__.__name__))
-        self.ectopic_container = moose.Neutral('ectopic_spikes', self.network_container.parent)
+        if not isinstance(container, moose.Neutral):
+            if container is None:
+                container = moose.Neutral('/')
+            elif isinstance(container, str):
+                container = moose.Neutral(container)
+            else:
+                raise Exception('Need a moose-object/string/None as container. Got %s of type %s' % (container, container.__class__.__name__))
+            
+        self.network_container = moose.Neutral('net', container)
+        self.ectopic_container = moose.Neutral('ectopic_spikes', container)
+        self.electrode_container = moose.Neutral('lfp', container)
+        self.instrumentation = moose.Neutral('instru', container) # Container for various devices used in testing
         self.tweaks_doc = []
         
     def setup_from_celltype_file(self, celltype_file=None, format=None, scale=None):
@@ -495,6 +497,22 @@ class TraubNet(object):
                 randspike.resetValue = 0.0
                 success = randspike.connect('outputSrc', cell.comp[cell.presyn], 'injectMsg')
                 config.LOGGER.debug('Connected %s to %s: %s' % (randspike.path, cell.comp[cell.presyn].path, str(success)))
+
+    def setup_current_injection_test(self, inject_values, first_delay, data_container):
+        """Set up a test for each cell with a set of current injections."""
+        width = 50e-3        
+        pulsegen = moose.PulseGen('injct_test', self.instrumentation)
+        for index in range(len(inject_values)):
+            pulsegen.setLevel(index, inject_values[index])
+            pulsegen.setWidth(index, width)
+            pulsegen.setDelay(width)            
+        if first_delay > 0.0:
+            pulsegen.firstDelay = first_delay
+        for cell in self.cell_index_map.keys():
+            pulsegen.connect('outputSrc', cell.soma, 'injectMsg')
+        pulse_table = moose.Table('inject_test', data_container)
+        pulse_table.stepMode = 3
+        pulse_table.connect('inputRequest', pulsegen, 'output')
 
     def setup_lfp_recording(self, name, depth, data_container):
         """Setup electrodes for recording LFP."""
@@ -1005,9 +1023,16 @@ class TraubNet(object):
                                      ('Ek', 'f4')])
         path_start = len('/model/net/')
         synchans = []
+        conductances = []
         for vertex in self.celltype_graph.vs:
             for cell_index in self.populations[vertex['label']]:
                 cell = self.index_cell_map[cell_index]
+                for comp_index in range(1, cell.num_comp):
+                    comp = cell.comp[comp_index]
+                    for chan_id in moose.context.getChildren('%s/#[TYPE=HHChannel' % (comp.path)):
+                        chan = moose.HHChannel(chan_id)
+                        conductances.append((chan.path, chan.Gbar, chan.Ek))
+                        
                 presyn_comp = cell.comp[cell.presyn]     
                 spikegen = moose.SpikeGen('spike', presyn_comp)
                 for synchan_id in spikegen.neighbours('event', moose.OUTGOING):
@@ -1020,9 +1045,13 @@ class TraubNet(object):
                                      synchan.tau1,
                                      synchan.tau2,
                                      synchan.Ek))
+        if conductances:
+            dataset = numpy.rec.array(conductances)
+            network_struct.create_dataset('hhchan', data=dataset)
         if synchans:
             dataset = numpy.rec.array(synchans, dtype=synapse_dtype)
             network_struct.create_dataset('synapse', data=dataset, compression='gzip')
+                                            
         h5file.close()
         config.LOGGER.debug('END: save_cell_network')
 
