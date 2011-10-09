@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Sun Oct  9 14:33:55 2011 (+0530)
+# Last-Updated: Sun Oct  9 21:46:59 2011 (+0530)
 #           By: subha
-#     Update #: 2109
+#     Update #: 2110
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1030,7 +1030,7 @@ class TraubNet(object):
                 cell = self.index_cell_map[cell_index]
                 for comp_index in range(1, cell.num_comp):
                     comp = cell.comp[comp_index]
-                    for chan_id in moose.context.getChildren('%s/#[TYPE=HHChannel' % (comp.path)):
+                    for chan_id in moose.context.getChildren('%s/#[TYPE=HHChannel]' % (comp.path)):
                         chan = moose.HHChannel(chan_id)
                         conductances.append((chan.path, chan.Gbar, chan.Ek))
                         
