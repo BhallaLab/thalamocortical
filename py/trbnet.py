@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Sun Oct  9 11:36:07 2011 (+0530)
+# Last-Updated: Sun Oct  9 14:17:34 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 2101
+#     Update #: 2107
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -501,11 +501,13 @@ class TraubNet(object):
     def setup_current_injection_test(self, inject_values, first_delay, data_container):
         """Set up a test for each cell with a set of current injections."""
         width = 50e-3        
-        pulsegen = moose.PulseGen('injct_test', self.instrumentation)
+        pulsegen = moose.PulseGen('inject_test', self.instrumentation)
+        pulsegen.setCount(len(inject_values))
         for index in range(len(inject_values)):
             pulsegen.setLevel(index, inject_values[index])
             pulsegen.setWidth(index, width)
-            pulsegen.setDelay(width)            
+            pulsegen.setDelay(index, width)
+            print 'Current injection:', index, pulsegen.getLevel(index), pulsegen.getDelay(index), pulsegen.getWidth(index)
         if first_delay > 0.0:
             pulsegen.firstDelay = first_delay
         for cell in self.cell_index_map.keys():
@@ -529,10 +531,10 @@ class TraubNet(object):
             # first collect the indices of all the compartments that affect lfp
             comp_indices = []
             for level_no in cellclass.depth.keys():
-                print
-                print level_no, '-->',
+                # print
+                # print level_no, '-->',
                 for comp_no in cellclass.level[level_no]:
-                    print comp_no, ',',
+                    # print comp_no, ',',
                     comp_indices.append(comp_no)
             # then connect all such compartments in all cells of this type to the electrode object.
             for ii in self.populations[celltype['label']]:
