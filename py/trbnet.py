@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Sun Oct  9 21:46:59 2011 (+0530)
+# Last-Updated: Mon Oct 10 12:14:11 2011 (+0530)
 #           By: subha
-#     Update #: 2110
+#     Update #: 2130
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -422,6 +422,9 @@ class TraubNet(object):
                 precomp = precell.comp[precell.presyn]
                 for post_index in range(poststart, poststart+postcount):
                     postcell = self.index_cell_map[post_index]
+                    if pre_index == post_index:
+                        config.LOGGER.warning('Skipping self connection: %s->%s' % (precell.path, postcell.path))
+                        continue
                     postcompindex = int(self.ps_comp_mat[pre_index, post_index])
                     if postcompindex > 255:
                         raise Exception('%s->%s -- PS comp has absurd index %d' % (precell.path, postcell.path, postcompindex))
@@ -962,35 +965,29 @@ class TraubNet(object):
             return
         for celltype in self.celltype_graph.vs:
             indices = self.populations[celltype['label']]
-            if indices:
-                cell0 = self.index_cell_map[indices[0]]
-                channels = []
-                conductances = []
-                for comp_no in range(1, cell0.num_comp+1):
-                    comp = cell0.comp[comp_no]
-                    chan_ids = moose.context.getWildcardList(comp.path + '/#[TYPE=HHChannel]', True)
-                    channels.append([moose.HHChannel(chan_id) for chan_id in chan_ids])
-                    # create a list of normal distributions for each channel in the current compartment and append it to the list of conductances
-                    conductances.append([numpy.random.normal(loc=channel.Gbar,
-                                                             scale=channel.Gbar * conductance_dict[channel.name],
-                                                             size=len(indices))
-                                         for channel in channels[-1] if channel.Gbar > 0.0])
-                # print 'Channel Gbar: Shape:', len(conductances), len(conductances[0]), len(conductances[0][0])
-                for comp_no in range(cell0.num_comp):
-                    jj = 0
-                    # print 'Second dim of', comp_no, '=', len(conductances[comp_no])
-                    for protochannel in channels[comp_no]:
-                        if protochannel.Gbar <= 0.0:
-                            continue
-                        # print 'Third dim of', comp_no, jj, '=', len(conductances[comp_no][jj])
-                        ii = 0
-                        for index in indices:
-                            cell = self.index_cell_map[index]
-                            channel = moose.HHChannel('%s/%s' % (cell.comp[comp_no+1].path, protochannel.name))
-                            # print comp_no, jj, ii
-                            channel.Gbar = conductances[comp_no][jj][ii]
-                            ii += 1
-                    jj += 1
+            if not indices:
+                continue
+            cell0 = self.index_cell_map[indices[0]]
+            channels = []
+            conductances = []
+            for comp_no in range(1, cell0.num_comp+1):
+                comp = cell0.comp[comp_no]
+                chan_ids = moose.context.getWildcardList(comp.path + '/#[TYPE=HHChannel]', True)
+                for chan_id in chan_ids:
+                    proto_channel = moose.HHChannel(chan_id)
+                    mean = proto_channel.Gbar
+                    sd = proto_channel.Gbar * conductance_dict[proto_channel.name]
+                    if mean <= 0.0 or sd <= 0.0:
+                        continue
+                    conductances = numpy.random.normal(loc=mean,
+                                                       scale=sd,
+                                                       size=len(indices))
+                    ii = 0
+                    for index in indices:
+                        cell = self.index_cell_map[index]
+                        channel = moose.HHChannel(proto_channel.name, cell.comp[comp_no])
+                        channel.Gbar = conductances[ii]
+                        ii += 1
         config.LOGGER.debug('END randomize_active_conductances')
 
     
