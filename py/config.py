@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Sep 23 13:43:02 2011 (+0530)
+# Last-Updated: Mon Oct 10 16:48:54 2011 (+0530)
 #           By: subha
-#     Update #: 272
+#     Update #: 274
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -213,7 +213,7 @@ for section in runconfig.sections():
         LOGGER.debug('%s: %s = %s' % (section, key, value))
         
 try:
-    rngseed = int(runconfig.get('numeric', 'rngseed'))
+    _rngseed = int(runconfig.get('numeric', 'rngseed'))
 except ValueError:
     rngseed = None
 try:
@@ -234,8 +234,8 @@ default_releasep = float(runconfig.get('synapse', 'releasep'))
 if to_reseed:
     reseed(mypid)
     LOGGER.info('NUMPY RNG SEED SET TO %d' % (rngseed))
-elif rngseed is not None:
-    reseed(rngseed)
+elif _rngseed is not None:
+    reseed(_rngseed)
     LOGGER.info('NUMPY RNG SEED SET TO %d' % (rngseed))
 
 
