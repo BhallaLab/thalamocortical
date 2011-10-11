@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Oct 11 09:40:19 2011 (+0530)
-#           By: subha
-#     Update #: 2138
+# Last-Updated: Tue Oct 11 16:01:07 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 2139
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -453,7 +453,8 @@ class TraubNet(object):
                         synchan = precomp.makeSynapse(postcomp, 
                                                       name='nmda_from_%s' % (pretype_vertex['label']), 
                                                       classname=nmdachan_classname, 
-                                                      Ek=0.0, 
+                                                      Ek=0.0,
+                                                      Gbar=g_nmda,
                                                       tau1=syn_edge['taunmda'], 
                                                       tau2=5e-3, 
                                                       Pr=p_release, 
