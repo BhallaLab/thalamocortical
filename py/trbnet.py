@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Oct 10 12:14:11 2011 (+0530)
+# Last-Updated: Tue Oct 11 08:11:23 2011 (+0530)
 #           By: subha
-#     Update #: 2130
+#     Update #: 2137
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -346,12 +346,14 @@ class TraubNet(object):
             config.LOGGER.debug('ggaba= %s, type:%s' % (str(edge['ggaba']), edge['ggaba'].__class__.__name__))
             config.LOGGER.debug('allowed postsynaptic compartments: %s (after conversion: %s)' % (edge['pscomps'], ps_comps))
             pre_per_post =  int(connprob * precount)
+            print 'Pre', pretype_vertex['label'], 'Post', posttype_vertex['label'], 'pre_per_post', pre_per_post, 'connprob', connprob, 'precount', precount
             if (connprob <= 0) or (len(ps_comps) == 0) or (precount <= 0) or (postcount <= 0) or (pre_per_post <= 0):
                 continue
             # pre_indices[i] is the array of global indices of the
             # presynaptic cells connecting to the i-th postsynaptic
             # cell of posttype.
             pre_indices = numpy.random.randint(low=prestart, high=prestart+precount, size=(postcount,pre_per_post))
+            print 'Pre-indices', pre_indices
             # comp_indices[i][j] is the index of the postsynaptic
             # compartment in ps_comps for i-th postsynaptic
             # compartment for j-th presynaptic cell connecting to
@@ -362,6 +364,10 @@ class TraubNet(object):
                                     for postindex in range(postcount)
                                     for preindex in pre_indices[postindex]],
                                    dtype=numpy.int32)
+            print '========== START List of synapases ==========='
+            for item in syn_list:
+                print item
+            print '========== END List of synapases ==========='
             config.LOGGER.debug(edge['pscomps'])
             indices = comp_indices.flatten()
             ps_comp_list = ps_comps[indices]
