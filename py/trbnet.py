@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Oct 11 16:01:07 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 2139
+# Last-Updated: Tue Oct 11 16:28:53 2011 (+0530)
+#           By: subha
+#     Update #: 2140
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -346,7 +346,7 @@ class TraubNet(object):
             config.LOGGER.debug('ggaba= %s, type:%s' % (str(edge['ggaba']), edge['ggaba'].__class__.__name__))
             config.LOGGER.debug('allowed postsynaptic compartments: %s (after conversion: %s)' % (edge['pscomps'], ps_comps))
             pre_per_post =  int(connprob * precount)
-            print 'Pre', pretype_vertex['label'], 'Post', posttype_vertex['label'], 'pre_per_post', pre_per_post, 'connprob', connprob, 'precount', precount
+            # print 'Pre', pretype_vertex['label'], 'Post', posttype_vertex['label'], 'pre_per_post', pre_per_post, 'connprob', connprob, 'precount', precount
             if (connprob <= 0) or (len(ps_comps) == 0) or (precount <= 0) or (postcount <= 0) or (pre_per_post <= 0):
                 continue
             # pre_indices[i] is the array of global indices of the
