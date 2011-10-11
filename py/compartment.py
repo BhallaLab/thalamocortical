@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Oct  6 08:36:22 2011 (+0530)
+# Last-Updated: Tue Oct 11 16:03:02 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 303
+#     Update #: 305
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -177,9 +177,9 @@ class MyCompartment(moose.Compartment):
                     threshold=0.0, 
                     absRefract=0.0, 
                     Ek=0.0, 
-                    Gbar=1e-8, 
-                    tau1=1e-3, 
-                    tau2=2e-3,
+                    Gbar=None, 
+                    tau1=None, 
+                    tau2=None,
                     weight=1.0,
                     delay=0.0,
                     Pr=1.0):
