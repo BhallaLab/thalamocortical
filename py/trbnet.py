@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Oct 11 08:11:23 2011 (+0530)
+# Last-Updated: Tue Oct 11 09:40:19 2011 (+0530)
 #           By: subha
-#     Update #: 2137
+#     Update #: 2138
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -353,7 +353,7 @@ class TraubNet(object):
             # presynaptic cells connecting to the i-th postsynaptic
             # cell of posttype.
             pre_indices = numpy.random.randint(low=prestart, high=prestart+precount, size=(postcount,pre_per_post))
-            print 'Pre-indices', pre_indices
+            # print 'Pre-indices', pre_indices
             # comp_indices[i][j] is the index of the postsynaptic
             # compartment in ps_comps for i-th postsynaptic
             # compartment for j-th presynaptic cell connecting to
@@ -364,10 +364,10 @@ class TraubNet(object):
                                     for postindex in range(postcount)
                                     for preindex in pre_indices[postindex]],
                                    dtype=numpy.int32)
-            print '========== START List of synapases ==========='
-            for item in syn_list:
-                print item
-            print '========== END List of synapases ==========='
+            # print '========== START List of synapases ==========='
+            # for item in syn_list:
+            #     print item
+            # print '========== END List of synapases ==========='
             config.LOGGER.debug(edge['pscomps'])
             indices = comp_indices.flatten()
             ps_comp_list = ps_comps[indices]
