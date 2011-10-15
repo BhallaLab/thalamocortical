@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Oct 11 16:28:53 2011 (+0530)
+# Last-Updated: Sat Oct 15 17:46:56 2011 (+0530)
 #           By: subha
-#     Update #: 2140
+#     Update #: 2154
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -459,6 +459,12 @@ class TraubNet(object):
                                                       tau2=5e-3, 
                                                       Pr=p_release, 
                                                       delay=delay)
+                        # This is just for debugging NMDA channel
+                        print 'Maximum conductance of', synchan.path, ':', synchan.Gbar
+                        nmda_tab = moose.Table('/data/%s_%s_%s_%s_%s' % ( precell.name, precomp.name, postcell.name, postcomp.name, synchan.name))
+                        print 'Created table:', nmda_tab.path
+                        nmda_tab.stepMode = 3
+                        nmda_tab.connect('inputRequest', synchan, 'Gk')
                         synchan.MgConc = TraubFullNetData.MgConc
                     g_gaba = self.g_gaba_mat[pre_index, post_index]
                     if g_gaba != 0.0:
