@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Oct 11 16:03:02 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 305
+# Last-Updated: Mon Oct 17 17:45:34 2011 (+0530)
+#           By: subha
+#     Update #: 311
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -222,6 +222,11 @@ class MyCompartment(moose.Compartment):
         synapse.weight[num_synapses - 1] = weight
         if config.stochastic:
             synapse.initPr[num_synapses - 1] = Pr
+        # These are for testing short-term plasticity
+        table_container = moose.Neutral('/data/Gk')
+        Gk_table = moose.Table('/data/Gk/%s_%s_%s_%s_%s' % (name, moose.Neutral(self.parent).name, self.name, moose.Neutral(target.parent).name, target.name))
+        Gk_table.stepMode = 3
+        Gk_table.connect('inputRequest', synapse, 'Gk')
         return synapse
         
 
