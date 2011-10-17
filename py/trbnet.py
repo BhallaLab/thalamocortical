@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Oct 15 17:46:56 2011 (+0530)
+# Last-Updated: Mon Oct 17 10:04:36 2011 (+0530)
 #           By: subha
-#     Update #: 2154
+#     Update #: 2160
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -450,22 +450,24 @@ class TraubNet(object):
                                             delay=delay)
                     g_nmda = self.g_nmda_mat[pre_index, post_index]
                     if g_nmda != 0.0:
+                        # NMDA synapse model is weird in that we use
+                        # the product of saturation and Gbar as an
+                        # upper limit on the conductance. On the other
+                        # hand, the actual synaptic weight is also set
+                        # to what is considered as Gbar for SynChan.
                         synchan = precomp.makeSynapse(postcomp, 
                                                       name='nmda_from_%s' % (pretype_vertex['label']), 
                                                       classname=nmdachan_classname, 
                                                       Ek=0.0,
                                                       Gbar=g_nmda,
+                                                      weight=g_nmda,
                                                       tau1=syn_edge['taunmda'], 
                                                       tau2=5e-3, 
                                                       Pr=p_release, 
                                                       delay=delay)
                         # This is just for debugging NMDA channel
-                        print 'Maximum conductance of', synchan.path, ':', synchan.Gbar
-                        nmda_tab = moose.Table('/data/%s_%s_%s_%s_%s' % ( precell.name, precomp.name, postcell.name, postcomp.name, synchan.name))
-                        print 'Created table:', nmda_tab.path
-                        nmda_tab.stepMode = 3
-                        nmda_tab.connect('inputRequest', synchan, 'Gk')
                         synchan.MgConc = TraubFullNetData.MgConc
+                        synchan.saturation = 1.0                        
                     g_gaba = self.g_gaba_mat[pre_index, post_index]
                     if g_gaba != 0.0:
                         g_gaba_slow = 0.0
