@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Oct 17 10:04:36 2011 (+0530)
+# Last-Updated: Mon Oct 17 11:36:22 2011 (+0530)
 #           By: subha
-#     Update #: 2160
+#     Update #: 2180
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -306,9 +306,11 @@ class TraubNet(object):
                             new_edge['taugabaslow'] = tn.nRT_TCR_tau_gaba_slow
                             new_edge['ggaba'] = 'uniform %g %g' % (tn.nRT_TCR_ggaba_low, tn.nRT_TCR_ggaba_high) # How to specify distribution?
                         elif posttype['label'] == 'nRT':
-                            new_edge['taugabaslow'] = tn.nRT_nRT_tau_gaba_slow
-                    
+                            new_edge['taugabaslow'] = tn.nRT_nRT_tau_gaba_slow                    
                     edge_count += 1
+        for new_edge in self.celltype_graph.es:
+            for key, value in new_edge.attributes().items():
+                config.LOGGER.debug('## %s(%d)->%s(%d): %s = %s' % (celltype['label'], celltype.index, posttype['label'], posttype.index, key, str(value)))
 
     def _read_celltype_graph(self):
         """
@@ -438,7 +440,7 @@ class TraubNet(object):
                     if postcomp is None:
                         continue
                     g_ampa = self.g_ampa_mat[pre_index, post_index]
-                    if g_ampa != 0.0:                        
+                    if g_ampa != 0.0:
                         precomp.makeSynapse(postcomp, 
                                             name='ampa_from_%s' % (pretype_vertex['label']), 
                                             classname=synchan_classname, 
@@ -465,7 +467,6 @@ class TraubNet(object):
                                                       tau2=5e-3, 
                                                       Pr=p_release, 
                                                       delay=delay)
-                        # This is just for debugging NMDA channel
                         synchan.MgConc = TraubFullNetData.MgConc
                         synchan.saturation = 1.0                        
                     g_gaba = self.g_gaba_mat[pre_index, post_index]
