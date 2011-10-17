@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Oct 17 11:36:22 2011 (+0530)
+# Last-Updated: Mon Oct 17 16:53:25 2011 (+0530)
 #           By: subha
-#     Update #: 2180
+#     Update #: 2201
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -399,6 +399,28 @@ class TraubNet(object):
         if config.stochastic:
             synchan_classname = 'STPSynChan'
             nmdachan_classname = 'STPNMDAChan'
+            nmda_deltaF = float(config.runconfig.get('NMDA', 'deltaF'))
+            nmda_d1 = float(config.runconfig.get('NMDA', 'd1'))
+            nmda_d2 = float(config.runconfig.get('NMDA', 'd2'))
+            nmda_tauD1 = float(config.runconfig.get('NMDA', 'tauD1'))
+            nmda_tauD2 = float(config.runconfig.get('NMDA', 'tauD2'))
+            nmda_tauF = float(config.runconfig.get('NMDA', 'tauF'))
+            nmda_initPr = float(config.runconfig.get('NMDA', 'initPr'))
+            ampa_deltaF = float(config.runconfig.get('AMPA', 'deltaF'))
+            ampa_d1 = float(config.runconfig.get('AMPA', 'd1'))
+            ampa_d2 = float(config.runconfig.get('AMPA', 'd2'))
+            ampa_tauD1 = float(config.runconfig.get('AMPA', 'tauD1'))
+            ampa_tauD2 = float(config.runconfig.get('AMPA', 'tauD2'))
+            ampa_tauF = float(config.runconfig.get('AMPA', 'tauF'))
+            ampa_initPr = float(config.runconfig.get('GABA', 'initPr'))
+            gaba_deltaF = float(config.runconfig.get('GABA', 'deltaF'))
+            gaba_d1 = float(config.runconfig.get('GABA', 'd1'))
+            gaba_d2 = float(config.runconfig.get('GABA', 'd2'))
+            gaba_tauD1 = float(config.runconfig.get('GABA', 'tauD1'))
+            gaba_tauD2 = float(config.runconfig.get('GABA', 'tauD2'))
+            gaba_tauF = float(config.runconfig.get('GABA', 'tauF'))
+            gaba_initPr = float(config.runconfig.get('GABA', 'initPr'))
+
         starttime = datetime.now()
         total_count = 0
         for celltype in self.celltype_graph.vs:
@@ -441,7 +463,7 @@ class TraubNet(object):
                         continue
                     g_ampa = self.g_ampa_mat[pre_index, post_index]
                     if g_ampa != 0.0:
-                        precomp.makeSynapse(postcomp, 
+                        synchan = precomp.makeSynapse(postcomp, 
                                             name='ampa_from_%s' % (pretype_vertex['label']), 
                                             classname=synchan_classname, 
                                             Ek=0.0, 
@@ -450,6 +472,14 @@ class TraubNet(object):
                                             tau2=syn_edge['tauampa'], 
                                             Pr=p_release, 
                                             delay=delay)
+                        if config.stochastic:
+                            synchan.deltaF = ampa_deltaF
+                            synchan.d1 = ampa_d1
+                            synchan.d2 = ampa_d2
+                            synchan.tauF = ampa_tauF
+                            synchan.tauD1 = ampa_tauD1
+                            synchan.tauD2 = ampa_tauD2
+                            synchan.initPr[synchan.numSynapses-1] = ampa_initPr
                     g_nmda = self.g_nmda_mat[pre_index, post_index]
                     if g_nmda != 0.0:
                         # NMDA synapse model is weird in that we use
@@ -469,6 +499,14 @@ class TraubNet(object):
                                                       delay=delay)
                         synchan.MgConc = TraubFullNetData.MgConc
                         synchan.saturation = 1.0                        
+                        if config.stochastic:
+                            synchan.deltaF = nmda_deltaF
+                            synchan.d1 = nmda_d1
+                            synchan.d2 = nmda_d2
+                            synchan.tauF = nmda_tauF
+                            synchan.tauD1 = nmda_tauD1
+                            synchan.tauD2 = nmda_tauD2
+                            synchan.initPr[synchan.numSynapses-1] = nmda_initPr
                     g_gaba = self.g_gaba_mat[pre_index, post_index]
                     if g_gaba != 0.0:
                         g_gaba_slow = 0.0
@@ -480,7 +518,7 @@ class TraubNet(object):
                                 elif posttype_vertex['label'] == 'TCR':
                                     g_gaba_slow = g_gaba *  (1 - self.frac_nRT_TCR_ggaba_fast)
                                     g_gaba = g_gaba * self.frac_nRT_TCR_ggaba_fast
-                                precomp.makeSynapse(postcomp, 
+                                synchan = precomp.makeSynapse(postcomp, 
                                                     name='gaba_slow_from_%s' % (pretype_vertex['label']), 
                                                     classname=synchan_classname, 
                                                     Ek=syn_edge['ekgaba'], 
@@ -489,8 +527,16 @@ class TraubNet(object):
                                                     tau2=0.0, 
                                                     Pr=p_release, 
                                                     delay=delay)                               
+                                if config.stochastic:
+                                    synchan.deltaF = gaba_deltaF
+                                    synchan.d1 = gaba_d1
+                                    synchan.d2 = gaba_d2
+                                    synchan.tauF = gaba_tauF
+                                    synchan.tauD1 = gaba_tauD1
+                                    synchan.tauD2 = gaba_tauD2
+                                    synchan.initPr[synchan.numSynapses-1] = gaba_initPr
 
-                        precomp.makeSynapse(postcomp, 
+                        synchan = precomp.makeSynapse(postcomp, 
                                             name='gaba_from_%s' % (pretype_vertex['label']), 
                                             classname=synchan_classname, 
                                             Ek=syn_edge['ekgaba'], 
@@ -499,6 +545,15 @@ class TraubNet(object):
                                             tau2=0.0, 
                                             Pr=p_release, 
                                             delay=delay)
+                        if config.stochastic:
+                            synchan.deltaF = gaba_deltaF
+                            synchan.d1 = gaba_d1
+                            synchan.d2 = gaba_d2
+                            synchan.tauF = gaba_tauF
+                            synchan.tauD1 = gaba_tauD1
+                            synchan.tauD2 = gaba_tauD2
+                            synchan.initPr[synchan.numSynapses-1] = gaba_initPr
+
         endtime = datetime.now()
         delta = endtime - starttime
         config.BENCHMARK_LOGGER.info('Finished network creation in: %g s' % (delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))
