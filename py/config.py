@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Oct 10 16:48:54 2011 (+0530)
+# Last-Updated: Wed Oct 19 20:31:56 2011 (+0530)
 #           By: subha
-#     Update #: 274
+#     Update #: 275
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -232,11 +232,12 @@ plotdt = float(runconfig.get('scheduling', 'plotdt'))
 clockjob.autoschedule = runconfig.get('scheduling', 'autoschedule') in ['Yes', 'yes', 'True', 'true', '1']
 default_releasep = float(runconfig.get('synapse', 'releasep')) 
 if to_reseed:
-    reseed(mypid)
-    LOGGER.info('NUMPY RNG SEED SET TO %d' % (rngseed))
-elif _rngseed is not None:
-    reseed(_rngseed)
-    LOGGER.info('NUMPY RNG SEED SET TO %d' % (rngseed))
+    if _rngseed is not None:
+        reseed(_rngseed)
+        LOGGER.info('NUMPY RNG SEED SET TO %d' % (rngseed))
+    else:
+        reseed(mypid)
+        LOGGER.info('NUMPY RNG SEED SET TO %d' % (rngseed))
 
 
 # 
