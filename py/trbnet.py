@@ -6,15 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-<<<<<<< HEAD
-# Last-Updated: Tue Oct 25 12:04:42 2011 (+0530)
+# Last-Updated: Tue Oct 25 12:21:46 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 2211
-=======
-# Last-Updated: Mon Oct 24 19:56:46 2011 (+0530)
-#           By: subha
-#     Update #: 2203
->>>>>>> f6e8310be697d9b291f93a6c06f5625aea0c3493
+#     Update #: 2212
 # URL: 
 # Keywords: 
 # Compatibility: 
