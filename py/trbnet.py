@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Oct 17 16:53:25 2011 (+0530)
-#           By: subha
-#     Update #: 2201
+# Last-Updated: Tue Oct 25 12:04:42 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 2211
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -447,17 +447,23 @@ class TraubNet(object):
             poststart = int(posttype_vertex['startindex'])
             precount = int(pretype_vertex['count'])
             postcount = int(posttype_vertex['count'])
+            # We loop through all pairs of pre and postsynaptic cell
+            # index. postcompindex will be nonzero only for those
+            # pairs having valid synapse.
             for pre_index in range(prestart, prestart+precount):
                 precell = self.index_cell_map[pre_index]
                 precomp = precell.comp[precell.presyn]
                 for post_index in range(poststart, poststart+postcount):
                     postcell = self.index_cell_map[post_index]
-                    if pre_index == post_index:
-                        config.LOGGER.warning('Skipping self connection: %s->%s' % (precell.path, postcell.path))
-                        continue
                     postcompindex = int(self.ps_comp_mat[pre_index, post_index])
                     if postcompindex > 255:
                         raise Exception('%s->%s -- PS comp has absurd index %d' % (precell.path, postcell.path, postcompindex))
+                    if postcompindex > 0 and pre_index == post_index:
+                        config.LOGGER.warning('Ignoring self connection: %s->%s (comp # %d)' % (precell.path, postcell.path, postcompindex))
+                    elif postcompindex == 0:
+                        continue
+                    else:
+                        config.LOGGER.debug('Setting connection: %s->%s (comp # %d): ampa = %g, nmda = %g, gaba = %g' % (precell.path, postcell.path, postcompindex, self.g_ampa_mat[pre_index, post_index], self.g_nmda_mat[pre_index, post_index],  self.g_gaba_mat[pre_index, post_index]))
                     postcomp = postcell.comp[postcompindex]
                     if postcomp is None:
                         continue
