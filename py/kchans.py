@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Feb  9 21:15:34 2011 (+0530)
-#           By: subha
-#     Update #: 684
+# Last-Updated: Tue Oct 25 19:04:38 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 686
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -143,13 +143,13 @@ class KA(KChannel):
 class KA_IB(KChannel):
     """A type K+ channel for tufted intrinsically bursting cells -
     multiplies tau_h of KA by 2.6"""
-    v = ChannelBase.v_array
-    m_inf = 1 / ( 1 + exp( ( - v - 60e-3 ) / 8.5e-3 ) )
-    tau_m =  1e-3 * (0.185 + 0.5 / ( exp( ( v + 35.8e-3 ) / 19.7e-3 ) + exp( ( - v - 79.7e-3 ) / 12.7e-3 ) ))
-    h_inf =   1 / ( 1 + exp( ( v + 78e-3 ) / 6e-3 ) )
-    tau_h = 2.6 * where( v <= -63e-3,\
-                             1e-3 * 0.5 / ( exp( ( v + 46e-3 ) / 5e-3 ) + exp( ( - v - 238e-3 ) / 37.5e-3 ) ), \
-                             9.5e-3)
+    # v = ChannelBase.v_array
+    # m_inf = 1 / ( 1 + exp( ( - v - 60e-3 ) / 8.5e-3 ) )
+    # tau_m =  1e-3 * (0.185 + 0.5 / ( exp( ( v + 35.8e-3 ) / 19.7e-3 ) + exp( ( - v - 79.7e-3 ) / 12.7e-3 ) ))
+    # h_inf =   1 / ( 1 + exp( ( v + 78e-3 ) / 6e-3 ) )
+    # tau_h = 2.6 * where( v <= -63e-3,\
+    #                          1e-3 * 0.5 / ( exp( ( v + 46e-3 ) / 5e-3 ) + exp( ( - v - 238e-3 ) / 37.5e-3 ) ), \
+    #                          9.5e-3)
 
     def __init__(self, name, parent, Ek=-95e-3):
         if config.context.exists(parent.path + '/' + name):
@@ -157,12 +157,11 @@ class KA_IB(KChannel):
             return
 	KChannel.__init__(self, name, parent, 4, 1, Ek=Ek)
         self.X = 0.0
-
 	for i in range(config.ndivs + 1):
-            self.xGate.A[i] = KA_IB.tau_m[i]
-            self.xGate.B[i] = KA_IB.m_inf[i]
-            self.yGate.A[i] = KA_IB.tau_h[i]
-            self.yGate.B[i] = KA_IB.h_inf[i]
+            self.xGate.A[i] = KA.tau_m[i]
+            self.xGate.B[i] = KA.m_inf[i]
+            self.yGate.A[i] = 2.6*KA.tau_h[i]
+            self.yGate.B[i] = KA.h_inf[i]
         self.xGate.tweakTau()
 	self.yGate.tweakTau()
 
