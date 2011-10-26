@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Oct 25 12:21:46 2011 (+0530)
+# Last-Updated: Wed Oct 26 11:14:55 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 2212
+#     Update #: 2213
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -906,7 +906,7 @@ class TraubNet(object):
         config.LOGGER.info('%s Ek += %g' % (channel_class.__name__, value))
         self.tweaks_doc.append('%s.Ek += %g' % (channel_class.__name__, value))
         for cell in self.cell_index_map.keys():
-	    for ii in range(1, cell.num_comp):
+	    for ii in range(1, cell.num_comp+1):
                 comp = cell.comp[ii]
                 for chan in comp.channels:
                     if isinstance(chan, channel_class):
@@ -1102,7 +1102,7 @@ class TraubNet(object):
         for vertex in self.celltype_graph.vs:
             for cell_index in self.populations[vertex['label']]:
                 cell = self.index_cell_map[cell_index]
-                for comp_index in range(1, cell.num_comp):
+                for comp_index in range(1, cell.num_comp+1):
                     comp = cell.comp[comp_index]
                     for chan_id in moose.context.getChildren('%s/#[TYPE=HHChannel]' % (comp.path)):
                         chan = moose.HHChannel(chan_id)

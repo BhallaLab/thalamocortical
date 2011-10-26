@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jul 24 10:04:47 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Jul 27 11:52:46 2011 (+0530)
-#           By: subha
-#     Update #: 703
+# Last-Updated: Wed Oct 26 11:02:11 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 709
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -220,7 +220,14 @@ class TraubCell(moose.Cell):
                 ret[int(tokens[1])].add(int(tokens[0]))
         return ret
 
-
+    def scale_conductance(self, channel_name, scale):
+        for comp_no in range(1, self.num_comp+1):
+            comp = self.comp[comp_no]
+            path = comp.path + '/' + channel_name
+            if moose.context.exists(path):
+                chan = moose.HHChannel(path)
+                chan.Gbar = chan.Gbar * scale
+        print 'Scaled %s by %g' % (channel_name, scale)
 
     def _ca_tau(self):
         raise NotImplementedError("You must set tau for [Ca2+] decay in the method _ca_tau() in subclass.")

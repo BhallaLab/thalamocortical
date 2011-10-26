@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 11:44:48 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Sep  3 17:08:22 2011 (+0530)
-#           By: subha
-#     Update #: 58
+# Last-Updated: Wed Oct 26 11:54:16 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 125
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -122,6 +122,21 @@ class TuftedIB(TraubCell):
         sim = Simulation(cls.__name__)
         mycell = TuftedIB(TuftedIB.prototype, sim.model.path + "/TuftedIB")
         print 'Created cell:', mycell.path
+        mycell.scale_conductance('CaL', 0.0)
+        mycell.scale_conductance('CaT', 0.0)
+        mycell.scale_conductance('K2', 0.0)
+        # mycell.scale_conductance('KA_IB', 0.0)
+        mycell.scale_conductance('KAHP_DP', 0.0)
+        mycell.scale_conductance('KC', 0.0)
+        mycell.scale_conductance('KDR', 0.0)
+        mycell.scale_conductance('KM', 0.0)
+        mycell.scale_conductance('NaF', 0.0)
+        mycell.scale_conductance('NaP', 0.0)
+        mycell.scale_conductance('AR', 0.0)
+        for chanid in moose.context.getWildcardList(mycell.path+'/##[TYPE=HHChannel]', True):
+            chan = moose.HHChannel(chanid)
+            if chan.Gbar != 0.0:
+                print chan.path, 'Nonzero Gbar'
         vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_tuftIB', 'Vm', sim.data)
         ca_conc_path = mycell.soma.path + '/CaPool'
         ca_table = None
@@ -138,8 +153,11 @@ class TuftedIB(TraubCell):
             kc = moose.HHChannel(kc_path)
             kc.connect('Gk', gk_table, 'inputRequest')
             pymoose.showmsg(ca_conc)
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=0.3e-9, firstDelay=0.0, firstWidth=50e-3)
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=-0.3e-9, firstDelay=50e-3, firstWidth=20e-3, secondLevel=0.9e-9, secondDelay=100e-3, secondWidth=20e-3)
 #         pulsegen1 = mycell.soma.insertPulseGen('pulsegen1', sim.model, firstLevel=3e-7, firstDelay=150e-3, firstWidth=10e-3)
+        pulse_table = moose.Table('/data/injection')
+        pulse_table.stepMode = 3
+        pulse_table.connect('inputRequest', pulsegen, 'output')
 
         sim.schedule()
         if mycell.has_cycle():
@@ -159,14 +177,15 @@ class TuftedIB(TraubCell):
             nrn_vm = nrn_vm[:, 1]
             nrn_ca = config.pylab.loadtxt('../nrn/mydata/Ca_tuftIB.plot')
             nrn_ca = nrn_ca[:,1]
-            config.pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
-            config.pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
+            config.pylab.plot(nrn_t, nrn_vm, 'r-', label='nrn vm')
+            config.pylab.plot(mus_t, mus_vm, 'k--', label='mus vm')
+            config.pylab.plot(mus_t, config.pylab.array(pulse_table)*1e10-100, 'b-', label='I_inject(x10 nA)')
     #         if ca_table:
     #             ca_array = config.pylab.array(ca_table)
     #             config.pylab.plot(nrn_t, -nrn_ca, 'r-', label='nrn (-)ca')
     #             config.pylab.plot(mus_t, -ca_array, 'b-.', label='mus (-)ca')
     #             print config.pylab.amax(ca_table)
-            config.pylab.legend()
+            config.pylab.legend(loc=0)
             config.pylab.show()
         
         
