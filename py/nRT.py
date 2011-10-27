@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 15:18:24 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Sep  3 17:06:57 2011 (+0530)
-#           By: subha
-#     Update #: 80
+# Last-Updated: Thu Oct 27 14:13:46 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 84
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -174,11 +174,15 @@ class nRT(TraubCell):
         mycell.dump_cell('nRT.txt')        
         if config.has_pylab:
             mus_vm = config.pylab.array(vm_table) * 1e3
-            nrn_vm = config.pylab.loadtxt('../nrn/mydata/Vm_nRT.plot')
-            nrn_t = nrn_vm[:, 0]
-            mus_t = linspace(0, nrn_t[-1], len(mus_vm))
-            nrn_vm = nrn_vm[:, 1]
-            config.pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
+            mus_t = linspace(0, sim.simtime, len(mus_vm))
+            try:
+                nrn_vm = config.pylab.loadtxt('../nrn/mydata/Vm_nRT.plot')
+                print 'Here'
+                nrn_vm = nrn_vm[:, 1]
+                nrn_t = nrn_vm[:, 0]
+                config.pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
+            except IOError:
+                pass
             config.pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
             config.pylab.legend()
             config.pylab.show()
