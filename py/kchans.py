@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:49 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Oct 25 19:04:38 2011 (+0530)
+# Last-Updated: Thu Oct 27 12:05:34 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 686
+#     Update #: 694
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -105,7 +105,7 @@ class KDR_FS(KChannel):
 
     def __init__(self, name, parent, Ek=-95e-3):
         if config.context.exists(parent.path + '/' + name):
-            KChannel.__init__(self, name, parent, 4, Ek=Ek)
+            KChannel.__init__(self, name, parent, xpower=4, ypower=0, Ek=Ek)
             return
 	KChannel.__init__(self, name, parent, 4, Ek=Ek)
 	for i in range(config.ndivs + 1):
@@ -156,7 +156,6 @@ class KA_IB(KChannel):
             KChannel.__init__(self, name, parent, 4, 1)
             return
 	KChannel.__init__(self, name, parent, 4, 1, Ek=Ek)
-        self.X = 0.0
 	for i in range(config.ndivs + 1):
             self.xGate.A[i] = KA.tau_m[i]
             self.xGate.B[i] = KA.m_inf[i]
@@ -164,6 +163,7 @@ class KA_IB(KChannel):
             self.yGate.B[i] = KA.h_inf[i]
         self.xGate.tweakTau()
 	self.yGate.tweakTau()
+        self.X = 0.0
 
 
 class K2(KChannel):
@@ -178,7 +178,7 @@ class K2(KChannel):
 
     def __init__(self, name, parent, Ek=-95e-3):
         if config.context.exists(parent.path + '/' + name):
-            KChannel.__init__(self, name, parent, 4, 1)
+            KChannel.__init__(self, name, parent, xpower=1.0, ypower=1.0)
             return
 	KChannel.__init__(self, name, parent, xpower=1.0, ypower=1.0, Ek=Ek)
 	for i in range(config.ndivs + 1):
@@ -189,23 +189,17 @@ class K2(KChannel):
         self.xGate.tweakTau()
 	self.yGate.tweakTau()
         self.X = 0.0
-	# self.xGate.A.dumpFile('k2_xa.plot')
-        # self.xGate.B.dumpFile('k2_xb.plot')
-	# self.yGate.A.dumpFile('k2_ya.plot')
-        # self.yGate.B.dumpFile('k2_yb.plot')
 	
 
 class KM(KChannel):
     v = ChannelBase.v_array
     a =  1e3 * 0.02 / ( 1 + exp((-v - 20e-3 ) / 5e-3))
     b = 1e3 * 0.01 * exp((-v - 43e-3) / 18e-3)
-    minf = a / (a + b)
-    mtau = 1 / (a + b)
     def __init__(self, name, parent, Ek=-95e-3):
         if config.context.exists(parent.path + '/' + name):
-            KChannel.__init__(self, name, parent, 4, 1)
+            KChannel.__init__(self, name, parent, xpower=1.0, ypower=0.0)
             return
-	KChannel.__init__(self, name, parent, 1, Ek=Ek)
+	KChannel.__init__(self, name, parent, xpower=1.0, ypower=0.0, Ek=Ek)
 	for i in range(config.ndivs + 1):
             self.xGate.A[i] = KM.a[i]
             self.xGate.B[i] = KM.b[i]
