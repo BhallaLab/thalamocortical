@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 19:32:34 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Sep  3 17:04:24 2011 (+0530)
-#           By: subha
-#     Update #: 44
+# Last-Updated: Fri Oct 21 16:28:00 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 46
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -131,11 +131,13 @@ class DeepLTS(TraubCell):
         if config.has_pylab:
             mus_vm = config.pylab.array(vm_table) * 1e3
             mus_t = linspace(0, sim.simtime * 1e3, len(mus_vm))
-            mus_ca = config.pylab.array(ca_table)
-            nrn_vm = config.pylab.loadtxt('../nrn/mydata/Vm_supLTS.plot')
-            nrn_t = nrn_vm[:, 0]
-            nrn_vm = nrn_vm[:, 1]
-            config.pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
+            try:
+                nrn_vm = config.pylab.loadtxt('../nrn/mydata/Vm_supLTS.plot')
+                nrn_t = nrn_vm[:, 0]
+                nrn_vm = nrn_vm[:, 1]
+                config.pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
+            except IOError:
+                print 'NEURON Data not available.'
             config.pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
             config.pylab.legend()
             config.pylab.show()

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 11:44:48 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Oct 26 11:54:16 2011 (+0530)
+# Last-Updated: Thu Oct 27 12:08:25 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 125
+#     Update #: 144
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -122,21 +122,21 @@ class TuftedIB(TraubCell):
         sim = Simulation(cls.__name__)
         mycell = TuftedIB(TuftedIB.prototype, sim.model.path + "/TuftedIB")
         print 'Created cell:', mycell.path
-        mycell.scale_conductance('CaL', 0.0)
-        mycell.scale_conductance('CaT', 0.0)
-        mycell.scale_conductance('K2', 0.0)
+        # mycell.scale_conductance('CaL', 0.0)
+        # mycell.scale_conductance('CaT', 0.0)
+        # mycell.scale_conductance('K2', 0.0)
         # mycell.scale_conductance('KA_IB', 0.0)
-        mycell.scale_conductance('KAHP_DP', 0.0)
-        mycell.scale_conductance('KC', 0.0)
-        mycell.scale_conductance('KDR', 0.0)
-        mycell.scale_conductance('KM', 0.0)
-        mycell.scale_conductance('NaF', 0.0)
-        mycell.scale_conductance('NaP', 0.0)
-        mycell.scale_conductance('AR', 0.0)
-        for chanid in moose.context.getWildcardList(mycell.path+'/##[TYPE=HHChannel]', True):
-            chan = moose.HHChannel(chanid)
-            if chan.Gbar != 0.0:
-                print chan.path, 'Nonzero Gbar'
+        # mycell.scale_conductance('KAHP_DP', 0.0)
+        # mycell.scale_conductance('KC', 0.0)
+        # mycell.scale_conductance('KDR', 0.0)
+        # mycell.scale_conductance('KM', 0.0)
+        # mycell.scale_conductance('NaF', 0.0)
+        # mycell.scale_conductance('NaP', 0.0)
+        # mycell.scale_conductance('AR', 0.0)
+        # for chanid in moose.context.getWildcardList(mycell.path+'/##[TYPE=HHChannel]', True):
+        #     chan = moose.HHChannel(chanid)
+        #     if chan.Gbar != 0.0:
+        #         print chan.path, 'Nonzero Gbar'
         vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_tuftIB', 'Vm', sim.data)
         ca_conc_path = mycell.soma.path + '/CaPool'
         ca_table = None
@@ -177,8 +177,8 @@ class TuftedIB(TraubCell):
             nrn_vm = nrn_vm[:, 1]
             nrn_ca = config.pylab.loadtxt('../nrn/mydata/Ca_tuftIB.plot')
             nrn_ca = nrn_ca[:,1]
-            config.pylab.plot(nrn_t, nrn_vm, 'r-', label='nrn vm')
-            config.pylab.plot(mus_t, mus_vm, 'k--', label='mus vm')
+            config.pylab.plot(nrn_t, nrn_vm, 'r-..', label='nrn vm')
+            config.pylab.plot(mus_t, mus_vm, 'k--.', label='mus vm')
             config.pylab.plot(mus_t, config.pylab.array(pulse_table)*1e10-100, 'b-', label='I_inject(x10 nA)')
     #         if ca_table:
     #             ca_array = config.pylab.array(ca_table)
