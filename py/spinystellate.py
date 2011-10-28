@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Sep 29 11:43:22 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Sep  3 17:00:09 2011 (+0530)
-#           By: subha
-#     Update #: 525
+# Last-Updated: Thu Oct 27 14:15:45 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 530
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -128,100 +128,19 @@ class SpinyStellate(TraubCell):
         # mycell.dump_cell('spinstell.txt')
         if config.has_pylab:
             mus_vm = config.pylab.array(vm_table) * 1e3
-            nrn_vm = config.pylab.loadtxt('../nrn/mydata/Vm_spinstell.plot')
-            nrn_t = nrn_vm[:, 0]
-            mus_t = linspace(0, nrn_t[-1], len(mus_vm))
-            nrn_vm = nrn_vm[:, 1]
-            nrn_ca = config.pylab.loadtxt('../nrn/mydata/Ca_spinstell.plot')
-            nrn_ca = nrn_ca[:,1]
-            config.pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
+            mus_t = linspace(0, sim.simtime, len(mus_vm))
             config.pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
-    #         if ca_table:
-    #             ca_array = config.pylab.array(ca_table)
-    #             config.pylab.plot(nrn_t, -nrn_ca, 'r-', label='nrn (-)ca')
-    #             config.pylab.plot(mus_t, -ca_array, 'b-.', label='mus (-)ca')
-    #             print config.pylab.amax(ca_table)
-            config.pylab.legend()
+            try:
+                nrn_vm = config.pylab.loadtxt('../nrn/mydata/Vm_spinstell.plot')
+                nrn_t = nrn_vm[:, 0]
+                nrn_vm = nrn_vm[:, 1]
+                nrn_ca = config.pylab.loadtxt('../nrn/mydata/Ca_spinstell.plot')
+                config.pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
+            except IOError:
+                pass
+            config.pylab.legend(loc=0)
             config.pylab.show()
 
-import unittest
-
-class SpinyStellateTestCase(unittest.TestCase):
-    def setUp(self):
-        self.sim = Simulation('SpinyStellate')
-        path = self.sim.model.path + '/' + 'TestSpinyStellate'
-        config.LOGGER.debug('Creating cell %s' % (path))
-        TraubCell.adjust_chanlib(SpinyStellate.chan_params)
-        self.cell = SpinyStellate(path, SpinyStellate.proto_file)
-        config.LOGGER.debug('Cell created')
-        for handler in config.LOGGER.handlers:
-            handler.flush()
-        self.sim.schedule()
-
-    def test_compartment_count(self):
-        for comp_no in range(SpinyStellate.num_comp):
-            path = '%s/comp_%d' % (self.cell.path, comp_no + 1)
-            self.assertTrue(config.context.exists(path))
-    
-    def test_initVm(self):
-        for comp_no in range(SpinyStellate.num_comp):
-            self.assertAlmostEqual(self.cell.comp[comp_no + 1].initVm, -65e-3)
-
-    def test_Em(self):
-        for comp_no in range(SpinyStellate.num_comp):
-            self.assertAlmostEqual(self.cell.comp[comp_no + 1].Em, -65e-3)
-
-    def test_Ca_connections(self):
-        for comp_no in range(SpinyStellate.num_comp):
-            ca_path = self.cell.comp[comp_no + 1].path + '/CaPool'
-            if not config.context.exists(ca_path):
-                continue
-            caPool = moose.CaConc(ca_path)
-            for chan in SpinyStellate.ca_dep_chans:
-                chan_path = self.cell.comp[comp_no + 1].path + '/' + chan
-                if not config.context.exists(chan_path):
-                    continue
-                chan_obj = moose.HHChannel(chan_path)
-                self.assertTrue(len(chan_obj.neighbours('concen')) > 0)
-            sources = caPool.neighbours('current')
-            self.failIfEqual(len(sources), 0)
-            for chan in sources:
-                self.assertTrue(chan.path().endswith('CaL'))
-                    
-    def test_reversal_potentials(self):
-        for num in range(SpinyStellate.num_comp):
-            comp = self.cell.comp[num + 1]
-            for chan_id in comp.neighbours('channel'):
-                chan = moose.HHChannel(chan_id)
-                chan_class = eval(chan.name)
-                key = None
-                if issubclass(chan_class, NaChannel):
-                    key = 'ENa'
-                elif issubclass(chan_class, KChannel):
-                    key = 'EK'
-                elif issubclass(chan_class, CaChannel):
-                    key = 'ECa'
-                elif issubclass(chan_class, AR):
-                    key = 'EAR'
-                else:
-                    pass
-                self.assertAlmostEqual(chan.Ek, SpinyStellate.chan_params[key])
-                    
-def test_creation_time(count=10):
-    cells = []
-    for ii in range(count):
-        start = datetime.now()
-        cells.append(SpinyStellate('cell_%d' % (ii), SpinyStellate.proto_file))
-        end = datetime.now()
-        delta = end - start
-        config.BENCHMARK_LOGGER.info('created fresh cell %s in: %g s' % (cells[-1].name, delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
-
-    for ii in range(count):
-        start = datetime.now()
-        cells.append(SpinyStellate(SpinyStellate.prototype, 'copy_of_cell_%d' % (ii)))
-        end = datetime.now()
-        delta = end - start
-        config.BENCHMARK_LOGGER.info('created copy %s in: %g s' % (cells[-1].name, delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
         
 
 # test main --
