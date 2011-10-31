@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Oct 26 11:14:55 2011 (+0530)
+# Last-Updated: Sun Oct 30 13:38:42 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 2213
+#     Update #: 2237
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1067,6 +1067,32 @@ class TraubNet(object):
                         ii += 1
         config.LOGGER.debug('END randomize_active_conductances')
 
+
+    def setup_bias_current(self, population_name, level, delay, width, data_container):
+        """Apply a steady bias current to a population of cells.
+
+        level, delay and width are either single values or lists of
+        the same length.
+        """
+        pulsegen = moose.PulseGen('%s_bias' % (population_name), self.instrumentation)
+        if isinstance(level, list):
+            pulsegen.setCount(len(level)+1)
+            for ii in range(len(level)):
+                pulsegen.setLevel(ii, level[ii])
+                pulsegen.setDelay(ii, delay[ii])
+                pulsegen.setWidth(ii, width[ii])
+            pulsegen.setDelay(len(level), 1e9) # last delay is set to infinite to avoid repetition
+        else:
+            pulsegen.setFirstLevel(level)
+            pulsegen.setFirstWidth(width)
+            pulsegen.setFirstDelay(delay)
+        for cell_index in self.populations[population_name]:
+            pulsegen.connect('outputSrc', self.index_cell_map[cell_index].soma, 'injectMsg')
+        container = moose.Neutral('bias_current', data_container)
+        pulsedata = moose.Table(pulsegen.name, container)
+        pulsedata.stepMode = 3
+        pulsedata.connect('inputRequest', pulsegen, 'output')
+        config.LOGGER.info('Created pulsegen %s to apply bias current to %s population.' % (pulsegen.path, population_name))
     
     def save_cell_network(self, filename):
         """Save network model directly from MOOSE structure, rather
