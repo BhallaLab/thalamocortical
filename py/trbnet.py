@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Sun Oct 30 13:38:42 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 2237
+# Last-Updated: Fri Nov  4 17:02:06 2011 (+0530)
+#           By: subha
+#     Update #: 2243
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -595,15 +595,19 @@ class TraubNet(object):
         pulse_table.stepMode = 3
         pulse_table.connect('inputRequest', pulsegen, 'output')
 
-    def setup_lfp_recording(self, name, depth, data_container):
+    def setup_lfp_recording(self, name, depth, data_container, cellclasses=[]):
         """Setup electrodes for recording LFP."""
         electrode = moose.Efield(name, self.electrode_container)
         self.electrodes.append(electrode)
         electrode.x = 0.0
         electrode.y = 0.0
         electrode.z = depth
-        for celltype in self.celltype_graph.vs:
-            cellclass = eval(celltype['label'])
+        if cellclasses == []:
+            for celltype in self.celltype_graph.vs:
+                cellclasses.append(celltype['label'])
+
+        for celltype in cellclasses:
+            cellclass = eval(celltype)
             # nRT and TCR cells will be ignored
             if not hasattr(cellclass, 'depth') or cellclass.depth is  None:
                 continue
