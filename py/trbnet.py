@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Nov  4 17:02:06 2011 (+0530)
+# Last-Updated: Fri Nov 11 10:10:33 2011 (+0530)
 #           By: subha
-#     Update #: 2243
+#     Update #: 2244
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -620,7 +620,7 @@ class TraubNet(object):
                     # print comp_no, ',',
                     comp_indices.append(comp_no)
             # then connect all such compartments in all cells of this type to the electrode object.
-            for ii in self.populations[celltype['label']]:
+            for ii in self.populations[celltype]:
                 cell = self.index_cell_map[ii]
                 # print 'cell:', cell.path, 'comps:', comp_indices
                 for jj in comp_indices:
