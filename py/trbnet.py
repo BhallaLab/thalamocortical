@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Nov 11 10:10:33 2011 (+0530)
-#           By: subha
-#     Update #: 2244
+# Last-Updated: Wed Nov 16 17:37:05 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 2245
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -432,6 +432,10 @@ class TraubNet(object):
                 self.cell_index_map[cell] = total_count + ii
                 self.populations[celltype['label']].append(total_count + ii)
             total_count += cell_count
+        endtime = datetime.now()
+        delta = endtime - starttime
+        config.BENCHMARK_LOGGER.info('Time to create %d cells: %g s' % (total_count, delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))
+        
         for syn_edge in self.celltype_graph.es:
             pretype_vertex = self.celltype_graph.vs[syn_edge.source]
             posttype_vertex = self.celltype_graph.vs[syn_edge.target]
