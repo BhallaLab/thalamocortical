@@ -7,9 +7,9 @@
 # Copyright (C) 2010 Subhasis Ray, all rights reserved.
 # Created: Wed Dec 15 10:16:41 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Nov 17 20:36:33 2011 (+0530)
-#           By: subha
-#     Update #: 2771
+# Last-Updated: Thu Nov 24 02:09:07 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 2804
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -386,6 +386,28 @@ class DataVizWidget(QtGui.QMainWindow):
             mdiChild.setWidget(PlotWidget())
         mdiChild.showMaximized()
         self.__makeLinePlot()
+
+    def __plotSelectionsAsRaster(self):
+        self.dataList.model().clear()
+        self.__selectForPlot()
+        mdiChild = self.mdiArea.activeSubWindow()
+        if (mdiChild is None) or (mdiChild.widget() is not None):
+            mdiChild = self.mdiArea.addSubWindow(PlotWidget())
+            mdiChild.setWindowTitle('Plot %d' % len(self.mdiArea.subWindowList()))
+        else:
+            mdiChild.setWidget(PlotWidget())
+        mdiChild.showMaximized()
+        plotWidget = mdiChild.widget()
+        datalist = []
+        pathlist = []
+        for item in self.h5tree.selectedItems():
+            path = item.path()
+            pathlist.append(path)
+            tseries = self.h5tree.getTimeSeries(path)
+            data = numpy.arra(self.h5tree.getData(path))
+            datalist.append((tseries, data))
+        plotWidget.makeSpectrogram(datalist)
+        
 
     def __makeNewRasterPlot(self):
         self.dataList.model().clear()
@@ -810,14 +832,19 @@ class DataVizWidget(QtGui.QMainWindow):
         for filename in file_path_dict.keys():
             path_list = file_path_dict[filename]
             data_list = []
+            sampling_interval = self.h5tree.get_plotdt(filename)
+            start_index = int(start/sampling_interval)
+            end_index = int(end/sampling_interval)
             for path in path_list:
                 tmp_data = self.h5tree.getData(path)
-                data = numpy.zeros(len(tmp_data))
-                data[:] = tmp_data[:]
+                data = numpy.zeros(end_index-start_index)
+                # print len(data)
+                # print len(tmp_data[start_index:end_index])
+                data[:] = tmp_data[start_index:end_index]
                 data_list.append(data)
-            sampling_interval = self.h5tree.get_plotdt(filename)
+            
             filtered_data_list = method(data_list, sampling_interval, cutoff, rolloff)
-            ts = self.h5tree.getTimeSeries(path_list[0])
+            ts = self.h5tree.getTimeSeries(path_list[0])[start_index:end_index]
             plot_data_list = [(ts, data) for data in filtered_data_list]
             mdiChild.widget().addPlotCurveList(path_list, plot_data_list, curvenames=path_list)
             self.connect(mdiChild.widget(), QtCore.SIGNAL('curveSelected'), self.__showStatusMessage)
