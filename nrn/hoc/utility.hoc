@@ -147,7 +147,7 @@ proc print_readcell(){ localobj cell,dump_file, strfn, secref, seclist
 	    strfn.head(compname, "\\[", compname)
 	    sprint(compname, "%s_%s", compname, comp_index)
 	    //	    print "secname: ", compname, " index: ", comp_index, " parent: ", parent_str
-	    dump_file.printf("*set_compt_param ELEAK %g\n", e_pas * 1e-3)
+	    dump_file.printf("*set_compt_param EREST_ACT %g\n", e_pas * 1e-3)
 	    dump_file.printf("*set_compt_param RM %g\n", 1e-4/g_pas)
 	    dump_file.printf("*set_compt_param CM %g\n", cm * 1e-2)
 	    dump_file.printf("*set_compt_param RA %g\n", Ra * 1e-2)
