@@ -56,22 +56,22 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     stim2.del = t1 + 100
     stim2.dur = 20
     // stim2.dur = 10.0// $1 - $2
-    forsec cell.all{
-	// if (ismembrane("ka_ib")){gbar_ka_ib = 0.0 }
-	if (ismembrane("kahp_deeppyr")){gbar_kahp_deeppyr = 0.0 }
-    	if (ismembrane("nap")) { gbar_nap = 0.0 }
-        if (ismembrane("naf")) { gbar_naf = 0.0 }
-        if (ismembrane("kc")) { gbar_kc = 0.0 }	
-        if (ismembrane("km")) { gbar_km = 0.0 }
-        if (ismembrane("kdr")) { gbar_kdr = 0.0}
-        if (ismembrane("k2")) { gbar_k2 = 0.0 }
-        if (ismembrane("cal")) { gbar_cal = 0.0 }
-        if (ismembrane("cat")) { gbar_cat = 0.0 }
-        if (ismembrane("ar")) { gbar_ar = 0.0 }
-	}
-	// print_cell(cell, "tuftIB")
+    // forsec cell.all{
+    	// if (ismembrane("ka_ib")){gbar_ka_ib = 0.0 }
+    // 	if (ismembrane("kahp_deeppyr")){gbar_kahp_deeppyr = 0.0 }
+    // 	if (ismembrane("nap")) { gbar_nap = 0.0 }
+    //     if (ismembrane("naf")) { gbar_naf = 0.0 }
+    //     if (ismembrane("kc")) { gbar_kc = 0.0 }	
+    //     if (ismembrane("km")) { gbar_km = 0.0 }
+    //     if (ismembrane("kdr")) { gbar_kdr = 0.0}
+    //     if (ismembrane("k2")) { gbar_k2 = 0.0 }
+    //     if (ismembrane("cal")) { gbar_cal = 0.0 }
+    //     if (ismembrane("cat")) { gbar_cat = 0.0 }
+    //     if (ismembrane("ar")) { gbar_ar = 0.0 }
+    // 	}
+ print_cell(cell, "tuftIB")
 	// save_proto(cell, "TuftedIB.p")
-    // print_readcell(cell, "TuftedIB.p")
+    print_readcell(cell, "TuftedIB.p")
     // g = new File()
     // g.wopen("mydata/Ca_suppyrrs.plot")
     // f.wopen("mydata/Vm_suppyrrs.plot")
