@@ -12,7 +12,7 @@
 
 
 
-*set_global     EREST_ACT	-65e-3
+*set_global     EREST_ACT	-70e-3
 
 
 

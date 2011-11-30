@@ -7,6 +7,8 @@
 *cartesian
 
 *asymmetric
+*  
+*set_global EREST_ACT -0.065
 
 *set_compt_param EREST_ACT -0.065
 
