@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Nov 21 16:57:01 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 2246
+# Last-Updated: Wed Nov 30 11:31:21 2011 (+0530)
+#           By: subha
+#     Update #: 2247
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -684,7 +684,8 @@ class TraubNet(object):
 
         The tables are created under {data_container}/spikes"""
         spike_container = moose.Neutral('spikes', data_container)
-        raise Exception('Update this with spike detection from SpikeGen at  axon segment.')
+        # Is it correct to record the spikes from soma or the SpikeGen ?
+        # raise Exception('Update this with spike detection from SpikeGen at  axon segment.')
         for cell in self.cell_index_map.keys():
             tab = cell.soma.insertRecorder(cell.name, 'Vm', spike_container)
             tab.stepMode = moose.TAB_SPIKE
