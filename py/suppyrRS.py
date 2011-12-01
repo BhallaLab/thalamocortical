@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Sep  3 16:59:41 2011 (+0530)
-#           By: subha
-#     Update #: 705
+# Last-Updated: Thu Dec  1 17:38:11 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 777
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -116,16 +116,18 @@ class SupPyrRS(TraubCell):
         config.LOGGER.info(" *")
         config.LOGGER.info(" **************************************************************************/")
         sim = Simulation(cls.__name__)
+        sim.simdt = 1e-6
+        sim.plotdt = 1e-4
         mycell = SupPyrRS(SupPyrRS.prototype, sim.model.path + "/SupPyrRS")
         config.LOGGER.info('Created cell: %s' % (mycell.path))
-        vm_table = mycell.comp[SupPyrRS.presyn].insertRecorder('Vm_suppyrrs', 'Vm', sim.data)
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=50e-3, firstWidth=50e-3)
+        vm_table = mycell.soma.insertRecorder('Vm_suppyrrs', 'Vm', sim.data)
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=0.4e-9, firstDelay=50e-3, firstWidth=200e-3)
 
         sim.schedule()
         if mycell.has_cycle():
             config.LOGGER.warning("WARNING!! CYCLE PRESENT IN CICRUIT.")
         t1 = datetime.now()
-        sim.run(200e-3)
+        sim.run(300e-3)
         t2 = datetime.now()
         delta = t2 - t1
         config.BENCHMARK_LOGGER.info('simulation time: %g' % (delta.seconds + 1e-6 * delta.microseconds))
@@ -146,16 +148,33 @@ class SupPyrRS(TraubCell):
             #     print config.pylab.amax(ca_table)
             config.pylab.legend()
             config.pylab.show()
+            data_array = config.pylab.zeros((len(mus_vm), 2))
+            data_array[:, 0] = mus_t[:]
+            data_array[:, 1] = mus_vm[:]
+            config.pylab.savetxt('Vm_suppyrRS.dat', data_array)
         
 
 import unittest
+import uuid
 class SupPyrRSTestCase(unittest.TestCase):
     def setUp(self):
+        self.conductance_densities = defaultdict(list)
+        self.conductance_densities['NaF'] = [10.0 * x for x in [400, 187.5, 93.75, 12.5, 12.5, 125, 93.75, 12.5, 12.5, 12.5, 12.5, 12.5, 12.5]]
+        self.conductance_densities['NaP'] = [10.0 * x for x in [0, 0.12, 0.06, 0.008, 0.008, 0.08, 0.06, 0.008, 0.008, 0.008, 0.008, 0.008, 0.008]]
+        self.conductance_densities['KDR'] = [10.0 * x for x in [400, 125, 93.75, 6.25, 6.25, 125, 93.75, 6.25, 6.25, 6.25, 6.25, 6.25, 6.25]]
+        self.conductance_densities['KC'] = [10.0 * x for x in [0, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12]]
+        self.conductance_densities['KA'] = [10.0 * x for x in [2, 30, 2, 2, 2, 30, 2, 2, 2, 2, 2, 2, 2]]
+        self.conductance_densities['KM'] = [10.0 * x for x in [0, 7.5, 7.5,  7.5, 7.5, 7.5, 7.5, 7.5, 7.5, 7.5, 7.5, 7.5, 7.5]]
+        self.conductance_densities['K2'] = [10.0 * 0.1] * 13
+        self.conductance_densities['KAHP'] = [10.0 * x for x in [0, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04]]
+        self.conductance_densities['CaL'] = [10.0 * x for x in [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
+        self.conductance_densities['CaT'] = [10.0 * x for x in [0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]]
+        self.conductance_densities['AR'] = [10.0 * x for x in [0, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]]
         self.sim = Simulation('SupPyrRS')
         path = self.sim.model.path + '/TestSupPyrRS'
         config.LOGGER.debug('Creating cell %s' % path)
         TraubCell.adjust_chanlib(SupPyrRS.chan_params)
-        self.cell = SupPyrRS(path, SupPyrRS.proto_file)
+        self.cell = SupPyrRS(SupPyrRS.prototype,  "%s/SupPyrRS%d" % (self.sim.model.path, uuid.uuid4().int))
         config.LOGGER.debug('Cell created')
         self.sim.schedule()
 
@@ -167,7 +186,7 @@ class SupPyrRSTestCase(unittest.TestCase):
 
     def test_initVm(self):
         for comp_no in range(SupPyrRS.num_comp):
-            self.assertAlmostEqual(self.cell.comp[comp_no + 1].initVm, -65e-3)
+            self.assertAlmostEqual(self.cell.comp[comp_no + 1].initVm, -70e-3)
 
     def test_Em(self):
         for comp_no in range(SupPyrRS.num_comp):
@@ -210,6 +229,19 @@ class SupPyrRSTestCase(unittest.TestCase):
                 else:
                     pass
                 self.assertAlmostEqual(chan.Ek, SupPyrRS.chan_params[key])
+
+    def test_conductances(self):
+        for level, comp_nums in self.cell.level.items():
+            for comp_num in comp_nums:
+                comp = self.cell.comp[comp_num]
+                print 'Here'
+                for chan_id in moose.context.getWildcardList('%s/#[TYPE=HHChannel]' % (comp.path), True):
+                    print chan_id.path()
+                    channel = moose.HHChannel(chan_id)
+                    channame = channel.name
+                    gbar = channel.Gbar / comp.sarea()
+                    self.assertAlmostEqual(self.conductance_densities[channame][level], gbar)
+                
     
 # test main --
 from simulation import Simulation
