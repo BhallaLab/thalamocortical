@@ -24,7 +24,7 @@ objref cell, stim1, stim2
 proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     tstop = $1
     t1 = $2
-    printf("Run for: %g ms, stim at: %g\n", tstop, t1)
+    printf("Run for: %g ms\n", tstop)
     t2 = 1e9 a2 = 0
     cell = new suppyrRS()
     // for ii = 1, 59 {
@@ -49,8 +49,9 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     // ikvec.record(&cell.comp[1].ik_kc(0.5))
     stim1 = new IClamp(0.5) 
     stim1.amp = 0.4
-    stim1.del = 50.0 //t1
+    stim1.del = 100.0 //t1
     stim1.dur = 200.0 // $1 - $2
+    printf("Stim at %g ms for %g ms\n", stim1.del, stim1.dur)
     // stim2 = new IClamp(0.5) 
     // stim2.amp = 0.3e3
     // stim2.del = t1 + 100
@@ -102,5 +103,5 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     // f.close()
 }
 
-runcell(300., 50.)
+runcell(300., 100.)
 quit()
