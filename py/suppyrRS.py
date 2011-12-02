@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Dec  1 17:38:11 2011 (+0530)
+# Last-Updated: Fri Dec  2 17:45:59 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 777
+#     Update #: 780
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -121,8 +121,7 @@ class SupPyrRS(TraubCell):
         mycell = SupPyrRS(SupPyrRS.prototype, sim.model.path + "/SupPyrRS")
         config.LOGGER.info('Created cell: %s' % (mycell.path))
         vm_table = mycell.soma.insertRecorder('Vm_suppyrrs', 'Vm', sim.data)
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=0.4e-9, firstDelay=50e-3, firstWidth=200e-3)
-
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=0.4e-9, firstDelay=100e-3, firstWidth=200e-3)
         sim.schedule()
         if mycell.has_cycle():
             config.LOGGER.warning("WARNING!! CYCLE PRESENT IN CICRUIT.")
@@ -240,6 +239,8 @@ class SupPyrRSTestCase(unittest.TestCase):
                     channel = moose.HHChannel(chan_id)
                     channame = channel.name
                     gbar = channel.Gbar / comp.sarea()
+                    if level != 0 and comp_num != 1: # compensate for dendritic area doubling for spines
+                        gbar /= 2.0 
                     self.assertAlmostEqual(self.conductance_densities[channame][level], gbar)
                 
     
