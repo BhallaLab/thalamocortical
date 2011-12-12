@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Sep 23 00:18:00 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Dec 12 12:38:23 2011 (+0530)
+# Last-Updated: Mon Dec 12 13:54:03 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 187
+#     Update #: 189
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -41,9 +41,10 @@ class SupLTS(TraubCell):
         'ENa': 50e-3,
         'EK': -100e-3,
         'ECa': 125e-3,
-        'EAR': 0.25, # dummy
+        'EAR': -40e-3, # dummy
         'EGABA': -75e-3, # Sanchez-Vives et al. 1997 
         'TauCa': 20e-3,
+        'X_AR': 0.25
     }
     ca_dep_chans = ['KAHP_SLOWER', 'KC_FAST']
     num_comp = 59
