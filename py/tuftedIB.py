@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 11:44:48 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Dec 12 20:51:03 2011 (+0530)
-#           By: subha
-#     Update #: 173
+# Last-Updated: Mon Dec 12 21:22:33 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 178
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -198,7 +198,8 @@ class TuftedIBTestCase(unittest.TestCase):
         self.conductance_densities['KDR'] = [10.0 * x for x in [450, 170, 75, 0, 0, 120, 75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
         self.conductance_densities['KC'] = [10.0 * x for x in [0, 16, 16, 0.5, 0.5, 16, 16, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1.2, 1.2, 1.2, 1.2, 1.2]]
         self.conductance_densities['KA_IB'] = [10.0 * x for x in [0.6, 20, 8, 0.6, 0.6, 8, 8, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6]]
-        self.conductance_densities['KM'] = [10.0 * x for x in [42, 11.9, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 5.6, 5.6, 5.6, 5.6, 5.6]]
+        # In the paper they have 42 for gKM of axon, but in neuron code it is 30
+        self.conductance_densities['KM'] = [10.0 * x for x in [30, 11.9, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 5.6, 5.6, 5.6, 5.6, 5.6]] 
         self.conductance_densities['K2'] = [10.0 * 0.5] * 20
         self.conductance_densities['KAHP_DP'] = [10.0 * x for x in [0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]]
         self.conductance_densities['CaL'] = [10.0 * x for x in [0, 4, 4, 4, 4, 4, 4, 4, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 1, 1, 1, 2.7, 0.6]]
@@ -272,10 +273,11 @@ class TuftedIBTestCase(unittest.TestCase):
                 for chan_id in moose.context.getWildcardList('%s/#[TYPE=HHChannel]' % (comp.path), True):
                     channel = moose.HHChannel(chan_id)
                     channame = channel.name
+                    print channel.path, level
                     gbar = channel.Gbar / comp.sarea()
                     if level != 0 and comp_num != 1: # compensate for dendritic area doubling for spines
                         gbar /= 2.0 
-                    if channame == 'CaL' and comp_num > 49):
+                    if channame == 'CaL' and comp_num > 49:
                         self.assertAlmostEqual(self.conductance_densities[channame][19], gbar)
                     else:
                         self.assertAlmostEqual(self.conductance_densities[channame][level], gbar)
@@ -286,8 +288,8 @@ from simulation import Simulation
 from subprocess import call
 if __name__ == "__main__":
     # call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_tuftIB.hoc'], cwd='../nrn')
-    TuftedIB.test_single_cell()
-    # unittest.main()
+    # TuftedIB.test_single_cell()
+    unittest.main()
 
 
 
