@@ -88,11 +88,11 @@ proc print_readcell(){ localobj cell,dump_file, strfn, secref, seclist
     dump_file = new File()
     print "Dump file created"
     print "arg ", numarg()
-    strfn.head(secname(), "\\[", tstr)
-    sprint(cellname, "%s", tstr)
-    sprint(tstr, "%s.p", tstr)
-    dump_file.wopen(tstr)
-    print "Opened dump file :", tstr
+    // strfn.head(secname(), "\\[", tstr)
+    // sprint(cellname, "%s", tstr)
+    // sprint(tstr, "%s.p", tstr)
+    dump_file.wopen($s2)
+    print "Opened dump file :", $s2
     seclist = new SectionList()
     seclist.allroots()
     forsec seclist {

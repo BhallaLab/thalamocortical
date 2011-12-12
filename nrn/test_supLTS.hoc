@@ -42,20 +42,7 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     stim1.amp = 0.3
     stim1.del = 50.0//t1
     stim1.dur = 50.0// $1 - $2
-    forsec cell.all{
-	// if (ismembrane("naf2")) { gbar_naf2 = 0.0 }
-        // if (ismembrane("kc_fast")) { gbar_kc_fast = 0.0 }
-	
-	// if (ismembrane("kahp_slower")) { gbar_kahp_slower = 0.0}
-
-        // if (ismembrane("km")) { gbar_km = 0.0 }
-        // if (ismembrane("kdr_fs")) { gbar_kdr_fs = 0.0}
-        // if (ismembrane("ka")) { gbar_ka = 0.0 }
-        // if (ismembrane("k2")) { gbar_k2 = 0.0 }
-	// if (ismembrane("cal")) { gbar_cal = 0.0 }
-        // if (ismembrane("cat_a")) { gbar_cat_a = 0.0 }
-    }
-    print_cell(cell, "suppyrLTS")
+    print_readcell(cell, "SupLTS.p")
     cell.comp[cell.presyn_comp] { print "### V = ", v(0.5) }    
     run()
     f.wopen("mydata/Vm_supLTS.plot")
@@ -69,11 +56,5 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     }
     f.close()
 }
-
-proc finit0(){
-    print "finit0"
-    forsec cell.all { v = -70 }
-}
-
 runcell(200., 50.)
 quit()
