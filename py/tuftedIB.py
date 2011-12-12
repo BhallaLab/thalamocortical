@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 11:44:48 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Oct 27 12:08:25 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 144
+# Last-Updated: Mon Dec 12 20:51:03 2011 (+0530)
+#           By: subha
+#     Update #: 173
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -188,13 +188,106 @@ class TuftedIB(TraubCell):
             config.pylab.legend(loc=0)
             config.pylab.show()
         
-        
+import unittest
+import uuid
+class TuftedIBTestCase(unittest.TestCase):
+    def setUp(self):
+        self.conductance_densities = defaultdict(list)
+        self.conductance_densities['NaF'] = [10.0 * x for x in [450, 200, 75, 15, 15, 150, 75, 15, 15, 15, 15, 15, 15, 15, 15, 3, 3, 3, 3, 3]]
+        self.conductance_densities['NaP'] = [10.0 * x for x in [0, 0.16, 0.06, 0.012, 0.012, 0.12, 0.06, 0.012, 0.012, 0.012, 0.012, 0.012, 0.012, 0.012, 0.012, 0.0024, 0.0024, 0.0024, 0.0024, 0.0024]]
+        self.conductance_densities['KDR'] = [10.0 * x for x in [450, 170, 75, 0, 0, 120, 75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+        self.conductance_densities['KC'] = [10.0 * x for x in [0, 16, 16, 0.5, 0.5, 16, 16, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1.2, 1.2, 1.2, 1.2, 1.2]]
+        self.conductance_densities['KA_IB'] = [10.0 * x for x in [0.6, 20, 8, 0.6, 0.6, 8, 8, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6]]
+        self.conductance_densities['KM'] = [10.0 * x for x in [42, 11.9, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 5.6, 5.6, 5.6, 5.6, 5.6]]
+        self.conductance_densities['K2'] = [10.0 * 0.5] * 20
+        self.conductance_densities['KAHP_DP'] = [10.0 * x for x in [0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]]
+        self.conductance_densities['CaL'] = [10.0 * x for x in [0, 4, 4, 4, 4, 4, 4, 4, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 1, 1, 1, 2.7, 0.6]]
+        self.conductance_densities['CaT'] = [10.0 * x for x in [0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]]
+        self.conductance_densities['AR'] = [10.0 * x for x in [0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.2, 0.2]]
+        self.sim = Simulation('TuftedIB')
+        path = self.sim.model.path + '/TestTuftedIB'
+        config.LOGGER.debug('Creating cell %s' % path)
+        TraubCell.adjust_chanlib(TuftedIB.chan_params)
+        self.cell = TuftedIB(TuftedIB.prototype,  "%s/TuftedIB%d" % (self.sim.model.path, uuid.uuid4().int))
+        config.LOGGER.debug('Cell created')
+        self.sim.schedule()
+
+    
+    def test_compartment_count(self):
+        for comp_no in range(TuftedIB.num_comp):
+            path = '%s/comp_%d' % (self.cell.path, comp_no + 1)
+            self.assertTrue(config.context.exists(path))
+
+    def test_initVm(self):
+        for comp_no in range(TuftedIB.num_comp):
+            self.assertAlmostEqual(self.cell.comp[comp_no + 1].initVm, -70e-3)
+
+    def test_Em(self):
+        for comp_no in range(TuftedIB.num_comp):
+            self.assertAlmostEqual(self.cell.comp[comp_no + 1].Em, -70e-3)
+
+    def test_Ca_connections(self):
+        for comp_no in range(TuftedIB.num_comp):
+            ca_path = self.cell.comp[comp_no + 1].path + '/CaPool'
+            if not config.context.exists(ca_path):
+                config.LOGGER.debug('%s : No CaPool' % (self.cell.comp[comp_no + 1].path))
+                continue
+            caPool = moose.CaConc(ca_path)
+            for chan in TuftedIB.ca_dep_chans:
+                chan_path = self.cell.comp[comp_no + 1].path + '/' + chan
+                if not config.context.exists(chan_path):
+                    continue
+                chan_obj = moose.HHChannel(chan_path)
+                self.assertTrue(len(chan_obj.neighbours('concen')) > 0)
+                
+            sources = caPool.neighbours('current')
+            self.failIfEqual(len(sources), 0)
+            for chan in sources:
+                self.assertTrue(chan.path().endswith('CaL'))
+                    
+    def test_reversal_potentials(self):
+        for num in range(TuftedIB.num_comp):
+            comp = self.cell.comp[num + 1]
+            for chan_id in comp.neighbours('channel'):
+                chan = moose.HHChannel(chan_id)
+                chan_class = eval(chan.name)
+                key = None
+                if issubclass(chan_class, NaChannel):
+                    key = 'ENa'
+                elif issubclass(chan_class, KChannel):
+                    key = 'EK'
+                elif issubclass(chan_class, CaChannel):
+                    key = 'ECa'
+                elif issubclass(chan_class, AR):
+                    key = 'EAR'
+                else:
+                    pass
+                self.assertAlmostEqual(chan.Ek, TuftedIB.chan_params[key])
+
+    def test_conductances(self):
+        for level, comp_nums in self.cell.level.items():
+            for comp_num in comp_nums:
+                comp = self.cell.comp[comp_num]
+                print 'Here'
+                for chan_id in moose.context.getWildcardList('%s/#[TYPE=HHChannel]' % (comp.path), True):
+                    channel = moose.HHChannel(chan_id)
+                    channame = channel.name
+                    gbar = channel.Gbar / comp.sarea()
+                    if level != 0 and comp_num != 1: # compensate for dendritic area doubling for spines
+                        gbar /= 2.0 
+                    if channame == 'CaL' and comp_num > 49):
+                        self.assertAlmostEqual(self.conductance_densities[channame][19], gbar)
+                    else:
+                        self.assertAlmostEqual(self.conductance_densities[channame][level], gbar)
+                    
+                    
 # test main --
 from simulation import Simulation
 from subprocess import call
 if __name__ == "__main__":
     # call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_tuftIB.hoc'], cwd='../nrn')
     TuftedIB.test_single_cell()
+    # unittest.main()
 
 
 
