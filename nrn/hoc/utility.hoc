@@ -123,8 +123,9 @@ proc print_readcell(){ localobj cell,dump_file, strfn, secref, seclist
     dump_file.printf(" * J. Neurophysiol. 93, 2194-2232, 2005\n")
     dump_file.printf(" * Pubmed: http://www.ncbi.nlm.nih.gov/pubmed/15525801?dopt=Abstract\n")
     dump_file.printf(" ***********************************************************************/\n")
-
+    
     dump_file.printf("*cartesian\n*relative\n*asymmetric\n")
+    dump_file.printf("*set_global EREST_ACT %g\n", cell.comp[1].e_pas*1e-3)
     forsec seclist  {
 	    sarea = PI * L * diam * 1e-8 // um^2 to cm^2
 	    xarea = PI * diam * diam * 1e-8 / 4.0
@@ -147,7 +148,7 @@ proc print_readcell(){ localobj cell,dump_file, strfn, secref, seclist
 	    strfn.head(compname, "\\[", compname)
 	    sprint(compname, "%s_%s", compname, comp_index)
 	    //	    print "secname: ", compname, " index: ", comp_index, " parent: ", parent_str
-	    dump_file.printf("*set_compt_param EREST_ACT %g\n", e_pas * 1e-3)
+	    dump_file.printf("*set_compt_param ELEAK %g\n", e_pas * 1e-3)
 	    dump_file.printf("*set_compt_param RM %g\n", 1e-4/g_pas)
 	    dump_file.printf("*set_compt_param CM %g\n", cm * 1e-2)
 	    dump_file.printf("*set_compt_param RA %g\n", Ra * 1e-2)
