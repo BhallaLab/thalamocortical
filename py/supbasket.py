@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Oct  6 16:52:28 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Sep  3 17:03:31 2011 (+0530)
-#           By: subha
-#     Update #: 49
+# Last-Updated: Mon Dec 12 17:05:47 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 51
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -72,7 +72,7 @@ class SupBasket(TraubCell):
     depth = None    
 
     proto_file = 'SupBasket.p'
-    prototype = TraubCell.read_proto(proto_file, 'SupBasket', chan_params)
+    prototype = TraubCell.read_proto(proto_file, 'SupBasket', level_dict=level, depth_dict=depth, params=chan_params)
     def __init__(self, *args):
         # start = datetime.now()
         TraubCell.__init__(self, *args)

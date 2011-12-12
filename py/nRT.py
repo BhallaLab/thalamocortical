@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 15:18:24 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Oct 27 14:13:46 2011 (+0530)
+# Last-Updated: Mon Dec 12 16:42:29 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 84
+#     Update #: 94
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -68,7 +68,7 @@ class nRT(TraubCell):
     level = TraubCell.readlevels('nRT.levels')
     depth = None
     proto_file = 'nRT.p'
-    prototype = TraubCell.read_proto(proto_file, "nRT", chan_params)
+    prototype = TraubCell.read_proto(proto_file, "nRT", level_dict=level, depth_dict=depth, params=chan_params)
     ca_dep_chans = ['KAHP_SLOWER','KC']
 
     def __init__(self, *args):
@@ -119,8 +119,6 @@ class nRT(TraubCell):
 		    if obj_class == 'HHChannel':
 			obj = moose.HHChannel(child)
                         gbar = obj.Gbar
-#                         if not obj.name in nRT.unblocked_chans:
-#                             obj.Gbar = 0.0
 			pyclass = eval(obj.name)
 			if issubclass(pyclass, KChannel):
 			    obj.Ek = -100e-3
@@ -174,15 +172,16 @@ class nRT(TraubCell):
         mycell.dump_cell('nRT.txt')        
         if config.has_pylab:
             mus_vm = config.pylab.array(vm_table) * 1e3
-            mus_t = linspace(0, sim.simtime, len(mus_vm))
+            mus_t = linspace(0, sim.simtime*1e3, len(mus_vm))
             try:
                 nrn_vm = config.pylab.loadtxt('../nrn/mydata/Vm_nRT.plot')
-                print 'Here'
-                nrn_vm = nrn_vm[:, 1]
+                print 'Here', nrn_vm.shape
                 nrn_t = nrn_vm[:, 0]
+                nrn_vm = nrn_vm[:, 1]
                 config.pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
             except IOError:
                 pass
+            print mus_vm.shape, mus_t.shape
             config.pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
             config.pylab.legend()
             config.pylab.show()

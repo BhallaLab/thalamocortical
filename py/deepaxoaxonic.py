@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 11:11:39 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Sep  3 17:04:55 2011 (+0530)
-#           By: subha
-#     Update #: 44
+# Last-Updated: Mon Dec 12 15:12:22 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 45
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -72,7 +72,7 @@ class DeepAxoaxonic(TraubCell):
     depth = None
     
     proto_file = "DeepAxoaxonic.p"
-    prototype = TraubCell.read_proto(proto_file, "DeepAxoaxonic", chan_params)
+    prototype = TraubCell.read_proto(proto_file, "DeepAxoaxonic", level_dict=level, depth_dict=depth, params=chan_params)
     ca_dep_chans = ['KC_FAST']
     def __init__(self, *args):
         TraubCell.__init__(self, *args)

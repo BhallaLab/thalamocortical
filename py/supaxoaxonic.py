@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Oct  6 16:52:28 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Sep  3 17:03:03 2011 (+0530)
-#           By: subha
-#     Update #: 38
+# Last-Updated: Mon Dec 12 17:04:39 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 41
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -65,8 +65,10 @@ class SupAxoaxonic(TraubCell):
     ca_dep_chans = ['KC_FAST']
     num_comp = 59
     presyn = 59
+    depth = None
+    level = TraubCell.readlevels('SupAxoaxonic.levels')
     proto_file = 'SupAxoaxonic.p'
-    prototype = TraubCell.read_proto(proto_file, 'SupAxoaxonic', chan_params)
+    prototype = TraubCell.read_proto(proto_file, 'SupAxoaxonic', level_dict=level, depth_dict=depth, params=chan_params)
     def __init__(self, *args):
         # start = datetime.now()
         TraubCell.__init__(self, *args)
