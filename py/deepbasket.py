@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 14:30:33 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Sep  3 17:05:26 2011 (+0530)
-#           By: subha
-#     Update #: 58
+# Last-Updated: Mon Dec 12 15:14:00 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 59
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -69,7 +69,7 @@ class DeepBasket(TraubCell):
     level = TraubCell.readlevels('DeepBasket.levels')
     depth = None
     proto_file = 'DeepBasket.p'
-    prototype = TraubCell.read_proto(proto_file, "DeepBasket", chan_params)
+    prototype = TraubCell.read_proto(proto_file, "DeepBasket", level_dict=level, depth_dict=depth, params=chan_params)
     def __init__(self, *args):
         TraubCell.__init__(self, *args)
         moose.CaConc(self.soma.path + '/CaPool').tau = 50e-3

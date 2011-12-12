@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Sep 29 11:43:22 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Oct 27 14:15:45 2011 (+0530)
+# Last-Updated: Mon Dec 12 16:39:02 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 530
+#     Update #: 564
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -40,7 +40,7 @@ class SpinyStellate(TraubCell):
         'ENa': 50e-3,
         'EK': -100e-3,
         'EAR': -40e-3,
-        'ECa': 100e-3,
+        'ECa': 125e-3,
         'EGABA': -75e-3, # Sanchez-Vives et al. 1997 
         'TauCa': 20e-3,
         'X_AR': 0.0
@@ -96,13 +96,6 @@ class SpinyStellate(TraubCell):
             handler.flush()
 
 
-        mycell.soma.x0 = 0.0
-        mycell.soma.y0 = 0.0
-        mycell.soma.z0 = 0.0
-        mycell.soma.x = 0.0
-        mycell.soma.y = 0.0
-        mycell.soma.z = mycell.soma.length
-        # mycellview = MyCellView(mycell)
         config.LOGGER.debug('Created cell: %s' % (mycell.path))
         # for neighbour in mycell.soma.neighbours('raxial'):
         #     print 'RAXIAL', neighbours.path()
@@ -128,7 +121,7 @@ class SpinyStellate(TraubCell):
         # mycell.dump_cell('spinstell.txt')
         if config.has_pylab:
             mus_vm = config.pylab.array(vm_table) * 1e3
-            mus_t = linspace(0, sim.simtime, len(mus_vm))
+            mus_t = linspace(0, sim.simtime*1e3, len(mus_vm))
             config.pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
             try:
                 nrn_vm = config.pylab.loadtxt('../nrn/mydata/Vm_spinstell.plot')
@@ -142,6 +135,95 @@ class SpinyStellate(TraubCell):
             config.pylab.show()
 
         
+import unittest
+import uuid
+class SpinyStellateTestCase(unittest.TestCase):
+    def setUp(self):
+        self.conductance_densities = defaultdict(list)
+        self.conductance_densities['NaF2'] = [10.0 * x for x in [400, 150, 75, 75, 5, 5, 5, 5, 5, 5]]
+        self.conductance_densities['NaPF_SS'] = [10.0 * x for x in [0.4, 0.15, 0.075, 0.075, 0.005, 0.005, 0.005, 0.005, 0.005, 0.005]]
+        self.conductance_densities['KDR_FS'] = [10.0 * x for x in [400, 100, 75, 75, 0, 0, 0, 0, 0, 0]]
+        self.conductance_densities['KC_FAST'] = [10.0 * x for x in [0, 10, 10, 10, 10, 0, 0, 0, 0, 0]]
+        self.conductance_densities['KA'] = [10.0 * x for x in [2, 30, 30, 2, 2, 2, 2, 2, 2, 2]]
+        self.conductance_densities['KM'] = [10.0 * x for x in [0, 3.75, 3.75,  3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75]]
+        self.conductance_densities['K2'] = [10.0 * 0.1] * 10
+        self.conductance_densities['KAHP_SLOWER'] = [10.0 * x for x in [0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]]
+        self.conductance_densities['CaL'] = [10.0 * x for x in [0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 3, 3, 3]]
+        self.conductance_densities['CaT_A'] = [10.0 * x for x in [0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]]
+        self.conductance_densities['AR'] = [10.0 * x for x in [0, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]]
+        self.sim = Simulation('SpinyStellate')
+        path = self.sim.model.path + '/TestSpinyStellate'
+        config.LOGGER.debug('Creating cell %s' % path)
+        TraubCell.adjust_chanlib(SpinyStellate.chan_params)
+        self.cell = SpinyStellate(SpinyStellate.prototype,  "%s/SpinyStellate%d" % (self.sim.model.path, uuid.uuid4().int))
+        config.LOGGER.debug('Cell created')
+        self.sim.schedule()
+
+    
+    def test_compartment_count(self):
+        for comp_no in range(SpinyStellate.num_comp):
+            path = '%s/comp_%d' % (self.cell.path, comp_no + 1)
+            self.assertTrue(config.context.exists(path))
+
+    def test_initVm(self):
+        for comp_no in range(SpinyStellate.num_comp):
+            self.assertAlmostEqual(self.cell.comp[comp_no + 1].initVm, -65e-3)
+
+    def test_Em(self):
+        for comp_no in range(SpinyStellate.num_comp):
+            self.assertAlmostEqual(self.cell.comp[comp_no + 1].Em, -65e-3)
+
+    def test_Ca_connections(self):
+        for comp_no in range(SpinyStellate.num_comp):
+            ca_path = self.cell.comp[comp_no + 1].path + '/CaPool'
+            if not config.context.exists(ca_path):
+                config.LOGGER.debug('%s : No CaPool' % (self.cell.comp[comp_no + 1].path))
+                continue
+            caPool = moose.CaConc(ca_path)
+            for chan in SpinyStellate.ca_dep_chans:
+                chan_path = self.cell.comp[comp_no + 1].path + '/' + chan
+                if not config.context.exists(chan_path):
+                    continue
+                chan_obj = moose.HHChannel(chan_path)
+                self.assertTrue(len(chan_obj.neighbours('concen')) > 0)
+                
+            sources = caPool.neighbours('current')
+            self.failIfEqual(len(sources), 0)
+            for chan in sources:
+                self.assertTrue(chan.path().endswith('CaL'))
+                    
+    def test_reversal_potentials(self):
+        for num in range(SpinyStellate.num_comp):
+            comp = self.cell.comp[num + 1]
+            for chan_id in comp.neighbours('channel'):
+                chan = moose.HHChannel(chan_id)
+                chan_class = eval(chan.name)
+                key = None
+                if issubclass(chan_class, NaChannel):
+                    key = 'ENa'
+                elif issubclass(chan_class, KChannel):
+                    key = 'EK'
+                elif issubclass(chan_class, CaChannel):
+                    key = 'ECa'
+                elif issubclass(chan_class, AR):
+                    key = 'EAR'
+                else:
+                    pass
+                self.assertAlmostEqual(chan.Ek, SpinyStellate.chan_params[key])
+
+    def test_conductances(self):
+        for level, comp_nums in self.cell.level.items():
+            for comp_num in comp_nums:
+                comp = self.cell.comp[comp_num]
+                print 'Here'
+                for chan_id in moose.context.getWildcardList('%s/#[TYPE=HHChannel]' % (comp.path), True):
+                    print chan_id.path()
+                    channel = moose.HHChannel(chan_id)
+                    channame = channel.name
+                    gbar = channel.Gbar / comp.sarea()
+                    if level != 0 and comp_num != 1: # compensate for dendritic area doubling for spines
+                        gbar /= 2.0
+                    self.assertAlmostEqual(self.conductance_densities[channame][level], gbar)
 
 # test main --
 from simulation import Simulation
