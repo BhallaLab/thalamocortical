@@ -55,16 +55,16 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     // stim2.amp = 0.3e3
     // stim2.del = t1 + 100
     // stim2.dur = 10.0// $1 - $2
-    forsec cell.all{
+    // forsec cell.all{
         // if (ismembrane("naf2")) { gbar_naf2 = 0.0 }
         // if (ismembrane("kc_fast")) { gbar_kc_fast = 0.0 }
 	
         // if (ismembrane("kdr_fs")) { gbar_kdr_fs = 0.0}
         // if (ismembrane("ka")) { gbar_ka = 0.0 }
         // if (ismembrane("cal")) { gbar_cal = 0.0 }
-    }
+    // }
     // print_cell(cell, "deepbask")
-    // print_readcell(cell, "suppyrRS.p")
+    print_readcell(cell, "DeepBasket.p")
     // g = new File()
     // g.wopen("mydata/Ca_suppyrrs.plot")
     // f.wopen("mydata/Vm_suppyrrs.plot")
