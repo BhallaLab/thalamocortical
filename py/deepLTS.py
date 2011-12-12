@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 19:32:34 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Dec 12 11:31:57 2011 (+0530)
+# Last-Updated: Mon Dec 12 15:06:20 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 47
+#     Update #: 50
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -66,8 +66,13 @@ class DeepLTS(TraubCell):
     ca_dep_chans = ['KAHP_SLOWER', 'KC_FAST']
     num_comp = 59
     presyn = 59
+    # level maps level number to the set of compartments belonging to it
+    level = TraubCell.readlevels("DeepLTS.levels")
+    # depth stores a map between level number and the depth of the compartments.
+    depth = None    
+
     proto_file = 'DeepLTS.p'
-    prototype = TraubCell.read_proto(proto_file, "DeepLTS", chan_params)
+    prototype = TraubCell.read_proto(proto_file, "DeepLTS", level_dict=level, depth_dict=depth, params=chan_params)
     def __init__(self, *args):
         TraubCell.__init__(self, *args)
         moose.CaConc(self.soma.path + '/CaPool').tau = 50e-3
