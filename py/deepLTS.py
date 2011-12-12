@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 19:32:34 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Oct 21 16:28:00 2011 (+0530)
+# Last-Updated: Mon Dec 12 11:31:57 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 46
+#     Update #: 47
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -119,7 +119,6 @@ class DeepLTS(TraubCell):
         config.LOGGER.debug(('Created cell: %s' % mycell.path))
         vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_deepLTS', 'Vm', sim.data)
         pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=50e-3, firstWidth=50e-3)
-#         pulsegen1 = mycell.soma.insertPulseGen('pulsegen1', sim.model, firstLevel=3e-7, firstDelay=150e-3, firstWidth=10e-3)
 
         sim.schedule()
         if mycell.has_cycle():

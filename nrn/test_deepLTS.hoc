@@ -64,7 +64,7 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
         // if (ismembrane("cal")) { gbar_cal = 0.0 }
     // }
     // print_cell(cell, "deepLTS")
-    // print_readcell(cell, "suppyrRS.p")
+    print_readcell(cell, "DeepLTS.p")
     // g = new File()
     // g.wopen("mydata/Ca_suppyrrs.plot")
     // f.wopen("mydata/Vm_suppyrrs.plot")

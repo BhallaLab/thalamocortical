@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Sep 23 00:18:00 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Sep  3 17:01:46 2011 (+0530)
-#           By: subha
-#     Update #: 138
+# Last-Updated: Mon Dec 12 12:38:23 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 187
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -40,11 +40,10 @@ class SupLTS(TraubCell):
     chan_params = {
         'ENa': 50e-3,
         'EK': -100e-3,
-        'EAR': -40e-3,
         'ECa': 125e-3,
+        'EAR': 0.25, # dummy
         'EGABA': -75e-3, # Sanchez-Vives et al. 1997 
         'TauCa': 20e-3,
-        'X_AR': 0.25
     }
     ca_dep_chans = ['KAHP_SLOWER', 'KC_FAST']
     num_comp = 59
@@ -54,7 +53,7 @@ class SupLTS(TraubCell):
     # depth stores a map between level number and the depth of the compartments.
     depth = None    
     proto_file = 'SupLTS.p'
-    prototype = TraubCell.read_proto(proto_file, "SupLTS", chan_params)
+    prototype = TraubCell.read_proto(proto_file, "SupLTS", level_dict=level, depth_dict=depth, params=chan_params)
     def __init__(self, *args):
         # start = datetime.now()
         TraubCell.__init__(self, *args)
@@ -194,16 +193,7 @@ class SupLTS(TraubCell):
             ca_table = moose.Table('Ca_supLTS', sim.data)
             ca_table.stepMode = 3
             ca_conc.connect('Ca', ca_table, 'inputRequest')
-        kc_path = mycell.soma.path + '/KC'
-        gk_table = None
-        if config.context.exists(kc_path):
-            gk_table = moose.Table('gkc', sim.data)
-            gk_table.stepMode = 3
-            kc = moose.HHChannel(kc_path)
-            kc.connect('Gk', gk_table, 'inputRequest')
-            pymoose.showmsg(ca_conc)
         pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=50e-3, firstWidth=50e-3)
-
         sim.schedule()
         if mycell.has_cycle():
             print "WARNING!! CYCLE PRESENT IN CICRUIT."
@@ -216,7 +206,7 @@ class SupLTS(TraubCell):
         mycell.dump_cell('supLTS.txt')
         if config.has_pylab:
             mus_vm = config.pylab.array(vm_table) * 1e3
-            nrn_vm = config.pylab.loadtxt('../nrn/mydata/Vm_supLTS.plot.gz')
+            nrn_vm = config.pylab.loadtxt('../nrn/mydata/Vm_supLTS.plot')
             nrn_t = nrn_vm[:, 0]
             mus_t = linspace(0, sim.simtime*1e3, len(mus_vm))
             nrn_vm = nrn_vm[:, 1]
@@ -231,14 +221,27 @@ class SupLTS(TraubCell):
 
 
 import unittest
+import uuid
 
 class SupLTSTestCase(unittest.TestCase):
     def setUp(self):
+        self.conductance_densities = defaultdict(list)
+        self.conductance_densities['NaF2'] = [10.0 * x for x in [400, 60, 60, 60, 10, 10, 10, 10, 10, 10]]
+        
+        self.conductance_densities['KDR_FS'] = [10.0 * x for x in [400, 100, 100, 100, 10, 10, 10, 10, 10, 10]]
+        self.conductance_densities['KC_FAST'] = [10.0 * x for x in [0, 25, 25, 25, 25, 25, 25, 25, 25, 25]]
+        self.conductance_densities['KA'] = [10.0 * 1] * 10
+        self.conductance_densities['KM'] = [10 * x for x in [0.0, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]]
+        self.conductance_densities['K2'] = [10.0 * 0.5] * 10
+        self.conductance_densities['KAHP_SLOWER'] = [10.0 * x for x in [0.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]]
+        self.conductance_densities['CaT_A'] = [10.0 * x for x in [0.0, 0.05, 0.05, 0.05, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0]]
+        self.conductance_densities['CaL'] = [10.0 * x for x in [0.0, 0.1, 0.1, 0.1, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]]
+
         self.sim = Simulation('SupLTS')
         path = self.sim.model.path + '/' + 'TestSupLTS'
         config.LOGGER.debug('Creating cell %s' % (path))
         TraubCell.adjust_chanlib(SupLTS.chan_params)
-        self.cell = SupLTS(path, SupLTS.proto_file)
+        self.cell = SupLTS(SupLTS.prototype, '%s/SupLTS%d' % (self.sim.model.path, uuid.uuid4().int))
         config.LOGGER.debug('Cell created')
         for handler in config.LOGGER.handlers:
             handler.flush()
@@ -293,7 +296,18 @@ class SupLTSTestCase(unittest.TestCase):
                     pass
                 self.assertAlmostEqual(chan.Ek, SupLTS.chan_params[key])
                     
-        
+    def test_conductances(self):
+        for level, comp_nums in self.cell.level.items():
+            for comp_num in comp_nums:
+                comp = self.cell.comp[comp_num]
+                print 'Here'
+                for chan_id in moose.context.getWildcardList('%s/#[TYPE=HHChannel]' % (comp.path), True):
+                    print chan_id.path()
+                    channel = moose.HHChannel(chan_id)
+                    channame = channel.name
+                    gbar = channel.Gbar / comp.sarea()
+                self.assertAlmostEqual(self.conductance_densities[channame][level], gbar)
+                        
         
 # test main --
 from simulation import Simulation
