@@ -901,7 +901,7 @@ func type() {return       12 }
        insert kdr
        gbar_kdr =   0.4
        insert ka
-       gbar_ka =   0.001
+       gbar_ka =   0.005
        insert k2
        gbar_k2 =   0.0005
  }
@@ -1042,7 +1042,7 @@ func type() {return       12 }
  // (the area is doubled but the volume is const.)
  proc double_dend_cond() {
      print "double_dend_cond() ..."
-   spine_area_multiplier = 2
+   spine_area_multiplier = 1
    forsec Dendrites {
         if (ismembrane("napf_tcr")) { gbar_napf_tcr *= spine_area_multiplier }
         if (ismembrane("napf_tcrf")) { gbar_napf_tcrf *= spine_area_multiplier }

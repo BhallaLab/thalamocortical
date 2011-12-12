@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Aug  7 13:59:30 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Dec  2 18:03:03 2011 (+0530)
-#           By: subha
-#     Update #: 784
+# Last-Updated: Mon Dec 12 16:24:43 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 790
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -132,13 +132,16 @@ class SupPyrRS(TraubCell):
         config.BENCHMARK_LOGGER.info('simulation time: %g' % (delta.seconds + 1e-6 * delta.microseconds))
         if config.has_pylab:
             mus_vm = config.pylab.array(vm_table) * 1e3
-            # nrn_vm = config.pylab.loadtxt('../nrn/mydata/Vm_suppyrrs.plot')
-            # nrn_t = nrn_vm[:, 0]
-            mus_t = linspace(0, sim.simtime, len(mus_vm))
-            # nrn_vm = nrn_vm[:, 1]
-            # nrn_ca = config.pylab.loadtxt('../nrn/mydata/Ca_suppyrrs.plot')
-            # nrn_ca = nrn_ca[:,1]
-            # config.pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
+            mus_t = linspace(0, sim.simtime*1e3, len(mus_vm))
+            try:
+                nrn_vm = config.pylab.loadtxt('../nrn/mydata/Vm_suppyrrs.plot')
+                nrn_t = nrn_vm[:, 0]
+                nrn_vm = nrn_vm[:, 1]
+                # nrn_ca = config.pylab.loadtxt('../nrn/mydata/Ca_suppyrrs.plot')
+                # nrn_ca = nrn_ca[:,1]
+                config.pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
+            except IOError:
+                pass
             data = config.pylab.zeros((len(mus_vm), 2))
             data[:, 0] = mus_t[:]
             data[:, 1] = mus_vm[:]
