@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 11:44:48 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Dec 12 21:22:33 2011 (+0530)
+# Last-Updated: Tue Dec 13 11:04:22 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 178
+#     Update #: 193
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -202,7 +202,7 @@ class TuftedIBTestCase(unittest.TestCase):
         self.conductance_densities['KM'] = [10.0 * x for x in [30, 11.9, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 19.04, 5.6, 5.6, 5.6, 5.6, 5.6]] 
         self.conductance_densities['K2'] = [10.0 * 0.5] * 20
         self.conductance_densities['KAHP_DP'] = [10.0 * x for x in [0, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]]
-        self.conductance_densities['CaL'] = [10.0 * x for x in [0, 4, 4, 4, 4, 4, 4, 4, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5, 1, 1, 1, 2.7, 0.6]]
+        self.conductance_densities['CaL'] = [10.0 * x for x in [0, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.6]]
         self.conductance_densities['CaT'] = [10.0 * x for x in [0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]]
         self.conductance_densities['AR'] = [10.0 * x for x in [0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.2, 0.2]]
         self.sim = Simulation('TuftedIB')
@@ -277,8 +277,13 @@ class TuftedIBTestCase(unittest.TestCase):
                     gbar = channel.Gbar / comp.sarea()
                     if level != 0 and comp_num != 1: # compensate for dendritic area doubling for spines
                         gbar /= 2.0 
-                    if channame == 'CaL' and comp_num > 49:
-                        self.assertAlmostEqual(self.conductance_densities[channame][19], gbar)
+                    if channame == 'CaL':
+                        if comp_num > 47 and comp_num < 50:
+                            self.assertAlmostEqual(self.conductance_densities[channame][level] * 4.5, gbar)
+                        elif comp_num >= 38 and comp_num <= 44:
+                            self.assertAlmostEqual(self.conductance_densities[channame][level] * 2.0, gbar)
+                        else:
+                            self.assertAlmostEqual(self.conductance_densities[channame][level], gbar)                            
                     else:
                         self.assertAlmostEqual(self.conductance_densities[channame][level], gbar)
                     
