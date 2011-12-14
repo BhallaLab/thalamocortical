@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 13:42:14 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Dec 13 22:09:46 2011 (+0530)
+# Last-Updated: Wed Dec 14 11:08:54 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 66
+#     Update #: 68
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -168,6 +168,7 @@ class TuftedRS(TraubCell):
     #             config.pylab.plot(mus_t, -ca_array, 'b-.', label='mus (-)ca')
     #             print config.pylab.amax(ca_table)
             config.pylab.legend()
+            config.pylab.title('tuftedRS')
             config.pylab.show()
         
 import unittest
