@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 23:58:13 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Dec 12 17:57:43 2011 (+0530)
+# Last-Updated: Wed Dec 14 10:49:31 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 159
+#     Update #: 165
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -109,10 +109,6 @@ class NaF2(NaChannel):
         self.xGate.tweakTau()
         self.yGate.tweakTau()
         self.X = 0.0
-        self.xGate.A.dumpFile('naf2_xa.plot')
-        self.xGate.B.dumpFile('naf2_xb.plot')
-        self.yGate.A.dumpFile('naf2_ya.plot')
-        self.yGate.B.dumpFile('naf2_yb.plot')
 
 class NaF2_nRT(NaF2):
     """This is a version of NaF2 without the fastNa_shift - applicable to nRT cell."""
@@ -162,8 +158,6 @@ class NaPF_SS(NaChannel):
             NaChannel.__init__(self, name, parent, xpower=3.0, Ek=Ek)
             return
         NaChannel.__init__(self, name, parent, xpower=3.0, Ek=Ek)
-        if shift is None:
-            shift = -2.5e-3
         config.LOGGER.debug('NaPF_SS: shift = %g' % (shift))
         v = linspace(config.vmin, config.vmax, config.ndivs + 1) + shift
         tau_m = where(v < -30e-3, \

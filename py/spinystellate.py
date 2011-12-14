@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Sep 29 11:43:22 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Dec 12 16:39:02 2011 (+0530)
+# Last-Updated: Wed Dec 14 10:40:46 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 564
+#     Update #: 579
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -39,7 +39,7 @@ class SpinyStellate(TraubCell):
     chan_params = {
         'ENa': 50e-3,
         'EK': -100e-3,
-        'EAR': -40e-3,
+        'EAR': -40e-3, # increasing EAR brings the spikes earlier, -37.5 gives an exact match with NEURON model.
         'ECa': 125e-3,
         'EGABA': -75e-3, # Sanchez-Vives et al. 1997 
         'TauCa': 20e-3,
@@ -54,12 +54,8 @@ class SpinyStellate(TraubCell):
     prototype = TraubCell.read_proto("SpinyStellate.p", "SpinyStellate", level_dict=level, depth_dict=depth, params=chan_params)
     def __init__(self, *args):
         # start = datetime.now()
-        # for arg in args: print arg
         TraubCell.__init__(self, *args)
-        # print 'TraubCell.__init__ passed'
-        # print 'Soma:', self.soma.path
         soma_ca_pool = moose.CaConc(self.soma.path + '/CaPool')
-        # print 'CaPool generated'
         soma_ca_pool.tau = 50e-3
         # end = datetime.now()
         # delta = end - start
@@ -141,6 +137,9 @@ class SpinyStellateTestCase(unittest.TestCase):
     def setUp(self):
         self.conductance_densities = defaultdict(list)
         self.conductance_densities['NaF2'] = [10.0 * x for x in [400, 150, 75, 75, 5, 5, 5, 5, 5, 5]]
+        # Strange: the paper says 400 mS/cm^2 density of NaP in level
+        # 0 in table A3, but in NEURON code it does not exist for
+        # level 0.
         self.conductance_densities['NaPF_SS'] = [10.0 * x for x in [0.4, 0.15, 0.075, 0.075, 0.005, 0.005, 0.005, 0.005, 0.005, 0.005]]
         self.conductance_densities['KDR_FS'] = [10.0 * x for x in [400, 100, 75, 75, 0, 0, 0, 0, 0, 0]]
         self.conductance_densities['KC_FAST'] = [10.0 * x for x in [0, 10, 10, 10, 10, 0, 0, 0, 0, 0]]
@@ -215,7 +214,6 @@ class SpinyStellateTestCase(unittest.TestCase):
         for level, comp_nums in self.cell.level.items():
             for comp_num in comp_nums:
                 comp = self.cell.comp[comp_num]
-                print 'Here'
                 for chan_id in moose.context.getWildcardList('%s/#[TYPE=HHChannel]' % (comp.path), True):
                     print chan_id.path()
                     channel = moose.HHChannel(chan_id)
