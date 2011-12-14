@@ -44,7 +44,7 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     stim1.amp = 0.3
     stim1.del = 50.0//t1
     stim1.dur = 50.0// $1 - $2
-    forsec cell.all{
+    // forsec cell.all{
 	// if (ismembrane("nap")) { gbar_nap = 0.0 }
         // if (ismembrane("naf")) { gbar_naf = 0.0 }
         // if (ismembrane("kc")) { gbar_kc = 0.0 }
@@ -57,9 +57,8 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
 	// if (ismembrane("cal")) { gbar_cal = 0.0 }
         // if (ismembrane("cat")) { gbar_cat = 0.0 }
         // if (ismembrane("ar")) { gbar_ar = 0.0 }
-    }
-    print_cell(cell, "suppyrFRB")
-    // print_readcell(cell, "suppyrRS.p")
+    // }
+    print_readcell(cell, "SupPyrFRB.p")
     cell.comp[cell.presyn_comp] { print "### V = ", v(0.5) }    
     run()
     f.wopen("mydata/Vm_suppyrFRB.plot")

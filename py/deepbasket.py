@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 14:30:33 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Dec 12 15:14:00 2011 (+0530)
+# Last-Updated: Wed Dec 14 11:04:21 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 59
+#     Update #: 60
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -203,6 +203,7 @@ class DeepBasket(TraubCell):
     #             config.pylab.plot(mus_t, -ca_array, 'b-.', label='mus (-)ca')
     #             print config.pylab.amax(ca_table)
             config.pylab.legend()
+            config.pylab.title('DeepBasket')
             config.pylab.show()
         
         

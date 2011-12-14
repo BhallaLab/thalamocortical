@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 10:14:07 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Dec 12 19:50:20 2011 (+0530)
+# Last-Updated: Wed Dec 14 11:08:03 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 86
+#     Update #: 87
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -175,6 +175,7 @@ class TCR(TraubCell):
             mus_t = linspace(0, sim.simtime*1e3, len(mus_vm))
             config.pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
             config.pylab.legend()
+            config.pylab.title('TCR')
             config.pylab.show()
 import unittest
 import uuid

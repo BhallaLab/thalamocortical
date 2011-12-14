@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Sep 29 11:43:22 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Dec 14 10:40:46 2011 (+0530)
+# Last-Updated: Wed Dec 14 11:05:53 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 579
+#     Update #: 580
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -128,6 +128,7 @@ class SpinyStellate(TraubCell):
             except IOError:
                 pass
             config.pylab.legend(loc=0)
+            config.pylab.title('spinystellate')
             config.pylab.show()
 
         

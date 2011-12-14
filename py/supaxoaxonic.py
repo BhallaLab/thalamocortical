@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Oct  6 16:52:28 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Dec 12 17:04:39 2011 (+0530)
+# Last-Updated: Wed Dec 14 11:06:14 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 41
+#     Update #: 42
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -130,6 +130,7 @@ class SupAxoaxonic(TraubCell):
     #             config.pylab.plot(mus_t, -ca_array, 'b-.', label='mus (-)ca')
     #             print config.pylab.amax(ca_table)
             config.pylab.legend()
+            config.pylab.title('supaxoaxonic')
             config.pylab.show()
         
         
