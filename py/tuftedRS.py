@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 13:42:14 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Dec 13 20:56:40 2011 (+0530)
+# Last-Updated: Tue Dec 13 22:09:46 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 65
+#     Update #: 66
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -268,8 +268,8 @@ from simulation import Simulation
 from subprocess import call
 if __name__ == "__main__":
     # call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_tuftRS.hoc'], cwd='../nrn')
-    # TuftedRS.test_single_cell()
-    unittest.main()
+    TuftedRS.test_single_cell()
+    # unittest.main()
 
 
 
