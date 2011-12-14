@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 19:32:34 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Dec 12 15:06:20 2011 (+0530)
+# Last-Updated: Wed Dec 14 11:04:45 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 50
+#     Update #: 52
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -144,6 +144,7 @@ class DeepLTS(TraubCell):
                 print 'NEURON Data not available.'
             config.pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
             config.pylab.legend()
+            config.pylab.title('DeepLTS')
             config.pylab.show()
 
         

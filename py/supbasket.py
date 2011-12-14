@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Oct  6 16:52:28 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Dec 12 17:05:47 2011 (+0530)
+# Last-Updated: Wed Dec 14 11:06:39 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 51
+#     Update #: 52
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -133,6 +133,7 @@ class SupBasket(TraubCell):
     #             config.pylab.plot(mus_t, -ca_array, 'b-.', label='mus (-)ca')
     #             print config.pylab.amax(ca_table)
             config.pylab.legend()
+            config.pylab.title('supbasket')
             config.pylab.show()
         
         

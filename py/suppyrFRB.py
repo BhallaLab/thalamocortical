@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Sep 21 01:45:00 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Sep  3 17:01:02 2011 (+0530)
-#           By: subha
-#     Update #: 141
+# Last-Updated: Wed Dec 14 11:07:21 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 142
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -201,6 +201,7 @@ class SupPyrFRB(TraubCell):
     #             config.pylab.plot(mus_t, -ca_array, 'b-.', label='mus (-)ca')
     #             print config.pylab.amax(ca_table)
             config.pylab.legend()
+            config.pylab.title('suppyrFRB')
             config.pylab.show()
         
         

@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 11:34:27 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Sep  3 17:06:00 2011 (+0530)
-#           By: subha
-#     Update #: 35
+# Last-Updated: Wed Dec 14 11:05:05 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 36
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -133,6 +133,7 @@ class NontuftedRS(TraubCell):
             config.pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
             config.pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
             config.pylab.legend()
+            config.pylab.title('nontuftedRS')
             config.pylab.show()
         
         

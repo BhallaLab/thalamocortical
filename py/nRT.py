@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 15:18:24 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Dec 12 16:42:29 2011 (+0530)
+# Last-Updated: Wed Dec 14 11:05:23 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 94
+#     Update #: 95
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -184,6 +184,7 @@ class nRT(TraubCell):
             print mus_vm.shape, mus_t.shape
             config.pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
             config.pylab.legend()
+            config.pylab.title('nRT')
             config.pylab.show()
         
         

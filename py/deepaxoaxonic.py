@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 11:11:39 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Dec 12 15:12:22 2011 (+0530)
+# Last-Updated: Wed Dec 14 11:46:20 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 45
+#     Update #: 47
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -145,6 +145,7 @@ class DeepAxoaxonic(TraubCell):
     #             config.pylab.plot(mus_t, -ca_array, 'b-.', label='mus (-)ca')
     #             print config.pylab.amax(ca_table)
             config.pylab.legend()
+            config.pylab.title('DeepAxoaxonic')
             config.pylab.show()
         
         

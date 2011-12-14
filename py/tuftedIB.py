@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 11:44:48 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Dec 13 11:04:22 2011 (+0530)
+# Last-Updated: Wed Dec 14 11:08:33 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 193
+#     Update #: 195
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -186,6 +186,7 @@ class TuftedIB(TraubCell):
     #             config.pylab.plot(mus_t, -ca_array, 'b-.', label='mus (-)ca')
     #             print config.pylab.amax(ca_table)
             config.pylab.legend(loc=0)
+            config.pylab.title('tuftedIB')
             config.pylab.show()
         
 import unittest
@@ -293,8 +294,8 @@ from simulation import Simulation
 from subprocess import call
 if __name__ == "__main__":
     # call(['/home/subha/neuron/nrn/x86_64/bin/nrngui', 'test_tuftIB.hoc'], cwd='../nrn')
-    # TuftedIB.test_single_cell()
-    unittest.main()
+    TuftedIB.test_single_cell()
+    # unittest.main()
 
 
 

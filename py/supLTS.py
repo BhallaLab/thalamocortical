@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Sep 23 00:18:00 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Dec 12 13:54:03 2011 (+0530)
+# Last-Updated: Wed Dec 14 11:07:02 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 189
+#     Update #: 190
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -218,6 +218,7 @@ class SupLTS(TraubCell):
             config.pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
             config.pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
             config.pylab.legend()
+            config.pylab.title('supLTS')
             config.pylab.show()
 
 
