@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Dec 23 10:53:17 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 2379
+# Last-Updated: Fri Dec 23 12:03:09 2011 (+0530)
+#           By: subha
+#     Update #: 2380
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1225,7 +1225,8 @@ class TraubNet(object):
                 print stim.path(), 'Stimulus to', neighbour.path()
                 if moose.Neutral(neighbour).className == 'Compartment':
                     targets.append([stim.path(), neighbour.path()])
-        dataset = stimulus_struct.create_dataset('connection', data=numpy.rec.array(targets))
+        if targets:
+            dataset = stimulus_struct.create_dataset('connection', data=numpy.rec.array(targets))
         
         h5file.close()
         config.LOGGER.debug('END: save_cell_network')
