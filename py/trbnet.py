@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Nov 30 11:31:21 2011 (+0530)
-#           By: subha
-#     Update #: 2247
+# Last-Updated: Wed Dec 21 17:31:04 2011 (+0530)
+#           By: Subhasis Ray
+#     Update #: 2372
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -94,6 +94,7 @@ import pymoose
 from trbnetdata import TraubFullNetData
 
 # The cell classes
+from cell import TraubCell
 from spinystellate import SpinyStellate
 from suppyrRS import SupPyrRS
 from suppyrFRB import SupPyrFRB
@@ -732,8 +733,8 @@ class TraubNet(object):
                 cell.soma.insertRecorder(cell.name, 'Vm', vm_container)
                 cell.soma.insertCaRecorder(cell.name, ca_container)
         
-    def setup_stimulus(self, bg_celltype='any', 
-                       probe_celltype='any',
+    def setup_stimulus(self, bg_cells='any', 
+                       probe_cells='any',
                        stim_onset=1.0, 
                        bg_interval=0.5, 
                        pulse_width=60e-6, 
@@ -741,7 +742,8 @@ class TraubNet(object):
                        level=5e-12, 
                        bg_count=100, 
                        probe_count=10, 
-                       stim_container='/stim'):
+                       stim_container='/stim',
+                       data_container='/data'):
         """Setup the stimulus protocol.
 
         The protocol is as follows:
@@ -764,14 +766,17 @@ class TraubNet(object):
         generator. probe_trigger will trigger the probe pulse
         generator.
 
-        stim_container -- container object for stimulating-electrodes
-
-        celltype -- type of cells we are looking at
+        bg_cells -- type of cells we are using as background or an
+        explicit list of cells
+        
+        probe_cells -- type of cells we are looking at, or an explicit
+        list of cells
 
         stim_onset -- when we consider the system stabilized and start
         stimulus
 
-        bg_interval -- interval between two stimulus sessions
+        bg_interval -- interval between two background stimulus
+        sessions. probe stimulus will be applied at half the rate.
 
         pulse_width -- width of background pulses
 
@@ -784,6 +789,9 @@ class TraubNet(object):
         bg_count -- number of cells stimulated by background pulse.
 
         probe_count -- number of cells to be probed.
+
+        stim_container -- container object for stimulating-electrodes
+
 
         """
         if  isinstance(stim_container, str):
@@ -816,38 +824,84 @@ class TraubNet(object):
         self.stim_probe.trigMode = moose.EXT_GATE
         self.stim_gate.connect('outputSrc', self.stim_bg, 'input')
         self.stim_gate.connect('outputSrc', self.stim_probe, 'input')
+        stim_data_container = moose.Neutral('stimulus', data_container)
+        bg_table = moose.Table(self.stim_bg.name, stim_data_container)
+        bg_table.stepMode = 3
+        bg_table.connect('inputRequest', self.stim_bg, 'output')
+        probe_table = moose.Table(self.stim_probe.name, stim_data_container)
+        probe_table.stepMode = 3
+        probe_table.connect('inputRequest', self.stim_probe, 'output')
+        
         bg_cell_indices = []
+        if isinstance(bg_cells, str):
+            if bg_cells == 'any':
+                bg_cell_indices = numpy.random.shuffle(arange(len(self.index_cell_map.keys())))
+                bg_cell_indices = bg_cell_indices[:bg_count]
+            else:
+                celltype_vertex_set = self.celltype_graph.vs.select(label_eq=bg_cells)
+                for vertex in celltype_vertex_set:
+                    startindex = int(vertex['startindex'])
+                    count = int(vertex['count'])
+                    print vertex['label'], startindex, count
+                    indices = numpy.arange(startindex, startindex+count)
+                    numpy.random.shuffle(indices)
+                    print indices
+                    bg_cell_indices = numpy.concatenate((bg_cell_indices, indices[:bg_count]))
+        
         probe_cell_indices = []
-        if bg_celltype == 'any':
-            bg_cell_indices = numpy.random.randint(low=0, high=len(self.index_cell_map.keys()), size=bg_count)
+        if isinstance(probe_cells, str):
+            if probe_cells == 'any':
+                probe_cell_indices = numpy.random.shuffle(numpy.arange(0, len(self.index_cell_map.keys())))
+                probe_cell_indices = probe_cell_indices[:probe_count]
+            else:
+                celltype_vertex_set = self.celltype_graph.vs.select(label_eq=probe_cells)
+                for vertex in celltype_vertex_set:
+                    startindex = int(vertex['startindex'])
+                    count = int(vertex['count'])
+                    print vertex['label'], startindex, count
+                    indices = numpy.arange(startindex, startindex+count)
+                    numpy.random.shuffle(indices)
+                    print indices
+                    probe_cell_indices = numpy.concatenate((probe_cell_indices, indices[:probe_count]))
+        bg_cell_list = []
+        if isinstance(bg_cells, list):
+            bg_cell_list = bg_cells
         else:
-            celltype_vertex_set = self.celltype_graph.vs.select(label_eq=bg_celltype)
-            for vertex in celltype_vertex_set:
-                startindex = int(vertex['startindex'])
-                count = int(vertex['count'])
-                np.concatenate((bg_cell_indices, numpy.random.randint(low=startindex, high=startindex+count, size=bg_count)))
-
-        probe_cell_indices = []
-        if probe_celltype == 'any':
-            probe_cell_indices = numpy.random.randint(low=0, high=len(self.index_cell_map.keys()), size=probe_count)
+            for index in bg_cell_indices:
+                bg_cell_list.append(self.index_cell_map[index])
+        
+        probe_cell_list = []
+        if isinstance(probe_cells, list):
+            probe_cell_list = probe_cells
         else:
-            celltype_vertex_set = self.celltype_graph.vs.select(label_eq=probe_celltype)
-            for vertex in celltype_vertex_set:
-                startindex = int(vertex['startindex'])
-                count = int(vertex['count'])
-                np.concatenate((bg_cell_indices, numpy.random.randint(low=startindex, high=startindex+count, size=probe_count)))
-        protocol_file = open('protocol_'+ config.filename_suffix)
+            for index in probe_cell_indices:
+                probe_cell_list.append(self.index_cell_map[index])
+        
+        protocol_file = open('protocol_'+ config.filename_suffix, 'w')
         protocol_file.write('onset: %g\nbg_interval: %g\nisi: %g\nwidth: %g\nlevel: %g\n' % (stim_onset, bg_interval, isi, pulse_width, level))
         protocol_file.write('background_cells:\n')
-        for index in bg_cell_indices:            
-            cell = self.index_cell_map[index]
-            self.stim_bg.connect('outputSrc', cell, 'injectMsg')
-            protocol_file.write('%s\n' % (cell.path))
+        print 'Printing background_cells and probe_cells'
+        for cell in bg_cell_list:
+            print 'background', cell
+            if isinstance(cell, str):
+                comp = moose.Compartment('%s/%s/comp_1' % (self.network_container.path, cell))
+            elif isinstance(cell, TraubCell):
+                comp = cell.soma
+            else:
+                raise Exception('Unknown type object for bg target: %s' % (cell))
+            self.stim_bg.connect('outputSrc', comp, 'injectMsg')
+            protocol_file.write('%s\n' % (comp.path))
         protocol_file.write('probe_cells:\n')
-        for index in probe_cell_indices:
-            cell = self.index_cell_map[index]
-            self.stim_probe.connect('outputSrc', cell, 'injectMsg')
-            protocol_file.write('%s\n' % (cell.path))
+        for cell in probe_cell_list:
+            print 'probe:', cell
+            if isinstance(cell, str):
+                comp = moose.Compartment('%s/%s/comp_1' % (self.network_container.path, cell))
+            elif isinstance(cell, TraubCell):
+                comp = cell.soma
+            else:
+                raise Exception('Unknown type object for probe target: %s' % (cell))
+            self.stim_probe.connect('outputSrc', comp, 'injectMsg')
+            protocol_file.write('%s\n' % (comp.path))
         protocol_file.close()
 
     def scale_populations(self, scale):
@@ -1162,7 +1216,15 @@ class TraubNet(object):
         if synchans:
             dataset = numpy.rec.array(synchans, dtype=synapse_dtype)
             network_struct.create_dataset('synapse', data=dataset, compression='gzip')
-                                            
+        stimulus_struct = h5file.create_group('stimulus')
+        targets = []
+        for stim in self.stim_container.children():
+            for neighbour in config.context.getNeighbours(stim, 'outputSrc', moose.OUTGOING):
+                print stim.path(), 'Stimulus to', neighbour.path()
+                if moose.Neutral(neighbour).className == 'Compartment':
+                    targets.append([stim.path(), neighbour.path()])
+        dataset = stimulus_struct.create_dataset('connection', data=numpy.rec.array(targets))
+        
         h5file.close()
         config.LOGGER.debug('END: save_cell_network')
 
