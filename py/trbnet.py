@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Dec 21 17:31:04 2011 (+0530)
+# Last-Updated: Fri Dec 23 10:53:17 2011 (+0530)
 #           By: Subhasis Ray
-#     Update #: 2372
+#     Update #: 2379
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -824,6 +824,8 @@ class TraubNet(object):
         self.stim_probe.trigMode = moose.EXT_GATE
         self.stim_gate.connect('outputSrc', self.stim_bg, 'input')
         self.stim_gate.connect('outputSrc', self.stim_probe, 'input')
+        if isinstance(data_container, str):
+            data_container = moose.Neutral(data_container)
         stim_data_container = moose.Neutral('stimulus', data_container)
         bg_table = moose.Table(self.stim_bg.name, stim_data_container)
         bg_table.stepMode = 3
