@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Dec 23 12:03:09 2011 (+0530)
+# Last-Updated: Thu Dec 29 11:30:39 2011 (+0530)
 #           By: subha
-#     Update #: 2380
+#     Update #: 2383
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -805,6 +805,7 @@ class TraubNet(object):
         self.stim_gate.firstDelay = stim_onset
         self.stim_gate.firstWidth = 1e9 # Keep it on forever
         self.stim_gate.firstLevel = 1.0                
+        self.stim_gate.secondDelay = 1e9
         self.stim_bg = moose.PulseGen('stim_bg', self.stim_container)
         self.stim_bg.firstLevel = level
         self.stim_bg.secondLevel = level
@@ -822,6 +823,8 @@ class TraubNet(object):
         self.stim_probe.firstWidth = pulse_width
         self.stim_probe.secondWidth = pulse_width            
         self.stim_probe.trigMode = moose.EXT_GATE
+
+        config.LOGGER.debug('Background stimulus: firstDelay: %g, firstWidth: %g, firstLevel: %g, secondDelay: %g, secondWidth: %g, secondLevel: %g' % (self.stim_bg.firstDelay, self.stim_bg.firstWidth, self.stim_bg.firstLevel, self.stim_bg.secondDelay, self.stim_bg.secondWidth, self.stim_bg.secondLevel))
         self.stim_gate.connect('outputSrc', self.stim_bg, 'input')
         self.stim_gate.connect('outputSrc', self.stim_probe, 'input')
         if isinstance(data_container, str):
