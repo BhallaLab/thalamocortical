@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Dec 29 11:30:39 2011 (+0530)
+# Last-Updated: Tue Jan  3 11:40:59 2012 (+0530)
 #           By: subha
-#     Update #: 2383
+#     Update #: 2387
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -310,6 +310,8 @@ class TraubNet(object):
                             new_edge['taugabaslow'] = tn.nRT_nRT_tau_gaba_slow                    
                     edge_count += 1
         for new_edge in self.celltype_graph.es:
+            celltype = self.celltype_graph.vs[new_edge.source]
+            posttype = self.celltype_graph.vs[new_edge.target]
             for key, value in new_edge.attributes().items():
                 config.LOGGER.debug('## %s(%d)->%s(%d): %s = %s' % (celltype['label'], celltype.index, posttype['label'], posttype.index, key, str(value)))
 
