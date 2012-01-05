@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Jan  3 11:40:59 2012 (+0530)
+# Last-Updated: Thu Jan  5 19:12:14 2012 (+0530)
 #           By: subha
-#     Update #: 2387
+#     Update #: 2390
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -820,7 +820,7 @@ class TraubNet(object):
         self.stim_probe = moose.PulseGen('stim_probe', self.stim_container)
         self.stim_probe.firstLevel = level
         self.stim_probe.secondLevel = level
-        self.stim_probe.firstDelay = 2 * bg_interval + pulse_width + isi
+        self.stim_probe.firstDelay = 2 * bg_interval + isi
         self.stim_probe.secondDelay = isi
         self.stim_probe.firstWidth = pulse_width
         self.stim_probe.secondWidth = pulse_width            
@@ -832,6 +832,9 @@ class TraubNet(object):
         if isinstance(data_container, str):
             data_container = moose.Neutral(data_container)
         stim_data_container = moose.Neutral('stimulus', data_container)
+        gate_table = moose.Table(self.stim_gate.name, stim_data_container)
+        gate_table.stepMode = 3
+        gate_table.connect('inputRequest', self.stim_gate, 'output')
         bg_table = moose.Table(self.stim_bg.name, stim_data_container)
         bg_table.stepMode = 3
         bg_table.connect('inputRequest', self.stim_bg, 'output')
