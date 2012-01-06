@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Jan  5 19:12:14 2012 (+0530)
+# Last-Updated: Fri Jan  6 15:42:35 2012 (+0530)
 #           By: subha
-#     Update #: 2390
+#     Update #: 2436
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -774,6 +774,8 @@ class TraubNet(object):
         probe_cells -- type of cells we are looking at, or an explicit
         list of cells
 
+        Ideally, background and probe cells should not overlap
+
         stim_onset -- when we consider the system stabilized and start
         stimulus
 
@@ -802,6 +804,7 @@ class TraubNet(object):
             self.stim_container = stim_container
         else:
             raise Exception('Stimulus container must be a string or a Neutral object: got %s', stim_container.__class__.__name__)
+        config.LOGGER.debug('Setting up stimulus protocol: bg_interval: %g, pulse_width: %g, isi: %g' % (bg_interval, pulse_width, isi))
         self.stim_gate = moose.PulseGen('stim_gate', self.stim_container)
         self.stim_gate.trigMode = moose.FREE_RUN
         self.stim_gate.firstDelay = stim_onset
@@ -820,13 +823,14 @@ class TraubNet(object):
         self.stim_probe = moose.PulseGen('stim_probe', self.stim_container)
         self.stim_probe.firstLevel = level
         self.stim_probe.secondLevel = level
-        self.stim_probe.firstDelay = 2 * bg_interval + isi
+        self.stim_probe.firstDelay = 2 * self.stim_bg.firstDelay + self.stim_bg.secondDelay
         self.stim_probe.secondDelay = isi
         self.stim_probe.firstWidth = pulse_width
         self.stim_probe.secondWidth = pulse_width            
         self.stim_probe.trigMode = moose.EXT_GATE
 
         config.LOGGER.debug('Background stimulus: firstDelay: %g, firstWidth: %g, firstLevel: %g, secondDelay: %g, secondWidth: %g, secondLevel: %g' % (self.stim_bg.firstDelay, self.stim_bg.firstWidth, self.stim_bg.firstLevel, self.stim_bg.secondDelay, self.stim_bg.secondWidth, self.stim_bg.secondLevel))
+        config.LOGGER.debug('Probe stimulus: firstDelay: %g, firstWidth: %g, firstLevel: %g, secondDelay: %g, secondWidth: %g, secondLevel: %g' % (self.stim_probe.firstDelay, self.stim_probe.firstWidth, self.stim_probe.firstLevel, self.stim_probe.secondDelay, self.stim_probe.secondWidth, self.stim_probe.secondLevel))
         self.stim_gate.connect('outputSrc', self.stim_bg, 'input')
         self.stim_gate.connect('outputSrc', self.stim_probe, 'input')
         if isinstance(data_container, str):
@@ -843,36 +847,52 @@ class TraubNet(object):
         probe_table.connect('inputRequest', self.stim_probe, 'output')
         
         bg_cell_indices = []
-        if isinstance(bg_cells, str):
+        probe_cell_indices = []
+        if isinstance(bg_cells, str) and isinstance(probe_cells, str) and bg_cells == probe_cells:
+            cell_indices = []
             if bg_cells == 'any':
-                bg_cell_indices = numpy.random.shuffle(arange(len(self.index_cell_map.keys())))
-                bg_cell_indices = bg_cell_indices[:bg_count]
+                cell_indices = numpy.arange(len(self.index_cell_map.keys()))
             else:
                 celltype_vertex_set = self.celltype_graph.vs.select(label_eq=bg_cells)
                 for vertex in celltype_vertex_set:
                     startindex = int(vertex['startindex'])
                     count = int(vertex['count'])
-                    print vertex['label'], startindex, count
-                    indices = numpy.arange(startindex, startindex+count)
-                    numpy.random.shuffle(indices)
-                    print indices
-                    bg_cell_indices = numpy.concatenate((bg_cell_indices, indices[:bg_count]))
-        
-        probe_cell_indices = []
-        if isinstance(probe_cells, str):
-            if probe_cells == 'any':
-                probe_cell_indices = numpy.random.shuffle(numpy.arange(0, len(self.index_cell_map.keys())))
-                probe_cell_indices = probe_cell_indices[:probe_count]
-            else:
-                celltype_vertex_set = self.celltype_graph.vs.select(label_eq=probe_cells)
-                for vertex in celltype_vertex_set:
-                    startindex = int(vertex['startindex'])
-                    count = int(vertex['count'])
-                    print vertex['label'], startindex, count
-                    indices = numpy.arange(startindex, startindex+count)
-                    numpy.random.shuffle(indices)
-                    print indices
-                    probe_cell_indices = numpy.concatenate((probe_cell_indices, indices[:probe_count]))
+                    cell_indices = numpy.concatenate((cell_indices, numpy.arange(startindex, startindex+count)))
+            numpy.random.shuffle(cell_indices)
+            bg_cell_indices = cell_indices[:bg_count]
+            probe_cell_indices = cell_indices[bg_count: bg_count+probe_count]
+        else:            
+            if isinstance(bg_cells, str):
+                if bg_cells == 'any':
+                    bg_cell_indices = numpy.arange(len(self.index_cell_map.keys()))
+                    numpy.random.shuffle(bg_cell_indices)
+                    bg_cell_indices = bg_cell_indices[:bg_count]
+                else:
+                    celltype_vertex_set = self.celltype_graph.vs.select(label_eq=bg_cells)
+                    for vertex in celltype_vertex_set: # This  should loop only once
+                        startindex = int(vertex['startindex'])
+                        count = int(vertex['count'])
+                        # print vertex['label'], startindex, count
+                        cell_indices = numpy.arange(startindex, startindex+count)
+                        numpy.random.shuffle(cell_indices)
+                        # print indices
+                        bg_cell_indices = numpy.concatenate((bg_cell_indices, cell_indices[:bg_count]))
+
+            if isinstance(probe_cells, str):
+                if probe_cells == 'any':
+                    probe_cell_indices = numpy.arange(0, len(self.index_cell_map.keys()))
+                    numpy.random.shuffle(probe_cell_indices)
+                    probe_cell_indices = probe_cell_indices[:probe_count]
+                else:
+                    celltype_vertex_set = self.celltype_graph.vs.select(label_eq=probe_cells)
+                    for vertex in celltype_vertex_set: # This should loop only once
+                        startindex = int(vertex['startindex'])
+                        count = int(vertex['count'])
+                        # print vertex['label'], startindex, count
+                        cell_indices = numpy.arange(startindex, startindex+count)
+                        numpy.random.shuffle(cell_indices)
+                        # print indices
+                        probe_cell_indices = numpy.concatenate((probe_cell_indices, cell_indices[:probe_count]))
         bg_cell_list = []
         if isinstance(bg_cells, list):
             bg_cell_list = bg_cells
@@ -887,12 +907,12 @@ class TraubNet(object):
             for index in probe_cell_indices:
                 probe_cell_list.append(self.index_cell_map[index])
         
-        protocol_file = open('protocol_'+ config.filename_suffix, 'w')
+        protocol_file = open('%s/protocol_%s' % (config.data_dir, config.filename_suffix), 'w')
         protocol_file.write('onset: %g\nbg_interval: %g\nisi: %g\nwidth: %g\nlevel: %g\n' % (stim_onset, bg_interval, isi, pulse_width, level))
         protocol_file.write('background_cells:\n')
-        print 'Printing background_cells and probe_cells'
+        # print 'Printing background_cells and probe_cells'
         for cell in bg_cell_list:
-            print 'background', cell
+            # print 'background', cell
             if isinstance(cell, str):
                 comp = moose.Compartment('%s/%s/comp_1' % (self.network_container.path, cell))
             elif isinstance(cell, TraubCell):
@@ -903,7 +923,7 @@ class TraubNet(object):
             protocol_file.write('%s\n' % (comp.path))
         protocol_file.write('probe_cells:\n')
         for cell in probe_cell_list:
-            print 'probe:', cell
+            # print 'probe:', cell
             if isinstance(cell, str):
                 comp = moose.Compartment('%s/%s/comp_1' % (self.network_container.path, cell))
             elif isinstance(cell, TraubCell):
