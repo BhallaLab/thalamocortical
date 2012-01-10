@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Oct 17 11:35:32 2011 (+0530)
-#           By: subha
-#     Update #: 1178
+# Last-Updated: Tue Jan 10 12:16:41 2012 (+0530)
+#           By: Subhasis Ray
+#     Update #: 1225
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -128,7 +128,7 @@ class TraubFullNetData(object):
                                [5,	5,	0,	0,	0,	5,	5,	5,	0,	0,	0,	5,	0,	0],
                                [10,	10,	10,	10,	10,	20,	20,	20,	20,	20,	20,	20,	0,	0],
                                [10,	10,	10,	10,	10,	10,	10,	10,	10,	10,	10,	20,	20,	20],
-                               [10,	10,	10,	10,	0,	0,	10,	10,	20,	10,	0,	10,	0,	25],
+                               [10,	10,	10,	10,	0,	20,	10,	10,	20,	10,	0,	10,	0,	25],
                                [0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	0,	15,	10]]
 
         self.tau_ampa = [[   2.0e-3,    2.0e-3,  0.8e-3,  0.8e-3, 1.0e-3, 2.0e-3, 2.0e-3, 2.0e-3,   0.8e-3,   0.8e-3,  1.0e-3,    2.0e-3,    0.0,    0.0],
@@ -591,7 +591,203 @@ class TraubFullNetData(object):
         return True
         
         
+import unittest
 
+class TestTrbNetData(unittest.TestCase):
+    moose_neuron_map = {
+        'SupPyrRS': 'suppyrRS',
+        'SupPyrFRB': 'suppyrFRB',
+        'SupBasket':'supbask',  
+        'SupAxoaxonic': 'supaxax',  
+        'SupLTS': 'supLTS',   
+        'SpinyStellate': 'spinstell',
+        'TuftedIB': 'tuftIB',   
+        'TuftedRS': 'tuftRS',   
+        'NontuftedRS': 'nontuftRS',
+        'DeepBasket': 'deepbask', 
+        'DeepAxoaxonic': 'deepaxax', 
+        'DeepLTS': 'deepLTS',  
+        'TCR': 'TCR',      
+        'nRT': 'nRT'
+        }
+    neuron_moose_map = {
+        'suppyrRS': 'SupPyrRS',
+        'suppyrFRB': 'SupPyrFRB',
+        'supbask':'SupBasket',  
+        'supaxax': 'SupAxoaxonic',  
+        'supLTS': 'SupLTS',   
+        'spinstell': 'SpinyStellate',
+        'tuftIB': 'TuftedIB',   
+        'tuftRS': 'TuftedRS',   
+        'nontuftRS': 'NontuftedRS',
+        'deepbask': 'DeepBasket', 
+        'deepaxax': 'DeepAxoaxonic', 
+        'deepLTS': 'DeepLTS',  
+        'TCR': 'TCR',      
+        'nRT': 'nRT'
+        }
+    prepost = {
+        'num_suppyrRS_to_suppyrRS'  : 50,
+        'num_suppyrRS_to_suppyrFRB' : 50,
+        'num_suppyrRS_to_supbask'   : 90,
+        'num_suppyrRS_to_supaxax'   : 90,
+        'num_suppyrRS_to_supLTS'    : 90,
+        'num_suppyrRS_to_spinstell' :  3,
+        'num_suppyrRS_to_tuftIB'    : 60,
+        'num_suppyrRS_to_tuftRS'    : 60,
+        'num_suppyrRS_to_deepbask'  : 30,
+        'num_suppyrRS_to_deepaxax'  : 30,
+        'num_suppyrRS_to_deepLTS'   : 30,
+        'num_suppyrRS_to_nontuftRS' :  3,
+        'num_suppyrFRB_to_suppyrRS' : 5,
+        'num_suppyrFRB_to_suppyrFRB': 5,
+        'num_suppyrFRB_to_supbask'  : 5,
+        'num_suppyrFRB_to_supaxax'  : 5,
+        'num_suppyrFRB_to_supLTS'   : 5,
+        'num_suppyrFRB_to_spinstell': 1,
+        'num_suppyrFRB_to_tuftIB'   : 3,
+        'num_suppyrFRB_to_tuftRS'   : 3,
+        'num_suppyrFRB_to_deepbask' : 3,
+        'num_suppyrFRB_to_deepaxax' : 3,
+        'num_suppyrFRB_to_deepLTS'  : 3,
+        'num_suppyrFRB_to_nontuftRS': 1,# small per Thomson & Bannister
+        'num_supbask_to_suppyrRS'   : 20,
+        'num_supbask_to_suppyrFRB'  : 20,
+        'num_supbask_to_supbask'    : 20,
+        'num_supbask_to_supaxax'    : 20,
+        'num_supbask_to_supLTS'     : 20,
+        'num_supbask_to_spinstell'  : 20,
+        'num_supaxax_to_suppyrRS'   : 20,# note
+        'num_supaxax_to_suppyrFRB'  : 20,# note
+        'num_supaxax_to_spinstell'  : 5,
+        'num_supaxax_to_tuftIB'     : 5,
+        'num_supaxax_to_tuftRS'     : 5,
+        'num_supaxax_to_nontuftRS'  : 5,
+        'num_supLTS_to_suppyrRS'    : 20,
+        'num_supLTS_to_suppyrFRB'   : 20,
+        'num_supLTS_to_supbask'     : 20,
+        'num_supLTS_to_supaxax'     : 20,
+        'num_supLTS_to_supLTS'      : 20,
+        'num_supLTS_to_spinstell'   : 20,
+        'num_supLTS_to_tuftIB'      : 20,
+        'num_supLTS_to_tuftRS'      : 20,
+        'num_supLTS_to_deepbask'    : 20,
+        'num_supLTS_to_deepaxax'    : 20,
+        'num_supLTS_to_deepLTS'     : 20,
+        'num_supLTS_to_nontuftRS'   : 20,
+        'num_spinstell_to_suppyrRS' : 20,
+        'num_spinstell_to_suppyrFRB': 20,
+        'num_spinstell_to_supbask'  : 20,
+        'num_spinstell_to_supaxax'  : 20,
+        'num_spinstell_to_supLTS'   : 20,
+        'num_spinstell_to_spinstell': 30,
+        'num_spinstell_to_tuftIB'   : 20,
+        'num_spinstell_to_tuftRS'   : 20,
+        'num_spinstell_to_deepbask' : 20,
+        'num_spinstell_to_deepaxax' : 20,
+        'num_spinstell_to_deepLTS'  : 20,
+        'num_spinstell_to_nontuftRS': 20,
+        'num_tuftIB_to_suppyrRS'    :  2,# small per Thomson   Bannister
+        'num_tuftIB_to_suppyrFRB'   :  2,# small per Thomson   Bannister
+        'num_tuftIB_to_supbask'     : 20,
+        'num_tuftIB_to_supaxax'     : 20,
+        'num_tuftIB_to_supLTS'      : 20,
+        'num_tuftIB_to_spinstell'   : 20,
+        'num_tuftIB_to_tuftIB'      : 50,
+        'num_tuftIB_to_tuftRS'      : 20,
+        'num_tuftIB_to_deepbask'    : 20,
+        'num_tuftIB_to_deepaxax'    : 20,
+        'num_tuftIB_to_deepLTS'     : 20,
+        'num_tuftIB_to_nontuftRS'   : 20,
+        'num_tuftRS_to_suppyrRS'    :  2,# small per Thomson   Bannister
+        'num_tuftRS_to_suppyrFRB'   :  2,# small per Thomson   Bannister
+        'num_tuftRS_to_supbask'     : 20,
+        'num_tuftRS_to_supaxax'     : 20,
+        'num_tuftRS_to_supLTS'      : 20,
+        'num_tuftRS_to_spinstell'   : 20,
+        'num_tuftRS_to_tuftIB'      : 20,
+        'num_tuftRS_to_tuftRS'      : 10,
+        'num_tuftRS_to_deepbask'    : 20,
+        'num_tuftRS_to_deepaxax'    : 20,
+        'num_tuftRS_to_deepLTS'     : 20,
+        'num_tuftRS_to_nontuftRS'   : 20,
+        'num_deepbask_to_spinstell' : 20,
+        'num_deepbask_to_tuftIB'    : 20,
+        'num_deepbask_to_tuftRS'    : 20,
+        'num_deepbask_to_deepbask'  : 20,
+        'num_deepbask_to_deepaxax'  : 20,
+        'num_deepbask_to_deepLTS'   : 20,
+        'num_deepbask_to_nontuftRS' : 20,
+        'num_deepaxax_to_suppyrRS'  :  5,
+        'num_deepaxax_to_suppyrFRB' :  5,
+        'num_deepaxax_to_spinstell' :  5,
+        'num_deepaxax_to_tuftIB'    :  5,
+        'num_deepaxax_to_tuftRS'    :  5,
+        'num_deepaxax_to_nontuftRS' :  5,
+        'num_deepLTS_to_suppyrRS'   : 10,
+        'num_deepLTS_to_suppyrFRB'  : 10,
+        'num_deepLTS_to_supbask'    : 10,
+        'num_deepLTS_to_supaxax'    : 10,
+        'num_deepLTS_to_supLTS'     : 10,
+        'num_deepLTS_to_spinstell'  : 20,
+        'num_deepLTS_to_tuftIB'     : 20,
+        'num_deepLTS_to_tuftRS'     : 20,
+        'num_deepLTS_to_deepbask'   : 20,
+        'num_deepLTS_to_deepaxax'   : 20,
+        'num_deepLTS_to_deepLTS'    : 20,
+        'num_deepLTS_to_nontuftRS'  : 20,
+        'num_TCR_to_suppyrRS'       : 10,
+        'num_TCR_to_suppyrFRB'      : 10,
+        'num_TCR_to_supbask'        : 10,
+        'num_TCR_to_supaxax'        : 10,
+        'num_TCR_to_spinstell'      : 20,
+        'num_TCR_to_tuftIB'         : 10,
+        'num_TCR_to_tuftRS'         : 10,
+        'num_TCR_to_deepbask'       : 20,
+        'num_TCR_to_deepaxax'       : 10,
+        'num_TCR_to_nRT'            : 25,# note
+        'num_TCR_to_nontuftRS'      : 10,
+        'num_nRT_to_TCR'            : 15,# note
+        'num_nRT_to_nRT'            : 10,
+        'num_nontuftRS_to_suppyrRS' : 10,
+        'num_nontuftRS_to_suppyrFRB': 10,
+        'num_nontuftRS_to_supbask'  : 10,
+        'num_nontuftRS_to_supaxax'  : 10,
+        'num_nontuftRS_to_supLTS'   : 10,
+        'num_nontuftRS_to_spinstell': 10,
+        'num_nontuftRS_to_tuftIB'   : 10,
+        'num_nontuftRS_to_tuftRS'   : 10,
+        'num_nontuftRS_to_deepbask' : 10,
+        'num_nontuftRS_to_deepaxax' : 10,
+        'num_nontuftRS_to_deepLTS'  : 10,
+        'num_nontuftRS_to_TCR'      : 20,
+        'num_nontuftRS_to_nRT'      : 20,
+        'num_nontuftRS_to_nontuftRS': 20
+    }
+    
+    def setUp(self):
+        self.netdata = TraubFullNetData()
 
+    def test_prepost_ratio(self):
+        """Verify that the presynaptic cell count for each
+        postsynaptic cell is correct.  The prepost dict has been
+        constructed by copy pasting the neuron code and doing a
+        bit of regular expression replacement.
+        """
+        for key, value in TestTrbNetData.prepost.items():
+            tokens = key.split('_')
+            pre = TestTrbNetData.neuron_moose_map[tokens[1]]
+            post = TestTrbNetData.neuron_moose_map[tokens[3]]
+            preindex = self.netdata.celltype.index(pre)
+            postindex = self.netdata.celltype.index(post)
+            print 'Checking connection ration between' , pre, 'and', post
+            self.assertEqual(value, self.netdata.pre_post_ratio[preindex][postindex])
+            
+            
+if __name__ == '__main__':
+    unittest.main()
+                                
+                
+        
 # 
 # trbnetdata.py ends here
