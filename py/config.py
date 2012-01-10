@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Oct 19 20:31:56 2011 (+0530)
+# Last-Updated: Tue Jan 10 18:07:41 2012 (+0530)
 #           By: subha
-#     Update #: 275
+#     Update #: 294
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -107,6 +107,13 @@ if not os.access(data_dir, os.F_OK):
 filename_suffix = '_%s_%d' % (timestamp.strftime('%Y%m%d_%H%M%S'), mypid)
 DATA_FILENAME = os.path.join(data_dir, 'data%s.h5' % (filename_suffix))
 MODEL_FILENAME = os.path.join(data_dir, 'network%s.h5' % (filename_suffix))
+
+LOGGER = logging.getLogger('traub2005')
+BENCHMARK_LOGGER = logging.getLogger('traub2005.benchmark')
+BENCHMARK_LOGGER.setLevel(logging.DEBUG)
+benchmarking=True # Dump benchmarking information
+
+
 #---------------------------------------------------------------------
 # moose components
 #---------------------------------------------------------------------
@@ -238,6 +245,23 @@ if to_reseed:
     else:
         reseed(mypid)
         LOGGER.info('NUMPY RNG SEED SET TO %d' % (rngseed))
+
+def update_timestamp():
+    global filename_suffix
+    global DATA_FILENAME
+    global MODEL_FILENAME
+    global LOG_FILENAME
+    global data_dir
+    global timestamp 
+    timestamp = datetime.now()
+    data_dir = os.path.join('data', timestamp.strftime('%Y_%m_%d'))
+    filename_suffix = '_%s_%d' % (timestamp.strftime('%Y%m%d_%H%M%S'), mypid)
+    DATA_FILENAME = os.path.join(data_dir, 'data%s.h5' % (filename_suffix))
+    MODEL_FILENAME = os.path.join(data_dir, 'network%s.h5' % (filename_suffix))
+    LOG_FILENAME = os.path.join(data_dir, 'traub2005%s.log' % (filename_suffix))
+    LOG_LEVEL = logging.DEBUG
+    logging.Handler.handleError = handleError
+    logging.basicConfig(filename=LOG_FILENAME, level=LOG_LEVEL, format='%(asctime)s %(levelname)s %(name)s %(filename)s %(funcName)s: %(message)s', filemode='w')
 
 
 # 
