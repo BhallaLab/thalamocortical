@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Jan 10 12:16:41 2012 (+0530)
-#           By: Subhasis Ray
-#     Update #: 1225
+# Last-Updated: Wed Jan 11 13:52:56 2012 (+0530)
+#           By: subha
+#     Update #: 1226
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -116,8 +116,8 @@ class TraubFullNetData(object):
                           100]
 
         
-        self.pre_post_ratio = [[50,     50,     90,     90,     90,     3,      60,     60,     30,     30,     30,     3,      0,      0],
-                               [5,      5,      5,	5,	5,	1,	3,	3,	3,	3,	3,	1,	0,	0],
+        self.pre_post_ratio = [[50, 50, 90, 90, 90, 3,  60, 60, 30, 30, 30, 3,  0,  0],
+                               [5,  5,  5,	5,	5,	1,	3,	3,	3,	3,	3,	1,	0,	0],
                                [20,	20,	20,	20,	20,	20,	0,	0,	0,	0,	0,	0,	0,	0],
                                [20,	20,	0,	0,	0,	5,	5,	5,	0,	0,	0,	5,	0,	0],
                                [20,	20,	20,	20,	20,	20,	20,	20,	20,	20,	20,	20,	0,	0],
