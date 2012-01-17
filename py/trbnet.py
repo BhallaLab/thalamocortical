@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Jan  6 15:42:35 2012 (+0530)
+# Last-Updated: Tue Jan 17 10:54:38 2012 (+0530)
 #           By: subha
-#     Update #: 2436
+#     Update #: 2438
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -293,7 +293,7 @@ class TraubNet(object):
                     self.celltype_graph.add_edges((celltype.index, posttype.index))
                     new_edge = self.celltype_graph.es[edge_count]
                     new_edge['weight'] = 1.0 * pre_post_ratio / celltype['count']
-                    new_edge['gampa'] = tn.g_ampa_baseline[celltype.index][posttype.index] * tn.tau_ampa[celltype.index][posttype.index] / numpy.e # This is how gmax is related to c (baseline conductance scaling factor) for AMPA in traub model
+                    new_edge['gampa'] = tn.g_ampa_baseline[celltype.index][posttype.index] * tn.tau_ampa[celltype.index][posttype.index]*1e3 / numpy.e # This is how gmax is related to c (baseline conductance scaling factor) for AMPA in traub model (e has unit of ms)
                     new_edge['gnmda'] = tn.g_nmda_baseline[celltype.index][posttype.index]
                     new_edge['tauampa'] = tn.tau_ampa[celltype.index][posttype.index]
                     new_edge['taunmda'] = tn.tau_nmda[celltype.index][posttype.index]
