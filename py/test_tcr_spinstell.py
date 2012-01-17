@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Jan 16 09:50:05 2012 (+0530)
 # Version: 
-# Last-Updated: Mon Jan 16 12:57:26 2012 (+0530)
+# Last-Updated: Tue Jan 17 10:50:59 2012 (+0530)
 #           By: subha
-#     Update #: 58
+#     Update #: 62
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -65,13 +65,14 @@ def test_tcr_spinstell_ampa():
     spinstell = SpinyStellate(SpinyStellate.prototype, sim.model.path + '/SpinyStellate')
     precomp = tcr.comp[TCR.presyn]
     postcomp = spinstell.comp[31] # 5 is among the allowed post synaptic compartments in spiny stellate cell
+    tau_ampa = netdata.tau_ampa[tcr_index][spinstell_index]
     synchan = precomp.makeSynapse(postcomp, 
                                   name='ampa_from_TCR', 
                                   classname='SynChan', 
                                   Ek=0.0,
-                                  Gbar=netdata.g_ampa_baseline[tcr_index][spinstell_index],
-                                  tau1=netdata.tau_ampa[tcr_index][spinstell_index],
-                                  tau2=netdata.tau_ampa[tcr_index][spinstell_index],
+                                  Gbar=netdata.g_ampa_baseline[tcr_index][spinstell_index] * tau_ampa*1e3/pylab.e,
+                                  tau1=tau_ampa,
+                                  tau2=tau_ampa,
                                   delay = synapse.SYNAPTIC_DELAY_THALAMOCORTICAL
                                   )
     stim = tcr.soma.insertPulseGen('stimulus', sim.model, firstLevel=1e-9, firstDelay=200e-3, firstWidth=2e-3)
