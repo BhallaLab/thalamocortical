@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Jan 17 10:54:38 2012 (+0530)
+# Last-Updated: Thu Jan 19 15:08:47 2012 (+0530)
 #           By: subha
-#     Update #: 2438
+#     Update #: 2440
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1161,6 +1161,9 @@ class TraubNet(object):
                         ii += 1
         config.LOGGER.debug('END randomize_active_conductances')
 
+    def randomize_synaptic_conductance(self):
+        """Randomize the synaptic conductance between celltypes"""
+        pass
 
     def setup_bias_current(self, population_name, level, delay, width, data_container):
         """Apply a steady bias current to a population of cells.
