@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Jan 16 09:50:05 2012 (+0530)
 # Version: 
-# Last-Updated: Tue Jan 17 10:50:59 2012 (+0530)
+# Last-Updated: Wed Jan 18 21:56:10 2012 (+0530)
 #           By: subha
-#     Update #: 62
+#     Update #: 73
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -79,11 +79,15 @@ def test_tcr_spinstell_ampa():
     tcr_soma_tab = tcr.soma.insertRecorder('stim', 'Vm', sim.data)
     ss_soma_tab = spinstell.soma.insertRecorder('ss_soma', 'Vm', sim.data)
     ss_dend_tab = postcomp.insertRecorder('ss_dend', 'Vm', sim.data)
+    gk_ampa_tab = moose.Table('gk_ss', sim.data)
+    gk_ampa_tab.stepMode = 3
+    print 'Connected Gk', gk_ampa_tab.connect('inputRequest', synchan, 'Gk')
     sim.schedule()
     sim.run(1.0)
     pylab.plot(numpy.linspace(0, 1.0, len(tcr_soma_tab)), tcr_soma_tab, label='tcr_soma')
     pylab.plot(numpy.linspace(0, 1.0, len(tcr_soma_tab)), ss_soma_tab, label='ss_soma')
     pylab.plot(numpy.linspace(0, 1.0, len(tcr_soma_tab)), ss_dend_tab, label='ss_dend')
+    pylab.plot(numpy.linspace(0, 1.0, len(gk_ampa_tab)), numpy.array(gk_ampa_tab) * 1e9, label='gk_ampa_spinstell (nS)')
     pylab.legend()
     pylab.show()
 
