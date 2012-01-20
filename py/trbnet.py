@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Jan 19 15:08:47 2012 (+0530)
+# Last-Updated: Fri Jan 20 18:05:54 2012 (+0530)
 #           By: subha
-#     Update #: 2440
+#     Update #: 2467
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -378,16 +378,29 @@ class TraubNet(object):
             ps_comp_list = ps_comps[indices]
             config.LOGGER.debug('ps_comps list has length: %d, syn_list has length: %d' % (len(ps_comp_list), len(syn_list)))
             self.ps_comp_mat.put(ps_comp_list, syn_list[:,0], syn_list[:, 1])
-            self.g_ampa_mat.put(float(edge['gampa']),
+            ampa_sd = float(config.runconfig.get('AMPA', 'sd'))
+            g_ampa = float(edge['gampa'])
+            if ampa_sd > 0:
+                g_ampa = numpy.random.normal(loc=g_ampa, scale=ampa_sd*g_ampa, size=len(syn_list))
+            self.g_ampa_mat.put(g_ampa,
                                 syn_list[:, 0], syn_list[:,1])
-            self.g_nmda_mat.put(float(edge['gnmda']),
+            
+            g_nmda = float(edge['gnmda'])
+            nmda_sd = float(config.runconfig.get('NMDA', 'sd'))
+            if nmda_sd > 0:
+                g_nmda = numpy.random.normal(loc=g_nmda, scale=nmda_sd*g_nmda, size=len(syn_list))
+            self.g_nmda_mat.put(g_nmda,
                                 syn_list[:, 0], syn_list[:,1])
             if (pretype_vertex['label'] == 'nRT') and (posttype_vertex['label'] == 'TCR'):
                 self.g_gaba_mat.put(numpy.random.random_sample(len(syn_list)) * (self.nRT_TCR_ggaba_high - self.nRT_TCR_ggaba_low) + self.nRT_TCR_ggaba_low,
                                     syn_list[:,0],
                                     syn_list[:,1])
             else:
-                self.g_gaba_mat.put(float(edge['ggaba']),
+                gaba_sd = float(config.runconfig.get('AMPA', 'sd'))
+                g_gaba = float(edge['ggaba'])
+                if gaba_sd > 0:
+                    g_gaba = numpy.random.normal(loc=g_gaba, scale=gaba_sd*g_gaba, size=len(syn_list))
+                self.g_gaba_mat.put(g_gaba,
                                     syn_list[:,0], syn_list[:,1])                    
 
         end = datetime.now()
@@ -1163,7 +1176,10 @@ class TraubNet(object):
 
     def randomize_synaptic_conductance(self):
         """Randomize the synaptic conductance between celltypes"""
-        pass
+        for pretype in self.celltype_graph.vs:
+            pre_index = pretype[]
+            for posttype in self.celltype_graph.vs:
+                
 
     def setup_bias_current(self, population_name, level, delay, width, data_container):
         """Apply a steady bias current to a population of cells.
