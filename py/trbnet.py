@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Jan 20 18:05:54 2012 (+0530)
+# Last-Updated: Fri Jan 20 18:18:19 2012 (+0530)
 #           By: subha
-#     Update #: 2467
+#     Update #: 2468
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1173,13 +1173,6 @@ class TraubNet(object):
                         channel.Gbar = conductances[ii]
                         ii += 1
         config.LOGGER.debug('END randomize_active_conductances')
-
-    def randomize_synaptic_conductance(self):
-        """Randomize the synaptic conductance between celltypes"""
-        for pretype in self.celltype_graph.vs:
-            pre_index = pretype[]
-            for posttype in self.celltype_graph.vs:
-                
 
     def setup_bias_current(self, population_name, level, delay, width, data_container):
         """Apply a steady bias current to a population of cells.
