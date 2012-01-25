@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 13:42:14 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Dec 14 11:08:54 2011 (+0530)
+# Last-Updated: Sun Jan 22 23:55:46 2012 (+0530)
 #           By: Subhasis Ray
-#     Update #: 68
+#     Update #: 71
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -139,14 +139,14 @@ class TuftedRS(TraubCell):
         #     kc = moose.HHChannel(kc_path)
         #     kc.connect('Gk', gk_table, 'inputRequest')
         #     pymoose.showmsg(ca_conc)
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=10e-10, firstDelay=0.0, firstWidth=50e-3)
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=-0.4e-9, firstDelay=0.0, firstWidth=200e-3)
 #         pulsegen1 = mycell.soma.insertPulseGen('pulsegen1', sim.model, firstLevel=3e-7, firstDelay=150e-3, firstWidth=10e-3)
 
         sim.schedule()
         if mycell.has_cycle():
             print "WARNING!! CYCLE PRESENT IN CICRUIT."
         t1 = datetime.now()
-        sim.run(200e-3)
+        sim.run(500e-3)
         t2 = datetime.now()
         delta = t2 - t1
         print 'MOOSE: simulation time: ', delta.seconds + 1e-6 * delta.microseconds
