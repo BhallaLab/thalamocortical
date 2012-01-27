@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Jan 20 18:18:19 2012 (+0530)
+# Last-Updated: Fri Jan 27 13:43:16 2012 (+0530)
 #           By: subha
-#     Update #: 2468
+#     Update #: 2469
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -836,7 +836,7 @@ class TraubNet(object):
         self.stim_probe = moose.PulseGen('stim_probe', self.stim_container)
         self.stim_probe.firstLevel = level
         self.stim_probe.secondLevel = level
-        self.stim_probe.firstDelay = 2 * self.stim_bg.firstDelay + self.stim_bg.secondDelay
+        self.stim_probe.firstDelay = 2 * self.stim_bg.firstDelay + self.stim_bg.secondDelay + pulse_width
         self.stim_probe.secondDelay = isi
         self.stim_probe.firstWidth = pulse_width
         self.stim_probe.secondWidth = pulse_width            
