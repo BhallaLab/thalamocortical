@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Jan 27 10:57:36 2012 (+0530)
+# Last-Updated: Fri Jan 27 11:14:06 2012 (+0530)
 #           By: subha
-#     Update #: 296
+#     Update #: 318
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -69,7 +69,8 @@ import moose
 
 timestamp = datetime.now()
 mypid = os.getpid()
-rngseed = None
+numpy_reseeded = False
+numpy_rngseed = None
 stochastic = False # If set to True, the synapses are stochastic, otherwise the deterministic ones are used.
 
 def reseed(seed):
@@ -80,18 +81,22 @@ def reseed(seed):
 
     seed -- seed to be used for the simulation.
     """
-    global rngseed
-    if rngseed is not None:
+    global numpy_reseeded
+    global numpy_rngseed
+    if numpy_reseeded:
         raise Warning('Random number generator already seeded with: %s' % (str(seed)))
-    rngseed = seed
-    numpy.random.seed(rngseed)
+    numpy_reseeded = True
+    numpy.random.seed(seed)
+    numpy_rngseed = seed
+    
 
+moose_reseeded = False
 moose_rngseed = None
 
 def moose_reseed(seed):
     """This is for changing the moose' built-in RNG"""
-    global moose_rngseed
-    if moose_rngseed is not None:
+    global moose_reseeded
+    if moose_reseeded:
         raise Warning('Random number generator already seeded with: %s' % (str(seed)))
     moose_rngseed = seed
     moose.PyMooseBase.getContext().srandom(seed)
@@ -220,17 +225,16 @@ for section in runconfig.sections():
         LOGGER.debug('%s: %s = %s' % (section, key, value))
         
 try:
-    _rngseed = int(runconfig.get('numeric', 'rngseed'))
+    __numpy_rngseed = int(runconfig.get('numeric', 'numpy_rngseed'))
 except ValueError:
-    _rngseed = None
+    __numpy_rngseed = None
 try:
-    __seed = int(runconfig.get('numeric', 'moose_rngseed'))
-    moose_reseed(__seed)
-    LOGGER.info('MOOSE RNG SEED SET TO %d' % (moose_rngseed))
+    __moose_rngseed = int(runconfig.get('numeric', 'moose_rngseed'))
 except ValueError:
-    moose_rngseed = None
+    __moose_rngseed = 0
 
-to_reseed = runconfig.get('numeric', 'reseed') in ['Yes', 'yes', 'True', 'true', '1']
+reseed_numpy = runconfig.get('numeric', 'reseed_numpy') in ['Yes', 'yes', 'True', 'true', '1']
+reseed_moose = runconfig.get('numeric', 'reseed_moose') in ['Yes', 'yes', 'True', 'true', '1']
 stochastic = runconfig.get('numeric', 'stochastic') in ['Yes', 'yes', 'True', 'true', '1']
 solver = runconfig.get('numeric', 'solver')
 simtime = float(runconfig.get('scheduling', 'simtime'))
@@ -238,9 +242,13 @@ simdt = float(runconfig.get('scheduling', 'simdt'))
 plotdt = float(runconfig.get('scheduling', 'plotdt'))
 clockjob.autoschedule = runconfig.get('scheduling', 'autoschedule') in ['Yes', 'yes', 'True', 'true', '1']
 default_releasep = float(runconfig.get('synapse', 'releasep')) 
-if to_reseed:
-    reseed(_rngseed)
-    LOGGER.info('NUMPY RNG SEED SET TO %d' % (rngseed))
+if reseed_numpy:
+    reseed(__numpy_rngseed)    
+    LOGGER.info('NUMPY RNG SEED SET TO %s' % (str(__numpy_rngseed)))
+if reseed_moose:    
+    moose_reseed(__moose_rngseed)
+    LOGGER.info('MOOSE RNG SEED SET TO %s' % (str(moose_rngseed)))
+    
 
 def update_timestamp():
     global filename_suffix
