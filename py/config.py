@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Jan 10 18:07:41 2012 (+0530)
+# Last-Updated: Fri Jan 27 10:57:36 2012 (+0530)
 #           By: subha
-#     Update #: 294
+#     Update #: 296
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -222,7 +222,7 @@ for section in runconfig.sections():
 try:
     _rngseed = int(runconfig.get('numeric', 'rngseed'))
 except ValueError:
-    rngseed = None
+    _rngseed = None
 try:
     __seed = int(runconfig.get('numeric', 'moose_rngseed'))
     moose_reseed(__seed)
@@ -239,12 +239,8 @@ plotdt = float(runconfig.get('scheduling', 'plotdt'))
 clockjob.autoschedule = runconfig.get('scheduling', 'autoschedule') in ['Yes', 'yes', 'True', 'true', '1']
 default_releasep = float(runconfig.get('synapse', 'releasep')) 
 if to_reseed:
-    if _rngseed is not None:
-        reseed(_rngseed)
-        LOGGER.info('NUMPY RNG SEED SET TO %d' % (rngseed))
-    else:
-        reseed(mypid)
-        LOGGER.info('NUMPY RNG SEED SET TO %d' % (rngseed))
+    reseed(_rngseed)
+    LOGGER.info('NUMPY RNG SEED SET TO %d' % (rngseed))
 
 def update_timestamp():
     global filename_suffix
