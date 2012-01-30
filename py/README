@@ -26,7 +26,10 @@ cell.py -- subclass of MOOSE Cell class enhanced in Python for easy
 
 The following files contain classes to load prototype cells from
 corresponding GENESIS .p files and provide copy constructors based on
-those prototypes.
+those prototypes. Each of these can be run independently to simulate
+single cell model with current injection (you may need to comment out
+parts of code to compare with the corresponding NEURON simulation
+data).
 
 deepaxoaxonic.py
 deepbasket.py
