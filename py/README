@@ -1,0 +1,67 @@
+This directory contains files to setup and simulate the single column
+thalamocortical model by Traub et al, 2005. 
+
+The current implementation differs from the original model in that (1)
+it does not have gap junctions and (2) the synapses can be switched to
+have facilitation and depression with stochastic transmission.
+
+Running the simulation requires MOOSE simulator
+(http://moose.sourceforge.net) compiled with Python support (make
+BUILD=pymoose).
+
+Below is a list of files with their uses:
+
+trbsim.py -- main file to start a simulation.
+
+trbsim.py -- code wrapping the simulation settings, data recording etc.
+
+trbnet.py -- code to setup the network
+
+trbnetdata.py -- the default network information hard coded as Python
+              data structures. The final results can be tweaked by the values in the
+              .ini files.
+
+cell.py -- subclass of MOOSE Cell class enhanced in Python for easy
+        loading of single cell prototypes.
+
+The following files contain classes to load prototype cells from
+corresponding GENESIS .p files and provide copy constructors based on
+those prototypes.
+
+deepaxoaxonic.py
+deepbasket.py
+deepLTS.py
+nontuftedRS.py
+nRT.py
+spinystellate.py
+supaxoaxonic.py
+supbasket.py
+supLTS.py
+suppyrFRB.py
+suppyrRS.py
+tcr.py
+tuftedIB.py
+tuftedRS.py
+
+
+compartment.py -- MOOSE single compartments subclassed with enhanced
+               functionality in Python
+
+synapse.py -- data about synapses in Python datastructures.
+
+channel.py -- MOOSE HHChannel subclassed in Python with enhanced
+           functionality. Exact channel definitions subclass this.
+
+archan.py -- AR channel
+
+cachans.py -- Ca2+ channels
+
+kchans.py -- K+ channel definitions
+
+nachans.py -- Na+ channel definitions
+
+capool.py -- Ca2+ pool enhanced in Python
+
+trbutil.py -- some utility functions.
+
+
