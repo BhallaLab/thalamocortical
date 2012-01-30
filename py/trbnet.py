@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Jan 27 13:43:16 2012 (+0530)
+# Last-Updated: Sat Jan 28 12:05:22 2012 (+0530)
 #           By: subha
-#     Update #: 2469
+#     Update #: 2472
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1278,7 +1278,8 @@ class TraubNet(object):
         starttime =  datetime.now()
         compression_filter =  tables.Filters(complevel=9, complib='zlib', fletcher32=True)
         h5file =  tables.openFile(filename,  mode = 'w',  title = 'Traub Network: timestamp: %s' % (config.timestamp.strftime('%Y-%M-%D %H:%M:%S')),  filters = compression_filter)
-        h5file.root._v_attrs.rngseed = config.rngseed
+        h5file.root._v_attrs.numpy_rngseed = config.numpy_rngseed
+        h5file.root._v_attrs.moose_rngseed = config.moose_rngseed
         h5file.root._v_attrs.notes = '\n'.join(self.tweaks_doc)
         # Save simulation configuration data. I am saving it both in
         # data file as well as network file as often the data file is
