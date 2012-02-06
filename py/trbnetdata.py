@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Jan 11 13:52:56 2012 (+0530)
+# Last-Updated: Thu Feb  2 14:18:14 2012 (+0530)
 #           By: subha
-#     Update #: 1226
+#     Update #: 1227
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -146,7 +146,7 @@ class TraubFullNetData(object):
                          [   2.0e-3,    2.0e-3,  1.0e-3,  1.0e-3,    0.0, 2.0e-3, 2.0e-3, 2.0e-3,   1.0e-3,   1.0e-3,     0.0,    2.0e-3,    0.0, 2.0e-3],
                          [      0.0,       0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,      0.0,      0.0,     0.0,       0.0,    0.0,    0.0]]
 
-        # ta_nmda[suppyrrs][suppyrrs] = 130.0 ms according to paper, but 130.5 ms in code
+        # tau_nmda[suppyrrs][suppyrrs] = 130.0 ms according to paper, but 130.5 ms in code
         self.tau_nmda = [[ 130.5e-3,    130e-3,  100e-3,  100e-3, 100e-3, 130e-3, 130e-3, 130e-3,   100e-3,   100e-3,   100e-3,    130e-3,    0.0,    0.0],
                          [ 130.0e-3,    130e-3,  100e-3,  100e-3, 100e-3, 130e-3, 130e-3, 130e-3,   100e-3,   100e-3,   100e-3,    130e-3,    0.0,    0.0],
                          [      0.0,       0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,      0.0,      0.0,      0.0,       0.0,    0.0,    0.0],
