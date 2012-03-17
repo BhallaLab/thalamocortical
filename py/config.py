@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Fri Jan 27 11:14:06 2012 (+0530)
+# Last-Updated: Sat Mar 17 13:43:28 2012 (+0530)
 #           By: subha
-#     Update #: 318
+#     Update #: 326
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -221,7 +221,9 @@ runconfig = configparser.SafeConfigParser()
 runconfig.optionxform = str
 runconfig.read(['defaults.ini', 'custom.ini'])
 for section in runconfig.sections():    
-    for key, value in runconfig.items(section):
+    # section_entries  = runconfig.items(section)
+    # print section_entries
+    for key,value in sorted(runconfig.items(section)):
         LOGGER.debug('%s: %s = %s' % (section, key, value))
         
 try:
