@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Jan 28 12:05:22 2012 (+0530)
+# Last-Updated: Mon Mar 19 20:14:17 2012 (+0530)
 #           By: subha
-#     Update #: 2472
+#     Update #: 2479
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1231,7 +1231,12 @@ class TraubNet(object):
         path_start = len('/model/net/')
         synchans = []
         conductances = []
+        celltypes = []
+        celltype_type = numpy.dtype([('name', 'S32'),
+                                     ('index', 'i8'),
+                                     ('count', 'i16')])
         for vertex in self.celltype_graph.vs:
+            celltypes.append((vertex['label'], vertex.index, vertex['count']))
             for cell_index in self.populations[vertex['label']]:
                 cell = self.index_cell_map[cell_index]
                 for comp_index in range(1, cell.num_comp+1):
@@ -1258,6 +1263,9 @@ class TraubNet(object):
         if synchans:
             dataset = numpy.rec.array(synchans, dtype=synapse_dtype)
             network_struct.create_dataset('synapse', data=dataset, compression='gzip')
+        if celltypes:
+            dataset = numpy.rec.array(celltypes, dtype=celltype_type)
+            network_struct.create_dataset('celltype', data=dataset)
         stimulus_struct = h5file.create_group('stimulus')
         targets = []
         for stim in self.stim_container.children():
