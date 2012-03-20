@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Mar 19 20:26:55 2012 (+0530)
+# Last-Updated: Mon Mar 19 20:28:33 2012 (+0530)
 #           By: subha
-#     Update #: 2480
+#     Update #: 2481
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1232,7 +1232,7 @@ class TraubNet(object):
         synchans = []
         conductances = []
         celltypes = []
-        celltype_type = numpy.dtype([('name', 'S32'),
+        celltype_type = numpy.dtype([('name', 'S16'),
                                      ('index', 'i1'),
                                      ('count', 'i2')])
         for vertex in self.celltype_graph.vs:
