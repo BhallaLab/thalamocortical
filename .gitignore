@@ -6,6 +6,9 @@
 *.so
 *.so.*
 *.png
+*.pdf
+*.jpg
+*.jpeg
 *.pyc
 *~
 *.pickle
