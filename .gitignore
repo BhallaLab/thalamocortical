@@ -1,5 +1,16 @@
+*.h5
+*.log
+*.bz2
+*.gz
+*.o
+*.so
+*.so.*
+*.png
 *.pyc
 *~
+*.pickle
+moose.py.*
+py/data/*
 gen/Cinfolist.txt
 gen/Vm_gen.plot
 gen/Vm_gen_gen.plot
