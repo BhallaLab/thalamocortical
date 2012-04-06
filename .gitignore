@@ -382,6 +382,7 @@ nrn/x86_64/special
 nrn/x86_64/traub_nmda.c
 nrn/x86_64/traub_nmda.lo
 nrn/x86_64/traub_nmda.mod
+nrn/mydata/*
 py/g77traub
 py/g77traub/colossusnodes
 py/g77traub/colossusnodes_fastmachines
