@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Mar 19 20:28:33 2012 (+0530)
+# Last-Updated: Tue Apr 24 12:02:58 2012 (+0530)
 #           By: subha
-#     Update #: 2481
+#     Update #: 2500
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -728,6 +728,7 @@ class TraubNet(object):
         """
         vm_container = moose.Neutral('Vm', data_container)
         ca_container = moose.Neutral('Ca', data_container)
+        syn_gk_container = moose.Neutral('synapse', data_container)
         if celltype == 'all':
             vs = self.celltype_graph.vs
         else:
@@ -747,6 +748,17 @@ class TraubNet(object):
                 cell = self.index_cell_map[cellindex]
                 cell.soma.insertRecorder(cell.name, 'Vm', vm_container)
                 cell.soma.insertCaRecorder(cell.name, ca_container)
+                synchan = moose.getwildcardlist(cell.path + '/##[TYPE=SynChan]', True)
+                nmda = moose.getwildcardlist(cell.path + '/##[TYPE=NMDAChan]', True)
+                synlist = synchan + nmda
+                for chan in synlist:
+                    synapase = moose.Neutral(chan)
+                    comp = moose.Neutral(synapse.parent)
+                    tab = moose.Table('gk_%s_%s_%s' % (cell.name, comp.name, synapse.name), syn_gk_container)
+                    tab.stepMode = 3
+                    print 'Connected recording table', tab.name, tab.connect('inputRequest', synapse, 'Gk')
+
+
         
     def setup_stimulus(self, bg_cells='any', 
                        probe_cells='any',
