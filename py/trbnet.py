@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Apr 24 12:02:58 2012 (+0530)
+# Last-Updated: Tue Apr 24 14:57:09 2012 (+0530)
 #           By: subha
-#     Update #: 2500
+#     Update #: 2506
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -748,15 +748,15 @@ class TraubNet(object):
                 cell = self.index_cell_map[cellindex]
                 cell.soma.insertRecorder(cell.name, 'Vm', vm_container)
                 cell.soma.insertCaRecorder(cell.name, ca_container)
-                synchan = moose.getwildcardlist(cell.path + '/##[TYPE=SynChan]', True)
-                nmda = moose.getwildcardlist(cell.path + '/##[TYPE=NMDAChan]', True)
+                synchan = moose.context.getWildcardList(cell.path + '/##[TYPE=SynChan]', True)
+                nmda = moose.context.getWildcardList(cell.path + '/##[TYPE=NMDAChan]', True)
                 synlist = synchan + nmda
                 for chan in synlist:
-                    synapase = moose.Neutral(chan)
-                    comp = moose.Neutral(synapse.parent)
-                    tab = moose.Table('gk_%s_%s_%s' % (cell.name, comp.name, synapse.name), syn_gk_container)
+                    syn = moose.Neutral(chan)
+                    comp = moose.Neutral(syn.parent)
+                    tab = moose.Table('gk_%s_%s_%s' % (cell.name, comp.name, syn.name), syn_gk_container)
                     tab.stepMode = 3
-                    print 'Connected recording table', tab.name, tab.connect('inputRequest', synapse, 'Gk')
+                    print 'Connected recording table', tab.name, tab.connect('inputRequest', syn, 'Gk')
 
 
         
