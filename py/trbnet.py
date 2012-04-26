@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Apr 24 14:57:09 2012 (+0530)
+# Last-Updated: Thu Apr 26 13:12:56 2012 (+0530)
 #           By: subha
-#     Update #: 2506
+#     Update #: 2507
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -480,6 +480,7 @@ class TraubNet(object):
                         raise Exception('%s->%s -- PS comp has absurd index %d' % (precell.path, postcell.path, postcompindex))
                     if postcompindex > 0 and pre_index == post_index:
                         config.LOGGER.warning('Ignoring self connection: %s->%s (comp # %d)' % (precell.path, postcell.path, postcompindex))
+                        continue
                     elif postcompindex == 0:
                         continue
                     else:
