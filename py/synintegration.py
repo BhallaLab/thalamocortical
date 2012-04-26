@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Apr 24 15:30:05 2012 (+0530)
 # Version: 
-# Last-Updated: Tue Apr 24 21:25:41 2012 (+0530)
+# Last-Updated: Thu Apr 26 14:42:48 2012 (+0530)
 #           By: subha
-#     Update #: 138
+#     Update #: 176
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -53,6 +53,59 @@ def get_syninfo(filename, cellname, srctype):
         ret = (comps, subarray['type'], gbar, tau1, tau2, Ek)
     return ret
 
+def synintegration2(filename, target_cell):
+    raise NotImplementedError
+    syntab = None
+    netfile = h5.File(filename, 'r')
+    syntab = netfile['network/synapse'][:]
+    idx = np.char.startswith(syntab['dest'], target_cell)
+    syntab = syntab[idx]
+    sim = Simulation('synintegration')
+    cell = SpinyStellate(SpinyStellate.prototype, 
+                         sim.model.path + '/SpinyStellate')
+    vm_table = cell.comp[cell.presyn].insertRecorder('Vm', 'Vm', sim.data)
+    # Create a common spike gen object
+    sp = moose.SpikeGen('spike', sim.model)
+    sp.threshold = 0.0
+    sp.edgeTriggered = 1
+    sptab = moose.Table('spike', sim.data)
+    sptab.stepMode = 3
+    sptab.connect('inputRequest', sp, 'state')
+    for ii in range(len(syntab)):
+        source = syntab['source'][ii].partition('/')[0]
+        dest, compname = syntab['dest'][ii].split('/')
+        if source == dest:
+            print 'source = dest', source, filename
+            continue
+        comp_no = compname.split('_')[-1]
+        comp = cell[int(comp_no)]
+        weight = 1.0
+        if syntab['type'][ii] == 'nmda':
+            chan = moose.NMDAChan('nmda_from_%s' % 
+                                  (source.split('_')[0]), comp)
+            chan.MgConc = 1.5            
+            weight = syntab['Gbar'][ii]
+        else:
+            chan = moose.SynChan('%s_from_%s' % 
+                                 (syntab['type'][ii], source.split('_')[0]), 
+                                 comp)
+        chan.Gbar = syntab['Gbar'][ii]
+        chan.tau1 = syntab['tau1'][ii]
+        chan.tau2 = syntab['tau2'][ii]
+        chan.Ek = syntab['Ek'][ii]
+        comp.connect('channel', chan, 'channel')
+        sp.connect('event', chan, 'synapse')
+        count = chan.numSynapses
+        if source_type == 'TCR':
+            chan.delay[count-1] = 1e-3 # thalamocortical delay
+        else:
+            chan.delay[count-1] = 0.05e-3 # default delay
+        chan.weight[count-1] = weight
+        gktable = moose.Table('%s_%s_%s' % (cell.name, comp.name, chan.name), sim.data)
+        gktable.stepMode = 3
+        gktable.connect('inputRequest', chan, 'Gk')
+            
+    
 def test_synintegration(filename, target_cell, source_type):
     sim = Simulation('synintegration')
     cell = SpinyStellate(SpinyStellate.prototype, 
