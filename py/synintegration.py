@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Apr 24 15:30:05 2012 (+0530)
 # Version: 
-# Last-Updated: Thu Apr 26 14:42:48 2012 (+0530)
+# Last-Updated: Sat Apr 28 14:44:03 2012 (+0530)
 #           By: subha
-#     Update #: 176
+#     Update #: 399
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -34,6 +34,11 @@ import h5py as h5
 import moose
 from trbsim import Simulation
 from spinystellate import SpinyStellate
+from tcr import TCR
+from deepLTS import DeepLTS
+from trbnetdata import TraubFullNetData
+
+netdata = TraubFullNetData()
 
 def get_syninfo(filename, cellname, srctype):
     """Load the synapses on cell from network file specified by
@@ -105,7 +110,114 @@ def synintegration2(filename, target_cell):
         gktable.stepMode = 3
         gktable.connect('inputRequest', chan, 'Gk')
             
+
+thalamic = ['nRT', 'TCR']
+
+def delay(pretype, posttype):
+    if pretype in thalamic and posttype not in thalamic:
+        return 1e-3
+    elif pretype not in thalamic and posttype in thalamic:
+        return 5e-3
+    else:
+        return 0.05e-3
     
+def ampa(pre_ix, post_ix):
+    """Return parameters for AMPA synapse."""
+    tau = netdata.tau_ampa[pre_ix][post_ix]
+    return {'tau1': tau,
+            'tau2': tau,
+            'Gbar': netdata.g_ampa_baseline[pre_ix][post_ix] * \
+                tau * 1e3 / np.e,
+            'Ek': 0.0,
+            'weight': 1.0,
+            'classname': 'SynChan'}
+    
+def gaba(pre_ix, post_ix):
+    """Return parameters for GABA synapse with a single component."""
+    return {'tau1': netdata.tau_gaba[pre_ix][post_ix],
+            'tau2': 0.0,
+            'Gbar': netdata.g_gaba_baseline[pre_ix][post_ix],
+            'Ek': -81e-3,
+            'weight': 1.0,
+            'classname': 'SynChan'}
+
+def nmda(pre_ix, post_ix):
+    """Return parameters for NMDA synapse."""
+    return {'tau1': netdata.tau_nmda[pre_ix][post_ix],
+            'tau2': 0.0,
+            'Gbar': netdata.g_nmda_baseline[pre_ix][post_ix],
+            'weight': netdata.g_nmda_baseline[pre_ix][post_ix],
+            'Ek': 0.0,
+            'classname': 'NMDAChan'}
+
+
+def make_synapse(precell, postcell, syntype):
+    pretype = precell.__class__.__name__
+    posttype = postcell.__class__.__name__
+    pre_ix = netdata.celltype.index(pretype)
+    post_ix = netdata.celltype.index(posttype)
+    precomp = precell.comp[precell.presyn]
+    try:
+        postcomp_ix = netdata.allowed_comps[pre_ix][post_ix][0]
+        postcomp = postcell.comp[postcomp_ix]
+    except IndexError:
+        return None
+    kwargs = {}
+    classname = 'SynChan'
+    if syntype == 'ampa':
+        kwargs = ampa(pre_ix, post_ix)
+    elif syntype == 'nmda':
+        kwargs = nmda(pre_ix, post_ix)
+    else:
+        kwargs = gaba(pre_ix, post_ix)
+    kwargs['delay'] = delay(netdata.celltype[pre_ix], 
+                            netdata.celltype[post_ix])
+    kwargs['name'] = '%s_from_%s' % (syntype, posttype)    
+    kwargs['classname'] = classname
+    if kwargs['Gbar'] == 0.0:
+        return None
+    return precomp.makeSynapse(postcomp, **kwargs)
+
+def record_data(datacontainer, tabname, targetobj, targetfield):
+    tab = moose.Table(tabname, datacontainer)
+    tab.stepMode = 3
+    tab.connect('inputRequest', targetobj, targetfield)
+    return tab
+    
+def threecell_test():
+    sim = Simulation('threecell')
+    tcr_ix = netdata.celltype.index('TCR')
+    ss_ix = netdata.celltype.index('SpinyStellate')
+    lts_ix = netdata.celltype.index('DeepLTS')
+    ss = SpinyStellate(SpinyStellate.prototype,
+                       sim.model.path + '/SpinyStellate')
+    tcr = TCR(TCR.prototype, sim.model.path + '/TCR')
+    lts = DeepLTS(DeepLTS.prototype, sim.model.path + '/DeepLTS')
+    cells = [ss, tcr, lts]
+    for postcell in cells:
+        for precell in cells:
+            if precell == postcell:
+                continue
+            for syntype in ['ampa', 'nmda', 'gaba']:
+                syn = make_synapse(precell, postcell, syntype)
+                if syn is not None:
+                    tab = record_data(sim.data, 'gk_%s_%s' % (postcell.name, syn.name), syn, 'Gk')
+        record_data(sim.data, 'Vm_%s' % (postcell.name), postcell.comp[postcell.presyn], 'Vm')
+    pulsegen = moose.PulseGen('pulse', sim.model)
+    pulsegen.firstDelay = 3.0
+    pulsegen.firstLevel = 1.0
+    pulsegen.firstWidth = 1e-3
+    pulsegen.trigMode = moose.FREE_RUN
+    pulsegen.connect('outputSrc', tcr.soma, 'injectMsg')
+    ptable = moose.Table('pulse', sim.data)
+    ptable.stepMode = 3
+    ptable.connect('inputRequest', pulsegen, 'output')
+    sim.schedule(simdt=1e-6, plotdt=1e-6)
+    sim.run(10.0)
+    sim.save_data_h5(filename.replace('network_', 'synintegration_'))
+    
+    
+
 def test_synintegration(filename, target_cell, source_type):
     sim = Simulation('synintegration')
     cell = SpinyStellate(SpinyStellate.prototype, 
@@ -166,10 +278,10 @@ def test_synintegration(filename, target_cell, source_type):
     sim.save_data_h5(filename.replace('network_', 'synintegration_'))
 
 if __name__ == '__main__':
-    test_synintegration('/data/subha/rsync_ghevar_cortical_data_clone/2012_01_18/network_20120118_142820_7865.h5.new',
-                        'SpinyStellate_0',
-                        'TCR')
-                        
+    # test_synintegration('/data/subha/rsync_ghevar_cortical_data_clone/2012_01_18/network_20120118_142820_7865.h5.new',
+    #                     'SpinyStellate_0',
+    #                     'TCR')
+    threecell_test()
             
 # 
 # synintegration.py ends here
