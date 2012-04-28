@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Apr 24 15:30:05 2012 (+0530)
 # Version: 
-# Last-Updated: Sat Apr 28 14:44:03 2012 (+0530)
+# Last-Updated: Sat Apr 28 18:41:44 2012 (+0530)
 #           By: subha
-#     Update #: 399
+#     Update #: 433
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -35,8 +35,9 @@ import moose
 from trbsim import Simulation
 from spinystellate import SpinyStellate
 from tcr import TCR
-from deepLTS import DeepLTS
+from deepbasket import DeepBasket
 from trbnetdata import TraubFullNetData
+from datetime import datetime
 
 netdata = TraubFullNetData()
 
@@ -172,10 +173,13 @@ def make_synapse(precell, postcell, syntype):
         kwargs = gaba(pre_ix, post_ix)
     kwargs['delay'] = delay(netdata.celltype[pre_ix], 
                             netdata.celltype[post_ix])
-    kwargs['name'] = '%s_from_%s' % (syntype, posttype)    
+    kwargs['name'] = '%s_from_%s' % (syntype, pretype)    
     kwargs['classname'] = classname
     if kwargs['Gbar'] == 0.0:
         return None
+    print '== Synapse:', precell.path, '<=', postcell.path, '=='
+    print kwargs
+    print '-- !Synapse Args --'
     return precomp.makeSynapse(postcomp, **kwargs)
 
 def record_data(datacontainer, tabname, targetobj, targetfield):
@@ -188,12 +192,12 @@ def threecell_test():
     sim = Simulation('threecell')
     tcr_ix = netdata.celltype.index('TCR')
     ss_ix = netdata.celltype.index('SpinyStellate')
-    lts_ix = netdata.celltype.index('DeepLTS')
+    basket_ix = netdata.celltype.index('DeepBasket')
     ss = SpinyStellate(SpinyStellate.prototype,
                        sim.model.path + '/SpinyStellate')
     tcr = TCR(TCR.prototype, sim.model.path + '/TCR')
-    lts = DeepLTS(DeepLTS.prototype, sim.model.path + '/DeepLTS')
-    cells = [ss, tcr, lts]
+    basket = DeepBasket(DeepBasket.prototype, sim.model.path + '/DeepBasket')
+    cells = [ss, tcr, basket]
     for postcell in cells:
         for precell in cells:
             if precell == postcell:
@@ -205,16 +209,21 @@ def threecell_test():
         record_data(sim.data, 'Vm_%s' % (postcell.name), postcell.comp[postcell.presyn], 'Vm')
     pulsegen = moose.PulseGen('pulse', sim.model)
     pulsegen.firstDelay = 3.0
-    pulsegen.firstLevel = 1.0
-    pulsegen.firstWidth = 1e-3
+    pulsegen.firstLevel = 1e-9
+    pulsegen.firstWidth = 2e-3
     pulsegen.trigMode = moose.FREE_RUN
     pulsegen.connect('outputSrc', tcr.soma, 'injectMsg')
     ptable = moose.Table('pulse', sim.data)
     ptable.stepMode = 3
     ptable.connect('inputRequest', pulsegen, 'output')
-    sim.schedule(simdt=1e-6, plotdt=1e-6)
-    sim.run(10.0)
-    sim.save_data_h5(filename.replace('network_', 'synintegration_'))
+    sim.schedule(simdt=25e-6, plotdt=25e-5)
+    for t in range(10):
+        start = datetime.now()
+        sim.run(1.0)
+        end = datetime.now()
+        delta = end - start
+        print 'Ran', t+1, '-th second in', delta.seconds + 1e-6 * delta.microseconds
+    sim.save_data_h5('threecells.h5')
     
     
 
