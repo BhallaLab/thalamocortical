@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Apr 26 13:12:56 2012 (+0530)
+# Last-Updated: Tue May  1 16:14:04 2012 (+0530)
 #           By: subha
-#     Update #: 2507
+#     Update #: 2508
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -475,6 +475,7 @@ class TraubNet(object):
                 precomp = precell.comp[precell.presyn]
                 for post_index in range(poststart, poststart+postcount):
                     postcell = self.index_cell_map[post_index]
+                    # self.ps_comp_mat will be holding the compartment index for pre-post cell pair.
                     postcompindex = int(self.ps_comp_mat[pre_index, post_index])
                     if postcompindex > 255:
                         raise Exception('%s->%s -- PS comp has absurd index %d' % (precell.path, postcell.path, postcompindex))
