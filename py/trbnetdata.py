@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Feb  2 14:18:14 2012 (+0530)
+# Last-Updated: Tue May  1 15:42:51 2012 (+0530)
 #           By: subha
-#     Update #: 1227
+#     Update #: 1245
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -484,6 +484,16 @@ class TraubFullNetData(object):
         self.nRT_TCR_ggaba_high = 2.1e-9
         self.nRT_TCR_ggaba_low = 0.7e-9
         self.ectopic_interval = [10.0, 10.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, 1.0, 1.0, -1.0]
+
+    def get_orig_connprob(self, pretype, posttype):
+        """Connection probability from pretype to posttype computed
+        from the total number of cells of pretype and posttype and
+        prepost ratio in the original model."""
+        preindex = self.celltype.index(pretype)
+        postindex = self.celltype.index(posttype)
+        precount = self.cellcount[preindex]
+        ratio = self.pre_post_ratio[preindex][postindex]
+        return ratio * 1.0 / precount        
         
     def check_pre_post_ratio(self):
         """Check the pre-post ratio for each celltype pair"""
