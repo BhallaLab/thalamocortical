@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue May  1 16:14:04 2012 (+0530)
+# Last-Updated: Wed May  2 16:02:06 2012 (+0530)
 #           By: subha
-#     Update #: 2508
+#     Update #: 2510
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -708,9 +708,10 @@ class TraubNet(object):
             tab = cell.soma.insertRecorder(cell.name, 'Vm', spike_container)
             tab.stepMode = moose.TAB_SPIKE
             tab.stepSize = -20e-3
+        ectopic_container = moose.Neutral('%s/ectopic_spikes' % (data_container.path))
         for ch in self.ectopic_container.children():
             spike = moose.Neutral(ch)
-            tab = moose.Table(spike.name, spike_container)
+            tab = moose.Table(spike.name, ectopic_container)
             tab.stepMode = moose.TAB_SPIKE
             tab.stepSize = 0.2e-9
             spike.connect('state', tab, 'inputRequest')
