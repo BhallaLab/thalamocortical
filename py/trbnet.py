@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon May  7 18:32:50 2012 (+0530)
+# Last-Updated: Mon May  7 18:37:26 2012 (+0530)
 #           By: Subhasis Ray
-#     Update #: 2522
+#     Update #: 2525
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -969,6 +969,7 @@ class TraubNet(object):
             raise Warning('Cell-graph already instantiated. Cannot rescale.')
         for vertex in self.celltype_graph.vs:
             vertex['count'] *= scale
+            
     
     def scale_conductance(self, conductance_name, scale_dict):
         """Scale a particular synaptic conductance between pairs of celltypes.
@@ -1033,6 +1034,7 @@ class TraubNet(object):
             edge['gampa'] = edge['gampa'] / scale
             edge['ggaba'] = edge['ggaba'] / scale
             edge['gnmda'] = edge['gnmda'] / scale
+            config.LOGGER.info('scaled %s->%s conductances by %g' % (pre_vertex['label'], self.celltype_graph.vs[edge.target]['label'], 1.0/scale))
         
     def tweak_Ek(self, channel_class, value):
         """Adds value to channel's reversal potential. According
