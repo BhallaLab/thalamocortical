@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon May  7 18:37:26 2012 (+0530)
+# Last-Updated: Mon May  7 18:42:38 2012 (+0530)
 #           By: Subhasis Ray
-#     Update #: 2525
+#     Update #: 2526
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1031,6 +1031,8 @@ class TraubNet(object):
         for edge in self.celltype_graph.es:
             pre_vertex = self.celltype_graph.vs[edge.source]
             scale = presynaptic_scaling[pre_vertex['label']]
+            if scale <= 0:
+                continue
             edge['gampa'] = edge['gampa'] / scale
             edge['ggaba'] = edge['ggaba'] / scale
             edge['gnmda'] = edge['gnmda'] / scale
