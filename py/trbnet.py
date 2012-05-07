@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed May  2 16:02:06 2012 (+0530)
-#           By: subha
-#     Update #: 2510
+# Last-Updated: Mon May  7 18:32:50 2012 (+0530)
+#           By: Subhasis Ray
+#     Update #: 2522
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -293,6 +293,7 @@ class TraubNet(object):
                     self.celltype_graph.add_edges((celltype.index, posttype.index))
                     new_edge = self.celltype_graph.es[edge_count]
                     new_edge['weight'] = 1.0 * pre_post_ratio / celltype['count']
+                    g_ampa_baseline = tn.g_ampa_baseline[celltype.index][posttype.index] 
                     new_edge['gampa'] = tn.g_ampa_baseline[celltype.index][posttype.index] * tn.tau_ampa[celltype.index][posttype.index]*1e3 / numpy.e # This is how gmax is related to c (baseline conductance scaling factor) for AMPA in traub model (e has unit of ms)
                     new_edge['gnmda'] = tn.g_nmda_baseline[celltype.index][posttype.index]
                     new_edge['tauampa'] = tn.tau_ampa[celltype.index][posttype.index]
@@ -1014,12 +1015,25 @@ class TraubNet(object):
         name count
 
         """
+        presynaptic_scaling = {}
         for celltype, count in config.runconfig.items('cellcount'):
             vertices = self.celltype_graph.vs.select(label_eq=celltype)
             for vertex in vertices:
+                presynaptic_scaling[celltype] = float(count) / vertex['count']
                 vertex['count'] = int(count)
                 config.LOGGER.info('%s population size: %d' % (celltype, vertex['count']))
-
+        # 2012-05-07 18:24:53 (+0530) As discussed in last lab meet, I
+        # need to scale the synaptic conductances according
+        # reduction/increase in cell count of each type so that the
+        # total conductance of each synapse type on each cell type
+        # remains unchanged.
+        for edge in self.celltype_graph.es:
+            pre_vertex = self.celltype_graph.vs[edge.source]
+            scale = presynaptic_scaling[pre_vertex['label']]
+            edge['gampa'] = edge['gampa'] / scale
+            edge['ggaba'] = edge['ggaba'] / scale
+            edge['gnmda'] = edge['gnmda'] / scale
+        
     def tweak_Ek(self, channel_class, value):
         """Adds value to channel's reversal potential. According
         Nernst equation, a multiplicative change in ionic
