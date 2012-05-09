@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon May  7 18:42:38 2012 (+0530)
-#           By: Subhasis Ray
-#     Update #: 2526
+# Last-Updated: Wed May  9 18:59:27 2012 (+0530)
+#           By: subha
+#     Update #: 2530
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -752,6 +752,8 @@ class TraubNet(object):
                 cell = self.index_cell_map[cellindex]
                 cell.soma.insertRecorder(cell.name, 'Vm', vm_container)
                 cell.soma.insertCaRecorder(cell.name, ca_container)
+                if config.runconfig.get('record', 'gk_syn') not in ['YES', 'Yes', 'yes', '1', 'TRUE', 'True', 'true']:
+                    continue
                 synchan = moose.context.getWildcardList(cell.path + '/##[TYPE=SynChan]', True)
                 nmda = moose.context.getWildcardList(cell.path + '/##[TYPE=NMDAChan]', True)
                 synlist = synchan + nmda
