@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed May  9 18:59:27 2012 (+0530)
+# Last-Updated: Thu May 10 17:04:18 2012 (+0530)
 #           By: subha
-#     Update #: 2530
+#     Update #: 2535
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1036,7 +1036,13 @@ class TraubNet(object):
             if scale <= 0:
                 continue
             edge['gampa'] = edge['gampa'] / scale
-            edge['ggaba'] = edge['ggaba'] / scale
+            try:
+                edge['ggaba'] = edge['ggaba'] / scale
+            except TypeError: # nRT->TCR is uniformly distributed between two values, scale those.
+                tokens = edge['ggaba'].split()
+                lower = float(tokens[1]) / scale
+                upper = float(tokens[2]) / scale
+                edge['ggaba'] = 'uniform %f %f' % (lower, upper)
             edge['gnmda'] = edge['gnmda'] / scale
             config.LOGGER.info('scaled %s->%s conductances by %g' % (pre_vertex['label'], self.celltype_graph.vs[edge.target]['label'], 1.0/scale))
         
