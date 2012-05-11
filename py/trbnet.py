@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Thu May 10 17:04:18 2012 (+0530)
+# Last-Updated: Thu May 10 17:36:13 2012 (+0530)
 #           By: subha
-#     Update #: 2535
+#     Update #: 2553
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -397,7 +397,7 @@ class TraubNet(object):
                                     syn_list[:,0],
                                     syn_list[:,1])
             else:
-                gaba_sd = float(config.runconfig.get('AMPA', 'sd'))
+                gaba_sd = float(config.runconfig.get('GABA', 'sd'))
                 g_gaba = float(edge['ggaba'])
                 if gaba_sd > 0:
                     g_gaba = numpy.random.normal(loc=g_gaba, scale=gaba_sd*g_gaba, size=len(syn_list))
@@ -967,6 +967,7 @@ class TraubNet(object):
 
     def scale_populations(self, scale):
         """Scale the number of cells in each population by a factor."""
+        raise NotImplementedError('This has been removed and not up to date')
         if self.cell_graph is not None:
             raise Warning('Cell-graph already instantiated. Cannot rescale.')
         for vertex in self.celltype_graph.vs:
@@ -1003,7 +1004,7 @@ class TraubNet(object):
                             if conductance_name == 'ggaba' and pretype_vertex['label'] == 'nRT' and posttype_vertex['label'] == 'TCR':
                                 self.nRT_TCR_ggaba_low *= scale_factor
                                 self.nRT_TCR_ggaba_high *= scale_factor
-                                edge[conductance_name] = 'uniform %f %f' % (self.nRT_TCR_ggaba_low, self.nRT_TCR_ggaba_high)
+                                edge[conductance_name] = 'uniform %s %s' % (self.nRT_TCR_ggaba_low, self.nRT_TCR_ggaba_high)
                             else:
                                 edge[conductance_name] *= scale_factor
 
@@ -1040,9 +1041,12 @@ class TraubNet(object):
                 edge['ggaba'] = edge['ggaba'] / scale
             except TypeError: # nRT->TCR is uniformly distributed between two values, scale those.
                 tokens = edge['ggaba'].split()
-                lower = float(tokens[1]) / scale
-                upper = float(tokens[2]) / scale
-                edge['ggaba'] = 'uniform %f %f' % (lower, upper)
+                config.LOGGER.debug(str(tokens))
+                self.nRT_TCR_ggaba_low = float(tokens[1]) / scale
+                self.nRT_TCR_ggaba_high = float(tokens[2]) / scale
+                edge['ggaba'] = 'uniform %s %s' % (self.nRT_TCR_ggaba_low, self.nRT_TCR_ggaba_high)
+
+                config.LOGGER.debug('nRT->TCR after scaling ggaba %s: %g, %g' % (edge['ggaba'], self.nRT_TCR_ggaba_low, self.nRT_TCR_ggaba_high))
             edge['gnmda'] = edge['gnmda'] / scale
             config.LOGGER.info('scaled %s->%s conductances by %g' % (pre_vertex['label'], self.celltype_graph.vs[edge.target]['label'], 1.0/scale))
         
@@ -1094,7 +1098,7 @@ class TraubNet(object):
                                 if g_name == 'ggaba' and source == 'nRT' and dest == 'TCR':
                                     self.nRT_TCR_ggaba_low *= scale_factor
                                     self.nRT_TCR_ggaba_high *= scale_factor
-                                    syn[g_name] = 'uniform %f %f' % (self.nRT_TCR_ggaba_low, self.nRT_TCR_ggaba_high)
+                                    syn[g_name] = 'uniform %s %s' % (self.nRT_TCR_ggaba_low, self.nRT_TCR_ggaba_high)
 
                                 else:
                                     syn[g_name] *= scale_factor
@@ -1129,7 +1133,7 @@ class TraubNet(object):
                                 if g_name == 'ggaba' and source == 'nRT' and dest == 'TCR':
                                     self.nRT_TCR_ggaba_low = value
                                     self.nRT_TCR_ggaba_high = value
-                                    syn[g_name] = 'uniform %f %f' % (self.nRT_TCR_ggaba_low, self.nRT_TCR_ggaba_high)
+                                    syn[g_name] = 'uniform %s %s' % (self.nRT_TCR_ggaba_low, self.nRT_TCR_ggaba_high)
                                 else:
                                     syn[g_name] = value
 
