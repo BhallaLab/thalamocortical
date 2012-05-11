@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Sep 29 11:43:22 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Dec 14 11:05:53 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 580
+# Last-Updated: Fri May 11 16:36:19 2012 (+0530)
+#           By: subha
+#     Update #: 582
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -98,14 +98,14 @@ class SpinyStellate(TraubCell):
         # for neighbour in mycell.soma.neighbours('axial'):
         #     print 'AXIAL', neighbour.path()
         vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_spinstell', 'Vm', sim.data)
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=50e-3, firstWidth=50e-3)
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=50e-3, firstWidth=500e-3)
 #         pulsegen1 = mycell.soma.insertPulseGen('pulsegen1', sim.model, firstLevel=3e-7, firstDelay=150e-3, firstWidth=10e-3)
 
         sim.schedule()
         if mycell.has_cycle():
             config.LOGGER.warning("WARNING!! CYCLE PRESENT IN CICRUIT.")
         t1 = datetime.now()
-        sim.run(200e-3)
+        sim.run(1.0)
         t2 = datetime.now()
         delta = t2 - t1
         config.BENCHMARK_LOGGER.info('simulation time: %g' % (delta.seconds + 1e-6 * delta.microseconds))
