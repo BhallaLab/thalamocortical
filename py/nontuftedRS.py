@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 11:34:27 2009 (+0530)
 # Version: 
-# Last-Updated: Sun Jan 22 23:54:13 2012 (+0530)
-#           By: Subhasis Ray
-#     Update #: 39
+# Last-Updated: Fri May 11 16:45:29 2012 (+0530)
+#           By: subha
+#     Update #: 45
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -114,24 +114,27 @@ class NontuftedRS(TraubCell):
         mycell = NontuftedRS(NontuftedRS.prototype, sim.model.path + "/NontuftedRS")
         print 'Created cell:', mycell.path
         vm_table = mycell.comp[NontuftedRS.presyn].insertRecorder('Vm_nontuftRS', 'Vm', sim.data)
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=1e-9, firstDelay=50e-3, firstWidth=300e-3)
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=1e-9, firstDelay=50e-3, firstWidth=500e-3)
         sim.schedule()
         if mycell.has_cycle():
             print "WARNING!! CYCLE PRESENT IN CICRUIT."
         t1 = datetime.now()
-        sim.run(500e-3)
+        sim.run(1.0)
         t2 = datetime.now()
         delta = t2 - t1
         print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
         sim.dump_data('data')
         if config.has_pylab:
             mus_vm = config.pylab.array(vm_table) * 1e3
-            nrn_vm = config.pylab.loadtxt('../nrn/mydata/Vm_nontuftRS.plot')
-            nrn_t = nrn_vm[:, 0]
-            mus_t = linspace(0, nrn_t[-1], len(mus_vm))
-            nrn_vm = nrn_vm[:, 1]
-            config.pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
+            mus_t = linspace(0, sim.simtime*1e3, len(mus_vm))
             config.pylab.plot(mus_t, mus_vm, 'g-.', label='mus vm')
+            try:
+                nrn_vm = config.pylab.loadtxt('../nrn/mydata/Vm_nontuftRS.plot')
+                nrn_t = nrn_vm[:, 0]
+                nrn_vm = nrn_vm[:, 1]
+                config.pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
+            except IOError:
+                pass
             config.pylab.legend()
             config.pylab.title('nontuftedRS')
             config.pylab.show()
