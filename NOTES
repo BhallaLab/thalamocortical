@@ -3108,8 +3108,11 @@ TypeError: sequence elements must be integer pairs
   nRT = 100
 
 * TODO <2012-05-14 Mon 19:52> AWS feedback
-  - Niraj pointed out that in stead of having spike/nospike probabilities,
+  - [X] Niraj pointed out that in stead of having spike/nospike probabilities,
     looking at the distribution of the timing might be useful.
+
+        - Implemented PSTH in dataviz. That takes care of the distribution.
+
   - Upi pointed out that in path calculation we should incorporate inhibitory
     synapse: we could as well use the actual conductances, but I was reluctant
     to go for such a fine measure.
