@@ -291,6 +291,9 @@
   here - checking each implementation and cleaning it up.
 
 * TODO Document what I am doing. Keep track of the files.
+  :PROPERTIES:
+  :ID:       f7cd9d0b-e7c3-495f-a5ee-8410b912ccee
+  :END:
 * TODO Clean up trbutil.py and utility.g with verification in mind.
 * <2008-12-02 Tue 23:01> Organizing tests
   Created file trb_tests.g. This file will contain all the tests as I build
@@ -3088,7 +3091,10 @@ TypeError: sequence elements must be integer pairs
   the full model to complete the network behaviour (for example, now there is
   too much synchronized spiking in spiny stellates and no spiking in between
   these bursts).
-* <2012-05-13 Sun 20:59> Running a simulation
+* DONE <2012-05-13 Sun 20:59> Running a simulation
+  CLOSED: [2012-05-22 Tue 16:18]
+  - CLOSING NOTE [2012-05-22 Tue 16:19] \\
+    This simulation finished. Documented in labnotebook entry: http://magaj.ncbs.res.in/notepal2012/blogs/subha/2012-05-22
   Supragranular layers removed. Added nontufted RS with bias current 0.1 nA (fig 6 Traub et al 2005)
 
   SpinyStellate =	1000
