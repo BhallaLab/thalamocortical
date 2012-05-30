@@ -549,7 +549,7 @@
   Peculiarities of NEURON to remember:
   time unit: ms
   voltage unit: mV
-  current unit: nA
+  current unit: nA (?? they put mA/cm^2 for ina in mod files, but in IClamp objects it is in nA)
   
   all resistance/capacitance/conductance are specific, not absolute values. 
   
