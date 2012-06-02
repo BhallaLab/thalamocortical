@@ -3105,3 +3105,31 @@ TypeError: sequence elements must be integer pairs
     synapse: we could as well use the actual conductances, but I was reluctant
     to go for such a fine measure.
     
+* <2012-06-03 Sun 00:10> Converting Ca concentration parameters : phi to B
+  I am writing test code for port of the channels to new moose. When
+  converting CaConc, I got confused about the conversion of phi to B
+  again. Finally this is the logic for the conversion:
+
+  MOOSE/GENESIS uses:
+
+  d(Ca)/dt = B * Ik - Ca/tau
+
+  where Ik is the total Ca current and all units are in SI.
+
+  NEURON form is:
+
+  Ca' = - phi * ica - beta * Ca
+
+  Now, NEURON's unit system has Ca in mM, which happens to be the SI unit
+  (mole/m^3). beta is just 1/tau, so we have to convert ms-1 to s-1, i.e.,
+  multiply by 1e3.
+
+  For phi, we note that 
+
+  - ica has opposite sign convention to Ik. So the sign is resolved.
+  - now,
+
+    B * Ik = phi * ica
+    => B * Ik (in A) = phi * Ik (in mA) / area (in cm2)
+    => B = phi * 1e3 / area
+    
