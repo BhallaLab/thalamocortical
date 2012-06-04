@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Thu May 10 17:36:13 2012 (+0530)
+# Last-Updated: Mon Jun  4 16:17:09 2012 (+0530)
 #           By: subha
-#     Update #: 2553
+#     Update #: 2554
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1250,7 +1250,7 @@ class TraubNet(object):
         than going through the graph-based version."""
         config.LOGGER.debug('START: save_cell_network to %s' % (filename))
         h5file =  h5py.File(filename,  'w')
-        h5file.attrs['TITLE'] = 'Traub Network: timestamp: %s' % (config.timestamp.strftime('%Y-%M-%D %H:%M:%S'))
+        h5file.attrs['TITLE'] = 'Traub Network: timestamp: %s' % (config.timestamp.strftime('%Y-%m-%d %H:%M:%S'))
         h5file.attrs['notes'] = '\n'.join(self.tweaks_doc)
         # Save simulation configuration data. I am saving it both in
         # data file as well as network file as often the data file is
