@@ -291,6 +291,9 @@
   here - checking each implementation and cleaning it up.
 
 * TODO Document what I am doing. Keep track of the files.
+  :PROPERTIES:
+  :ID:       f7cd9d0b-e7c3-495f-a5ee-8410b912ccee
+  :END:
 * TODO Clean up trbutil.py and utility.g with verification in mind.
 * <2008-12-02 Tue 23:01> Organizing tests
   Created file trb_tests.g. This file will contain all the tests as I build
@@ -549,7 +552,7 @@
   Peculiarities of NEURON to remember:
   time unit: ms
   voltage unit: mV
-  current unit: nA
+  current unit: nA (?? they put mA/cm^2 for ina in mod files, but in IClamp objects it is in nA)
   
   all resistance/capacitance/conductance are specific, not absolute values. 
   
@@ -3075,7 +3078,10 @@ TypeError: sequence elements must be integer pairs
   currents disabled.
 
 
-* TODO <2012-05-12 Sat 13:57> Optimize dataviz code for displaying data tables.
+* DONE <2012-05-12 Sat 13:57> Optimize dataviz code for displaying data tables.
+  CLOSED: [2012-05-18 Fri 15:36]
+  - CLOSING NOTE [2012-05-18 Fri 15:36] \\
+    implemented the model and incorporated into dataviz.
   CLOCK: [2012-05-16 Wed 10:58]
 
 * TODO <2012-05-12 Sat 15:12> Run full simulation
@@ -3085,7 +3091,10 @@ TypeError: sequence elements must be integer pairs
   the full model to complete the network behaviour (for example, now there is
   too much synchronized spiking in spiny stellates and no spiking in between
   these bursts).
-* <2012-05-13 Sun 20:59> Running a simulation
+* DONE <2012-05-13 Sun 20:59> Running a simulation
+  CLOSED: [2012-05-22 Tue 16:18]
+  - CLOSING NOTE [2012-05-22 Tue 16:19] \\
+    This simulation finished. Documented in labnotebook entry: http://magaj.ncbs.res.in/notepal2012/blogs/subha/2012-05-22
   Supragranular layers removed. Added nontufted RS with bias current 0.1 nA (fig 6 Traub et al 2005)
 
   SpinyStellate =	1000
@@ -3099,8 +3108,11 @@ TypeError: sequence elements must be integer pairs
   nRT = 100
 
 * TODO <2012-05-14 Mon 19:52> AWS feedback
-  - Niraj pointed out that in stead of having spike/nospike probabilities,
+  - [X] Niraj pointed out that in stead of having spike/nospike probabilities,
     looking at the distribution of the timing might be useful.
+
+        - Implemented PSTH in dataviz. That takes care of the distribution.
+
   - Upi pointed out that in path calculation we should incorporate inhibitory
     synapse: we could as well use the actual conductances, but I was reluctant
     to go for such a fine measure.
