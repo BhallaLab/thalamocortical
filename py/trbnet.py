@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Jun  4 16:17:09 2012 (+0530)
+# Last-Updated: Mon Jun  4 16:23:24 2012 (+0530)
 #           By: subha
-#     Update #: 2554
+#     Update #: 2564
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -403,7 +403,6 @@ class TraubNet(object):
                     g_gaba = numpy.random.normal(loc=g_gaba, scale=gaba_sd*g_gaba, size=len(syn_list))
                 self.g_gaba_mat.put(g_gaba,
                                     syn_list[:,0], syn_list[:,1])                    
-
         end = datetime.now()
         delta = end - start
         config.BENCHMARK_LOGGER.info('cell-cell network generation in: %g s' % (delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))
@@ -1153,7 +1152,6 @@ class TraubNet(object):
         if Rm_sd == 0.0 or Ra_sd == 0.0 or Cm_sd == 0.0 or initVm_sd == 0.0:
             config.LOGGER.info('Passive properties unchanged.')
             return
-
         for celltype in self.celltype_graph.vs:
             indices = self.populations[celltype['label']]
             if indices:
@@ -1180,7 +1178,6 @@ class TraubNet(object):
                         cell.comp[comp_index+1].Ra = randomized_values[comp_index][2][ii]
                     ii += 1
         config.LOGGER.debug('END Randomizing passive properties')
-
 
     def randomize_active_conductances(self):
         """Change the active conductances to be distributed normally
@@ -1323,7 +1320,6 @@ class TraubNet(object):
         
         h5file.close()
         config.LOGGER.debug('END: save_cell_network')
-
 
     def save_network_model(self,  filename):
         """Save the network structure in an hdf5 file"""
@@ -1501,7 +1497,6 @@ def test_generate_celltype_graph(celltype_file='celltype_graph.gml', format='gml
         if source['label'] == 'nRT' and target['label'] == 'TCR':
             assert edge['taugabaslow'] == original_edge['taugabaslow']
             
-            
 def test_scale_conductance():
     netdata = TraubFullNetData()
     trbnet = TraubNet()
@@ -1515,7 +1510,6 @@ def test_scale_conductance():
                        ('*', 'DeepAxoaxonic'): 0.2,
                        ('*', 'TCR'): 0.2,
                        ('*', 'nRT'): 0.2}
-    
     scale_dict_ampa_ss_low = {('SpinyStellate', 'SpinyStellate'): 0.25/2.0}
     trbnet.scale_conductance('gampa', scale_dict_ampa)
     trbnet.scale_conductance('gnmda', scale_dict_nmda)
@@ -1538,7 +1532,6 @@ def test_scale_conductance():
         else:
             assert numpy.allclose([edge['gnmda']], [gnmda_baseline])
     print 'test_scale_conductance: Successfully tested.'
-
 
 def test_reading_network(filename):
     tn =  TraubNet()
@@ -1568,21 +1561,18 @@ def test_reading_network(filename):
             assert row['pscomps'][ii] == pscomp
             ii +=  1
         assert row['ekgaba'] == edge['ekgaba']
-
         it =  None
         try:
             it =  iter(edge['ggaba'])
         except TypeError:
             assert row['ggaba'][0] == edge['ggaba']
             assert row['ggaba'][0] == edge['ggaba']
-
         assert ((it is None) or (self.celltype_graph.vs[edge.source]['label'] == 'nRT'))
         if self.celltype_graph.vs[edge.source]['label'] == 'nRT':
             if self.celltype_graph.vs[edge.target]['label'] == 'TCR':
                 assert row['ggaba'][0] ==  tn.nRT_TCR_ggaba_low
                 assert row['ggaba'][1] ==  tn.nRT_TCR_ggaba_high
             assert row['taugabaslow'] == edge['taugabaslow']
-        
     h5file.close()
 
 if __name__ == '__main__':
