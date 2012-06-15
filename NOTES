@@ -1,5 +1,6 @@
 -*- mode: org; fill-column: 78 -*-
 #+STARTUP: lognotedone
+#+TODO: TODO(t) WAIT(w@/!) | DONE(d@/!) CANCELED(c@)
 * Converting Kahp and Kc
    I_K(AHP) is calculated like this:
    I_K(AHP) = Gbar*m*(V-Ek)
@@ -3084,7 +3085,10 @@ TypeError: sequence elements must be integer pairs
     implemented the model and incorporated into dataviz.
   CLOCK: [2012-05-16 Wed 10:58]
 
-* TODO <2012-05-12 Sat 15:12> Run full simulation
+* DONE <2012-05-12 Sat 15:12> Run full simulation
+  CLOSED: [2012-06-15 Fri 10:24]
+  - State "DONE"       from "TODO"       [2012-06-15 Fri 10:25] \\
+    Today the simulation for 55 s with halved cell count got over: /data/subha/cortical/py/data/2012_05_22/traub2005_20120522_152734_10973.log
   When going through the older simulations to see why I eliminated the deep
   layer pyramids, I saw that there was more activity in these cells in the
   full model (albeit with bias currents). It is possible that we really need
