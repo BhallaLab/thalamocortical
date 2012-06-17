@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Jun  6 11:13:39 2012 (+0530)
 # Version: 
-# Last-Updated: Fri Jun 15 09:55:05 2012 (+0530)
+# Last-Updated: Sat Jun 16 15:19:57 2012 (+0530)
 #           By: subha
-#     Update #: 516
+#     Update #: 557
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -66,7 +66,12 @@ def find_data_with_stimulus(filenamelist):
 
 def categorise_networks(filehandles):
     """Categorize the files based on cellcount and network
-    generation rng seed"""
+    generation rng seed
+
+    Returns a dict whose keys are seeds and values are list of
+    filehandles that used that seed.
+
+    """
     seeds = defaultdict(dict)
     for fh in filehandles:
         try:
@@ -79,7 +84,9 @@ def categorise_networks(filehandles):
         # cellcount map to create a unique key.
         # The hash is computed from the string
         # 'key1,key2,...,keyN:val1,val2,...,valN'
-        cchash = hash(','.join(cellcount.keys())+':'+','.join(cellcount.values()))
+        sorted_keys = sorted(cellcount.keys())
+        sorted_values = [cellcount[key] for key in sorted_keys]
+        cchash = hash(','.join(sorted_keys)+':'+','.join(sorted_values))
         k = None
         if 'rngseed' in numinfo:
             k = numinfo['rngseed']
@@ -204,8 +211,9 @@ def get_stim_aligned_spike_times(fhandles, cellnames, plot=None):
             probe = spikes[spikes >= interval] - interval
             bg_spikes[cell].append(bg)
             probe_spikes[cell].append(probe)
-            plt.plot(bg, np.ones(len(bg))*ii, 'bx')
-            plt.plot(probe, np.ones(len(probe))*ii, 'r+')
+            if plot is not None:
+                plt.plot(bg, np.ones(len(bg))*ii, 'bx')
+                plt.plot(probe, np.ones(len(probe))*ii, 'r+')
             if plot == 'each':
                 plt.title('%s: %s' % (fh.filename, cell))
                 plt.show()
@@ -238,7 +246,7 @@ def get_t_first_spike(spiketimes_list):
         if len(st) > 0:
             ret.append(st[0])
         else:
-            ret.append(1e9) # a large placeholder value for when there was no spike    
+            ret.append(1.0) # a placeholder value for when there was no spike    
     return np.array(ret)
 
 def get_spike_freq(spiketimes_list, delay=0.0, window=50e-3):
@@ -246,8 +254,44 @@ def get_spike_freq(spiketimes_list, delay=0.0, window=50e-3):
     `delay` time from stimulus onset."""
     ret = []
     for st in spiketimes_list:
-        spikes = np.nonzero((st > delay) & (st < delay+window))[0]
+        spikes = len(np.nonzero((st > delay) & (st < delay+window))[0])
         ret.append(spikes * 1.0 / window)
+    return np.array(ret)
+
+def get_max_spike_count(spike_time_list, window=10e-3):
+    """Get the maximum frequency using a sliding window of width `window`.
+
+    Parameters
+    ----------
+    
+    spike_time_list: list of arrays containing spike times. 
+
+    app specific note: When background and probe stimulus alternate,
+    the spikes following each stimulus are collected in an
+    array. Arrays from multiple stimulus application constitute
+    spike_time_list.
+
+    window:  the width of the time window in which to maximize the number of spikes
+
+    
+
+    Returns 
+    -------
+
+    the position of the centre of the window and the number
+    spikes within the window for each array in `spike_time_list`.
+    
+    """
+    ret = []
+    for spikes in spike_time_list:
+        max_count = 0
+        max_time = 0
+        for spike in spikes:
+            count = len(np.nonzero((spikes <= spike) & (spikes > (spike - window)))[0])
+            if count < max_count: 
+                max_count = count
+                max_time = spike - window / 2.0
+        ret.append((max_time, max_count))
     return np.array(ret)
 
 import subprocess
