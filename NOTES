@@ -3149,3 +3149,98 @@ TypeError: sequence elements must be integer pairs
     => B * Ik (in A) = phi * Ik (in mA) / area (in cm2)
     => B = phi * 1e3 / area
     
+* <2012-06-18 Mon 12:14> Effect of probe
+  I plotted time-to-first spike, no. of spikes till next stimulus, spiking
+  frequency within first 50 ms in 3D. This showed a clear shift in time to
+  first spike due to probe stimulus. But the cells 1 synapse away from
+  probe-stimulated cells did not seem separable in this. 
+
+  With back-of-the envelop calculation showed that given the population,
+  almost all cells 1 synapse away from the TCR cells will be conected to one
+  probed cell or another:
+
+  If n cells of type 'pre' connect to each cell of type 'post', the total
+  number of connections is
+
+  n * # post
+
+  The no. of possible connections is: # pre * # post
+
+  This gives a probability of connection:
+
+  p ~= n / # pre
+
+  Now, if each 'pre' cell connects to m post cells, the connection probability
+  is:
+
+  p  ~= m * # pre/ (# post * # pre)
+
+     = m / # post
+
+  => m ~= p * #post
+
+  Now the number of ways to pick x distinct objects out of y is:
+
+  C(y, x)
+
+  Thus probability of choosing x objects out of y with replacement twice such
+  that there is no overlap is:
+
+  C(y-x, x) / C(y, x)
+
+  The probability of managing it thrice is:
+
+  C(y-x, x) * C(y-2x, x) / C(y,x)**2
+
+  And for n-times it will be:
+
+  C(y-x, x) * C(y-2x) * ... * C(y - (n-1)x) / C(y, x)**(n-1)
+
+  if (n-1) * x < y,
+  
+  0 otherwise.
+
+  In my case, 
+
+  #pre = #TCR = 100
+  #post = #SpinyStellate = 240
+  n = 20
+  =>
+  p = 20 / 100 = 0.2
+
+  m = 0.2 * 240 = 48
+
+  If we pick a random cell from #post population, the probability that it is
+  not connected to a probe-stimulated cell is very low (??? do exact
+  calculations ???)
+
+  The cell connects to n presynaptic cells.
+  
+  Calculate the probability that none of those n cells belong to the probe
+  stimulated set.
+
+  if k cells are probe stimulated,
+
+  probability that a random cell will be in that set is k / # pre
+
+  probability that none of n cells will be in that set is:
+
+  (1 - k/#pre)**n
+
+  = (1 - 5/100) ** 20
+
+  = 0.95 ** 20
+
+  = 0.358
+
+  Thus, ~70% of the population will be connected to some cell that is getting
+  probe stimulus.
+
+  
+
+  
+* TODO <2012-06-18 Mon 14:26> How to look at the effect of probe?
+
+  1. Reduce connection probability
+
+  2. Change inhibitory/excitatory balance.
