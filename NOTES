@@ -3266,3 +3266,4 @@ TypeError: sequence elements must be integer pairs
   I was putting all the spike times with respect to preceding stimulus in a 1D
   array but doing the analysis assuming they were in blocks corresponding to
   preceding stimulus.
+* <2012-06-21 Thu 12:12> Average spiking seems constant for bg only. Another bug?
