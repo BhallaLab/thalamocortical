@@ -3244,3 +3244,26 @@ TypeError: sequence elements must be integer pairs
   1. Reduce connection probability
 
   2. Change inhibitory/excitatory balance.
+* TODO <2012-06-19 Tue 11:47> What to plot?
+  For each cell I have gathered teh following information:
+
+  array: t_first_spike: Time to first spike after each stimulus
+  array: t_peak_spiking: Time of peak spiking rate (within a window) after each stimulus
+  array: f_peak_spiking: Peak spiking rate after each stimulus
+  array: f_avg: average spiking rate after each stimulus
+
+  I can plot:
+
+  1. distribution of each arry over stimuli, and over cells (3D)
+
+  2. 2D plots of averages over stimuli
+     t_first_spike - t_peak_spiking
+     t_first_spike - f_peak_spiking
+     t_first_spike - f_avg
+     t_peak_spiking - f_avg
+     f_peak_spiking - f_avg
+* <2012-06-20 Wed 15:16> Another blunder
+  I was putting all the spike times with respect to preceding stimulus in a 1D
+  array but doing the analysis assuming they were in blocks corresponding to
+  preceding stimulus.
+* <2012-06-21 Thu 12:12> Average spiking seems constant for bg only. Another bug?
