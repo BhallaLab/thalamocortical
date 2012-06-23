@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Jun 18 14:29:18 2012 (+0530)
 # Version: 
-# Last-Updated: Sat Jun 23 15:24:30 2012 (+0530)
+# Last-Updated: Sat Jun 23 15:30:39 2012 (+0530)
 #           By: subha
-#     Update #: 109
+#     Update #: 110
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -67,6 +67,7 @@ if __name__ == '__main__':
     config.read(['custom.ini'])
     # tmp_config is what we'll keep changing
     tmp_config = cp.SafeConfigParser()
+    tmp_config.optionxform = str
     tmp_config.read(['custom.ini'])    
     for celltype, count in starting_cellcount.items():
         tmp_config.set('cellcount', celltype, str(count))
