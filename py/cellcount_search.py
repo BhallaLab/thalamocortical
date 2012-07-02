@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Jun 18 14:29:18 2012 (+0530)
 # Version: 
-# Last-Updated: Sat Jun 23 15:30:39 2012 (+0530)
+# Last-Updated: Fri Jun 29 15:38:50 2012 (+0530)
 #           By: subha
-#     Update #: 110
+#     Update #: 113
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -59,7 +59,7 @@ starting_cellcount = {
 candidates = ['DeepBasket', 'DeepAxoaxonic', 'DeepLTS']
 increments = 10
 steps = 11
-process_count = 2
+process_count = 3
 
 if __name__ == '__main__':
     # Store the original configuration ahead of changing the file.
@@ -68,7 +68,7 @@ if __name__ == '__main__':
     # tmp_config is what we'll keep changing
     tmp_config = cp.SafeConfigParser()
     tmp_config.optionxform = str
-    tmp_config.read(['custom.ini'])    
+    tmp_config.read(['custom.ini'])
     for celltype, count in starting_cellcount.items():
         tmp_config.set('cellcount', celltype, str(count))
     processes = deque()
