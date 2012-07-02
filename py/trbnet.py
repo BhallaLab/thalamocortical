@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Jun  4 16:23:24 2012 (+0530)
+# Last-Updated: Mon Jul  2 14:29:32 2012 (+0530)
 #           By: subha
-#     Update #: 2564
+#     Update #: 2603
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -826,6 +826,10 @@ class TraubNet(object):
 
         stim_container -- container object for stimulating-electrodes
 
+        2012-07-02 12:36:53 (+0530) Subhasis Ray
+        
+        Updating stimulus protocol to give trains (similar config
+        change in custom.ini) The paired pulse does not work.
 
         """
         if  isinstance(stim_container, str):
@@ -842,22 +846,57 @@ class TraubNet(object):
         self.stim_gate.firstLevel = 1.0                
         self.stim_gate.secondDelay = 1e9
         self.stim_bg = moose.PulseGen('stim_bg', self.stim_container)
-        self.stim_bg.firstLevel = level
-        self.stim_bg.secondLevel = level
-        self.stim_bg.firstDelay = bg_interval
-        self.stim_bg.firstWidth = pulse_width
-        self.stim_bg.secondDelay = isi
-        self.stim_bg.secondWidth = pulse_width        
-        self.stim_bg.trigMode = moose.EXT_GATE
-
         self.stim_probe = moose.PulseGen('stim_probe', self.stim_container)
-        self.stim_probe.firstLevel = level
-        self.stim_probe.secondLevel = level
-        self.stim_probe.firstDelay = 2 * self.stim_bg.firstDelay + self.stim_bg.secondDelay + pulse_width
-        self.stim_probe.secondDelay = isi
-        self.stim_probe.firstWidth = pulse_width
-        self.stim_probe.secondWidth = pulse_width            
-        self.stim_probe.trigMode = moose.EXT_GATE
+        delays = {}
+        levels = {}
+        widths = {}
+        for key, value in config.runconfig.items('stimulus'):
+            if key.startswith('delay_'):
+                index = int(key.rpartition('_')[-1])
+                delays[index] = float(value)
+            elif key.startswith('level_'):
+                index = int(key.rpartition('_')[-1])
+                levels[index] = float(value)
+            elif key.startswith('width_'):
+                index = int(key.rpartition('_')[-1])
+                widths[index] = float(value)
+        if len(delays) > 2:
+            self.stim_bg.count = len(delays)
+            self.stim_probe.count = len(delays)
+            for index in delays.keys():
+                self.stim_bg.delay[index] = delays[index]
+                self.stim_probe.delay[index] = delays[index]
+                if index in levels:
+                    self.stim_bg.level[index] = levels[index]
+                    self.stim_probe.level[index] = levels[index]
+                else:
+                    self.stim_bg.level[index] = level
+                    self.stim_probe.level[index] = level
+                if index in widths:
+                    self.stim_bg.width[index] = width[index]                    
+                    self.stim_probe.width[index] = width[index]                    
+                else:
+                    self.stim_bg.width[index] = pulse_width
+                    self.stim_probe.width[index] = pulse_width
+        else:
+            self.stim_bg.firstLevel = level
+            self.stim_bg.secondLevel = level
+            self.stim_bg.firstDelay = bg_interval
+            self.stim_bg.firstWidth = pulse_width
+            self.stim_bg.secondDelay = isi
+            self.stim_bg.secondWidth = pulse_width        
+            self.stim_bg.trigMode = moose.EXT_GATE
+
+            self.stim_probe.firstLevel = level
+            self.stim_probe.secondLevel = level
+            self.stim_probe.firstDelay = 2 * self.stim_bg.firstDelay + self.stim_bg.secondDelay + pulse_width
+            self.stim_probe.secondDelay = isi
+            self.stim_probe.firstWidth = pulse_width
+            self.stim_probe.secondWidth = pulse_width            
+            self.stim_probe.trigMode = moose.EXT_GATE
+        self.stim_probe.delay[0] = self.stim_bg.delay[0]  + sum([self.stim_bg.delay[ii] for ii in range(self.stim_bg.count)]) + self.stim_bg.width[self.stim_bg.count - 1]
+        
+        
 
         config.LOGGER.debug('Background stimulus: firstDelay: %g, firstWidth: %g, firstLevel: %g, secondDelay: %g, secondWidth: %g, secondLevel: %g' % (self.stim_bg.firstDelay, self.stim_bg.firstWidth, self.stim_bg.firstLevel, self.stim_bg.secondDelay, self.stim_bg.secondWidth, self.stim_bg.secondLevel))
         config.LOGGER.debug('Probe stimulus: firstDelay: %g, firstWidth: %g, firstLevel: %g, secondDelay: %g, secondWidth: %g, secondLevel: %g' % (self.stim_probe.firstDelay, self.stim_probe.firstWidth, self.stim_probe.firstLevel, self.stim_probe.secondDelay, self.stim_probe.secondWidth, self.stim_probe.secondLevel))
