@@ -3244,7 +3244,11 @@ TypeError: sequence elements must be integer pairs
   1. Reduce connection probability
 
   2. Change inhibitory/excitatory balance.
-* TODO <2012-06-19 Tue 11:47> What to plot?
+* DONE <2012-06-19 Tue 11:47> What to plot?
+  CLOSED: [2012-07-05 Thu 12:19]
+  - State "DONE"       from "TODO"       [2012-07-05 Thu 12:28] \\
+    I am done with the plots. Was not  too informative. There was a large effect of stimulus sequence (probe is always even, bg is always odd). I checked the halved network simulated for 55 s. There is a change in PSTH of the population. I am yet to correlate the synaptic path length with the spiking time/probability/frequency.
+    See blogs: http://magaj.ncbs.res.in/notepal2012/blogs/subha/2012-07-04, http://magaj.ncbs.res.in/notepal2012/blogs/subha/2012-06-26, http://magaj.ncbs.res.in/notepal2012/blogs/subha/2012-06-25-0, http://magaj.ncbs.res.in/notepal2012/blogs/subha/2012-06-18 etc.
   For each cell I have gathered teh following information:
 
   array: t_first_spike: Time to first spike after each stimulus
@@ -3267,3 +3271,7 @@ TypeError: sequence elements must be integer pairs
   array but doing the analysis assuming they were in blocks corresponding to
   preceding stimulus.
 * <2012-06-21 Thu 12:12> Average spiking seems constant for bg only. Another bug?
+* <2012-07-13 Fri 09:57> Check reproducibility of simulation
+  While I dumped the network data, I have not actually verified that I can
+  reproduce a simulation from that network information. That has been pending
+  and needs serious attention.
