@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Jul  2 14:29:32 2012 (+0530)
+# Last-Updated: Sat Jul 14 12:29:40 2012 (+0530)
 #           By: subha
-#     Update #: 2603
+#     Update #: 2608
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -703,9 +703,10 @@ class TraubNet(object):
         The tables are created under {data_container}/spikes"""
         spike_container = moose.Neutral('spikes', data_container)
         # Is it correct to record the spikes from soma or the SpikeGen ?
-        # raise Exception('Update this with spike detection from SpikeGen at  axon segment.')
-        for cell in self.cell_index_map.keys():
-            tab = cell.soma.insertRecorder(cell.name, 'Vm', spike_container)
+        # 2012-07-14 12:28:38 (+0530) Switching to recording from presynaptic compartment.
+        for cell in self.cell_index_map.keys():            
+            tab = cell.comp[cell.presyn].insertRecorder(cell.name, 'Vm', spike_container)
+            print 'Recording spike from:', cell.comp[cell.presyn].path
             tab.stepMode = moose.TAB_SPIKE
             tab.stepSize = -20e-3
         ectopic_container = moose.Neutral('%s/ectopic_spikes' % (data_container.path))
