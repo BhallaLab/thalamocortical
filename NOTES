@@ -3148,6 +3148,16 @@ TypeError: sequence elements must be integer pairs
     B * Ik = phi * ica
     => B * Ik (in A) = phi * Ik (in mA) / area (in cm2)
     => B = phi * 1e3 / area
+
+    2012-07-20 12:15:06 (+0530) : There is an error in the above derivation:
+    (B * Ik) /s = (phi * ica ) / ms
+    => B * Ik * 1e3 = phi * ica
+
+    which leaves us with B = phi / area
+
+    But somewhere there is a missing factor of 100 as in the single
+    compartment test I get correct result only if B = 2.6e7 when phi =
+    2.6e5. See today's lab note for right derivation/
     
 * <2012-06-18 Mon 12:14> Effect of probe
   I plotted time-to-first spike, no. of spikes till next stimulus, spiking

@@ -2,7 +2,7 @@ load_file("nrngui.hoc")
 load_file("hoc/traubcon.hoc")
 load_file("hoc/utility.hoc")
 load_file("cells/TCR_template.hoc")
-objref vm_vec, stim, dump_file
+objref vm_vec, stim, dump_file, input[6]
 PI=3.141592
 FARADAY=96485
 secondorder=2
@@ -19,41 +19,45 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g
     t2 = 1e9 a2 = 0
     cell = new TCR()
     finit0()
-    dump_file = new File()
-    dump_file.wopen("tcr.txt")
-    dump_file.printf("comp,len,dia,sarea,xarea,Em,Cm,Rm,Ra,Ek_AR,Gbar_AR,Ek_CaL,Gbar_CaL,Ek_CaT,Gbar_CaT,Ek_K2,Gbar_K2,Ek_KA,Gbar_KA,Ek_KAHP_SLOWER,Gbar_KAHP_SLOWER,Ek_KC,Gbar_KC,Ek_KDR,Gbar_KDR,Ek_KM,Gbar_KM,Ek_NaF_TCR,Gbar_NaF_TCR,Ek_NaPF_TCR,Gbar_NaPF_TCR,Ca_tau,Ca_B\n")
-    for i = 1,137  {
-	cell.comp[i] {
-	    sarea = PI * L * diam * 1e-8 // um^2 to cm^2
-	    xarea = PI * diam * diam * 1e-8 / 4.0
-	    dump_file.printf("%d,%g,%g,%g,%g,%g,%g,%g,%g", i, L * 1e-6, diam * 1e-6, sarea * 1e-4, xarea*1e-4, v*1e-3, cm  * 1e-6 * sarea, 1.0/(g_pas * sarea), Ra * L * 1e-4 / xarea) // all multipliers for unit conversion
-	    if (ismembrane("ar")) dump_file.printf(",%g,%g", 1e-3 * erev_ar, gbar_ar * sarea) else dump_file.printf(",0.0,0.0")
-	    if (ismembrane("cal")) dump_file.printf(",%g,%g", 1e-3 * 125, gbar_cal * sarea) else dump_file.printf(",0.0,0.0")
-	    if (ismembrane("cat")) dump_file.printf(",%g,%g", 1e-3 * 125, gbar_cat * sarea) else dump_file.printf(",0.0,0.0")
-	    if (ismembrane("k2")) dump_file.printf(",%g,%g", 1e-3 * ek, gbar_k2 * sarea) else dump_file.printf(",0.0,0.0")
-	    if (ismembrane("ka")) dump_file.printf(",%g,%g", 1e-3 * ek, gbar_ka * sarea) else dump_file.printf(",0.0,0.0")	    
-	    if (ismembrane("kahp_slower")) dump_file.printf(",%g,%g", 1e-3 * ek, gbar_kahp_slower * sarea) else dump_file.printf(",0.0,0.0")	    
-	    if (ismembrane("kc")) dump_file.printf(",%g,%g", 1e-3 * ek, gbar_kc * sarea) else dump_file.printf(",0.0,0.0")
-	    if (ismembrane("kdr")) dump_file.printf(",%g,%g", 1e-3 * ek, gbar_kdr * sarea) else dump_file.printf(",0.0,0.0")
-	    if (ismembrane("km")) dump_file.printf(",%g,%g", 1e-3 * ek, gbar_km * sarea) else dump_file.printf(",0.0,0.0")
-	    if (ismembrane("naf_tcr")) dump_file.printf(",%g,%g", 1e-3 * ena, gbar_naf_tcr * sarea) else dump_file.printf(",0.0,0.0")
-	    if (ismembrane("napf_tcr")) dump_file.printf(",%g,%g", 1e-3 * ena, gbar_napf_tcr * sarea) else dump_file.printf(",0.0,0.0")
-	    if (ismembrane("cad")) dump_file.printf(",%g,%g", 1e-3 / beta_cad, phi_cad / (sarea * 1e-4)) else dump_file.printf(",0.0,0.0")
-	}
-	dump_file.printf("\n")
-    }
-    dump_file.close()
+    // dump_file = new File()
+    // dump_file.wopen("tcr.txt")
+    // dump_file.printf("comp,len,dia,sarea,xarea,Em,Cm,Rm,Ra,Ek_AR,Gbar_AR,Ek_CaL,Gbar_CaL,Ek_CaT,Gbar_CaT,Ek_K2,Gbar_K2,Ek_KA,Gbar_KA,Ek_KAHP_SLOWER,Gbar_KAHP_SLOWER,Ek_KC,Gbar_KC,Ek_KDR,Gbar_KDR,Ek_KM,Gbar_KM,Ek_NaF_TCR,Gbar_NaF_TCR,Ek_NaPF_TCR,Gbar_NaPF_TCR,Ca_tau,Ca_B\n")
+    // for i = 1,137  {
+	// cell.comp[i] {
+	    // sarea = PI * L * diam * 1e-8 // um^2 to cm^2
+	    // xarea = PI * diam * diam * 1e-8 / 4.0
+	    // dump_file.printf("%d,%g,%g,%g,%g,%g,%g,%g,%g", i, L * 1e-6, diam * 1e-6, sarea * 1e-4, xarea*1e-4, v*1e-3, cm  * 1e-6 * sarea, 1.0/(g_pas * sarea), Ra * L * 1e-4 / xarea) // all multipliers for unit conversion
+	    // if (ismembrane("ar")) dump_file.printf(",%g,%g", 1e-3 * erev_ar, gbar_ar * sarea) else dump_file.printf(",0.0,0.0")
+	    // if (ismembrane("cal")) dump_file.printf(",%g,%g", 1e-3 * 125, gbar_cal * sarea) else dump_file.printf(",0.0,0.0")
+	    // if (ismembrane("cat")) dump_file.printf(",%g,%g", 1e-3 * 125, gbar_cat * sarea) else dump_file.printf(",0.0,0.0")
+	    // if (ismembrane("k2")) dump_file.printf(",%g,%g", 1e-3 * ek, gbar_k2 * sarea) else dump_file.printf(",0.0,0.0")
+	    // if (ismembrane("ka")) dump_file.printf(",%g,%g", 1e-3 * ek, gbar_ka * sarea) else dump_file.printf(",0.0,0.0")	    
+	    // if (ismembrane("kahp_slower")) dump_file.printf(",%g,%g", 1e-3 * ek, gbar_kahp_slower * sarea) else dump_file.printf(",0.0,0.0")	    
+	    // if (ismembrane("kc")) dump_file.printf(",%g,%g", 1e-3 * ek, gbar_kc * sarea) else dump_file.printf(",0.0,0.0")
+	    // if (ismembrane("kdr")) dump_file.printf(",%g,%g", 1e-3 * ek, gbar_kdr * sarea) else dump_file.printf(",0.0,0.0")
+	    // if (ismembrane("km")) dump_file.printf(",%g,%g", 1e-3 * ek, gbar_km * sarea) else dump_file.printf(",0.0,0.0")
+	    // if (ismembrane("naf_tcr")) dump_file.printf(",%g,%g", 1e-3 * ena, gbar_naf_tcr * sarea) else dump_file.printf(",0.0,0.0")
+	    // if (ismembrane("napf_tcr")) dump_file.printf(",%g,%g", 1e-3 * ena, gbar_napf_tcr * sarea) else dump_file.printf(",0.0,0.0")
+	    // if (ismembrane("cad")) dump_file.printf(",%g,%g", 1e-3 / beta_cad, phi_cad / (sarea * 1e-4)) else dump_file.printf(",0.0,0.0")
+	// }
+	// dump_file.printf("\n")
+    // }
+    // dump_file.close()
     access cell.comp[1] // soma
     f = new File()
     tvec = new Vector()
     vvec = new Vector()
     tvec.record(&t)
     vvec.record(&cell.comp[cell.presyn_comp].v(0.5))
-    print_cell(cell, "tcr")
-    stim1 = new IClamp(0.5) 
-    stim1.amp = 0.3
-    stim1.del = t1
-    stim1.dur = $1 - $2
+    // print_cell(cell, "tcr")
+    del = 100.0 // ms
+    for i=0,6 {
+        input[i] = new IClamp(0.5) 
+        input[i].amp = 1 // nA
+        input[i].del = del
+        input[i].dur = 1.0 // ms
+        del = del + 25 //ms
+        }
     run()
     f.wopen("mydata/Vm_tcr.plot")
     for ii = 0, vvec.size() - 1{
@@ -65,5 +69,5 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g
 proc finit0(){
     forsec cell.all { v = -70 }
 }
-runcell(100, 0.0)
+runcell(1000, 0.0)
 //quit()
