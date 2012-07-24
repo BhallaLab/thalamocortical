@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Jul 14 12:29:40 2012 (+0530)
+# Last-Updated: Tue Jul 24 14:23:57 2012 (+0530)
 #           By: subha
-#     Update #: 2608
+#     Update #: 2612
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1058,6 +1058,7 @@ class TraubNet(object):
         name count
 
         """
+        config.LOGGER.debug('Updating cell counts')
         presynaptic_scaling = {}
         for celltype, count in config.runconfig.items('cellcount'):
             vertices = self.celltype_graph.vs.select(label_eq=celltype)
@@ -1616,12 +1617,14 @@ def test_reading_network(filename):
     h5file.close()
 
 if __name__ == '__main__':
-    net = TraubNet()
-    net._generate_celltype_graph()
-    net._generate_cell_graph()
-    net.create_network()
-    net.save_network_model(config.MODEL_FILENAME)
-    net.verify_saved_model(config.MODEL_FILENAME)
+    raise NotImplementedError('run trbsim.py in stead')
+    # net = TraubNet()
+    # net.set_populations()
+    # net._generate_celltype_graph()
+    # net._generate_cell_graph()
+    # net.create_network()
+    # net.save_network_model(config.MODEL_FILENAME)
+    # net.verify_saved_model(config.MODEL_FILENAME)
     
 # 
 # trbnet.py ends here
