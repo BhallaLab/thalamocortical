@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Jul 17 17:50:19 2012 (+0530)
 # Version: 
-# Last-Updated: Thu Jul 19 17:00:15 2012 (+0530)
+# Last-Updated: Fri Jul 20 12:46:52 2012 (+0530)
 #           By: subha
-#     Update #: 53
+#     Update #: 94
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -62,16 +62,16 @@ from compartment import MyCompartment
 
 channel_density = {
     'NaF2':     1500.0,
-    # 'NaPF_SS':  1.5,
-    # 'KDR_FS':   1000.0,
-    # 'KC_FAST':  100.0,
-    # 'KA':       300.0,
-    # 'KM':       37.5,
-    # 'K2':       1.0,
-    # 'KAHP_SLOWER':      1.0,
-    # 'CaL':      5.0,
-    # 'CaT_A':    1.0,
-    # 'AR':       2.5
+    'NaPF_SS':  1.5,
+    'KDR_FS':   1000.0,
+    'KC_FAST':  100.0,
+    'KA':       300.0,
+    'KM':       37.5,
+    'K2':       1.0,
+    'KAHP_SLOWER':      1.0,
+    'CaL':      5.0,
+    'CaT_A':    1.0,
+    'AR':       2.5
 }
 # channels = {'NaF2': 'NaF2_SS', 'NaPF_SS': 'NaPF_SS', 'KDR_FS': 'KDR_FS', \
 #                 'KA': 'KA', 'K2': 'K2', 'KM': 'KM', 'KC_FAST': 'KC_FAST', \
@@ -124,6 +124,7 @@ if __name__ == '__main__':
     soma.initVm = -65e-3
     channel_lib = init_channels()
     gk = {}
+    chandict = {}
     for channel, density in channel_density.items():
         chan = channel_lib[channel]
         new_chan = moose.HHChannel(chan, chan.name, soma)
@@ -132,6 +133,7 @@ if __name__ == '__main__':
         gk[channel] = moose.Table(channel, sim.data)
         gk[channel].stepMode = 3
         gk[channel].connect('inputRequest', chan, 'Gk')
+        chandict[channel] = chan
         print chan.name, chan.Gbar
 	if channel.startswith('K'):
 	    chan.Ek = EK
@@ -145,10 +147,16 @@ if __name__ == '__main__':
 	else:
 	    print 'Error: unknown channel', channel
     cad = moose.CaConc('CaPool', soma)
-    cad.B = (5.2e-6 / 2e-10) / soma.sarea()
+    cad.B = 2.6e7 / soma.sarea()
     cad.tau = 50e-3
+    cad.connect('concSrc', chandict['KAHP_SLOWER'], 'concen')
+    cad.connect('concSrc', chandict['KC_FAST'], 'concen')
+    chandict['CaL'].connect('IkSrc', cad, 'current')
+    ca_table = moose.Table('Ca', sim.data)
+    ca_table.stepMode = 3
+    ca_table.connect('inputRequest', cad, 'Ca')
     vm_table = soma.insertRecorder('Vm', 'Vm', sim.data)
-    soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=1e9, firstWidth=1e3)
+    soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=100e-3, firstWidth=50e-3)
     print 'Rm:', soma.Rm
     print 'Cm:', soma.Cm,
     print 'Em:', soma.Em
@@ -159,31 +167,16 @@ if __name__ == '__main__':
     print chan.Gbar, chan.Ek
     chan.connect('Gk', gk_naf2_table, 'inputRequest')
     sim.schedule(simdt=simdt, plotdt=plotdt)
-    print 'Soma fields'
-    for field in dir(soma):
-        x = getattr(soma, field)
-        if isinstance(x, float):
-            print field, x
-    chan = moose.HHChannel(soma.path + '/NaF2')
-    print 'NaF2 fields'
-    for field in dir(chan):
-        x = getattr(chan, field)
-        if isinstance(x, float):
-            print field, x
-    # for channel in soma.channels:
-    #     channel.useClock(0)
     sim.run(simtime)
-    for i in range(len(gk_naf2_table)):
-        gk_naf2_table[i] = gk_naf2_table[i] / soma.sarea()
     sim.dump_data('data')
     pylab.subplot(111)
     tseries = pylab.linspace(0, simtime, len(vm_table))
-    pylab.plot(tseries*1e3, pylab.array(vm_table) * 1e3, 'x', label='oldmus')
+    pylab.plot(tseries*1e3, pylab.array(vm_table) * 1e3, label='oldmus')
     # pylab.subplot(312)
     newmus = pylab.loadtxt('/home/subha/src/dh_branch/Demos/traub_2005/py/data/singlecomp_Vm.dat')
-    pylab.plot(newmus[:,0], newmus[:,1]*1e3, 'x', label='newmus')
-    nrn = pylab.loadtxt('/home/subha/src/dh_branch/Demos/traub_2005/nrn/data/singlecomp_Vm.plot')
-    pylab.plot(nrn[:,0], nrn[:,1], 'x', label='nrn')
+    pylab.plot(newmus[:,0]*1e3, newmus[:,1]*1e3, label='newmus')
+    nrn = pylab.loadtxt('/home/subha/src/dh_branch/Demos/traub_2005/nrn/data/singlecomp_Vm.dat')
+    pylab.plot(nrn[:,0], nrn[:,1], label='nrn')
     # for key, value in gk.items():
     #     pylab.plot(value, label=key)
     pylab.legend()
