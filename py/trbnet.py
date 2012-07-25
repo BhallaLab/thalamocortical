@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Jul 24 14:23:57 2012 (+0530)
+# Last-Updated: Wed Jul 25 11:45:53 2012 (+0530)
 #           By: subha
-#     Update #: 2612
+#     Update #: 2673
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -183,6 +183,11 @@ class SynEdge(tables.IsDescription):
     ekgaba = tables.Float64Col() # reversal potential for gaba synapses
     ggaba =  tables.Float64Col(shape=(2)) # gaba conductance (distributed uniformly between first and second entry)
     prelease = tables.Float64Col() # Baseline synaptic release probability for this pair
+
+
+def assign_comp_param_to_population(cells, compartment_no, field, values):
+    assert(len(cells) == len(values))
+    [setattr(cells[ii].comp[compartment_no].id, field, values[ii]) for ii in range(len(cells))]
 
 class TraubNet(object):
     """Implements the full network in Traub et al 2005 model.
@@ -1182,43 +1187,83 @@ class TraubNet(object):
         from the Em/Rm/Cm/Ra by sd as standard deviation. Where the
         sd's are assumed to be fractions of mean (the default values)."""
         config.LOGGER.debug('START Randomizing passive properties')
+        initVm_sd = 0.0
+        Rm_sd = 0.0
+        Cm_sd = 0.0
+        Ra_sd = 0.0
+        Em_sd = 0.0
         try:
             initVm_sd = float(config.runconfig.get('sd_passive', 'initVm'))
-            Rm_sd = float(config.runconfig.get('sd_passive', 'Rm'))
-            Cm_sd = float(config.runconfig.get('sd_passive', 'Cm'))
-            Ra_sd = float(config.runconfig.get('sd_passive', 'Ra'))
+            config.LOGGER.info('initVm randomized with sd=%g of standard value.' % (initVm_sd))
         except ConfigParser.NoOptionError:
-            config.LOGGER.info('Passive properties unchanged.')
-            return
+            config.LOGGER.info('initVm constant in population.')
+        try:
+            Rm_sd = float(config.runconfig.get('sd_passive', 'Rm'))
+            config.LOGGER.info('Rm randomized with sd=%g of standard value.' % (Rm_sd))
+        except ConfigParser.NoOptionError:
+            config.LOGGER.info('Rm constant in population.')
+        try:
+            Cm_sd = float(config.runconfig.get('sd_passive', 'Cm'))
+            config.LOGGER.info('Cm randomized with sd=%g of standard value.' % (Cm_sd))
+        except ConfigParser.NoOptionError:
+            config.LOGGER.info('Cm constant in population.')
+        try:
+            Ra_sd = float(config.runconfig.get('sd_passive', 'Ra'))
+            config.LOGGER.info('Ra randomized with sd=%g of standard value.' % (Ra_sd))
+        except ConfigParser.NoOptionError:
+            config.LOGGER.info('Ra constant in population')
+        try:
+            Em_sd = float(config.runconfig.get('sd_passive', 'Ra'))
+            config.LOGGER.info('Em randomized with sd=%g of standard value.' % (Em_sd))
+        except ConfigParser.NoOptionError:
+            config.LOGGER.info('Em constant in population.')
         if Rm_sd == 0.0 or Ra_sd == 0.0 or Cm_sd == 0.0 or initVm_sd == 0.0:
-            config.LOGGER.info('Passive properties unchanged.')
-            return
+            config.LOGGER.info('Em constant in population.')
         for celltype in self.celltype_graph.vs:
             indices = self.populations[celltype['label']]
-            if indices:
-                cell0 = self.index_cell_map[indices[0]]
+            if indices is None or len(indices) == 0:
+                continue
+            cell0 = self.index_cell_map[indices[0]]
+            cells = [self.index_cell_map[index] for index in indices]
+            if initVm_sd > 0.0:
                 initVm_mean = cell0.soma.Em
                 randomized_initVm = numpy.random.normal(loc=initVm_mean, scale=initVm_sd*numpy.abs(initVm_mean), size=len(indices))
+                for ii in range(1, cell0.num_comp + 1):
+                    assign_comp_param_to_population(cells, ii, 'initVm',  randomized_initVm)
+            if Rm_sd > 0.0:
                 # Make a list of Rm of all the compartments in this celltype.
-                # Thiese will be used as mean for the normal distribution for each compartment.
+                # These will be used as mean for the normal distribution for each compartment.
                 mean_values = [(cell0.comp[ii].Rm, cell0.comp[ii].Cm, cell0.comp[ii].Ra) for ii in range(1, cell0.num_comp+1)]
-                randomized_values = [(numpy.random.normal(loc=mean_values[ii][0], scale=Rm_sd * mean_values[ii][0], size=len(indices)),
-                                      numpy.random.normal(loc=mean_values[ii][1], scale=Cm_sd * mean_values[ii][1], size=len(indices)),
-                                      numpy.random.normal(loc=mean_values[ii][2], scale=Ra_sd * mean_values[ii][2], size=len(indices)))
-                                     for ii in range(len(mean_values))]
-                # print celltype['label'], len(randomized_values), len(randomized_values[0]), len(randomized_values[0][0])
-                ii = 0
-                for index in indices:
-                    cell = self.index_cell_map[index]
-                    for comp_index in range(cell.num_comp):
-                        # print comp_index, index
-                        # Add 1 because compartment index starts from 1 instead of 0.
-                        cell.comp[comp_index+1].initVm = randomized_initVm[ii]
-                        cell.comp[comp_index+1].Rm = randomized_values[comp_index][0][ii]
-                        cell.comp[comp_index+1].Cm = randomized_values[comp_index][1][ii]
-                        cell.comp[comp_index+1].Ra = randomized_values[comp_index][2][ii]
-                    ii += 1
+                for ii in range(1, cell0.num_comp+1):
+                    Rm_mean = cell0.comp[ii].Rm
+                    randomized_Rm = numpy.random.normal(loc=mean_Rm, scale=Rm_sd * mean_Rm, size=len(indices))
+                    assign_comp_param_to_population(cells, ii, 'Rm', randomized_Rm)
+            if Cm_sd > 0.0:
+                # Make a list of Cm of all the compartments in this celltype.
+                # These will be used as mean for the normal distribution for each compartment.
+                mean_values = [(cell0.comp[ii].Cm, cell0.comp[ii].Cm, cell0.comp[ii].Ra) for ii in range(1, cell0.num_comp+1)]
+                for ii in range(1, cell0.num_comp+1):
+                    Cm_mean = cell0.comp[ii].Cm
+                    randomized_Cm = numpy.random.normal(loc=mean_Cm, scale=Cm_sd * mean_Cm, size=len(indices))
+                    assign_comp_param_to_population(cells, ii, 'Cm', randomized_Cm)
+            if Em_sd > 0.0:
+                # Make a list of Em of all the compartments in this celltype.
+                # These will be used as mean for the normal distribution for each compartment.
+                mean_values = [(cell0.comp[ii].Em, cell0.comp[ii].Em, cell0.comp[ii].Ra) for ii in range(1, cell0.num_comp+1)]
+                for ii in range(1, cell0.num_comp+1):
+                    Em_mean = cell0.comp[ii].Em
+                    randomized_Em = numpy.random.normal(loc=mean_Em, scale=Em_sd * mean_Em, size=len(indices))
+                    assign_comp_param_to_population(cells, ii, 'Em', randomized_Em)
+            if Ra_sd > 0.0:
+                # Make a list of Ra of all the compartments in this celltype.
+                # These will be used as mean for the normal distribution for each compartment.
+                mean_values = [(cell0.comp[ii].Ra, cell0.comp[ii].Ra, cell0.comp[ii].Ra) for ii in range(1, cell0.num_comp+1)]
+                for ii in range(1, cell0.num_comp+1):
+                    Ra_mean = cell0.comp[ii].Ra
+                    randomized_Ra = numpy.random.normal(loc=mean_Ra, scale=Ra_sd * mean_Ra, size=len(indices))
+                    assign_comp_param_to_population(cells, ii, 'Ra', randomized_Ra)
         config.LOGGER.debug('END Randomizing passive properties')
+
 
     def randomize_active_conductances(self):
         """Change the active conductances to be distributed normally
