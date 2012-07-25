@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Wed Apr 22 22:21:11 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Apr 14 19:43:54 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 142
+# Last-Updated: Tue Jul 17 16:49:23 2012 (+0530)
+#           By: subha
+#     Update #: 144
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -71,7 +71,7 @@ class CaPool(moose.CaConc):
     def connectCaChannels(self, channel_list):
         """Connects the Ca2+ channels in channel_list as a source of
         Ca2+ to the pool."""
-        raise Exception, 'Deprecated - as Ca channel is connected via addmsg1 field in readcell.'
+        # raise Exception, 'Deprecated - as Ca channel is connected via addmsg1 field in readcell.'
 
         for channel in channel_list:
                 if not hasattr(channel, 'connected_to_pool') or not channel.connected_to_pool:
@@ -82,7 +82,7 @@ class CaPool(moose.CaConc):
                 
     def connectDepChannels(self, channel_list):
         """Connect channels in channel_list as dependent channels"""
-        raise Exception, 'Deprecated - as CaPool is connected to Ca-dependent channels via addmsg1 field in readcell.'
+        # raise Exception, 'Deprecated - as CaPool is connected to Ca-dependent channels via addmsg1 field in readcell.'
         for channel in channel_list:
             if channel.useConcentration == 0:
                 print "WARNING: This channel does not use concentration:", channel.path
