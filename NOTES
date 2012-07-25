@@ -3290,6 +3290,7 @@ TypeError: sequence elements must be integer pairs
   of at regular intervals. This is because the phase of the stimulus
   with respect to synchronized spontaneous spiking seems to be
   affecting the net result of the stimulation.
-* <2012-07-25 Wed> Plot PSTH for individual stimuli separately
+* TODO <2012-07-25 Wed> Plot PSTH for individual stimuli separately
   Visibly the response is highly varied for different stimuli in a sequence,
   but these get averaged out in the combined PSTH over all stimuli.
+* TODO <2012-07-25 Wed> Verify scaling of synaptic conductance.
