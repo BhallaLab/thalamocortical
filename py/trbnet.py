@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Jul 25 11:45:53 2012 (+0530)
+# Last-Updated: Wed Jul 25 12:56:33 2012 (+0530)
 #           By: subha
-#     Update #: 2673
+#     Update #: 2679
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -187,7 +187,7 @@ class SynEdge(tables.IsDescription):
 
 def assign_comp_param_to_population(cells, compartment_no, field, values):
     assert(len(cells) == len(values))
-    [setattr(cells[ii].comp[compartment_no].id, field, values[ii]) for ii in range(len(cells))]
+    [setattr(cells[ii].comp[compartment_no], field, values[ii]) for ii in range(len(cells))]
 
 class TraubNet(object):
     """Implements the full network in Traub et al 2005 model.
@@ -1229,7 +1229,12 @@ class TraubNet(object):
                 initVm_mean = cell0.soma.Em
                 randomized_initVm = numpy.random.normal(loc=initVm_mean, scale=initVm_sd*numpy.abs(initVm_mean), size=len(indices))
                 for ii in range(1, cell0.num_comp + 1):
+                    print '##'
+                    print randomized_initVm
+                    print '##'
                     assign_comp_param_to_population(cells, ii, 'initVm',  randomized_initVm)
+                    for cell in cells:
+                        print cell.comp[ii].path, 'initVm', cell.comp[ii].initVm
             if Rm_sd > 0.0:
                 # Make a list of Rm of all the compartments in this celltype.
                 # These will be used as mean for the normal distribution for each compartment.
