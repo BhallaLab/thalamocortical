@@ -3285,3 +3285,8 @@ TypeError: sequence elements must be integer pairs
   While I dumped the network data, I have not actually verified that I can
   reproduce a simulation from that network information. That has been pending
   and needs serious attention.
+* TODO <2012-07-25 Wed> Randomized input
+  I need to try delivering the stimulus at randomized times in stead
+  of at regular intervals. This is because the phase of the stimulus
+  with respect to synchronized spontaneous spiking seems to be
+  affecting the net result of the stimulation.
