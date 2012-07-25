@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sun May  3 12:52:23 2009 (+0530)
 # Version: 
-# Last-Updated: Mon May 18 14:53:55 2009 (+0530)
-#           By: subhasis ray
-#     Update #: 172
+# Last-Updated: Tue Jul 17 17:16:02 2012 (+0530)
+#           By: subha
+#     Update #: 189
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -44,6 +44,9 @@
 # 
 
 # Code:
+import sys
+sys.path.append('..')
+
 import pylab
 
 from simulation import Simulation
@@ -105,7 +108,7 @@ def init_channels():
     return channel_lib
             
 if __name__ == '__main__':
-    sim = Simulation()
+    sim = Simulation('test_ss_soma')
     soma = MyCompartment('soma', sim.model)
     soma.length = 20e-6
     soma.diameter = 2e-6 * 7.5
@@ -115,12 +118,16 @@ if __name__ == '__main__':
     soma.Em = -65e-3
     soma.initVm = -65e-3
     channel_lib = init_channels()
+    gk = {}
     for channel, density in channel_density.items():
         chan = channel_lib[channel]
-        print chan.name, density
         new_chan = moose.HHChannel(chan, chan.name, soma)
-	chan = soma.insertChannel(new_chan, density)
+        chan = soma.insertChannel(new_chan, density)
         chan.X = 0.0
+        gk[channel] = moose.Table(channel, sim.data)
+        gk[channel].stepMode = 3
+        gk[channel].connect('inputRequest', chan, 'Gk')
+        print chan.name, chan.Gbar
 	if channel.startswith('K'):
 	    chan.Ek = EK
 	elif channel.startswith('Na'):
@@ -134,8 +141,11 @@ if __name__ == '__main__':
 	    print 'Error: unknown channel', channel
 	    
     soma.insertCaPool(5.2e-6 / 2e-10, 50e-3)
-    vm_table = soma.insertRecorder('Vm', sim.data)
+    vm_table = soma.insertRecorder('Vm', 'Vm', sim.data)
     soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=20.0e-3, firstWidth=1e3)
+    print 'Rm:', soma.Rm
+    print 'Cm:', soma.Cm,
+    print 'Em:', soma.Em
     gk_naf2_table = moose.Table('Gk_NaF2', sim.data)
     gk_naf2_table.stepMode = 3
     chan = moose.HHChannel(soma.path + '/NaF2')
@@ -150,7 +160,12 @@ if __name__ == '__main__':
     for i in range(len(gk_naf2_table)):
         gk_naf2_table[i] = gk_naf2_table[i] / soma.sarea()
     sim.dump_data('data')
+    pylab.subplot(211)
     pylab.plot(vm_table)
+    pylab.subplot(212)
+    for key, value in gk.items():
+        pylab.plot(value, label=key)
+    pylab.legend()
     pylab.show()
 
 
