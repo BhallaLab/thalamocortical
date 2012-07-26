@@ -3293,4 +3293,7 @@ TypeError: sequence elements must be integer pairs
 * TODO <2012-07-25 Wed> Plot PSTH for individual stimuli separately
   Visibly the response is highly varied for different stimuli in a sequence,
   but these get averaged out in the combined PSTH over all stimuli.
-* TODO <2012-07-25 Wed> Verify scaling of synaptic conductance.
+* DONE <2012-07-25 Wed> Verify scaling of synaptic conductance.
+  CLOSED: [2012-07-26 Thu 09:34]
+  - State "DONE"       from "TODO"       [2012-07-26 Thu 09:34] \\
+    Checked in the network files and the individual conductances are inversely proprtional to the total number of presynaptic cells.
