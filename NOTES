@@ -3297,3 +3297,7 @@ TypeError: sequence elements must be integer pairs
   CLOSED: [2012-07-26 Thu 09:34]
   - State "DONE"       from "TODO"       [2012-07-26 Thu 09:34] \\
     Checked in the network files and the individual conductances are inversely proprtional to the total number of presynaptic cells.
+
+* <2012-07-27 Fri 15:12> Principles of Computational Modeling in Neuroscience
+  Sterrat, Graham, Gilies and Willshaw, Chap 9 discusses Traub model. The bias
+  currents are apparently to imitate effects of drugs in the bath.
