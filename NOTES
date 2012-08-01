@@ -3301,6 +3301,9 @@ TypeError: sequence elements must be integer pairs
 * <2012-07-27 Fri 15:12> Principles of Computational Modeling in Neuroscience
   Sterrat, Graham, Gilies and Willshaw, Chap 9 discusses Traub model. The bias
   currents are apparently to imitate effects of drugs in the bath.
-* <2012-07-29 Sun 11:12> Write to McCormick
+* TODO <2012-07-29 Sun 11:12> Write to McCormick
   + The synchronized firing of spiny stellate cells at ~40 ms delay
   + The role of deep pyramids that do not firing under normal conditions
+* TODO <2012-07-30 Mon 15:39> Increase magnitude of ectopic inputs
+  Current ectopic inputs are subthreshold and have no visible effect on the
+  spiking of the pyramidal cells.
