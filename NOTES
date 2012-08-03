@@ -3307,3 +3307,19 @@ TypeError: sequence elements must be integer pairs
 * TODO <2012-07-30 Mon 15:39> Increase magnitude of ectopic inputs
   Current ectopic inputs are subthreshold and have no visible effect on the
   spiking of the pyramidal cells.
+* <2012-08-03 Fri 16:54> TCM and thesis
+  1. Will be good to have some result for connectivity
+     - Focus on the last figure (teh population PSTH does show a slight
+       increase when probe stim is applied.)
+  2. Documenting the process of model building can be useful for future.
+  
+* DONE <2012-08-03 Fri 17:06> What is special with 20120522_152734_10937?
+  CLOSED: [2012-08-03 Fri 17:11]
+  - State "DONE"       [2012-08-03 Fri 17:11] \\
+    When I plotted the same in
+      dataviz, they appear to fire in response to the stimulus only and possibly
+      the former was an artifact of lack of resolution and using crosses for the
+      data points. There were usually two spikes at a time. But no bursts as
+      correctly figured by the script.
+  The data from this simulation show constantly spiking spiny stellates in the
+  plot_first_spikes.py output. But no bursting.
