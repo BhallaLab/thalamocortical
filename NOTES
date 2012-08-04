@@ -3323,3 +3323,9 @@ TypeError: sequence elements must be integer pairs
       correctly figured by the script.
   The data from this simulation show constantly spiking spiny stellates in the
   plot_first_spikes.py output. But no bursting.
+
+* <2012-08-04 Sat 11:44> Check if spiny stellate cells can be stimulated faster
+  I cannot stimulate the TCR cells with paired pulse because of their long
+  refractory period. Upi asked in TCM if I could stimulate the axons instead.
+  For this I shall have to check the refractory period of spiny stellate
+  cells.
