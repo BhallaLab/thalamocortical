@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Aug  7 12:27:31 2012 (+0530)
+# Last-Updated: Tue Aug  7 12:53:47 2012 (+0530)
 #           By: subha
-#     Update #: 2680
+#     Update #: 2693
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1213,7 +1213,7 @@ class TraubNet(object):
         except ConfigParser.NoOptionError:
             config.LOGGER.info('Ra constant in population')
         try:
-            Em_sd = float(config.runconfig.get('sd_passive', 'Ra'))
+            Em_sd = float(config.runconfig.get('sd_passive', 'Em'))
             config.LOGGER.info('Em randomized with sd=%g of standard value.' % (Em_sd))
         except ConfigParser.NoOptionError:
             config.LOGGER.info('Em constant in population.')
@@ -1253,12 +1253,13 @@ class TraubNet(object):
                     assign_comp_param_to_population(cells, ii, 'Cm', randomized_Cm)
             if Em_sd > 0.0:
                 # Make a list of Em of all the compartments in this celltype.
-                # These will be used as mean for the normal distribution for each compartment.
-                mean_values = [(cell0.comp[ii].Em, cell0.comp[ii].Em, cell0.comp[ii].Ra) for ii in range(1, cell0.num_comp+1)]
-                for ii in range(1, cell0.num_comp+1):
-                    Em_mean = cell0.comp[ii].Em
-                    randomized_Em = numpy.random.normal(loc=mean_Em, scale=Em_sd * mean_Em, size=len(indices))
+                # These will be used as mean for the normal distribution for each cell.
+                mean_Em = cell0.soma.Em
+                randomized_Em = numpy.random.normal(loc=mean_Em, scale=Em_sd * numpy.abs(mean_Em), size=len(indices))
+                for ii in range(1, cell0.num_comp + 1):
                     assign_comp_param_to_population(cells, ii, 'Em', randomized_Em)
+                    for cell in cells:
+                        print cell.comp[ii].path, 'Em', cell.comp[ii].Em
             if Ra_sd > 0.0:
                 # Make a list of Ra of all the compartments in this celltype.
                 # These will be used as mean for the normal distribution for each compartment.
