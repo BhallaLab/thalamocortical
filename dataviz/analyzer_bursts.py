@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Aug  6 09:10:30 2012 (+0530)
 # Version: 
-# Last-Updated: Mon Aug  6 17:25:22 2012 (+0530)
+# Last-Updated: Tue Aug  7 09:31:11 2012 (+0530)
 #           By: subha
-#     Update #: 103
+#     Update #: 105
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -95,7 +95,9 @@ if __name__ == '__main__':
         outliers = np.nonzero(nbdata <= max(bdata))[0]
         print 'Nonbursting with too little inhibition:'
         for index in outliers:
-            print nbfiles[index], nbdata[index]
+            idx = np.where(strdata[:,0] == nbfiles[index])
+            for ii in idx:
+                print strdata[ii]
     
     counts, bins, patches = plt.hist([exc_inh[idx_bursting], exc_inh[idx_nonbursting]], label=['bursting', 'non-bursting'])
     plt.xticks(bins)
