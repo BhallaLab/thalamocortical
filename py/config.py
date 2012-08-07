@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Mar 17 13:43:28 2012 (+0530)
+# Last-Updated: Tue Aug  7 12:29:38 2012 (+0530)
 #           By: subha
-#     Update #: 326
+#     Update #: 340
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -82,22 +82,28 @@ def reseed(seed):
     seed -- seed to be used for the simulation.
     """
     global numpy_reseeded
-    global numpy_rngseed
+    global numpy_rngseed    
     if numpy_reseeded:
         raise Warning('Random number generator already seeded with: %s' % (str(seed)))
     numpy_reseeded = True
+    # If seed is 0, use a pseudo-random number for seed
+    if seed == 0:
+        seed = numpy.random.randint(999999999999999999)        
     numpy.random.seed(seed)
     numpy_rngseed = seed
     
 
 moose_reseeded = False
-moose_rngseed = None
+moose_rngseed = 0
 
 def moose_reseed(seed):
     """This is for changing the moose' built-in RNG"""
     global moose_reseeded
+    global moose_rngseed
     if moose_reseeded:
         raise Warning('Random number generator already seeded with: %s' % (str(seed)))
+    if seed == 0:
+        seed = numpy.random.randint(999999999999999999)        
     moose_rngseed = seed
     moose.PyMooseBase.getContext().srandom(seed)
     
@@ -229,7 +235,7 @@ for section in runconfig.sections():
 try:
     __numpy_rngseed = int(runconfig.get('numeric', 'numpy_rngseed'))
 except ValueError:
-    __numpy_rngseed = None
+    __numpy_rngseed = 0
 try:
     __moose_rngseed = int(runconfig.get('numeric', 'moose_rngseed'))
 except ValueError:
@@ -246,11 +252,12 @@ clockjob.autoschedule = runconfig.get('scheduling', 'autoschedule') in ['Yes', '
 default_releasep = float(runconfig.get('synapse', 'releasep')) 
 if reseed_numpy:
     reseed(__numpy_rngseed)    
-    LOGGER.info('NUMPY RNG SEED SET TO %s' % (str(__numpy_rngseed)))
+    LOGGER.info('NUMPY RNG SEED SET TO %d' % (numpy_rngseed))
 if reseed_moose:    
     moose_reseed(__moose_rngseed)
-    LOGGER.info('MOOSE RNG SEED SET TO %s' % (str(moose_rngseed)))
-    
+    LOGGER.info('MOOSE RNG SEED SET TO %d' % (moose_rngseed))
+runconfig.set('numeric', 'numpy_rngseed', str(numpy_rngseed))
+runconfig.set('numeric', 'moose_rngseed', str(moose_rngseed))
 
 def update_timestamp():
     global filename_suffix

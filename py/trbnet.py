@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Jul 25 12:56:33 2012 (+0530)
+# Last-Updated: Tue Aug  7 12:27:31 2012 (+0530)
 #           By: subha
-#     Update #: 2679
+#     Update #: 2680
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1229,9 +1229,9 @@ class TraubNet(object):
                 initVm_mean = cell0.soma.Em
                 randomized_initVm = numpy.random.normal(loc=initVm_mean, scale=initVm_sd*numpy.abs(initVm_mean), size=len(indices))
                 for ii in range(1, cell0.num_comp + 1):
-                    print '##'
-                    print randomized_initVm
-                    print '##'
+                    # print '##'
+                    # print randomized_initVm
+                    # print '##'
                     assign_comp_param_to_population(cells, ii, 'initVm',  randomized_initVm)
                     for cell in cells:
                         print cell.comp[ii].path, 'initVm', cell.comp[ii].initVm
