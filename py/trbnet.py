@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Aug  7 12:57:55 2012 (+0530)
+# Last-Updated: Thu Aug  9 09:25:28 2012 (+0530)
 #           By: subha
-#     Update #: 2694
+#     Update #: 2697
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1217,8 +1217,6 @@ class TraubNet(object):
             config.LOGGER.info('Em randomized with sd=%g of standard value.' % (Em_sd))
         except ConfigParser.NoOptionError:
             config.LOGGER.info('Em constant in population.')
-        if Rm_sd == 0.0 or Ra_sd == 0.0 or Cm_sd == 0.0 or initVm_sd == 0.0:
-            config.LOGGER.info('Em constant in population.')
         for celltype in self.celltype_graph.vs:
             indices = self.populations[celltype['label']]
             if indices is None or len(indices) == 0:
@@ -1229,12 +1227,7 @@ class TraubNet(object):
                 initVm_mean = cell0.soma.Em
                 randomized_initVm = numpy.random.normal(loc=initVm_mean, scale=initVm_sd*numpy.abs(initVm_mean), size=len(indices))
                 for ii in range(1, cell0.num_comp + 1):
-                    # print '##'
-                    # print randomized_initVm
-                    # print '##'
                     assign_comp_param_to_population(cells, ii, 'initVm',  randomized_initVm)
-                    # for cell in cells:
-                    #     print cell.comp[ii].path, 'initVm', cell.comp[ii].initVm
             if Rm_sd > 0.0:
                 # Make a list of Rm of all the compartments in this celltype.
                 # These will be used as mean for the normal distribution for each compartment.
@@ -1258,8 +1251,6 @@ class TraubNet(object):
                 randomized_Em = numpy.random.normal(loc=mean_Em, scale=Em_sd * numpy.abs(mean_Em), size=len(indices))
                 for ii in range(1, cell0.num_comp + 1):
                     assign_comp_param_to_population(cells, ii, 'Em', randomized_Em)
-                    # for cell in cells:
-                    #     print cell.comp[ii].path, 'Em', cell.comp[ii].Em
             if Ra_sd > 0.0:
                 # Make a list of Ra of all the compartments in this celltype.
                 # These will be used as mean for the normal distribution for each compartment.
