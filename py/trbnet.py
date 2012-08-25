@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Aug 25 14:34:41 2012 (+0530)
+# Last-Updated: Sat Aug 25 14:39:56 2012 (+0530)
 #           By: subha
-#     Update #: 2750
+#     Update #: 2751
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -870,7 +870,7 @@ class TraubNet(object):
         delays = {}
         levels = {}
         widths = {}
-        if bg_interval_sd > 0.0 and num_bg_pulses > 0:
+        if bg_interval_spread > 0.0 and num_bg_pulses > 0:
             delay_list = np.random.uniform(low=bg_interval, high=bg_interval_spread+bg_interval, size=num_bg_pulses)
             for ii in range(len(delay_list)):
                 delays[ii] = delay_list[ii]
