@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Aug 25 14:39:56 2012 (+0530)
+# Last-Updated: Sat Aug 25 15:42:20 2012 (+0530)
 #           By: subha
-#     Update #: 2751
+#     Update #: 2763
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -84,7 +84,7 @@ from collections import defaultdict
 from datetime import datetime
 import igraph
 import h5py
-import numpy
+import numpy as np
 import tables
 import ConfigParser
 from pysparse.sparse.spmatrix import ll_mat
@@ -299,7 +299,7 @@ class TraubNet(object):
                     new_edge = self.celltype_graph.es[edge_count]
                     new_edge['weight'] = 1.0 * pre_post_ratio / celltype['count']
                     g_ampa_baseline = tn.g_ampa_baseline[celltype.index][posttype.index] 
-                    new_edge['gampa'] = tn.g_ampa_baseline[celltype.index][posttype.index] * tn.tau_ampa[celltype.index][posttype.index]*1e3 / numpy.e # This is how gmax is related to c (baseline conductance scaling factor) for AMPA in traub model (e has unit of ms)
+                    new_edge['gampa'] = tn.g_ampa_baseline[celltype.index][posttype.index] * tn.tau_ampa[celltype.index][posttype.index]*1e3 / np.e # This is how gmax is related to c (baseline conductance scaling factor) for AMPA in traub model (e has unit of ms)
                     new_edge['gnmda'] = tn.g_nmda_baseline[celltype.index][posttype.index]
                     new_edge['tauampa'] = tn.tau_ampa[celltype.index][posttype.index]
                     new_edge['taunmda'] = tn.tau_nmda[celltype.index][posttype.index]
@@ -352,7 +352,7 @@ class TraubNet(object):
             postcount = int(posttype_vertex['count'])
             connprob = float(edge['weight'])
             
-            ps_comps = numpy.array(eval(edge['pscomps']), dtype=numpy.float)
+            ps_comps = np.array(eval(edge['pscomps']), dtype=np.float)
             config.LOGGER.debug('Connecting populations: pre=%s[:%d], post=%s[:%d], probability=%g' % (pretype_vertex['label'], pretype_vertex['count'], posttype_vertex['label'], posttype_vertex['count'], connprob))
             config.LOGGER.debug('ggaba= %s, type:%s' % (str(edge['ggaba']), edge['ggaba'].__class__.__name__))
             config.LOGGER.debug('allowed postsynaptic compartments: %s (after conversion: %s)' % (edge['pscomps'], ps_comps))
@@ -363,18 +363,18 @@ class TraubNet(object):
             # pre_indices[i] is the array of global indices of the
             # presynaptic cells connecting to the i-th postsynaptic
             # cell of posttype.
-            pre_indices = numpy.random.randint(low=prestart, high=prestart+precount, size=(postcount,pre_per_post))
+            pre_indices = np.random.randint(low=prestart, high=prestart+precount, size=(postcount,pre_per_post))
             # print 'Pre-indices', pre_indices
             # comp_indices[i][j] is the index of the postsynaptic
             # compartment in ps_comps for i-th postsynaptic
             # compartment for j-th presynaptic cell connecting to
             # postsynaptic cell
-            comp_indices = numpy.random.randint(low=0, high=len(ps_comps), size=(postcount, pre_per_post))
+            comp_indices = np.random.randint(low=0, high=len(ps_comps), size=(postcount, pre_per_post))
             # syn_list is the list of global index pairs for synapses
-            syn_list = numpy.array([[preindex, postindex + poststart]
+            syn_list = np.array([[preindex, postindex + poststart]
                                     for postindex in range(postcount)
                                     for preindex in pre_indices[postindex]],
-                                   dtype=numpy.int32)
+                                   dtype=np.int32)
             # print '========== START List of synapases ==========='
             # for item in syn_list:
             #     print item
@@ -387,25 +387,25 @@ class TraubNet(object):
             ampa_sd = float(config.runconfig.get('AMPA', 'sd'))
             g_ampa = float(edge['gampa'])
             if ampa_sd > 0:
-                g_ampa = numpy.random.normal(loc=g_ampa, scale=ampa_sd*g_ampa, size=len(syn_list))
+                g_ampa = np.random.normal(loc=g_ampa, scale=ampa_sd*g_ampa, size=len(syn_list))
             self.g_ampa_mat.put(g_ampa,
                                 syn_list[:, 0], syn_list[:,1])
             
             g_nmda = float(edge['gnmda'])
             nmda_sd = float(config.runconfig.get('NMDA', 'sd'))
             if nmda_sd > 0:
-                g_nmda = numpy.random.normal(loc=g_nmda, scale=nmda_sd*g_nmda, size=len(syn_list))
+                g_nmda = np.random.normal(loc=g_nmda, scale=nmda_sd*g_nmda, size=len(syn_list))
             self.g_nmda_mat.put(g_nmda,
                                 syn_list[:, 0], syn_list[:,1])
             if (pretype_vertex['label'] == 'nRT') and (posttype_vertex['label'] == 'TCR'):
-                self.g_gaba_mat.put(numpy.random.random_sample(len(syn_list)) * (self.nRT_TCR_ggaba_high - self.nRT_TCR_ggaba_low) + self.nRT_TCR_ggaba_low,
+                self.g_gaba_mat.put(np.random.random_sample(len(syn_list)) * (self.nRT_TCR_ggaba_high - self.nRT_TCR_ggaba_low) + self.nRT_TCR_ggaba_low,
                                     syn_list[:,0],
                                     syn_list[:,1])
             else:
                 gaba_sd = float(config.runconfig.get('GABA', 'sd'))
                 g_gaba = float(edge['ggaba'])
                 if gaba_sd > 0:
-                    g_gaba = numpy.random.normal(loc=g_gaba, scale=gaba_sd*g_gaba, size=len(syn_list))
+                    g_gaba = np.random.normal(loc=g_gaba, scale=gaba_sd*g_gaba, size=len(syn_list))
                 self.g_gaba_mat.put(g_gaba,
                                     syn_list[:,0], syn_list[:,1])                    
         end = datetime.now()
@@ -746,10 +746,10 @@ class TraubNet(object):
             if not random:
                 cell_list = self.get_maxdegree_cell_indices(celltype=vertex['label'], size=numcellspertype)
             else:
-                pop = numpy.array(self.populations[celltype])
+                pop = np.array(self.populations[celltype])
                 high = len(pop)
                 if high > numcells:
-                    indices = numpy.random.randint(low=0, high=high, size=numcells)
+                    indices = np.random.randint(low=0, high=high, size=numcells)
                     cell_list = pop[indices]
                 else:
                     cell_list = pop
@@ -872,6 +872,7 @@ class TraubNet(object):
         widths = {}
         if bg_interval_spread > 0.0 and num_bg_pulses > 0:
             delay_list = np.random.uniform(low=bg_interval, high=bg_interval_spread+bg_interval, size=num_bg_pulses)
+            print 'Delays:', delay_list
             for ii in range(len(delay_list)):
                 delays[ii] = delay_list[ii]
                 levels[ii] = level
@@ -890,17 +891,19 @@ class TraubNet(object):
         # More than 1 delay values indicate we want to explicitly set
         # each pulse time and duration, with probe pulses with every
         # alternet background pulse.
+        print delays, len(delays)
         if len(delays) > 1:
             self.stim_bg.count = len(delays)
             self.stim_probe.count = len(delays)/2+1
             for index in range(len(delays)):
                 self.stim_bg.delay[index] = delays[index]
+                print 'index:', index, 'delay:', self.stim_bg.delay[index]
                 self.stim_bg.level[index] = levels[index]
-                self.stim_bg.width[index] = width[index]                    
+                self.stim_bg.width[index] = widths[index]                    
                 if index % 2 == 0:
                     self.stim_probe.delay[index/2] = delays[index]+delays[index+1] + pulse_width
                     self.stim_probe.level[index/2] = levels[index]
-                    self.stim_probe.width[index/2] = width[index]                    
+                    self.stim_probe.width[index/2] = widths[index]                    
         # A single delay value means we have an even pulse train
         else:
             self.stim_bg.firstLevel = level
@@ -949,21 +952,21 @@ class TraubNet(object):
         if isinstance(bg_cells, str) and isinstance(probe_cells, str) and bg_cells == probe_cells:
             cell_indices = []
             if bg_cells == 'any':
-                cell_indices = numpy.arange(len(self.index_cell_map.keys()))
+                cell_indices = np.arange(len(self.index_cell_map.keys()))
             else:
                 celltype_vertex_set = self.celltype_graph.vs.select(label_eq=bg_cells)
                 for vertex in celltype_vertex_set:
                     startindex = int(vertex['startindex'])
                     count = int(vertex['count'])
-                    cell_indices = numpy.concatenate((cell_indices, numpy.arange(startindex, startindex+count)))
-            numpy.random.shuffle(cell_indices)
+                    cell_indices = np.concatenate((cell_indices, np.arange(startindex, startindex+count)))
+            np.random.shuffle(cell_indices)
             bg_cell_indices = cell_indices[:bg_count]
             probe_cell_indices = cell_indices[bg_count: bg_count+probe_count]
         else:            
             if isinstance(bg_cells, str):
                 if bg_cells == 'any':
-                    bg_cell_indices = numpy.arange(len(self.index_cell_map.keys()))
-                    numpy.random.shuffle(bg_cell_indices)
+                    bg_cell_indices = np.arange(len(self.index_cell_map.keys()))
+                    np.random.shuffle(bg_cell_indices)
                     bg_cell_indices = bg_cell_indices[:bg_count]
                 else:
                     celltype_vertex_set = self.celltype_graph.vs.select(label_eq=bg_cells)
@@ -971,15 +974,15 @@ class TraubNet(object):
                         startindex = int(vertex['startindex'])
                         count = int(vertex['count'])
                         # print vertex['label'], startindex, count
-                        cell_indices = numpy.arange(startindex, startindex+count)
-                        numpy.random.shuffle(cell_indices)
+                        cell_indices = np.arange(startindex, startindex+count)
+                        np.random.shuffle(cell_indices)
                         # print indices
-                        bg_cell_indices = numpy.concatenate((bg_cell_indices, cell_indices[:bg_count]))
+                        bg_cell_indices = np.concatenate((bg_cell_indices, cell_indices[:bg_count]))
 
             if isinstance(probe_cells, str):
                 if probe_cells == 'any':
-                    probe_cell_indices = numpy.arange(0, len(self.index_cell_map.keys()))
-                    numpy.random.shuffle(probe_cell_indices)
+                    probe_cell_indices = np.arange(0, len(self.index_cell_map.keys()))
+                    np.random.shuffle(probe_cell_indices)
                     probe_cell_indices = probe_cell_indices[:probe_count]
                 else:
                     celltype_vertex_set = self.celltype_graph.vs.select(label_eq=probe_cells)
@@ -987,10 +990,10 @@ class TraubNet(object):
                         startindex = int(vertex['startindex'])
                         count = int(vertex['count'])
                         # print vertex['label'], startindex, count
-                        cell_indices = numpy.arange(startindex, startindex+count)
-                        numpy.random.shuffle(cell_indices)
+                        cell_indices = np.arange(startindex, startindex+count)
+                        np.random.shuffle(cell_indices)
                         # print indices
-                        probe_cell_indices = numpy.concatenate((probe_cell_indices, cell_indices[:probe_count]))
+                        probe_cell_indices = np.concatenate((probe_cell_indices, cell_indices[:probe_count]))
         bg_cell_list = []
         if isinstance(bg_cells, list):
             bg_cell_list = bg_cells
@@ -1248,7 +1251,7 @@ class TraubNet(object):
             cells = [self.index_cell_map[index] for index in indices]
             if initVm_sd > 0.0:
                 initVm_mean = cell0.soma.Em
-                randomized_initVm = numpy.random.normal(loc=initVm_mean, scale=initVm_sd*numpy.abs(initVm_mean), size=len(indices))
+                randomized_initVm = np.random.normal(loc=initVm_mean, scale=initVm_sd*np.abs(initVm_mean), size=len(indices))
                 for ii in range(1, cell0.num_comp + 1):
                     assign_comp_param_to_population(cells, ii, 'initVm',  randomized_initVm)
             if Rm_sd > 0.0:
@@ -1257,7 +1260,7 @@ class TraubNet(object):
                 mean_values = [(cell0.comp[ii].Rm, cell0.comp[ii].Cm, cell0.comp[ii].Ra) for ii in range(1, cell0.num_comp+1)]
                 for ii in range(1, cell0.num_comp+1):
                     Rm_mean = cell0.comp[ii].Rm
-                    randomized_Rm = numpy.random.normal(loc=mean_Rm, scale=Rm_sd * mean_Rm, size=len(indices))
+                    randomized_Rm = np.random.normal(loc=mean_Rm, scale=Rm_sd * mean_Rm, size=len(indices))
                     assign_comp_param_to_population(cells, ii, 'Rm', randomized_Rm)
             if Cm_sd > 0.0:
                 # Make a list of Cm of all the compartments in this celltype.
@@ -1265,13 +1268,13 @@ class TraubNet(object):
                 mean_values = [(cell0.comp[ii].Cm, cell0.comp[ii].Cm, cell0.comp[ii].Ra) for ii in range(1, cell0.num_comp+1)]
                 for ii in range(1, cell0.num_comp+1):
                     Cm_mean = cell0.comp[ii].Cm
-                    randomized_Cm = numpy.random.normal(loc=mean_Cm, scale=Cm_sd * mean_Cm, size=len(indices))
+                    randomized_Cm = np.random.normal(loc=mean_Cm, scale=Cm_sd * mean_Cm, size=len(indices))
                     assign_comp_param_to_population(cells, ii, 'Cm', randomized_Cm)
             if Em_sd > 0.0:
                 # Make a list of Em of all the compartments in this celltype.
                 # These will be used as mean for the normal distribution for each cell.
                 mean_Em = cell0.soma.Em
-                randomized_Em = numpy.random.normal(loc=mean_Em, scale=Em_sd * numpy.abs(mean_Em), size=len(indices))
+                randomized_Em = np.random.normal(loc=mean_Em, scale=Em_sd * np.abs(mean_Em), size=len(indices))
                 for ii in range(1, cell0.num_comp + 1):
                     assign_comp_param_to_population(cells, ii, 'Em', randomized_Em)
             if Ra_sd > 0.0:
@@ -1280,7 +1283,7 @@ class TraubNet(object):
                 mean_values = [(cell0.comp[ii].Ra, cell0.comp[ii].Ra, cell0.comp[ii].Ra) for ii in range(1, cell0.num_comp+1)]
                 for ii in range(1, cell0.num_comp+1):
                     Ra_mean = cell0.comp[ii].Ra
-                    randomized_Ra = numpy.random.normal(loc=mean_Ra, scale=Ra_sd * mean_Ra, size=len(indices))
+                    randomized_Ra = np.random.normal(loc=mean_Ra, scale=Ra_sd * mean_Ra, size=len(indices))
                     assign_comp_param_to_population(cells, ii, 'Ra', randomized_Ra)
         config.LOGGER.debug('END Randomizing passive properties')
 
@@ -1311,7 +1314,7 @@ class TraubNet(object):
                     sd = proto_channel.Gbar * conductance_dict[proto_channel.name]
                     if mean <= 0.0 or sd <= 0.0:
                         continue
-                    conductances = numpy.random.normal(loc=mean,
+                    conductances = np.random.normal(loc=mean,
                                                        scale=sd,
                                                        size=len(indices))
                     ii = 0
@@ -1364,12 +1367,12 @@ class TraubNet(object):
         for section in config.runconfig.sections():
             table_contents = config.runconfig.items(section)
             if table_contents:
-                sectiontab = runconfig.create_dataset(section, data=numpy.rec.array(table_contents))
+                sectiontab = runconfig.create_dataset(section, data=np.rec.array(table_contents))
         
         # Save the celltype information (vertices of the celltype graph)
         network_struct =  h5file.create_group('network')
         network_struct.attrs['TITLE'] = 'Network structure'
-        synapse_dtype = numpy.dtype([('source','S32'), 
+        synapse_dtype = np.dtype([('source','S32'), 
                                      ('dest', 'S32'), 
                                      ('type', 'S4'), 
                                      ('Gbar', 'f4'),
@@ -1380,7 +1383,7 @@ class TraubNet(object):
         synchans = []
         conductances = []
         celltypes = []
-        celltype_type = numpy.dtype([('name', 'S16'),
+        celltype_type = np.dtype([('name', 'S16'),
                                      ('index', 'i1'),
                                      ('count', 'i2')])
         for vertex in self.celltype_graph.vs:
@@ -1406,13 +1409,13 @@ class TraubNet(object):
                                      synchan.tau2,
                                      synchan.Ek))
         if conductances:
-            dataset = numpy.rec.array(conductances)
+            dataset = np.rec.array(conductances)
             network_struct.create_dataset('hhchan', data=dataset)
         if synchans:
-            dataset = numpy.rec.array(synchans, dtype=synapse_dtype)
+            dataset = np.rec.array(synchans, dtype=synapse_dtype)
             network_struct.create_dataset('synapse', data=dataset, compression='gzip')
         if celltypes:
-            dataset = numpy.rec.array(celltypes, dtype=celltype_type)
+            dataset = np.rec.array(celltypes, dtype=celltype_type)
             network_struct.create_dataset('celltype', data=dataset)
         stimulus_struct = h5file.create_group('stimulus')
         targets = []
@@ -1422,7 +1425,7 @@ class TraubNet(object):
                 if moose.Neutral(neighbour).className == 'Compartment':
                     targets.append([stim.path(), neighbour.path()])
         if targets:
-            dataset = stimulus_struct.create_dataset('connection', data=numpy.rec.array(targets))
+            dataset = stimulus_struct.create_dataset('connection', data=np.rec.array(targets))
         
         h5file.close()
         config.LOGGER.debug('END: save_cell_network')
@@ -1433,7 +1436,7 @@ class TraubNet(object):
         starttime =  datetime.now()
         compression_filter =  tables.Filters(complevel=9, complib='zlib', fletcher32=True)
         h5file =  tables.openFile(filename,  mode = 'w',  title = 'Traub Network: timestamp: %s' % (config.timestamp.strftime('%Y-%M-%D %H:%M:%S')),  filters = compression_filter)
-        h5file.root._v_attrs.numpy_rngseed = config.numpy_rngseed
+        h5file.root._v_attrs.np_rngseed = config.numpy_rngseed
         h5file.root._v_attrs.moose_rngseed = config.moose_rngseed
         h5file.root._v_attrs.notes = '\n'.join(self.tweaks_doc)
         # Save simulation configuration data. I am saving it both in
@@ -1469,7 +1472,7 @@ class TraubNet(object):
             synedge['taugaba'] = edge['taugaba']
             synedge['prelease'] = edge['prelease']
             ii =  0
-            pscomps = numpy.zeros(90, dtype=numpy.uint8)
+            pscomps = np.zeros(90, dtype=np.uint8)
             for pscomp in eval(edge['pscomps']): 
                 pscomps[ii] = int(pscomp)
                 ii +=  1
@@ -1481,12 +1484,12 @@ class TraubNet(object):
             try:
                 it =  iter(edge['ggaba'])
             except TypeError:
-                synedge['ggaba'] = numpy.array([edge['ggaba'], edge['ggaba']])
+                synedge['ggaba'] = np.array([edge['ggaba'], edge['ggaba']])
 
             assert ((it is None) or (self.celltype_graph.vs[edge.source]['label'] == 'nRT'))
             if self.celltype_graph.vs[edge.source]['label'] == 'nRT':
                 if self.celltype_graph.vs[edge.target]['label'] == 'TCR':
-                    synedge['ggaba'] =  numpy.array([self.nRT_TCR_ggaba_low, self.nRT_TCR_ggaba_high])
+                    synedge['ggaba'] =  np.array([self.nRT_TCR_ggaba_low, self.nRT_TCR_ggaba_high])
                 synedge['taugabaslow'] = edge['taugabaslow']
             synedge.append()
         cellnet_group = h5file.createGroup(network_struct, 'cellnetwork', 'Cell-to-cell network structure')
@@ -1630,13 +1633,13 @@ def test_scale_conductance():
         gnmda_baseline = netdata.g_nmda_baseline[src_index][tgt_index]
         low_nmda_posttypes = [x[1] for x in scale_dict_nmda.keys()]
         if source['label'] == 'SpinyStellate' and target['label'] == 'SpinyStellate':
-            assert numpy.allclose([edge['gampa']], [gampa_baseline * 0.25])
+            assert np.allclose([edge['gampa']], [gampa_baseline * 0.25])
         else:
-            assert numpy.allclose([edge['gampa']], [gampa_baseline * 2.0])
+            assert np.allclose([edge['gampa']], [gampa_baseline * 2.0])
         if target['label'] in low_nmda_posttypes:
-            assert numpy.allclose([edge['gnmda']], [gnmda_baseline * 0.2])
+            assert np.allclose([edge['gnmda']], [gnmda_baseline * 0.2])
         else:
-            assert numpy.allclose([edge['gnmda']], [gnmda_baseline])
+            assert np.allclose([edge['gnmda']], [gnmda_baseline])
     print 'test_scale_conductance: Successfully tested.'
 
 def test_reading_network(filename):
