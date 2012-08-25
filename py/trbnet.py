@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Aug  9 09:25:28 2012 (+0530)
+# Last-Updated: Sat Aug 25 14:34:41 2012 (+0530)
 #           By: subha
-#     Update #: 2697
+#     Update #: 2750
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -775,6 +775,8 @@ class TraubNet(object):
                        probe_cells='any',
                        stim_onset=1.0, 
                        bg_interval=0.5, 
+                       bg_interval_spread=0.0,
+                       num_bg_pulses=0,
                        pulse_width=60e-6, 
                        isi=10e-3, 
                        level=5e-12, 
@@ -818,6 +820,14 @@ class TraubNet(object):
         bg_interval -- interval between two background stimulus
         sessions. probe stimulus will be applied at half the rate.
 
+        bg_interval_spread -- upper limit for background interval for
+        randomization. If 0, background pulse is at regular
+        interval. Otherwise, it is uniformly distributed between
+        bg_interval and bg_interval + bg_interval_spread.
+
+        num_bg_pulses -- in case of randomized stimulus, this
+        determines how many total background pulses to deliver.
+
         pulse_width -- width of background pulses
 
         isi -- if paired pulse, then the interval between the two
@@ -836,6 +846,10 @@ class TraubNet(object):
         
         Updating stimulus protocol to give trains (similar config
         change in custom.ini) The paired pulse does not work.
+
+        2012-08-25 14:20:22 (+0530) Subhasis Ray
+
+        Updating stimulus protocol to ramdomize pulses.
 
         """
         if  isinstance(stim_container, str):
@@ -856,34 +870,38 @@ class TraubNet(object):
         delays = {}
         levels = {}
         widths = {}
-        for key, value in config.runconfig.items('stimulus'):
-            if key.startswith('delay_'):
-                index = int(key.rpartition('_')[-1])
-                delays[index] = float(value)
-            elif key.startswith('level_'):
-                index = int(key.rpartition('_')[-1])
-                levels[index] = float(value)
-            elif key.startswith('width_'):
-                index = int(key.rpartition('_')[-1])
-                widths[index] = float(value)
-        if len(delays) > 2:
+        if bg_interval_sd > 0.0 and num_bg_pulses > 0:
+            delay_list = np.random.uniform(low=bg_interval, high=bg_interval_spread+bg_interval, size=num_bg_pulses)
+            for ii in range(len(delay_list)):
+                delays[ii] = delay_list[ii]
+                levels[ii] = level
+                widths[ii] = pulse_width
+        else:
+            for key, value in config.runconfig.items('stimulus'):
+                if key.startswith('delay_'):
+                    index = int(key.rpartition('_')[-1])
+                    delays[index] = float(value)
+                elif key.startswith('level_'):
+                    index = int(key.rpartition('_')[-1])
+                    levels[index] = float(value)
+                elif key.startswith('width_'):
+                    index = int(key.rpartition('_')[-1])
+                    widths[index] = float(value)
+        # More than 1 delay values indicate we want to explicitly set
+        # each pulse time and duration, with probe pulses with every
+        # alternet background pulse.
+        if len(delays) > 1:
             self.stim_bg.count = len(delays)
-            self.stim_probe.count = len(delays)
-            for index in delays.keys():
+            self.stim_probe.count = len(delays)/2+1
+            for index in range(len(delays)):
                 self.stim_bg.delay[index] = delays[index]
-                self.stim_probe.delay[index] = delays[index]
-                if index in levels:
-                    self.stim_bg.level[index] = levels[index]
-                    self.stim_probe.level[index] = levels[index]
-                else:
-                    self.stim_bg.level[index] = level
-                    self.stim_probe.level[index] = level
-                if index in widths:
-                    self.stim_bg.width[index] = width[index]                    
-                    self.stim_probe.width[index] = width[index]                    
-                else:
-                    self.stim_bg.width[index] = pulse_width
-                    self.stim_probe.width[index] = pulse_width
+                self.stim_bg.level[index] = levels[index]
+                self.stim_bg.width[index] = width[index]                    
+                if index % 2 == 0:
+                    self.stim_probe.delay[index/2] = delays[index]+delays[index+1] + pulse_width
+                    self.stim_probe.level[index/2] = levels[index]
+                    self.stim_probe.width[index/2] = width[index]                    
+        # A single delay value means we have an even pulse train
         else:
             self.stim_bg.firstLevel = level
             self.stim_bg.secondLevel = level
@@ -900,7 +918,12 @@ class TraubNet(object):
             self.stim_probe.firstWidth = pulse_width
             self.stim_probe.secondWidth = pulse_width            
             self.stim_probe.trigMode = moose.EXT_GATE
-        self.stim_probe.delay[0] = self.stim_bg.delay[0]  + sum([self.stim_bg.delay[ii] for ii in range(self.stim_bg.count)]) + self.stim_bg.width[self.stim_bg.count - 1]
+        # 2012-08-25 14:18:21 (+0530): Commenting out the following
+        # line because we do not want to start probe after all
+        # background pulses in one set are delivered, but with every
+        # alternet pulse, which is achieved above.
+
+        # self.stim_probe.delay[0] = self.stim_bg.delay[0]  + sum([self.stim_bg.delay[ii] for ii in range(self.stim_bg.count)]) + self.stim_bg.width[self.stim_bg.count - 1]
         
         
 
