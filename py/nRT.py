@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 15:18:24 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Dec 14 11:05:23 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 95
+# Last-Updated: Thu Sep  6 17:51:06 2012 (+0530)
+#           By: subha
+#     Update #: 96
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -157,14 +157,14 @@ class nRT(TraubCell):
         mycell = nRT(nRT.prototype, sim.model.path + "/nRT")
         config.LOGGER.info('Created cell: %s' % (mycell.path))
         vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_nRT', 'Vm', sim.data)
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=50.0e-3, firstWidth=50e-3)
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=100.0e-3, firstWidth=200e-3)
 #         pulsegen1 = mycell.soma.insertPulseGen('pulsegen1', sim.model, firstLevel=3e-7, firstDelay=150e-3, firstWidth=10e-3)
 
         sim.schedule()
         if mycell.has_cycle():
             config.LOGGING.warning("WARNING!! CYCLE PRESENT IN CICRUIT.")
         t1 = datetime.now()
-        sim.run(200e-3)
+        sim.run(500e-3)
         t2 = datetime.now()
         delta = t2 - t1
         config.LOGGER.info('simulation time: %g'  % (delta.seconds + 1e-6 * delta.microseconds))

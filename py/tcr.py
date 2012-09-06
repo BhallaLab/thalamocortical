@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 10:14:07 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Sep  6 16:38:48 2012 (+0530)
+# Last-Updated: Thu Sep  6 17:18:07 2012 (+0530)
 #           By: subha
-#     Update #: 189
+#     Update #: 190
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -179,12 +179,13 @@ class TCR(TraubCell):
         t2 = datetime.now()
         delta = t2 - t1
         print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
-        mus_presyn_vm = np.array(vm_table_presyn)
-        mus_soma_vm =  np.array(vm_table_soma) 
-        mus_t = np.linspace(0, sim.simtime, len(mus_soma_vm))
-        for ch in sim.data.children():
-            table = moose.Table(ch)
-            np.savetxt('data/%s_%s.dat' % (table.name, config.solver), np.transpose(np.vstack((mus_t, np.array(table)))))
+        sim.dump_data('data')
+        # mus_presyn_vm = np.array(vm_table_presyn)
+        # mus_soma_vm =  np.array(vm_table_soma) 
+        # mus_t = np.linspace(0, sim.simtime, len(mus_soma_vm))
+        # for ch in sim.data.children():
+        #     table = moose.Table(ch)
+        #     np.savetxt('data/%s_%s.dat' % (table.name, config.solver), np.transpose(np.vstack((mus_t, np.array(table)))))
         # sim.dump_data('data')
         # if config.has_pylab:
         #     try:

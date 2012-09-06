@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 19:32:34 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Sep  6 15:03:03 2012 (+0530)
+# Last-Updated: Thu Sep  6 17:52:17 2012 (+0530)
 #           By: subha
-#     Update #: 63
+#     Update #: 64
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -134,7 +134,7 @@ class DeepLTS(TraubCell):
             mus_vm = config.pylab.array(vm_table) * 1e3
             mus_t = linspace(0, sim.simtime * 1e3, len(mus_vm))
             try:
-                nrn_vm = config.pylab.loadtxt('../nrn/mydata/Vm_supLTS.plot')
+                nrn_vm = config.pylab.loadtxt('../nrn/mydata/Vm_deepLTS.plot')
                 nrn_t = nrn_vm[:, 0]
                 nrn_vm = nrn_vm[:, 1]
                 config.pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
