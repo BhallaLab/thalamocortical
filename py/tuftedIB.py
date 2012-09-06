@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 11:44:48 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Jan 23 00:00:26 2012 (+0530)
-#           By: Subhasis Ray
-#     Update #: 204
+# Last-Updated: Thu Sep  6 12:15:42 2012 (+0530)
+#           By: subha
+#     Update #: 208
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -154,7 +154,12 @@ class TuftedIB(TraubCell):
             kc.connect('Gk', gk_table, 'inputRequest')
             pymoose.showmsg(ca_conc)
         # The stimulus is similar to bottom trace in Fig A4
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=1.5e-9, firstDelay=50e-3, firstWidth=300e-3)
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=-0.3e-9, firstDelay=100e-3, firstWidth=100e-3)
+        pulsegen.secondLevel = 0.3e-9
+        pulsegen.secondDelay = 300e-3
+        pulsegen.secondWidth = 100e-3
+        pulsegen.count = 3
+        pulsegen.delay[2] = 1e9
 #         pulsegen1 = mycell.soma.insertPulseGen('pulsegen1', sim.model, firstLevel=3e-7, firstDelay=150e-3, firstWidth=10e-3)
         pulse_table = moose.Table('/data/injection')
         pulse_table.stepMode = 3
@@ -164,7 +169,7 @@ class TuftedIB(TraubCell):
         if mycell.has_cycle():
             print "WARNING!! CYCLE PRESENT IN CICRUIT."
         t1 = datetime.now()
-        sim.run(500e-3)
+        sim.run(1.0)
         t2 = datetime.now()
         delta = t2 - t1
         print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
