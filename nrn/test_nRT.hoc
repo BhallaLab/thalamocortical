@@ -29,7 +29,7 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     stim1 = new IClamp(0.5) 
     stim1.amp = 0.3
     stim1.del = t1
-    stim1.dur = 50.0
+    stim1.dur = 300.0
     run()    
     f.wopen("mydata/Vm_nRT.plot")
     for ii = 0, vvec.size() - 1{
@@ -44,5 +44,5 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     f.close()
 }
 
-runcell(200., 50.)
+runcell(1000., 100.)
 quit()

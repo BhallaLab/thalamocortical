@@ -50,8 +50,8 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     // ikvec.record(&cell.comp[1].ik_kc(0.5))
     stim1 = new IClamp(0.5) 
     stim1.amp = 0.3
-    stim1.del = 50.0//t1
-    stim1.dur = 50.0// $1 - $2
+    stim1.del = 100.0//t1
+    stim1.dur = 500.0// $1 - $2
     // stim2 = new IClamp(0.5) 
     // stim2.amp = 0.3e3
     // stim2.del = t1 + 100
@@ -107,5 +107,5 @@ proc finit0(){
     forsec cell.all { v = -65 }
 }
 
-runcell(200., 50.)
+runcell(1000., 100.)
 quit()
