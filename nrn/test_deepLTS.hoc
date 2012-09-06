@@ -64,7 +64,7 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
         // if (ismembrane("cal")) { gbar_cal = 0.0 }
     // }
     // print_cell(cell, "deepLTS")
-    print_readcell(cell, "DeepLTS.p")
+    // print_readcell(cell, "DeepLTS.p")
     // g = new File()
     // g.wopen("mydata/Ca_suppyrrs.plot")
     // f.wopen("mydata/Vm_suppyrrs.plot")
@@ -77,13 +77,13 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     // f.close()
     // g.close()
     run()    
-    f.wopen("mydata/Vm_deepLTS.dat")
+    f.wopen("mydata/Vm_deepLTS.plot")
     for ii = 0, vvec.size() - 1{
     	f.printf("%g %g\n", tvec.x(ii), vvec.x(ii))
     }
     f.close()
     
-    f.wopen("mydata/Ca_deepLTS.dat")
+    f.wopen("mydata/Ca_deepLTS.plot")
     for ii = 0, caconc.size() - 1{
     	f.printf("%g %g\n", tvec.x(ii), caconc.x(ii))
     }
