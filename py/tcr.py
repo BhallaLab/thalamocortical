@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 10:14:07 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Sep  4 13:55:47 2012 (+0530)
+# Last-Updated: Thu Sep  6 16:38:48 2012 (+0530)
 #           By: subha
-#     Update #: 186
+#     Update #: 189
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -162,7 +162,7 @@ class TCR(TraubCell):
         print 'Tables created:', vm_table_soma.path, vm_table_presyn.path
         stim_table = moose.Table('%s/stimulus' % (sim.data.path))
         stim_table.stepMode = 3
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=1e-9, firstDelay=100e-3, firstWidth=100e-3)
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=0.3e-9, firstDelay=100e-3, firstWidth=200e-3)
         # pulsegen.count = 4
         # for ii in range(pulsegen.count):
         #     pulsegen.delay[ii] = 0.025
@@ -175,7 +175,7 @@ class TCR(TraubCell):
         if mycell.has_cycle():
             print "WARNING!! CYCLE PRESENT IN CICRUIT."
         t1 = datetime.now()
-        sim.run(1.0)
+        sim.run(0.5)
         t2 = datetime.now()
         delta = t2 - t1
         print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
