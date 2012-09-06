@@ -126,7 +126,7 @@ class SupPyrRS(TraubCell):
         if mycell.has_cycle():
             config.LOGGER.warning("WARNING!! CYCLE PRESENT IN CICRUIT.")
         t1 = datetime.now()
-        sim.run(300e-3)
+        sim.run(500e-3)
         t2 = datetime.now()
         delta = t2 - t1
         config.BENCHMARK_LOGGER.info('simulation time: %g' % (delta.seconds + 1e-6 * delta.microseconds))

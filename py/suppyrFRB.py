@@ -170,14 +170,14 @@ class SupPyrFRB(TraubCell):
             kc = moose.HHChannel(kc_path)
             kc.connect('Gk', gk_table, 'inputRequest')
             pymoose.showmsg(ca_conc)
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=50e-3, firstWidth=50e-3)
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=100e-3, firstWidth=200e-3)
 #         pulsegen1 = mycell.soma.insertPulseGen('pulsegen1', sim.model, firstLevel=3e-7, firstDelay=150e-3, firstWidth=10e-3)
 
         sim.schedule()
         if mycell.has_cycle():
             print "WARNING!! CYCLE PRESENT IN CICRUIT."
         t1 = datetime.now()
-        sim.run(200e-3)
+        sim.run(500e-3)
         t2 = datetime.now()
         delta = t2 - t1
         print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
