@@ -70,7 +70,7 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
         // if (ismembrane("ar")) { gbar_ar = 0.0 }
     // }
     // print_cell(cell, "TCR")
-    print_readcell(cell, "TCR.p")
+    // print_readcell(cell, "TCR.p")
     // g = new File()
     // g.wopen("mydata/Ca_suppyrrs.plot")
     // f.wopen("mydata/Vm_suppyrrs.plot")
@@ -106,5 +106,5 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
 //     forsec cell.all { v = -65 }
 // }
 
-runcell(1000., 100.)
+runcell(500., 100.)
 quit()

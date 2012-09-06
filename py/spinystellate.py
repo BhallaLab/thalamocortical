@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Sep 29 11:43:22 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Sep  6 11:58:14 2012 (+0530)
+# Last-Updated: Thu Sep  6 17:17:58 2012 (+0530)
 #           By: subha
-#     Update #: 583
+#     Update #: 586
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -98,14 +98,14 @@ class SpinyStellate(TraubCell):
         # for neighbour in mycell.soma.neighbours('axial'):
         #     print 'AXIAL', neighbour.path()
         vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_spinstell', 'Vm', sim.data)
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=100e-3, firstWidth=300e-3)
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=100e-3, firstWidth=200e-3)
 #         pulsegen1 = mycell.soma.insertPulseGen('pulsegen1', sim.model, firstLevel=3e-7, firstDelay=150e-3, firstWidth=10e-3)
 
         sim.schedule()
         if mycell.has_cycle():
             config.LOGGER.warning("WARNING!! CYCLE PRESENT IN CICRUIT.")
         t1 = datetime.now()
-        sim.run(1.0)
+        sim.run(0.5)
         t2 = datetime.now()
         delta = t2 - t1
         config.BENCHMARK_LOGGER.info('simulation time: %g' % (delta.seconds + 1e-6 * delta.microseconds))
@@ -113,7 +113,7 @@ class SpinyStellate(TraubCell):
             print msg
         for msg in moose.Neutral('/model/SpinyStellate/solve').outMessages():
             print msg
-        # sim.dump_data('data')
+        sim.dump_data('data')
         # mycell.dump_cell('spinstell.txt')
         if config.has_pylab:
             mus_vm = config.pylab.array(vm_table) * 1e3
