@@ -69,5 +69,5 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g
 proc finit0(){
     forsec cell.all { v = -70 }
 }
-runcell(1000, 0.0)
+runcell(500, 100.0)
 //quit()
