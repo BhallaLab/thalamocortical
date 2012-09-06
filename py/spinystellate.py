@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Tue Sep 29 11:43:22 2009 (+0530)
 # Version: 
-# Last-Updated: Fri May 11 16:36:19 2012 (+0530)
+# Last-Updated: Thu Sep  6 11:58:14 2012 (+0530)
 #           By: subha
-#     Update #: 582
+#     Update #: 583
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -98,7 +98,7 @@ class SpinyStellate(TraubCell):
         # for neighbour in mycell.soma.neighbours('axial'):
         #     print 'AXIAL', neighbour.path()
         vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_spinstell', 'Vm', sim.data)
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=50e-3, firstWidth=500e-3)
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=100e-3, firstWidth=300e-3)
 #         pulsegen1 = mycell.soma.insertPulseGen('pulsegen1', sim.model, firstLevel=3e-7, firstDelay=150e-3, firstWidth=10e-3)
 
         sim.schedule()

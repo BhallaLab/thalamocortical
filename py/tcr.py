@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 10:14:07 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Jul 18 11:43:58 2012 (+0530)
+# Last-Updated: Tue Sep  4 13:55:47 2012 (+0530)
 #           By: subha
-#     Update #: 148
+#     Update #: 186
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -48,12 +48,12 @@
 import sys
 sys.path.append('/data/subha/chamcham_moose/python/')
 from datetime import datetime
+import numpy as np
 import config
 import trbutil
 import moose
 from cell import *
 from capool import CaPool
-
 
 class TCR(TraubCell):
     chan_params = {
@@ -151,49 +151,55 @@ class TCR(TraubCell):
         config.LOGGER.info(" *")
         config.LOGGER.info(" **************************************************************************/")
         sim = Simulation(cls.__name__)
-        sim.simdt = 1e-5
-        sim.plotdt = 0.25e-4
+        sim.simdt = 5e-6
+        sim.plotdt = 0.5e-4
         mycell = TCR(TCR.prototype, sim.model.path + "/TCR")
-        for ii in range(1, mycell.num_comp):
-            mycell.comp[ii].Em = -57e-3
+        # for ii in range(1, mycell.num_comp):
+        #     mycell.comp[ii].Em = -57e-3
         print 'Created cell:', mycell.path
-        vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_TCR', 'Vm', sim.data)
+        vm_table_presyn = mycell.comp[mycell.presyn].insertRecorder('TCR_presynaptic_Vm', 'Vm', sim.data)
+        vm_table_soma = mycell.soma.insertRecorder('TCR_soma_Vm', 'Vm', sim.data)
+        print 'Tables created:', vm_table_soma.path, vm_table_presyn.path
         stim_table = moose.Table('%s/stimulus' % (sim.data.path))
         stim_table.stepMode = 3
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=50e-3, firstWidth=50e-3)
-        pulsegen.count = 4
-        for ii in range(pulsegen.count):
-            pulsegen.delay[ii] = 0.025
-            pulsegen.level[ii] = 1e-9
-            pulsegen.width[ii] = 100e-6
-        pulsegen.delay[0]= 3.0
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=1e-9, firstDelay=100e-3, firstWidth=100e-3)
+        # pulsegen.count = 4
+        # for ii in range(pulsegen.count):
+        #     pulsegen.delay[ii] = 0.025
+        #     pulsegen.level[ii] = 1e-9
+        #     pulsegen.width[ii] = 100e-6
+        # pulsegen.delay[0]= 3.0
         stim_table.connect('inputRequest', pulsegen, 'output')
     
         sim.schedule()
         if mycell.has_cycle():
             print "WARNING!! CYCLE PRESENT IN CICRUIT."
         t1 = datetime.now()
-        sim.run(12.0)
+        sim.run(1.0)
         t2 = datetime.now()
         delta = t2 - t1
         print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
-        sim.dump_data('data')
-        if config.has_pylab:
-            try:
-                nrn_vm = config.pylab.loadtxt('../nrn/mydata/Vm_TCR.plot')
-                nrn_t = nrn_vm[:, 0]
-                nrn_vm = nrn_vm[:, 1]
-                config.pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
-            except IOError:
-                pass
-            mus_vm = config.pylab.array(vm_table) * 1e3
-            mus_t = linspace(0, sim.simtime*1e3, len(mus_vm))
-            mus_stim = config.pylab.array(stim_table) * 1e9
-            config.pylab.plot(mus_t, mus_vm, 'g-', label='mus vm (mV)')
-            config.pylab.plot(mus_t, mus_stim, 'r-', label='mus stim (nA)')
-            config.pylab.legend()
-            config.pylab.title('TCR')
-            config.pylab.show()
+        mus_presyn_vm = np.array(vm_table_presyn)
+        mus_soma_vm =  np.array(vm_table_soma) 
+        mus_t = np.linspace(0, sim.simtime, len(mus_soma_vm))
+        for ch in sim.data.children():
+            table = moose.Table(ch)
+            np.savetxt('data/%s_%s.dat' % (table.name, config.solver), np.transpose(np.vstack((mus_t, np.array(table)))))
+        # sim.dump_data('data')
+        # if config.has_pylab:
+        #     try:
+        #         nrn_vm = config.pylab.loadtxt('../nrn/mydata/Vm_TCR.plot')
+        #         nrn_t = nrn_vm[:, 0]
+        #         nrn_vm = nrn_vm[:, 1]
+        #         config.pylab.plot(nrn_t, nrn_vm, 'y-', label='nrn vm')
+        #     except IOError:
+        #         pass
+        #     mus_stim = config.pylab.array(stim_table) * 1e9
+        #     config.pylab.plot(mus_t, mus_vm, 'g-', label='mus vm (mV)')
+        #     config.pylab.plot(mus_t, mus_stim, 'r-', label='mus stim (nA)')
+        #     config.pylab.legend()
+        #     config.pylab.title('TCR')
+        #     config.pylab.show()
 
 
 import unittest
