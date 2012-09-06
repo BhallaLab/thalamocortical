@@ -48,9 +48,9 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     caconc.record(&cell.comp[1].cai(0.5))
     // ikvec.record(&cell.comp[1].ik_kc(0.5))
     stim1 = new IClamp(0.5) 
-    stim1.amp = 0.4
-    stim1.del = 100.0 //t1
-    stim1.dur = 200.0 // $1 - $2
+    stim1.amp = 0.3
+    stim1.del = t1
+    stim1.dur = 300.0 // $1 - $2
     printf("Stim at %g ms for %g ms\n", stim1.del, stim1.dur)
     // stim2 = new IClamp(0.5) 
     // stim2.amp = 0.3e3
@@ -103,5 +103,5 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     // f.close()
 }
 
-runcell(300., 100.)
+runcell(1000., 100.)
 quit()

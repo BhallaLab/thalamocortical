@@ -51,13 +51,13 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g
     vvec.record(&cell.comp[cell.presyn_comp].v(0.5))
     // print_cell(cell, "tcr")
     del = 100.0 // ms
-    for i=0,6 {
-        input[i] = new IClamp(0.5) 
-        input[i].amp = 1 // nA
-        input[i].del = del
-        input[i].dur = 1.0 // ms
-        del = del + 25 //ms
-        }
+    // for i=0,6 {
+    //     input[i] = new IClamp(0.5) 
+    //     input[i].amp = 1 // nA
+    //     input[i].del = del
+    //     input[i].dur = 1.0 // ms
+    //     del = del + 25 //ms
+    //     }
     run()
     f.wopen("mydata/Vm_tcr.plot")
     for ii = 0, vvec.size() - 1{

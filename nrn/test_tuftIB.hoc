@@ -50,11 +50,11 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     stim1 = new IClamp(0.5) 
     stim1.amp = -0.3
     stim1.del = t1
-    stim1.dur = 20
+    stim1.dur = 100
     stim2 = new IClamp(0.5) 
-    stim2.amp = 0.9
-    stim2.del = t1 + 100
-    stim2.dur = 20
+    stim2.amp = 0.3
+    stim2.del = t1 + 200
+    stim2.dur = 100
     // stim2.dur = 10.0// $1 - $2
     // forsec cell.all{
     	// if (ismembrane("ka_ib")){gbar_ka_ib = 0.0 }
@@ -69,9 +69,9 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     //     if (ismembrane("cat")) { gbar_cat = 0.0 }
     //     if (ismembrane("ar")) { gbar_ar = 0.0 }
     // 	}
- print_cell(cell, "tuftIB")
+    // print_cell(cell, "tuftIB")
 	// save_proto(cell, "TuftedIB.p")
-    print_readcell(cell, "TuftedIB.p")
+    // print_readcell(cell, "TuftedIB.p")
     // g = new File()
     // g.wopen("mydata/Ca_suppyrrs.plot")
     // f.wopen("mydata/Vm_suppyrrs.plot")
@@ -103,5 +103,5 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
 }
 
 
-runcell(200., 50.0)
+runcell(1000., 100.0)
 quit()
