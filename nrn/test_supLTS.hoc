@@ -41,7 +41,7 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     stim1 = new IClamp(0.5) 
     stim1.amp = 0.3
     stim1.del = t1
-    stim1.dur = 300.0// $1 - $2
+    stim1.dur = 200.0// $1 - $2
     print_readcell(cell, "SupLTS.p")
     cell.comp[cell.presyn_comp] { print "### V = ", v(0.5) }    
     run()
@@ -56,5 +56,5 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     }
     f.close()
 }
-runcell(300., 100.)
+runcell(500., 100.)
 quit()

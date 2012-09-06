@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 19:32:34 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Dec 14 11:04:45 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 52
+# Last-Updated: Thu Sep  6 15:03:03 2012 (+0530)
+#           By: subha
+#     Update #: 63
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -123,13 +123,11 @@ class DeepLTS(TraubCell):
         
         config.LOGGER.debug(('Created cell: %s' % mycell.path))
         vm_table = mycell.comp[mycell.presyn].insertRecorder('Vm_deepLTS', 'Vm', sim.data)
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=50e-3, firstWidth=50e-3)
-
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=3e-10, firstDelay=100e-3, firstWidth=200e-3)
         sim.schedule()
         if mycell.has_cycle():
             config.LOGGER.warning("WARNING!! CYCLE PRESENT IN CICRUIT.")
-
-        sim.run(200e-3)
+        sim.run(0.5)
         sim.dump_data('data')
         mycell.dump_cell('deepLTS.txt')
         if config.has_pylab:
