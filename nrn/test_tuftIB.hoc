@@ -48,13 +48,9 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     caconc.record(&cell.comp[1].cai(0.5))
     // ikvec.record(&cell.comp[1].ik_kc(0.5))
     stim1 = new IClamp(0.5) 
-    stim1.amp = -1.0
+    stim1.amp = 0.3
     stim1.del = t1
-    stim1.dur = 100
-    stim2 = new IClamp(0.5) 
-    stim2.amp = 1.0
-    stim2.del = stim1.del + stim1.dur + 100.0
-    stim2.dur = 100.0
+    stim1.dur = 200
     // stim2.dur = 10.0// $1 - $2
     // forsec cell.all{
     	// if (ismembrane("ka_ib")){gbar_ka_ib = 0.0 }
@@ -103,5 +99,5 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
 }
 
 
-runcell(1000., 100.0)
+runcell(500., 100.0)
 quit()

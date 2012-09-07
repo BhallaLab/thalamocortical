@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Sep 21 01:45:00 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Dec 14 11:07:21 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 142
+# Last-Updated: Fri Sep  7 14:57:12 2012 (+0530)
+#           By: subha
+#     Update #: 143
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -181,7 +181,7 @@ class SupPyrFRB(TraubCell):
         t2 = datetime.now()
         delta = t2 - t1
         print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
-        # sim.dump_data('data')
+        sim.dump_data('data')
         # mycell.dump_cell('suppyrFRB.txt')
         if config.has_pylab:
             mus_vm = config.pylab.array(vm_table) * 1e3
