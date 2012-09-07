@@ -63,7 +63,7 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     run()
     f.wopen("mydata/Vm_suppyrFRB.plot")
     for ii = 0, vvec.size() - 1{
-    	f.printf("%g %g\n", tvec.x(ii), vvec.x(ii))
+    	f.printf("%g %g\n", tvec.x(ii)*1e-3, vvec.x(ii)*1e-3)
     }
     f.close()
     f.wopen("mydata/Ca_suppyrFRB.plot")

@@ -44,7 +44,7 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     ikvec = new Vector()
     
     tvec.record(&t)
-    vvec.record(&cell.comp[1].v(0.5))
+    vvec.record(&cell.comp[cell.presyn_comp].v(0.5))
     caconc.record(&cell.comp[1].cai(0.5))
     // ikvec.record(&cell.comp[1].ik_kc(0.5))
     stim1 = new IClamp(0.5) 
@@ -85,13 +85,13 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     // g.close()
     run()    
     // print_readcell(cell, "SupPyrRS.p")
-    f.wopen("mydata/Vm_suppyrrs.plot")
+    f.wopen("mydata/Vm_suppyrRS.plot")
     for ii = 0, vvec.size() - 1{
-    	f.printf("%g %g\n", tvec.x(ii), vvec.x(ii))
+    	f.printf("%g %g\n", tvec.x(ii)*1e-3, vvec.x(ii)*1e-3)
     }
     f.close()
     
-    f.wopen("mydata/Ca_suppyrrs.plot")
+    f.wopen("mydata/Ca_suppyrRS.plot")
     for ii = 0, caconc.size() - 1{
     	f.printf("%g %g\n", tvec.x(ii), caconc.x(ii))
     }
