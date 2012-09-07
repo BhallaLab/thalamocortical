@@ -7,7 +7,7 @@ strdef tstr
 PI=3.141592
 FARADAY=96485
 secondorder=2
-dt = 1e-3
+dt = 0.025
 celsius=30
 v_init = -70.0
 //till the shift bug in the mod files are fixed (table depends on range variable)
@@ -84,7 +84,7 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     // f.close()
     // g.close()
     run()    
-    print_readcell(cell, "SupPyrRS.p")
+    // print_readcell(cell, "SupPyrRS.p")
     f.wopen("mydata/Vm_suppyrrs.plot")
     for ii = 0, vvec.size() - 1{
     	f.printf("%g %g\n", tvec.x(ii), vvec.x(ii))

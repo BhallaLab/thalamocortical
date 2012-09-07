@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 11:34:27 2009 (+0530)
 # Version: 
-# Last-Updated: Fri May 11 16:45:29 2012 (+0530)
+# Last-Updated: Fri Sep  7 10:12:43 2012 (+0530)
 #           By: subha
-#     Update #: 45
+#     Update #: 46
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -114,12 +114,12 @@ class NontuftedRS(TraubCell):
         mycell = NontuftedRS(NontuftedRS.prototype, sim.model.path + "/NontuftedRS")
         print 'Created cell:', mycell.path
         vm_table = mycell.comp[NontuftedRS.presyn].insertRecorder('Vm_nontuftRS', 'Vm', sim.data)
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=1e-9, firstDelay=50e-3, firstWidth=500e-3)
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=1e-9, firstDelay=100e-3, firstWidth=200e-3)
         sim.schedule()
         if mycell.has_cycle():
             print "WARNING!! CYCLE PRESENT IN CICRUIT."
         t1 = datetime.now()
-        sim.run(1.0)
+        sim.run(0.5)
         t2 = datetime.now()
         delta = t2 - t1
         print 'simulation time: ', delta.seconds + 1e-6 * delta.microseconds
