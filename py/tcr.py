@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 10:14:07 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Sep  6 17:18:07 2012 (+0530)
+# Last-Updated: Fri Sep  7 18:00:20 2012 (+0530)
 #           By: subha
-#     Update #: 190
+#     Update #: 202
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -157,12 +157,17 @@ class TCR(TraubCell):
         # for ii in range(1, mycell.num_comp):
         #     mycell.comp[ii].Em = -57e-3
         print 'Created cell:', mycell.path
-        vm_table_presyn = mycell.comp[mycell.presyn].insertRecorder('TCR_presynaptic_Vm', 'Vm', sim.data)
+        vm_table_presyn = mycell.comp[mycell.presyn].insertRecorder('Vm_TCR', 'Vm', sim.data)
         vm_table_soma = mycell.soma.insertRecorder('TCR_soma_Vm', 'Vm', sim.data)
         print 'Tables created:', vm_table_soma.path, vm_table_presyn.path
         stim_table = moose.Table('%s/stimulus' % (sim.data.path))
         stim_table.stepMode = 3
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=0.3e-9, firstDelay=100e-3, firstWidth=200e-3)
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=-1e-9, firstDelay=100e-3, firstWidth=100e-3)
+        pulsegen.secondDelay = 200e-3
+        pulsegen.secondWidth = 100e-3
+        pulsegen.secondLevel = 0.3e-9
+        pulsegen.count = 3
+        pulsegen.delay[2] = 1e9
         # pulsegen.count = 4
         # for ii in range(pulsegen.count):
         #     pulsegen.delay[ii] = 0.025
