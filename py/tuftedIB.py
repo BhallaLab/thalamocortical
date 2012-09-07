@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Oct 16 11:44:48 2009 (+0530)
 # Version: 
-# Last-Updated: Thu Sep  6 12:15:42 2012 (+0530)
+# Last-Updated: Fri Sep  7 10:23:49 2012 (+0530)
 #           By: subha
-#     Update #: 208
+#     Update #: 212
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -154,9 +154,9 @@ class TuftedIB(TraubCell):
             kc.connect('Gk', gk_table, 'inputRequest')
             pymoose.showmsg(ca_conc)
         # The stimulus is similar to bottom trace in Fig A4
-        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=-0.3e-9, firstDelay=100e-3, firstWidth=100e-3)
-        pulsegen.secondLevel = 0.3e-9
-        pulsegen.secondDelay = 300e-3
+        pulsegen = mycell.soma.insertPulseGen('pulsegen', sim.model, firstLevel=-1e-9, firstDelay=100e-3, firstWidth=100e-3)
+        pulsegen.secondLevel = 1e-9
+        pulsegen.secondDelay = 200e-3
         pulsegen.secondWidth = 100e-3
         pulsegen.count = 3
         pulsegen.delay[2] = 1e9
@@ -183,8 +183,8 @@ class TuftedIB(TraubCell):
             nrn_vm = nrn_vm[:, 1]
             nrn_ca = config.pylab.loadtxt('../nrn/mydata/Ca_tuftIB.plot')
             nrn_ca = nrn_ca[:,1]
-            config.pylab.plot(nrn_t, nrn_vm, 'r-..', label='nrn vm')
-            config.pylab.plot(mus_t, mus_vm, 'k--.', label='mus vm')
+            config.pylab.plot(nrn_t, nrn_vm, 'r-', label='nrn vm')
+            config.pylab.plot(mus_t, mus_vm, 'k-.', label='mus vm')
             config.pylab.plot(mus_t, config.pylab.array(pulse_table)*1e10-100, 'b-', label='I_inject(x10 nA)')
     #         if ca_table:
     #             ca_array = config.pylab.array(ca_table)
