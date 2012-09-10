@@ -48,7 +48,7 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     caconc.record(&cell.comp[1].cai(0.5))
     // ikvec.record(&cell.comp[1].ik_kc(0.5))
     stim1 = new IClamp(0.5) 
-    stim1.amp = 0.3
+    stim1.amp = 1.0
     stim1.del = t1
     stim1.dur = 200
     // stim2.dur = 10.0// $1 - $2
@@ -82,14 +82,14 @@ proc runcell(){ local i, t1, a1, t2, a2 localobj vvec, tvec, f, g, caconc, ikvec
     run()    
     f.wopen("mydata/Vm_tuftIB.plot")
     for ii = 0, vvec.size() - 1{
-    	f.printf("%g %g\n", tvec.x(ii), vvec.x(ii))
+    	f.printf("%g %g\n", tvec.x(ii)*1e-3, vvec.x(ii)*1e-3)
     }
     f.close()
     
-    f.wopen("mydata/Ca_tuftIB.plot")
-    for ii = 0, caconc.size() - 1{
-    	f.printf("%g %g\n", tvec.x(ii), caconc.x(ii))
-    }
+    // f.wopen("mydata/Ca_tuftIB.plot")
+    // for ii = 0, caconc.size() - 1{
+    // 	f.printf("%g %g\n", tvec.x(ii), caconc.x(ii))
+    // }
     // f.close()
     // f.wopen("mydata/ikc_suppyrrs.plot")
     // for ii = 0, tvec.size() - 1{
