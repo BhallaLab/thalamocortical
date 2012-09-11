@@ -1,3 +1,5 @@
+// Check for GABAA conductance in synapse between two single passive
+// compartments.
 objref netcon, conobj, syn
 objectvar vecT, vecV_a, vecV_b, stim1, vecG_a, vecG_b, outfile
 outfile = new File()
@@ -60,9 +62,10 @@ vecV_b.record(&soma_b.v(0.5))
 vecG_b.record(&syn.g)
 vecT.record(&t)
 run()
-outfile.wopen("gaba.plot")
+outfile.wopen("mydata/two_comp_gaba.plot")
+outfile.printf("# time presynaptic_vm postsynaptic_vm synaptic_conductance\n")
 for ii = 0, vecV_a.size() - 1 {
-	outfile.printf("%g %g %g %g\n", vecT.x(ii), vecV_a.x(ii), vecV_b.x(ii), vecG_b.x(ii))
+	outfile.printf("%g %g %g %g\n", vecT.x(ii)*1e-3, vecV_a.x(ii)*1e-3, vecV_b.x(ii)*1e-3, vecG_b.x(ii)*1e-6)
 }
 outfile.close()
-
+quit()
