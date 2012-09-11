@@ -17,7 +17,6 @@ celsius=30
 v_init=-65
 
 create soma_a
-access soma_a
 soma_a{
     nseg = 1
     diam = 15
@@ -31,12 +30,12 @@ soma_a{
     
     stim1 = new IClamp(0.5)
     stim1.amp = 0.1
-    stim1.dur = 10.0
-    stim1.del = 10
+    stim1.dur = 20.0
+    stim1.del = 20
+    e_gaba_a = -75.0
 }
 
 create soma_b
-access soma_b
 soma_b{
     nseg = 1
     diam = 15
@@ -49,6 +48,8 @@ soma_b{
     
     syn = new GABAA(0.5)
     syn.tau = 20.0 // ms    
+    e_gaba_a = -75.0
+    syn.e = e_gaba_a
 }
 // new NetCon(&source_v, synapse, threshold, delay, weight)
 soma_a netcon = new NetCon(&v(0.5), syn, 0.0, 5.0, 0.01e-3)
@@ -56,7 +57,7 @@ soma_a netcon = new NetCon(&v(0.5), syn, 0.0, 5.0, 0.01e-3)
 // netcon.delay = 5.0 // ms
 // netcon.threshold = 0.0
 
-tstop = 100
+tstop = 1000
 vecV_a.record(&soma_a.v(0.5))
 vecV_b.record(&soma_b.v(0.5))
 vecG_b.record(&syn.g)

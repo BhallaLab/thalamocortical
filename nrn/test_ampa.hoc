@@ -32,8 +32,8 @@ soma_a{
     
     stim1 = new IClamp(0.5)
     stim1.amp = 0.1
-    stim1.dur = 10.0
-    stim1.del = 10
+    stim1.dur = 20.0
+    stim1.del = 20
 }
 
 create soma_b
@@ -56,7 +56,7 @@ soma_b{
 // new NetCon(&source_v, synapse, threshold, delay, weight)
 soma_a netcon = new NetCon(&v(0.5), syn, 0.0, 5.0, 0.5e-3)
 
-tstop = 100
+tstop = 1000
 vecV_a.record(&soma_a.v(0.5))
 vecV_b.record(&soma_b.v(0.5))
 vecG_b.record(&syn.g)

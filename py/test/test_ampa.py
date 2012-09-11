@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Mar 22 16:58:57 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Sep 11 09:50:20 2012 (+0530)
+# Last-Updated: Tue Sep 11 17:42:19 2012 (+0530)
 #           By: subha
-#     Update #: 189
+#     Update #: 191
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -51,7 +51,7 @@ import numpy as np
 import pylab
 import moose
 
-def testAMPAChan(simtime=100e-3, simdt=1e-5, plotdt=1e-5):
+def testAMPAChan(simtime=1000e-3, simdt=1e-5, plotdt=1e-5):
     context = moose.PyMooseBase.getContext()
     container = moose.Neutral('test_AMPA')
     soma_a = moose.Compartment('A', container)
@@ -90,8 +90,8 @@ def testAMPAChan(simtime=100e-3, simdt=1e-5, plotdt=1e-5):
 
     pulsegen = moose.PulseGen('pulse', container)
     pulsegen.firstLevel = 0.1e-9
-    pulsegen.firstDelay = 10e-3
-    pulsegen.firstWidth = 10e-3
+    pulsegen.firstDelay = 20e-3
+    pulsegen.firstWidth = 20e-3
     pulsegen.secondLevel = 0.0
     pulsegen.secondDelay = 1e9
     pulsegen.connect('outputSrc', soma_a, 'injectMsg')
