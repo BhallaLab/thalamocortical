@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Mar 22 16:58:57 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Mar 30 15:06:45 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 175
+# Last-Updated: Tue Sep 11 09:59:30 2012 (+0530)
+#           By: subha
+#     Update #: 181
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -47,6 +47,7 @@
 # Code:
 
 import math
+import numpy as np
 import moose
 
 def testGABAChan(simtime=100e-3, simdt=1e-5, plotdt=1e-5):
@@ -73,7 +74,7 @@ def testGABAChan(simtime=100e-3, simdt=1e-5, plotdt=1e-5):
     
     spikegen = moose.SpikeGen('spike', container)
     spikegen.threshold = 0.0
-    spikegen.edgeTriggered = 0
+    spikegen.edgeTriggered = 1
     # spikegen.absRefractT = 1
     
     soma_a.connect('VmSrc', spikegen, 'Vm')
@@ -100,7 +101,7 @@ def testGABAChan(simtime=100e-3, simdt=1e-5, plotdt=1e-5):
     vmA.stepMode = 3
     vmA.connect('inputRequest', soma_a, 'Vm')
 
-    gGABA = moose.Table('G', data)
+    gGABA = moose.Table('G_gaba', data)
     gGABA.stepMode = 3
     gGABA.connect('inputRequest', gaba, 'Gk')
 
@@ -108,10 +109,11 @@ def testGABAChan(simtime=100e-3, simdt=1e-5, plotdt=1e-5):
     context.setClock(1, simdt)
     context.reset()
     context.step(simtime)
-
-    gGABA.dumpFile('gGABA.dat', False)
-    vmA.dumpFile('Va.dat', False)
-    vmB.dumpFile('Vb.dat', False)
+    ts = np.linspace(0, simtime, len(gGABA))
+    np.savetxt('../data/two_comp_gaba.plot', np.transpose(np.vstack((ts, vmA, vmB, gGABA))))
+    # gGABA.dumpFile('gGABA.dat', False)
+    # vmA.dumpFile('Va.dat', False)
+    # vmB.dumpFile('Vb.dat', False)
 
 if __name__ == '__main__':
     testGABAChan()
