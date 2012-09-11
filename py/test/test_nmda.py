@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Mar 22 16:58:57 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Sep 11 11:13:34 2012 (+0530)
+# Last-Updated: Tue Sep 11 14:48:54 2012 (+0530)
 #           By: subha
-#     Update #: 143
+#     Update #: 161
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -66,10 +66,11 @@ def testNMDAChan(simtime=1.0, simdt=1e-5, plotdt=1e-5):
     soma_b.initVm = -65e-3
     soma_b.Ra = 282942.12 # RA = 250 Ohm-cm
     
-    nmda = moose.SynChan('nmda', container)
-    nmda.tau1 = 5e-3
-    nmda.tau2 = 130.5e-3
-    nmda.Gbar = 1.0
+    nmda = moose.NMDAChan('nmda', container)
+    nmda.tau2 = 5e-3
+    nmda.tau1 = 130.5e-3
+    nmda.Gbar = 1
+    nmda.saturation = 1e10
     nmda.connect('channel', soma_b, 'channel')
     
     spikegen = moose.SpikeGen('spike', container)

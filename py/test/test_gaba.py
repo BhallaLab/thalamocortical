@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Mar 22 16:58:57 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Sep 11 09:59:30 2012 (+0530)
+# Last-Updated: Tue Sep 11 18:48:10 2012 (+0530)
 #           By: subha
-#     Update #: 181
+#     Update #: 184
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -50,7 +50,7 @@ import math
 import numpy as np
 import moose
 
-def testGABAChan(simtime=100e-3, simdt=1e-5, plotdt=1e-5):
+def testGABAChan(simtime=1000e-3, simdt=1e-5, plotdt=1e-5):
     context = moose.PyMooseBase.getContext()
     container = moose.Neutral('test_GABA')
     soma_a = moose.Compartment('A', container)
@@ -70,6 +70,7 @@ def testGABAChan(simtime=100e-3, simdt=1e-5, plotdt=1e-5):
     gaba = moose.SynChan('gaba', container)
     gaba.tau2 = 0.0
     gaba.tau1 = 20e-3 
+    gaba.Ek = -75e-3
     gaba.connect('channel', soma_b, 'channel')
     
     spikegen = moose.SpikeGen('spike', container)
@@ -86,8 +87,8 @@ def testGABAChan(simtime=100e-3, simdt=1e-5, plotdt=1e-5):
 
     pulsegen = moose.PulseGen('pulse', container)
     pulsegen.firstLevel = 0.1e-9
-    pulsegen.firstDelay = 10e-3
-    pulsegen.firstWidth = 10e-3
+    pulsegen.firstDelay = 20e-3
+    pulsegen.firstWidth = 20e-3
     pulsegen.secondLevel = 0.0
     pulsegen.secondDelay = 1e9
     pulsegen.connect('outputSrc', soma_a, 'injectMsg')

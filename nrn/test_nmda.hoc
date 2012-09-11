@@ -2,12 +2,13 @@
 // compartments.
 // Subhasis Ray. 2009-2012
 objref netcon, conobj, syn
-objectvar vecT, vecV_a, vecV_b, stim1, vecG_a, vecG_b, outfile
+objectvar vecT, vecV_a, vecV_b, stim1, vecG_a, vecG_b, vecMg_unblocked, outfile
 outfile = new File()
 vecV_a = new Vector()
 vecV_b = new Vector()
 vecG_a = new Vector()
 vecG_b = new Vector()
+vecMg_unblocked = new Vector()
 vecT = new Vector()
 
 FARADAY=96485
@@ -62,13 +63,15 @@ soma_a netcon = new NetCon(&v(1), syn, 0.0, 0.05, 0.25e-3)
 tstop = 1000.0
 vecV_a.record(&soma_a.v(0.5))
 vecV_b.record(&soma_b.v(0.5))
-vecG_b.record(&syn.g)
+// NOTE: g is not effective conductance. Effective conductance is g * Mg_unblocked.
+vecG_b.record(&syn.g) 
+vecMg_unblocked.record(&syn.Mg_unblocked)
 vecT.record(&t)
 run()
 outfile.wopen("mydata/two_comp_nmda.plot")
 outfile.printf("# time presynaptic_vm postsynaptic_vm synaptic_conductance\n")
 for ii = 0, vecV_a.size() - 1 {
-	outfile.printf("%g %g %g %g\n", vecT.x(ii)*1e-3, vecV_a.x(ii)*1e-3, vecV_b.x(ii)*1e-3, vecG_b.x(ii)*1e-6)
+	outfile.printf("%g %g %g %g\n", vecT.x(ii)*1e-3, vecV_a.x(ii)*1e-3, vecV_b.x(ii)*1e-3, vecG_b.x(ii)*vecMg_unblocked.x(ii)*1e-6)
 }
 outfile.close()
 quit()
