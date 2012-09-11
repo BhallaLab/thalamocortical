@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Mar 22 16:58:57 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Mar 29 19:41:39 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 168
+# Last-Updated: Tue Sep 11 09:50:20 2012 (+0530)
+#           By: subha
+#     Update #: 189
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -47,6 +47,8 @@
 # Code:
 
 import math
+import numpy as np
+import pylab
 import moose
 
 def testAMPAChan(simtime=100e-3, simdt=1e-5, plotdt=1e-5):
@@ -68,20 +70,23 @@ def testAMPAChan(simtime=100e-3, simdt=1e-5, plotdt=1e-5):
     
     ampa = moose.SynChan('ampa', container)
     ampa.tau2 = 2e-3 
-    ampa.tau1 = 2e-3
+    ampa.tau1 = ampa.tau2
     ampa.connect('channel', soma_b, 'channel')
     
     spikegen = moose.SpikeGen('spike', container)
     spikegen.threshold = 0.0
-    spikegen.edgeTriggered = 0
+    spikegen.edgeTriggered = 1
     # spikegen.absRefractT = 1
     
     soma_a.connect('VmSrc', spikegen, 'Vm')
     spikegen.connect('event', ampa, 'synapse')
 
     ampa.delay[0] = 5e-3
-    ampa.Gbar = ampa.tau1 / math.e #0.5e-9
-    ampa.weight[0] = 0.5e-6
+    # Traub et al use the equation gAMPA = c * t * exp(-t/tau), making
+    # the peak conductance c * tau / e. This means c will have unit of
+    # conductance/time. Hence scaling from 0.5e-3 uS/ms to SI.
+    ampa.Gbar = 0.5e-3 * 1e-6 * ampa.tau1*1e3 / math.e 
+    ampa.weight[0] = 1.0
 
     pulsegen = moose.PulseGen('pulse', container)
     pulsegen.firstLevel = 0.1e-9
@@ -100,7 +105,7 @@ def testAMPAChan(simtime=100e-3, simdt=1e-5, plotdt=1e-5):
     vmA.stepMode = 3
     vmA.connect('inputRequest', soma_a, 'Vm')
 
-    gAMPA = moose.Table('G', data)
+    gAMPA = moose.Table('G_ampa', data)
     gAMPA.stepMode = 3
     gAMPA.connect('inputRequest', ampa, 'Gk')
 
@@ -108,10 +113,13 @@ def testAMPAChan(simtime=100e-3, simdt=1e-5, plotdt=1e-5):
     context.setClock(1, simdt)
     context.reset()
     context.step(simtime)
-
-    gAMPA.dumpFile('gAMPA.dat', False)
-    vmA.dumpFile('Va.dat', False)
-    vmB.dumpFile('Vb.dat', False)
+    ts = np.linspace(0, simtime, len(gAMPA))
+    np.savetxt('../data/two_comp_ampa.plot', np.transpose(np.vstack((ts, vmA, vmB, gAMPA))))
+    # gAMPA.dumpFile('gAMPA.dat', False)
+    # vmA.dumpFile('Va.dat', False)
+    # vmB.dumpFile('Vb.dat', False)
+    pylab.plot(ts, gAMPA)
+    pylab.show()
 
 if __name__ == '__main__':
     testAMPAChan()

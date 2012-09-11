@@ -1,3 +1,6 @@
+// This script generates plots for comparing EPSP of AMPA synapses on
+// a passive compartment.
+//
 objref netcon, conobj, syn
 objectvar vecT, vecV_a, vecV_b, stim1, vecG_a, vecG_b, outfile
 outfile = new File()
@@ -49,11 +52,9 @@ soma_b{
     syn.tau = 2.0 // ms
     
 }
+
 // new NetCon(&source_v, synapse, threshold, delay, weight)
 soma_a netcon = new NetCon(&v(0.5), syn, 0.0, 5.0, 0.5e-3)
-// netcon.weight = 0.5e-3 // uS
-// netcon.delay = 5.0 // ms
-// netcon.threshold = 0.0
 
 tstop = 100
 vecV_a.record(&soma_a.v(0.5))
@@ -61,9 +62,10 @@ vecV_b.record(&soma_b.v(0.5))
 vecG_b.record(&syn.g)
 vecT.record(&t)
 run()
-outfile.wopen("ampa.plot")
+outfile.wopen("mydata/two_comp_ampa.plot")
+outfile.printf("# time presynaptic_vm postsynaptic_vm synaptic_conductance\n")
 for ii = 0, vecV_a.size() - 1 {
-	outfile.printf("%g %g %g %g\n", vecT.x(ii), vecV_a.x(ii), vecV_b.x(ii), vecG_b.x(ii))
+	outfile.printf("%g %g %g %g\n", vecT.x(ii)*1e-3, vecV_a.x(ii)*1e-3, vecV_b.x(ii)*1e-3, vecG_b.x(ii)*1e-6)
 }
 outfile.close()
-
+quit()
