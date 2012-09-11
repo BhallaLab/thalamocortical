@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Mar 22 16:58:57 2010 (+0530)
 # Version: 
-# Last-Updated: Fri May 27 10:11:24 2011 (+0530)
-#           By: Subhasis Ray
-#     Update #: 132
+# Last-Updated: Tue Sep 11 11:13:34 2012 (+0530)
+#           By: subha
+#     Update #: 143
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -46,9 +46,10 @@
 
 # Code:
 
+import numpy as np
 import moose
 
-def testNMDAChan(simtime=100e-3, simdt=1e-5, plotdt=1e-5):
+def testNMDAChan(simtime=1.0, simdt=1e-5, plotdt=1e-5):
     context = moose.PyMooseBase.getContext()
     container = moose.Neutral('test_NMDA')
     soma_a = moose.Compartment('A', container)
@@ -68,6 +69,7 @@ def testNMDAChan(simtime=100e-3, simdt=1e-5, plotdt=1e-5):
     nmda = moose.SynChan('nmda', container)
     nmda.tau1 = 5e-3
     nmda.tau2 = 130.5e-3
+    nmda.Gbar = 1.0
     nmda.connect('channel', soma_b, 'channel')
     
     spikegen = moose.SpikeGen('spike', container)
@@ -79,8 +81,9 @@ def testNMDAChan(simtime=100e-3, simdt=1e-5, plotdt=1e-5):
     nmda.weight[0] = 0.25e-9
     pulsegen = moose.PulseGen('pulse', container)
     pulsegen.firstLevel = 0.1e-9
-    pulsegen.firstDelay = 10e-3
-    pulsegen.firstWidth = 10e-3
+    pulsegen.firstDelay = 20e-3
+    pulsegen.firstWidth = 20e-3
+    pulsegen.secondDelay = 1e9
     pulsegen.connect('outputSrc', soma_a, 'injectMsg')
 
     data = moose.Neutral('data')
@@ -102,9 +105,11 @@ def testNMDAChan(simtime=100e-3, simdt=1e-5, plotdt=1e-5):
     context.setClock(3, plotdt)
     context.reset()
     context.step(simtime)
-    gNMDA.dumpFile('gNMDA.dat', False)
-    vmA.dumpFile('Va.dat', False)
-    vmB.dumpFile('Vb.dat', False)
+    # gNMDA.dumpFile('gNMDA.dat', False)
+    # vmA.dumpFile('Va.dat', False)
+    # vmB.dumpFile('Vb.dat', False)
+    ts = np.linspace(0, simtime, len(gNMDA))
+    np.savetxt('../data/two_comp_nmda.plot', np.transpose(np.vstack((ts, vmA, vmB, gNMDA))))
 
 if __name__ == '__main__':
     testNMDAChan()
