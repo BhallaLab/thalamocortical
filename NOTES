@@ -3375,3 +3375,24 @@ data_20120119_135900_9148.h5 [ 0.]
 data_20120501_163950_25700.h5 [ 0.3]
 data_20120503_093603_26726.h5 [ 0.3]
 data_20120513_210447_9261.h5 [ 0.3]
+* <2012-09-19 Wed 16:10> More simulations of TCR->SpinyStellate
+  Simulating TCR->SpinyStellate pathway with DeepLTS and DeepBasket
+  interneurons (30 each). Last one was with no DeepBasket and 60 DeepLTS. I do
+  not remember why I chose such a configuration. But this time the reasoning
+  is:
+
+  SpinyStellates are contacted by more LTS and Basket interneurons and very
+  few axoaxonic interneurons. Large number of TCR cells also connect to these
+  cells. The deep and superficial interneurons are identical. So these are
+  representative of both kinds.
+
+  Sun, Huguenard and Prince (2006) found that peak conductance of uIPSP is 5.6
+  +/- 1.4 nS whereas that of uEPSP is 0.56+/- 0.2 nS. In Traub et al, peak
+  GABA conductance from Deep basket is 1.5 ns and that from Spinystellate is
+  0.736 nS.
+
+  So reducing number of the inhibitory cells from 100 to 30 each makes the
+  conductance:
+
+  100/30 * 1.5 = 5 nS. Spiny stellate conductance remain 0.73, 1.5 times the
+  reported value.
