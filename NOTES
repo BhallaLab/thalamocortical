@@ -3402,3 +3402,4 @@ data_20120513_210447_9261.h5 [ 0.3]
   uniform distribution, I realized that the stimulus was repeating after 10
   s. I decided not to fix it now as it may be useful to have two repeats of
   the same stimulus sequence (which is random) on the same network.
+* <2012-10-02 Tue 16:35> Running with 40 deep baskets.
