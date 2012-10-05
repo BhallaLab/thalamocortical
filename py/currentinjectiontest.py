@@ -8,9 +8,9 @@
 # Maintainer: 
 # Created: Fri Oct  5 10:25:32 2012 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  5 12:03:40 2012 (+0530)
+# Last-Updated: Fri Oct  5 17:36:26 2012 (+0530)
 #           By: subha
-#     Update #: 119
+#     Update #: 160
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -88,7 +88,12 @@ def setupmodel(celltype, delay, amplitude, duration):
     vmtab = moose.Table(data.path+'/%s_soma_Vm' % (celltype))
     vmtab.stepMode = 3
     vmtab.connect('inputRequest', cell.soma, 'Vm')
+    spiketab = moose.Table(data.path+'/%s_soma_spike' % (celltype))
+    spiketab.stepMode = moose.TAB_SPIKE
+    spiketab.stepSize = -20e-3
+    spiketab.connect('inputRequest', cell.soma, 'Vm')
     return {'vm': vmtab,
+	    'spike': spiketab,
 	    'cell': cell,
 	    'stim': stim,
 	    'model': model,
@@ -107,19 +112,26 @@ def schedule(params):
     moose.context.useClock(2, '%s/##[TYPE=HSolve]' % (model.path), 'process')    
     moose.context.useClock(3, '%s/##[TYPE!=Compartment]' % (model.path), 'process')	
     moose.context.useClock(4, '%s/##' % (data.path), 'process')
-    print 'About to reset'
     moose.context.reset()
-    print 'After reset'
     
-def run_current_injection_test(celltype, delay, amplitude, duration, simtime, settlingtime=20e-3):
+def run_current_injection_test(celltype, delay, amplitude, duration, 
+			       simtime, settlingtime=20e-3):
     components = setupmodel(celltype, delay, amplitude, duration)
     schedule(components)
     moose.context.step(simtime)
     vmdata = np.asarray(components['vm'])
+    spikedata = np.asarray(components['spike'])
     tseries = np.linspace(0, simtime, len(vmdata))
-    plt.plot(tseries, vmdata)
-    plt.show()
-    return tseries, vmdata
+    components['tseries'] = tseries
+    return components
+
+def save_data(components, fname):
+    vmdata = np.transpose(np.vstack((components['tseries'], components['vm'])))
+    vmfile = 'vm_'+fname
+    np.savetxt(vmfile, vmdata)
+    spikefile = 'spike_'+fname
+    np.savetxt(spikefile, components['spike'])
+    print 'Saved data in', vmfile, spikefile
 
 import sys
 
@@ -127,6 +139,7 @@ default_delay = 100e-3
 default_amplitude = 1e-9
 default_duration = 100e-3
 default_simtime = 300e-3
+default_settlingtime = 20e-3
 
 def print_usage(name):
 	print 'Usage: %s celltype [delay amplitude duration simtime]' % (name)
@@ -138,20 +151,28 @@ simtime=%g second' % (default_delay, default_amplitude,
 		      default_duration, default_simtime)
 
 if __name__ == '__main__':
+    print sys.argv, len(sys.argv)
     if len(sys.argv) <= 1 or (len(sys.argv) > 2 and len(sys.argv) != 6):
 	print_usage(sys.argv[0])
-	sys.exit(1)
+	sys.exit(2)
     celltype = sys.argv[1]
-    delay = 100e-3
-    amplitude = 1e-9
-    duration = 100e-3
-    simtime = 300e-3
-    if len(sys.argv) == 5:
+    delay = default_delay
+    amplitude = default_amplitude
+    duration = default_duration
+    simtime = default_simtime
+    settlingtime = default_settlingtime
+    if len(sys.argv) == 6:
 	delay = float(sys.argv[2])
 	amplitude = float(sys.argv[3])
 	duration = float(sys.argv[4])
 	simtime = float(sys.argv[5])
-    run_current_injection_test(celltype, delay, amplitude, duration, simtime)
+    components = run_current_injection_test(
+	celltype, delay, amplitude, duration, simtime, settlingtime)
+    save_data(components, '%s_amp_%g.dat' % (celltype, amplitude))
+    if len(np.nonzero(np.asarray(
+		components['spike']) > settlingtime)[0]) > 0:
+	sys.exit(0)
+    sys.exit(1)
 
 
 # 
