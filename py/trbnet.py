@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Aug 27 09:30:49 2012 (+0530)
+# Last-Updated: Mon Sep 17 17:48:22 2012 (+0530)
 #           By: subha
-#     Update #: 2764
+#     Update #: 2770
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -79,7 +79,8 @@
 
 
 # Code:
-
+import sys
+sys.path.append('/data/subha/chamcham_moose/python')
 from collections import defaultdict
 from datetime import datetime
 import igraph
@@ -1685,10 +1686,11 @@ def test_reading_network(filename):
     h5file.close()
 
 if __name__ == '__main__':
-    raise NotImplementedError('run trbsim.py in stead')
-    # net = TraubNet()
+    # raise NotImplementedError('run trbsim.py in stead')
+    net = TraubNet()
     # net.set_populations()
-    # net._generate_celltype_graph()
+    net._generate_celltype_graph()
+    net.celltype_graph.write('celltypegraph.graphml', format='graphml')
     # net._generate_cell_graph()
     # net.create_network()
     # net.save_network_model(config.MODEL_FILENAME)
