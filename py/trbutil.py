@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jun  5 13:59:40 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Sep  3 16:55:46 2011 (+0530)
+# Last-Updated: Mon Nov 12 11:01:10 2012 (+0530)
 #           By: subha
-#     Update #: 13
+#     Update #: 15
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -44,9 +44,11 @@
 # 
 
 # Code:
-import config
+
+import smtplib
 from subprocess import call
 import numpy
+import config
 has_pylab = True
 try:
     import pylab
@@ -98,6 +100,23 @@ def do_plot(class_name, mus_t, mus_ca, mus_vm, nrn_t=None, nrn_ca=None, nrn_vm=N
         pylab.title('[Ca2+] in soma of %s' % class_name)
         pylab.legend()
         pylab.show()
+
+def send_email(recipient, sender, password,
+               server='smtp.gmail.com', 
+               port=587, subject='no subject', body='empty message'):
+    """Send an email to specified `recipient` using `sender`
+    account on `server`"""
+    smtp_obj = smtplib.SMTP(server, port)
+    smtp_obj.starttls()
+    smtp_obj.login(sender, password)
+    headers = ["from: " + sender,
+           "subject: " + subject,
+               "to: " + recipient,
+               "mime-version: 1.0",
+               "content-type: text/html"]
+    headers = "\r\n".join(headers)
+    smtp_obj.sendmail(sender, recipient, headers + "\r\n\r\n" + body)
+    smtp_obj.quit()
 
 if __name__ == '__main__':
     read_nrn_data('asa')
