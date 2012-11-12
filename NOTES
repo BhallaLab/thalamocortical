@@ -3403,3 +3403,7 @@ data_20120513_210447_9261.h5 [ 0.3]
   s. I decided not to fix it now as it may be useful to have two repeats of
   the same stimulus sequence (which is random) on the same network.
 * <2012-10-02 Tue 16:35> Running with 40 deep baskets.
+* <2012-11-07 Wed 15:05> Running with 50 deep baskets
+  14 Oct, 5 Nov, 7 Nov are reps with 50 deep baskets.
+* <2012-11-12 Mon 10:46> Added (and corrected) way to send email to myself at end of sim
+  
