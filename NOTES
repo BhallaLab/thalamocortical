@@ -3388,7 +3388,7 @@ data_20120513_210447_9261.h5 [ 0.3]
 
   Sun, Huguenard and Prince (2006) found that peak conductance of uIPSP is 5.6
   +/- 1.4 nS whereas that of uEPSP is 0.56+/- 0.2 nS. In Traub et al, peak
-  GABA conductance from Deep basket is 1.5 ns and that from Spinystellate is
+  GABA conductance from Deep basket is 1.5 nS and that from Spinystellate is
   0.736 nS.
 
   So reducing number of the inhibitory cells from 100 to 30 each makes the
@@ -3403,3 +3403,22 @@ data_20120513_210447_9261.h5 [ 0.3]
   s. I decided not to fix it now as it may be useful to have two repeats of
   the same stimulus sequence (which is random) on the same network.
 * <2012-10-02 Tue 16:35> Running with 40 deep baskets.
+* <2012-11-15 Thu 17:48> Categorizing by inhibition
+  I tried to categorise the spike raster plots for simulation done with 30, 40
+  and 50 DeepBasket cells. Did not succeed much.  I randomized the figures to
+  avoid bias: ~/src/dataviz/filetofigure_20121115_174117.txt has three columns,
+  no. of DeepBasket cells, filename, title of the figure.
+
+  My categorization was (fig nos):
+  
+  // synchronised firing of spiny stellates at high frequency
+  14, 10, 2, 9, 11
+  b,  c,  c, b, b
+  // synchronized firing of spiny stellates at medium frequency
+  15, 12, 7, 6, 8, 13, 5
+  a,  a,  a, a, a, b,  c
+  // synchronized firing of spiny stellates at low frequency
+  3, 4, 1
+  c, c, b
+  The medium frequency group contained all 30-Basket-cell simulations, but the
+  other two groups had similar mix of 40 and 50-basket cell simulations.
