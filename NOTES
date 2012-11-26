@@ -3330,7 +3330,6 @@ TypeError: sequence elements must be integer pairs
   For this I shall have to check the refractory period of spiny stellate
   cells.
 
-
 * <2012-08-05 Sun 14:03> Differences between bursting and non-bursting models
   Compared data_20120117_114805_6302.h5 with data_20120208_114141_4344.h5
 
@@ -3426,3 +3425,16 @@ data_20120513_210447_9261.h5 [ 0.3]
   The medium frequency group contained all 30-Basket-cell simulations, but the
   other two groups had similar mix of 40 and 50-basket cell simulations.
 * <2012-11-15 Thu 18:48> Running with 60 deep baskets
+* <2012-11-26 Mon 10:55> Incorrect notes
+  Simulation started at: 20121126_092938 has notes saying:
+
+  "10 TCR cells stimulated with background. Simulation of the
+  TCR->SpinyStellate network with 60 DeepBasket and 30 DeepLTS. run 1."
+
+  It is actually run 2. The notes were carried over from earlier simulation
+  started at: 20121124_162653.
+
+* <2012-11-26 Mon 10:57> Studying stimulus efficacy by increasing number of cells
+  The simulations started on 24 Nov 2012 are for answering Upi's query about
+  what happens if I stimulate more TCR cells. In these I stimulate 10 TCR
+  cells in stead of 5.
