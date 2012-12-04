@@ -3461,3 +3461,8 @@ data_20120513_210447_9261.h5 [ 0.3]
      In addition:
   3. Look at the relationship of time since last population burst with
      stimulus.
+The dominance of feed-forward inhibition is also suggested by the findings:
+that 60% of layer 4 inhibitory interneurons give spiking responses at
+monosynaptic latencies to thalamic stimulation, whereas <5% of layer 4
+excitatory neurons do (Porter, Johnson, Agmon. J Neurosci. 2001)
+- Kenneth D Miller, David J Pinto and Daniel J Simons (Curr Opinion in Neurobiol, 2001)
