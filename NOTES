@@ -3454,3 +3454,10 @@ data_20120513_210447_9261.h5 [ 0.3]
   1. Look at cells that fired in the vicinity of the stimulus.
   2. Look at cells that are not bursting.
      
+* <2012-12-04 Tue 12:20> What next?
+  As posted above
+  1. Look at cells that fired in the vicinity of the stimulus.
+  2. Look at cells that are not bursting.
+     In addition:
+  3. Look at the relationship of time since last population burst with
+     stimulus.
