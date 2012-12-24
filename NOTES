@@ -3469,3 +3469,11 @@ data_20120513_210447_9261.h5 [ 0.3]
   
 
 * <2012-12-09 Sun 18:56> Look for subnets!
+* <2012-12-22 Sat 11:58> New ways??
+  1. Pragati pointed out what Upi had said earlier - what if we reduce the complexity by removing the TCR cells?
+  2. Aditya: what if you remove inhibition? Follow up on Nino Rodriguez
+  3. Niraj: What about the high inhibition cases? Is the signal propagation
+     any better?
+  4. KP: what about the animated video of the activity?
+  5. Ananth: What about stronger inputs? Inhibition on TCR cells?
+  6. Me: what about associateing the immediate past acvtivity of neighbours?
