@@ -8,9 +8,9 @@
 # Maintainer: 
 # Created: Fri Oct  5 10:25:32 2012 (+0530)
 # Version: 
-# Last-Updated: Fri Oct  5 17:36:26 2012 (+0530)
+# Last-Updated: Wed Dec 26 09:38:48 2012 (+0530)
 #           By: subha
-#     Update #: 160
+#     Update #: 161
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -47,7 +47,7 @@
 
 # Code:
 
-from matplotlib import pyplot as plt
+# from matplotlib import pyplot as plt
 import numpy as np
 import moose
 from cell import TraubCell

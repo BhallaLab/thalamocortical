@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Aug  7 12:29:38 2012 (+0530)
+# Last-Updated: Wed Dec 26 09:40:15 2012 (+0530)
 #           By: subha
-#     Update #: 340
+#     Update #: 341
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -59,11 +59,11 @@ import logging
 import numpy
 # Try to import matplotlib. Code using matplotlib should be excluded
 # based on has_pylab flag.
-has_pylab = True
-try:
-    import pylab
-except ImportError:
-    has_pylab = False
+has_pylab = False
+# try:
+#     import pylab
+# except ImportError:
+#     has_pylab = False
 
 import moose
 
