@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Sat Jun 26 17:22:01 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Aug 10 13:46:10 2010 (+0530)
-#           By: Subhasis Ray
-#     Update #: 428
+# Last-Updated: Wed Dec 26 09:39:18 2012 (+0530)
+#           By: subha
+#     Update #: 430
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -56,7 +56,7 @@ import numpy
 import networkx as nx
 import igraph
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 import synapse
 import config
@@ -258,22 +258,23 @@ class TraubNet:
         config.LOGGER.debug(__name__ + ': finished.')
 
     def draw_cellclassnet(self):
-        try:
-            pos = nx.graphviz_layout(self.cellclassnet)
-        except:
-            pos = nx.graphviz_layout(self.cellclassnet)
-        edge_widths = [edata['prepost_ratio']*1.0/self.min_prepost_count for u, v, edata in self.cellclassnet.edges(data=True)]
-        print edge_widths
-        node_sizes = [self.cellclassnet.node[v]['count']*10 for v in self.cellclassnet]
-        nx.draw(self.cellclassnet, pos, 
-                alpha=0.4,
-                with_labels=True, 
-                node_size=node_sizes,
-                edge_color=edge_widths,
-                edge_cmap=plt.cm.jet,
-                edge_vmin=1.0,
-                edge_vmax=1.0*self.max_prepost_count/self.min_prepost_count)
-        plt.show()
+        return
+        # try:
+        #     pos = nx.graphviz_layout(self.cellclassnet)
+        # except:
+        #     pos = nx.graphviz_layout(self.cellclassnet)
+        # edge_widths = [edata['prepost_ratio']*1.0/self.min_prepost_count for u, v, edata in self.cellclassnet.edges(data=True)]
+        # print edge_widths
+        # node_sizes = [self.cellclassnet.node[v]['count']*10 for v in self.cellclassnet]
+        # nx.draw(self.cellclassnet, pos, 
+        #         alpha=0.4,
+        #         with_labels=True, 
+        #         node_size=node_sizes,
+        #         edge_color=edge_widths,
+        #         edge_cmap=plt.cm.jet,
+        #         edge_vmin=1.0,
+        #         edge_vmax=1.0*self.max_prepost_count/self.min_prepost_count)
+        # plt.show()
 
                               
 

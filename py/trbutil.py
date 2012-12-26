@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Jun  5 13:59:40 2009 (+0530)
 # Version: 
-# Last-Updated: Mon Nov 12 11:01:10 2012 (+0530)
+# Last-Updated: Wed Dec 26 09:41:55 2012 (+0530)
 #           By: subha
-#     Update #: 15
+#     Update #: 17
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -49,12 +49,6 @@ import smtplib
 from subprocess import call
 import numpy
 import config
-has_pylab = True
-try:
-    import pylab
-except ImportError:
-    has_pylab = False
-
 import gzip
 import numpy
 from scipy import signal
@@ -89,17 +83,17 @@ def do_plot(class_name, mus_t, mus_ca, mus_vm, nrn_t=None, nrn_ca=None, nrn_vm=N
             nrn_t = pylab.array()
             nrn_vm = pylab.array() 
             nrn_ca  = pylab.array()
-        pylab.subplot(211)
-        pylab.plot(nrn_t, nrn_vm, 'y-', label='NEURON')
-        pylab.plot(mus_t, mus_vm, 'g-.', label='MOOSE')
-        pylab.title('Vm in presynaptic compartment of %s' % class_name)
-        pylab.legend()
-        pylab.subplot(212)
-        pylab.plot(nrn_t, nrn_ca, 'r-', label='NEURON')
-        pylab.plot(mus_t, mus_ca, 'b-.', label='MOOSE')
-        pylab.title('[Ca2+] in soma of %s' % class_name)
-        pylab.legend()
-        pylab.show()
+        config.pylab.subplot(211)
+        config.pylab.plot(nrn_t, nrn_vm, 'y-', label='NEURON')
+        config.pylab.plot(mus_t, mus_vm, 'g-.', label='MOOSE')
+        config.pylab.title('Vm in presynaptic compartment of %s' % class_name)
+        config.pylab.legend()
+        config.pylab.subplot(212)
+        config.pylab.plot(nrn_t, nrn_ca, 'r-', label='NEURON')
+        config.pylab.plot(mus_t, mus_ca, 'b-.', label='MOOSE')
+        config.pylab.title('[Ca2+] in soma of %s' % class_name)
+        config.pylab.legend()
+        config.pylab.show()
 
 def send_email(recipient, sender, password,
                server='smtp.gmail.com', 
