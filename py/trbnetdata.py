@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Tue May  1 15:42:51 2012 (+0530)
+# Last-Updated: Thu Dec 27 17:11:49 2012 (+0530)
 #           By: subha
-#     Update #: 1245
+#     Update #: 1248
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -115,7 +115,7 @@ class TraubFullNetData(object):
                           100,
                           100]
 
-        
+        # pre_post_ratio[i][j] is the number of presynaptic cells of type index i that can synapse on post synaptic cell of type index j
         self.pre_post_ratio = [[50, 50, 90, 90, 90, 3,  60, 60, 30, 30, 30, 3,  0,  0],
                                [5,  5,  5,	5,	5,	1,	3,	3,	3,	3,	3,	1,	0,	0],
                                [20,	20,	20,	20,	20,	20,	0,	0,	0,	0,	0,	0,	0,	0],
@@ -266,6 +266,9 @@ class TraubFullNetData(object):
             [   1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ],
             [   1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0,    1.0 ]]
 
+        # allowed_comps[i][j] is the list of compartments on j-th
+        # neuron type(postsynaptic) where the i-th neuron
+        # type(presynaptic) can send synaptic input.
         self.allowed_comps = [
             [# SupPyrRS
                 [2,3,4,5,6,7,8,9,14,15,16,17,18,19,20,21,26, 27,28,29,30,31,32,33,10,11,12,13,22,23,24,25, 34,35,36,37], # SupPyrRS
