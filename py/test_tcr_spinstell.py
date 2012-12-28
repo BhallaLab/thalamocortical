@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Jan 16 09:50:05 2012 (+0530)
 # Version: 
-# Last-Updated: Fri Dec 28 10:52:22 2012 (+0530)
+# Last-Updated: Fri Dec 28 16:10:29 2012 (+0530)
 #           By: subha
-#     Update #: 173
+#     Update #: 174
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -109,6 +109,8 @@ def test_tcr_ss_spiking():
         stim.delay[ii] = delay
         stim.width[ii] = width
     stim.delay[0] = 1.0
+    for cell in tcr:
+        stim.connect('outputSrc', cell.soma, 'injectMsg')
     sim.schedule()
     sim.run(5.0)        
     for tab in chain(nmda_tabs, ampa_tabs, vm_tabs, ca_tabs):
