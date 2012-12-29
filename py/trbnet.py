@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Sep 17 17:48:22 2012 (+0530)
+# Last-Updated: Sat Dec 29 14:58:24 2012 (+0530)
 #           By: subha
-#     Update #: 2770
+#     Update #: 2778
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -712,7 +712,7 @@ class TraubNet(object):
         # 2012-07-14 12:28:38 (+0530) Switching to recording from presynaptic compartment.
         for cell in self.cell_index_map.keys():            
             tab = cell.comp[cell.presyn].insertRecorder(cell.name, 'Vm', spike_container)
-            print 'Recording spike from:', cell.comp[cell.presyn].path
+            config.LOGGER.info('Recording spike from: %s' % (cell.comp[cell.presyn].path))
             tab.stepMode = moose.TAB_SPIKE
             tab.stepSize = -20e-3
         ectopic_container = moose.Neutral('%s/ectopic_spikes' % (data_container.path))
@@ -760,15 +760,18 @@ class TraubNet(object):
                 cell.soma.insertCaRecorder(cell.name, ca_container)
                 if config.runconfig.get('record', 'gk_syn') not in ['YES', 'Yes', 'yes', '1', 'TRUE', 'True', 'true']:
                     continue
-                synchan = moose.context.getWildcardList(cell.path + '/##[TYPE=SynChan]', True)
+                synchan = moose.context.getWildcardList(cell.path + '/##[ISA=SynChan]', True)
                 nmda = moose.context.getWildcardList(cell.path + '/##[TYPE=NMDAChan]', True)
+                config.LOGGER.info('synchan: %s' % ([ch.path() for ch in synchan]))
+                config.LOGGER.info('nmda: %s' % ([ch.path() for ch in nmda]))
                 synlist = synchan + nmda
                 for chan in synlist:
                     syn = moose.Neutral(chan)
                     comp = moose.Neutral(syn.parent)
                     tab = moose.Table('gk_%s_%s_%s' % (cell.name, comp.name, syn.name), syn_gk_container)
                     tab.stepMode = 3
-                    print 'Connected recording table', tab.name, tab.connect('inputRequest', syn, 'Gk')
+                    success = tab.connect('inputRequest', syn, 'Gk')
+                    config.LOGGER.info('Connected recording table: %s to %s: %s' % (tab.name, syn.name, success))
 
 
         
