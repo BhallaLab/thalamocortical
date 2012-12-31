@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Jan 16 09:50:05 2012 (+0530)
 # Version: 
-# Last-Updated: Fri Dec 28 16:10:29 2012 (+0530)
+# Last-Updated: Mon Dec 31 14:52:19 2012 (+0530)
 #           By: subha
-#     Update #: 174
+#     Update #: 213
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -59,7 +59,9 @@ def test_tcr_ss_spiking():
     tcr = [TCR(TCR.prototype, '%s/TCR_%d' % (sim.model.path, idx)) for idx in range(num_tcr)]
     pre_per_post = netdata.pre_post_ratio[tcr_idx][ss_idx]
     for cell in ss:
-        post_comp_list = [cell.comp[ii] for ii in random.sample(netdata.allowed_comps[tcr_idx][ss_idx], pre_per_post)]
+        print cell.path
+        post_comp_list = [cell.comp[ii] for ii in random.sample(netdata.allowed_comps[tcr_idx][ss_idx],1)] #pre_per_post)]
+        print [p.path for p in post_comp_list]
         nmda_tabs = []
         ampa_tabs = []
         vm_tabs = []
@@ -89,6 +91,7 @@ def test_tcr_ss_spiking():
             nmda_tabs.append(moose.Table('%s/g%s' % (sim.data.path, nmda.name)))
             nmda_tabs[-1].stepMode = 3
             nmda_tabs[-1].connect('inputRequest', nmda, 'Gk')
+            print nmda_tabs[-1].path
     for cell in chain(tcr, ss):
         vm = moose.Table('%s/vm_soma_%s' % (sim.data.path, cell.name))
         vm.stepMode = 3
@@ -98,28 +101,34 @@ def test_tcr_ss_spiking():
         ca.stepMode = 3
         ca.connect('inputRequest', moose.CaConc('%s/CaPool' % (cell.soma.path)), 'Ca')
         ca_tabs.append(ca)
+        print ca.path
     stim = moose.PulseGen('%s/stim')
     pulsecount = 6
     delay = 25e-3
     width = 2e-3
-    level = 0.3e-9
+    level = 1e-9
     stim.setCount(7)
     for ii in range(pulsecount):
         stim.level[ii] = level
         stim.delay[ii] = delay
         stim.width[ii] = width
-    stim.delay[0] = 1.0
+    stim.delay[0] = 1.0e9
     for cell in tcr:
         stim.connect('outputSrc', cell.soma, 'injectMsg')
     sim.schedule()
     sim.run(5.0)        
-    for tab in chain(nmda_tabs, ampa_tabs, vm_tabs, ca_tabs):
-        ts = np.linspace(0, sim.simtime, len(tab))
-        np.savetxt('%s.dat' % (tab.name), np.c_[ts, tab])
+    for index, tablist in enumerate((nmda_tabs, ampa_tabs, vm_tabs, ca_tabs)):
+        pylab.subplot(2, 2, index + 1)        
+        for tab in tablist:
+            ts = np.linspace(0, sim.simtime, len(tab))
+            np.savetxt('%s.dat' % (tab.name), np.c_[ts, tab])
+            pylab.plot(ts, np.asarray(tab), label=tab.name)
+        pylab.title(tab.name)
+    pylab.show()        
     print 'Finished'
         
 
-def test_tcr_spinstell_ampa():
+def test_tcr_spinstell_nmda():
     netdata = TraubFullNetData()
     sim = Simulation('tcr_spinstell_synapse')
     tcr_index = netdata.celltype.index('TCR')
@@ -128,29 +137,31 @@ def test_tcr_spinstell_ampa():
     spinstell = SpinyStellate(SpinyStellate.prototype, sim.model.path + '/SpinyStellate')
     precomp = tcr.comp[TCR.presyn]
     postcomp = spinstell.comp[31] # 5 is among the allowed post synaptic compartments in spiny stellate cell
-    tau_ampa = netdata.tau_ampa[tcr_index][spinstell_index]
+    tau_nmda = netdata.tau_nmda[tcr_index][spinstell_index]
     synchan = precomp.makeSynapse(postcomp, 
-                                  name='ampa_from_TCR', 
-                                  classname='SynChan', 
+                                  name='nmda_from_TCR', 
+                                  classname='NMDAChan', 
                                   Ek=0.0,
-                                  Gbar=netdata.g_ampa_baseline[tcr_index][spinstell_index] * tau_ampa*1e3/pylab.e,
-                                  tau1=tau_ampa,
-                                  tau2=tau_ampa,
+                                  Gbar=netdata.g_nmda_baseline[tcr_index][spinstell_index] * tau_nmda*1e3/pylab.e,
+                                  tau1=tau_nmda,
+                                  tau2=5e-3,
                                   delay = synapse.SYNAPTIC_DELAY_THALAMOCORTICAL
                                   )
+    synchan.MgConc = 1.5
     stim = tcr.soma.insertPulseGen('stimulus', sim.model, firstLevel=1e-9, firstDelay=200e-3, firstWidth=2e-3)
     tcr_soma_tab = tcr.soma.insertRecorder('stim', 'Vm', sim.data)
     ss_soma_tab = spinstell.soma.insertRecorder('ss_soma', 'Vm', sim.data)
     ss_dend_tab = postcomp.insertRecorder('ss_dend', 'Vm', sim.data)
-    gk_ampa_tab = moose.Table('gk_ss', sim.data)
-    gk_ampa_tab.stepMode = 3
-    print 'Connected Gk', gk_ampa_tab.connect('inputRequest', synchan, 'Gk')
+    gk_nmda_tab = moose.Table('gk_ss', sim.data)
+    gk_nmda_tab.stepMode = 3
+    print 'Connected Gk', gk_nmda_tab.connect('inputRequest', synchan, 'Gk')
+    simtime = 5.0
     sim.schedule()
-    sim.run(1.0)
-    pylab.plot(np.linspace(0, 1.0, len(tcr_soma_tab)), tcr_soma_tab, label='tcr_soma')
-    pylab.plot(np.linspace(0, 1.0, len(tcr_soma_tab)), ss_soma_tab, label='ss_soma')
-    pylab.plot(np.linspace(0, 1.0, len(tcr_soma_tab)), ss_dend_tab, label='ss_dend')
-    pylab.plot(np.linspace(0, 1.0, len(gk_ampa_tab)), np.array(gk_ampa_tab) * 1e9, label='gk_ampa_spinstell (nS)')
+    sim.run(simtime)
+    pylab.plot(np.linspace(0, simtime, len(tcr_soma_tab)), tcr_soma_tab, label='tcr_soma')
+    pylab.plot(np.linspace(0, simtime, len(tcr_soma_tab)), ss_soma_tab, label='ss_soma')
+    pylab.plot(np.linspace(0, simtime, len(tcr_soma_tab)), ss_dend_tab, label='ss_dend')
+    pylab.plot(np.linspace(0, simtime, len(gk_nmda_tab)), np.array(gk_nmda_tab) * 1e9, label='gk_nmda_spinstell (nS)')
     pylab.legend()
     pylab.show()
 
