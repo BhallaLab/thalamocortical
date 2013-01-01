@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Jan 16 09:50:05 2012 (+0530)
 # Version: 
-# Last-Updated: Mon Dec 31 14:52:19 2012 (+0530)
+# Last-Updated: Tue Jan  1 09:32:01 2013 (+0530)
 #           By: subha
-#     Update #: 213
+#     Update #: 273
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -48,13 +48,15 @@ from tcr import TCR
 import synapse
 import random
 from itertools import cycle, izip, chain
+import config
 
 def test_tcr_ss_spiking():
     netdata = TraubFullNetData()
+    config.solver = 'hsolve'
     sim = Simulation('tcr_ss')
     tcr_idx = netdata.celltype.index('TCR')
     ss_idx = netdata.celltype.index('SpinyStellate')
-    num_ss, num_tcr = 1, 20
+    num_ss, num_tcr = 1, 1
     ss = [SpinyStellate(SpinyStellate.prototype, '%s/SS_%d' % (sim.model.path, idx)) for idx in range(num_ss)]
     tcr = [TCR(TCR.prototype, '%s/TCR_%d' % (sim.model.path, idx)) for idx in range(num_tcr)]
     pre_per_post = netdata.pre_post_ratio[tcr_idx][ss_idx]
@@ -91,7 +93,6 @@ def test_tcr_ss_spiking():
             nmda_tabs.append(moose.Table('%s/g%s' % (sim.data.path, nmda.name)))
             nmda_tabs[-1].stepMode = 3
             nmda_tabs[-1].connect('inputRequest', nmda, 'Gk')
-            print nmda_tabs[-1].path
     for cell in chain(tcr, ss):
         vm = moose.Table('%s/vm_soma_%s' % (sim.data.path, cell.name))
         vm.stepMode = 3
@@ -101,29 +102,39 @@ def test_tcr_ss_spiking():
         ca.stepMode = 3
         ca.connect('inputRequest', moose.CaConc('%s/CaPool' % (cell.soma.path)), 'Ca')
         ca_tabs.append(ca)
-        print ca.path
-    stim = moose.PulseGen('%s/stim')
-    pulsecount = 6
-    delay = 25e-3
-    width = 2e-3
+    stim = moose.PulseGen('%s/stim' % (sim.model.path))
+    pulses = [1.0, 
+              3.0, 3.2, 3.4,
+              4.0, 4.2, 4.4,
+              1e9]
+    width = 2.0e-3
     level = 1e-9
-    stim.setCount(7)
-    for ii in range(pulsecount):
-        stim.level[ii] = level
-        stim.delay[ii] = delay
+    stim.setCount(len(pulses)+1)
+    stim.level[0] = level
+    stim.delay[0] = pulses[0]
+    stim.width[0] = width
+    for ii, delay in enumerate(np.diff(pulses)):
+        stim.level[ii+1] = level
+        stim.delay[ii+1] = delay
         stim.width[ii] = width
-    stim.delay[0] = 1.0e9
     for cell in tcr:
         stim.connect('outputSrc', cell.soma, 'injectMsg')
-    sim.schedule()
-    sim.run(5.0)        
+    stim_tab = moose.Table('%s/stim' % (sim.data.path))
+    stim_tab.stepMode = 3
+    stim_tab.connect('inputRequest', stim, 'output')
+    sim.schedule()    
+    sim.run(2)
     for index, tablist in enumerate((nmda_tabs, ampa_tabs, vm_tabs, ca_tabs)):
         pylab.subplot(2, 2, index + 1)        
         for tab in tablist:
             ts = np.linspace(0, sim.simtime, len(tab))
-            np.savetxt('%s.dat' % (tab.name), np.c_[ts, tab])
-            pylab.plot(ts, np.asarray(tab), label=tab.name)
+            data = np.asarray(tab)
+            np.savetxt('%s.dat' % (tab.name), np.c_[ts, tab])            
+            pylab.plot(ts, data, label=tab.name)
         pylab.title(tab.name)
+        # stimdata = np.asarray(stim_tab) 
+        # pylab.plot(ts, stimdata / max(stimdata), label='stim')
+        pylab.legend()
     pylab.show()        
     print 'Finished'
         
