@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Dec 29 14:58:24 2012 (+0530)
+# Last-Updated: Tue Jan  1 09:34:23 2013 (+0530)
 #           By: subha
-#     Update #: 2778
+#     Update #: 2779
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1439,7 +1439,7 @@ class TraubNet(object):
         config.LOGGER.debug('Start saving the network model')
         starttime =  datetime.now()
         compression_filter =  tables.Filters(complevel=9, complib='zlib', fletcher32=True)
-        h5file =  tables.openFile(filename,  mode = 'w',  title = 'Traub Network: timestamp: %s' % (config.timestamp.strftime('%Y-%M-%D %H:%M:%S')),  filters = compression_filter)
+        h5file =  tables.openFile(filename,  mode = 'w',  title = 'Traub Network: timestamp: %s' % (config.timestamp.strftime('%Y-%M-%d %H:%M:%S')),  filters = compression_filter)
         h5file.root._v_attrs.np_rngseed = config.numpy_rngseed
         h5file.root._v_attrs.moose_rngseed = config.moose_rngseed
         h5file.root._v_attrs.notes = '\n'.join(self.tweaks_doc)
