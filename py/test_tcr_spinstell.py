@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Jan 16 09:50:05 2012 (+0530)
 # Version: 
-# Last-Updated: Tue Jan  1 12:03:18 2013 (+0530)
+# Last-Updated: Tue Jan  1 14:33:52 2013 (+0530)
 #           By: subha
-#     Update #: 303
+#     Update #: 339
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -32,7 +32,7 @@
 
 import numpy as np
 import pylab
-
+import matplotlib
 import sys
 sys.path.append('.')
 sys.path.append('/data/subha/chamcham_moose/python')
@@ -53,11 +53,11 @@ import config
 
 def test_tcr_ss_spiking():
     netdata = TraubFullNetData()
-    config.solver = 'ee'
+    config.solver = 'hsolve'
     sim = Simulation('tcr_ss')
     tcr_idx = netdata.celltype.index('TCR')
     ss_idx = netdata.celltype.index('SpinyStellate')
-    num_ss, num_tcr = 0, 1
+    num_ss, num_tcr = 1, 1
     ss = [SpinyStellate(SpinyStellate.prototype, '%s/SS_%d' % (sim.model.path, idx)) for idx in range(num_ss)]
     tcr = [TCR(TCR.prototype, '%s/TCR_%d' % (sim.model.path, idx)) for idx in range(num_tcr)]
     pre_per_post = netdata.pre_post_ratio[tcr_idx][ss_idx]
@@ -108,7 +108,7 @@ def test_tcr_ss_spiking():
               3.0, 3.2, 3.4,
               4.0, 4.2, 4.4,
               1e9]
-    width = 2.0e-3
+    width = 2e-3
     level = 1e-9
     stim.setCount(len(pulses)+1)
     stim.level[0] = level
@@ -123,30 +123,30 @@ def test_tcr_ss_spiking():
     stim_tab = moose.Table('%s/stim' % (sim.data.path))
     stim_tab.stepMode = 3
     stim_tab.connect('inputRequest', stim, 'output')
-    # sim.schedule()    
-    # sim.run(2)
-    TCR.test_single_cell()
-    std_tcr = moose.Cell('/model/TCR')
-    for compId in moose.context.getWildcardList(tcr[0].path+'/##[TYPE=Compartment]', True):
-        comp = moose.Compartment(compId)
-        print 'Comparing', comp.path, ':', compare_compartment(comp, moose.Compartment('%s/%s' % (std_tcr.path, comp.name)))        
-    # stimdata = np.asarray(stim_tab) 
-    # stimdata = stimdata
-    # for index, tablist in enumerate((nmda_tabs, ampa_tabs, vm_tabs, ca_tabs)):
-    #     pylab.subplot(2, 2, index + 1)        
-    #     ts = np.linspace(0, sim.simtime, len(stimdata))
-    #     pylab.plot(ts, stimdata * 1e9, label='stim')
-    #     tab = None
-    #     for tab in tablist:
-    #         ts = np.linspace(0, sim.simtime, len(tab))
-    #         data = np.asarray(tab)
-    #         data = data / (max(data) - min(data))
-    #         np.savetxt('%s.dat' % (tab.name), np.c_[ts, tab])            
-    #         pylab.plot(ts, data, label=tab.name)
-    #     if tab is not None:
-    #         pylab.title(tab.name)
-    #     pylab.legend()
-    # pylab.show()        
+    sim.schedule()    
+    sim.run(2.0)
+    stimdata = np.asarray(stim_tab)
+    fig = pylab.figure()
+    for index, tablist in enumerate((nmda_tabs, ampa_tabs, vm_tabs, ca_tabs)):
+        ax = fig.add_subplot(2, 2, index + 1)        
+        ts = np.linspace(0, sim.simtime, len(stimdata))
+        pylab.plot(ts, stimdata, label='stim')
+        tab = None
+        for tab in tablist:
+            ts = np.linspace(0, sim.simtime, len(tab))
+            data = np.asarray(tab)
+            np.savetxt('%s.dat' % (tab.name), np.c_[ts, tab])            
+            ax.plot(ts, data, label=tab.name)
+        if tab is not None:
+            pylab.title(tab.name)
+        bbox = matplotlib.transforms.Bbox.from_bounds(.1, .5, .5, .3) 
+        trans = ax.transAxes + fig.transFigure.inverted() 
+        l, b, w, h = matplotlib.transforms.TransformedBbox(bbox, trans).bounds
+        axins = fig.add_axes([l, b, w, h]) 
+        axins.plot(ts, stimdata, label='stimulus')
+        # axins.set_ylim(-1e-9, 2e-9)
+        pylab.legend()
+    pylab.show()        
     print 'Finished'
         
 
