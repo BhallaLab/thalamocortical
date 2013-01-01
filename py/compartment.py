@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Oct 18 14:34:20 2011 (+0530)
+# Last-Updated: Tue Jan  1 12:20:40 2013 (+0530)
 #           By: subha
-#     Update #: 313
+#     Update #: 339
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -222,6 +222,7 @@ class MyCompartment(moose.Compartment):
         synapse.weight[num_synapses - 1] = weight
         if config.stochastic:
             synapse.initPr[num_synapses - 1] = Pr
+        config.LOGGER.debug('Created synapse: %s of type %s' % (synapse.path, synapse.className))
         return synapse
         
 
@@ -279,6 +280,27 @@ def compare_compartment(left, right):
     if not result:
         print(left.path + ".Vm = " + str(left.Vm) + " <> " + right.path + ".Vm = " + str(right.Vm))
         return result
+    leftchans = moose.context.getWildcardList(left.path + '/##[TYPE=HHChannel]', True)
+    rightchans = moose.context.getWildcardList(right.path + '/##[TYPE=HHChannel]', True)
+    result = len(leftchans) == len(rightchans)
+    if not result:
+        print(left.path + ":channel-count = " + str(len(leftchans)) + " <> " + right.path + ":channel-count = " + str(len(rightchans)))
+        return result
+    lchanset = set([moose.HHChannel(ch).name for cha in leftchans])
+    rchanset = set([moose.HHChannel(ch).name for cha in rightchans])
+    for ch in lchanset - rchanset:
+        print ch.path, 'not in', right.path
+        result = False
+    for ch in rchanset - lchanset:
+        print ch.path, 'not in', left.path
+        result = False
+    if not result:
+        return result
+    for ch in leftchans:
+        lchan = moose.HHChannel(ch)
+        rchan = moose.HHChannel('%s/%s' % (right.path, lchan.name))
+        result = compare_channel(lchan, rchan)
+    return result
 
     return True
 # ! compare_compartments
