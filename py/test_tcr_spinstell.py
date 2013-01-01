@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Jan 16 09:50:05 2012 (+0530)
 # Version: 
-# Last-Updated: Tue Jan  1 14:33:52 2013 (+0530)
+# Last-Updated: Tue Jan  1 20:12:54 2013 (+0530)
 #           By: subha
-#     Update #: 339
+#     Update #: 392
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -33,6 +33,7 @@
 import numpy as np
 import pylab
 import matplotlib
+from matplotlib import pyplot as plt
 import sys
 sys.path.append('.')
 sys.path.append('/data/subha/chamcham_moose/python')
@@ -50,14 +51,16 @@ import random
 from itertools import cycle, izip, chain
 from compartment import compare_compartment
 import config
+import os
 
 def test_tcr_ss_spiking():
+    datadir = 'data'
     netdata = TraubFullNetData()
     config.solver = 'hsolve'
     sim = Simulation('tcr_ss')
     tcr_idx = netdata.celltype.index('TCR')
     ss_idx = netdata.celltype.index('SpinyStellate')
-    num_ss, num_tcr = 1, 1
+    num_ss, num_tcr = 19, 20
     ss = [SpinyStellate(SpinyStellate.prototype, '%s/SS_%d' % (sim.model.path, idx)) for idx in range(num_ss)]
     tcr = [TCR(TCR.prototype, '%s/TCR_%d' % (sim.model.path, idx)) for idx in range(num_tcr)]
     pre_per_post = netdata.pre_post_ratio[tcr_idx][ss_idx]
@@ -65,11 +68,12 @@ def test_tcr_ss_spiking():
     ampa_tabs = []
     vm_tabs = []
     ca_tabs = []
-    for cell in ss:
-        print cell.path
-        post_comp_list = [cell.comp[ii] for ii in random.sample(netdata.allowed_comps[tcr_idx][ss_idx],1)] #pre_per_post)]
-        print [p.path for p in post_comp_list]
+    for index, cell in enumerate(ss):
+        # Select one
+        post_comp_list = [cell.comp[ii] for ii in random.sample(netdata.allowed_comps[tcr_idx][ss_idx], index+1)]
+        print '\t', cell.path, 'receiving input on comps:'
         for precell, postcomp in izip(tcr, cycle(post_comp_list)):
+            print precell.path, 'on', postcomp.name
             ampa = precell.comp[precell.presyn].makeSynapse(postcomp,
                                                 name='ampa__%s__%s__%s' % (precell.name, cell.name, postcomp.name),
                                                 classname='SynChan',
@@ -105,7 +109,7 @@ def test_tcr_ss_spiking():
         ca_tabs.append(ca)
     stim = moose.PulseGen('%s/stim' % (sim.model.path))
     pulses = [1.0, 
-              3.0, 3.2, 3.4,
+              3.000, 3.040, 3.080, 3.120, 3.160, 3.200,
               4.0, 4.2, 4.4,
               1e9]
     width = 2e-3
@@ -124,68 +128,33 @@ def test_tcr_ss_spiking():
     stim_tab.stepMode = 3
     stim_tab.connect('inputRequest', stim, 'output')
     sim.schedule()    
-    sim.run(2.0)
-    stimdata = np.asarray(stim_tab)
-    fig = pylab.figure()
+    sim.run(5.0)
+    stimdata = np.asarray(stim_tab)    
+    ts = np.linspace(0, sim.simtime, len(stimdata))
+    np.savetxt('%s/stim.dat' % (datadir), np.c_[ts, stimdata])
+    fig = pylab.figure()        
     for index, tablist in enumerate((nmda_tabs, ampa_tabs, vm_tabs, ca_tabs)):
-        ax = fig.add_subplot(2, 2, index + 1)        
         ts = np.linspace(0, sim.simtime, len(stimdata))
-        pylab.plot(ts, stimdata, label='stim')
         tab = None
         for tab in tablist:
             ts = np.linspace(0, sim.simtime, len(tab))
             data = np.asarray(tab)
-            np.savetxt('%s.dat' % (tab.name), np.c_[ts, tab])            
-            ax.plot(ts, data, label=tab.name)
-        if tab is not None:
-            pylab.title(tab.name)
-        bbox = matplotlib.transforms.Bbox.from_bounds(.1, .5, .5, .3) 
-        trans = ax.transAxes + fig.transFigure.inverted() 
-        l, b, w, h = matplotlib.transforms.TransformedBbox(bbox, trans).bounds
-        axins = fig.add_axes([l, b, w, h]) 
-        axins.plot(ts, stimdata, label='stimulus')
+            np.savetxt('%s/%s.dat' % (datadir, tab.name), np.c_[ts, tab])            
+        # pylab.legend()
+        # bbox = matplotlib.transforms.Bbox.from_bounds(.1, .5, .5, .3) 
+        # trans = ax.transAxes + fig.transFigure.inverted() 
+        # l, b, w, h = matplotlib.transforms.TransformedBbox(bbox, trans).bounds
+        # axins = fig.add_axes([l, b, w, h]) 
+        # axins.plot(ts, stimdata, label='stimulus')
         # axins.set_ylim(-1e-9, 2e-9)
-        pylab.legend()
-    pylab.show()        
+    for tab in vm_tabs:
+        ts = np.linspace(0, sim.simtime, len(tab))
+        plt.figure()
+        plt.plot(ts, tab)
+        plt.savefig('%s/%s.svg' % (datadir, tab.name))
+        plt.close()
     print 'Finished'
         
-
-def test_tcr_spinstell_nmda():
-    netdata = TraubFullNetData()
-    sim = Simulation('tcr_spinstell_synapse')
-    tcr_index = netdata.celltype.index('TCR')
-    spinstell_index = netdata.celltype.index('SpinyStellate')
-    tcr = TCR(TCR.prototype, sim.model.path + '/TCR')
-    spinstell = SpinyStellate(SpinyStellate.prototype, sim.model.path + '/SpinyStellate')
-    precomp = tcr.comp[TCR.presyn]
-    postcomp = spinstell.comp[31] # 5 is among the allowed post synaptic compartments in spiny stellate cell
-    tau_nmda = netdata.tau_nmda[tcr_index][spinstell_index]
-    synchan = precomp.makeSynapse(postcomp, 
-                                  name='nmda_from_TCR', 
-                                  classname='NMDAChan', 
-                                  Ek=0.0,
-                                  Gbar=netdata.g_nmda_baseline[tcr_index][spinstell_index] * tau_nmda*1e3/pylab.e,
-                                  tau1=tau_nmda,
-                                  tau2=5e-3,
-                                  delay = synapse.SYNAPTIC_DELAY_THALAMOCORTICAL
-                                  )
-    synchan.MgConc = 1.5
-    stim = tcr.soma.insertPulseGen('stimulus', sim.model, firstLevel=1e-9, firstDelay=200e-3, firstWidth=2e-3)
-    tcr_soma_tab = tcr.soma.insertRecorder('stim', 'Vm', sim.data)
-    ss_soma_tab = spinstell.soma.insertRecorder('ss_soma', 'Vm', sim.data)
-    ss_dend_tab = postcomp.insertRecorder('ss_dend', 'Vm', sim.data)
-    gk_nmda_tab = moose.Table('gk_ss', sim.data)
-    gk_nmda_tab.stepMode = 3
-    print 'Connected Gk', gk_nmda_tab.connect('inputRequest', synchan, 'Gk')
-    simtime = 5.0
-    sim.schedule()
-    sim.run(simtime)
-    pylab.plot(np.linspace(0, simtime, len(tcr_soma_tab)), tcr_soma_tab, label='tcr_soma')
-    pylab.plot(np.linspace(0, simtime, len(tcr_soma_tab)), ss_soma_tab, label='ss_soma')
-    pylab.plot(np.linspace(0, simtime, len(tcr_soma_tab)), ss_dend_tab, label='ss_dend')
-    pylab.plot(np.linspace(0, simtime, len(gk_nmda_tab)), np.array(gk_nmda_tab) * 1e9, label='gk_nmda_spinstell (nS)')
-    pylab.legend()
-    pylab.show()
 
 if __name__ == '__main__':
     # test_tcr_spinstell_ampa()
