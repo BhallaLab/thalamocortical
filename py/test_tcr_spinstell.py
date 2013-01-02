@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Jan 16 09:50:05 2012 (+0530)
 # Version: 
-# Last-Updated: Tue Jan  1 20:12:54 2013 (+0530)
+# Last-Updated: Wed Jan  2 11:08:46 2013 (+0530)
 #           By: subha
-#     Update #: 392
+#     Update #: 431
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -52,9 +52,12 @@ from itertools import cycle, izip, chain
 from compartment import compare_compartment
 import config
 import os
+from datetime import datetime
 
 def test_tcr_ss_spiking():
-    datadir = 'data'
+    print 'test_tcr_ss_spiking: starting at', datetime.now().strftime('%Y%m%d_%H%M%S')
+    datadir = 'data_%s' % (datetime.now().strftime('%Y%m%d_%H%M%S'))
+    os.mkdir(datadir)
     netdata = TraubFullNetData()
     config.solver = 'hsolve'
     sim = Simulation('tcr_ss')
@@ -63,6 +66,7 @@ def test_tcr_ss_spiking():
     num_ss, num_tcr = 19, 20
     ss = [SpinyStellate(SpinyStellate.prototype, '%s/SS_%d' % (sim.model.path, idx)) for idx in range(num_ss)]
     tcr = [TCR(TCR.prototype, '%s/TCR_%d' % (sim.model.path, idx)) for idx in range(num_tcr)]
+    print 'test_tcr_ss_spiking: cells created at', datetime.now().strftime('%Y%m%d_%H%M%S')
     pre_per_post = netdata.pre_post_ratio[tcr_idx][ss_idx]
     nmda_tabs = []
     ampa_tabs = []
@@ -71,9 +75,9 @@ def test_tcr_ss_spiking():
     for index, cell in enumerate(ss):
         # Select one
         post_comp_list = [cell.comp[ii] for ii in random.sample(netdata.allowed_comps[tcr_idx][ss_idx], index+1)]
-        print '\t', cell.path, 'receiving input on comps:'
-        for precell, postcomp in izip(tcr, cycle(post_comp_list)):
-            print precell.path, 'on', postcomp.name
+        print cell.path, 'receiving input on %d comps:' % (index+1)
+        for precell, postcomp in zip(tcr, post_comp_list):
+            print '\t', precell.path, 'on', postcomp.name
             ampa = precell.comp[precell.presyn].makeSynapse(postcomp,
                                                 name='ampa__%s__%s__%s' % (precell.name, cell.name, postcomp.name),
                                                 classname='SynChan',
@@ -98,6 +102,7 @@ def test_tcr_ss_spiking():
             nmda_tabs.append(moose.Table('%s/g%s' % (sim.data.path, nmda.name)))
             nmda_tabs[-1].stepMode = 3
             nmda_tabs[-1].connect('inputRequest', nmda, 'Gk')
+    print 'test_tcr_ss_spiking: synapses created at', datetime.now().strftime('%Y%m%d_%H%M%S')
     for cell in chain(tcr, ss):
         vm = moose.Table('%s/vm_soma_%s' % (sim.data.path, cell.name))
         vm.stepMode = 3
@@ -107,35 +112,37 @@ def test_tcr_ss_spiking():
         ca.stepMode = 3
         ca.connect('inputRequest', moose.CaConc('%s/CaPool' % (cell.soma.path)), 'Ca')
         ca_tabs.append(ca)
-    stim = moose.PulseGen('%s/stim' % (sim.model.path))
+    stim = [moose.PulseGen('%s/stim_%d' % (sim.model.path, ii)) for ii in range(num_tcr)]
     pulses = [1.0, 
               3.000, 3.040, 3.080, 3.120, 3.160, 3.200,
               4.0, 4.2, 4.4,
               1e9]
     width = 2e-3
-    level = 1e-9
-    stim.setCount(len(pulses)+1)
-    stim.level[0] = level
-    stim.delay[0] = pulses[0]
-    stim.width[0] = width
-    for ii, delay in enumerate(np.diff(pulses)):
-        stim.level[ii+1] = level
-        stim.delay[ii+1] = delay
-        stim.width[ii] = width
-    for cell in tcr:
-        stim.connect('outputSrc', cell.soma, 'injectMsg')
-    stim_tab = moose.Table('%s/stim' % (sim.data.path))
-    stim_tab.stepMode = 3
-    stim_tab.connect('inputRequest', stim, 'output')
+    level = 2e-9
+    offset=0.0
+    stim_tabs = []
+    # Create stimuli that are slightly off each other 3 ms in this case
+    for st, cell in zip(stim, tcr):
+        st.setCount(len(pulses)+1)
+        st.level[0] = level
+        st.delay[0] = pulses[0] + offset
+        st.width[0] = width
+        for ii, delay in enumerate(np.diff(pulses)):
+            st.level[ii+1] = level
+            st.delay[ii+1] = delay + offset
+            st.width[ii] = width
+        st.connect('outputSrc', cell.soma, 'injectMsg')
+        stim_tab = moose.Table('%s/stim' % (sim.data.path))
+        stim_tab.stepMode = 3
+        stim_tab.connect('inputRequest', st, 'output')
+        stim_tabs.append(stim_tab)
+        offset += 0.003
+        
     sim.schedule()    
-    sim.run(5.0)
-    stimdata = np.asarray(stim_tab)    
-    ts = np.linspace(0, sim.simtime, len(stimdata))
-    np.savetxt('%s/stim.dat' % (datadir), np.c_[ts, stimdata])
-    fig = pylab.figure()        
-    for index, tablist in enumerate((nmda_tabs, ampa_tabs, vm_tabs, ca_tabs)):
-        ts = np.linspace(0, sim.simtime, len(stimdata))
-        tab = None
+    print 'test_tcr_ss_spiking: scheduling done at', datetime.now().strftime('%Y%m%d_%H%M%S')
+    sim.run(.001)
+    print 'test_tcr_ss_spiking: simulation done at', datetime.now().strftime('%Y%m%d_%H%M%S')
+    for index, tablist in enumerate((nmda_tabs, ampa_tabs, vm_tabs, ca_tabs, stim_tabs)):
         for tab in tablist:
             ts = np.linspace(0, sim.simtime, len(tab))
             data = np.asarray(tab)
@@ -153,7 +160,8 @@ def test_tcr_ss_spiking():
         plt.plot(ts, tab)
         plt.savefig('%s/%s.svg' % (datadir, tab.name))
         plt.close()
-    print 'Finished'
+    print 'test_tcr_ss_spiking: finished at', datetime.now().strftime('%Y%m%d_%H%M%S')
+
         
 
 if __name__ == '__main__':
