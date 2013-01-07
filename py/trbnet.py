@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Jan  1 09:34:23 2013 (+0530)
+# Last-Updated: Mon Jan  7 17:47:05 2013 (+0530)
 #           By: subha
-#     Update #: 2779
+#     Update #: 2783
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -489,9 +489,7 @@ class TraubNet(object):
                         config.LOGGER.warning('Ignoring self connection: %s->%s (comp # %d)' % (precell.path, postcell.path, postcompindex))
                         continue
                     elif postcompindex == 0:
-                        continue
-                    else:
-                        config.LOGGER.debug('Setting connection: %s->%s (comp # %d): ampa = %g, nmda = %g, gaba = %g' % (precell.path, postcell.path, postcompindex, self.g_ampa_mat[pre_index, post_index], self.g_nmda_mat[pre_index, post_index],  self.g_gaba_mat[pre_index, post_index]))
+                        continue                                            
                     postcomp = postcell.comp[postcompindex]
                     if postcomp is None:
                         continue
@@ -587,7 +585,7 @@ class TraubNet(object):
                             synchan.tauD1 = gaba_tauD1
                             synchan.tauD2 = gaba_tauD2
                             synchan.initPr[synchan.numSynapses-1] = gaba_initPr
-
+                    config.LOGGER.debug('Set connections: %s->%s (comp # %d): ampa = %g, nmda = %g, gaba = %g' % (precell.path, postcell.path, postcompindex, g_ampa, g_nmda,  g_gaba))
         endtime = datetime.now()
         delta = endtime - starttime
         config.BENCHMARK_LOGGER.info('Finished network creation in: %g s' % (delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))
