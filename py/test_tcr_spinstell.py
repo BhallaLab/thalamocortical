@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Jan 16 09:50:05 2012 (+0530)
 # Version: 
-# Last-Updated: Tue Jan 22 11:49:05 2013 (+0530)
+# Last-Updated: Tue Jan 22 11:51:15 2013 (+0530)
 #           By: subha
-#     Update #: 456
+#     Update #: 457
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -158,7 +158,7 @@ def test_tcr_ss_spiking(offset=0.0):
         
     sim.schedule()    
     print 'test_tcr_ss_spiking: scheduling done at', datetime.now().strftime('%Y%m%d_%H%M%S')
-    sim.run(.001)
+    sim.run(5.0)
     print 'test_tcr_ss_spiking: simulation done at', datetime.now().strftime('%Y%m%d_%H%M%S')
     for index, tablist in enumerate((nmda_tabs, ampa_tabs, vm_tabs, ca_tabs, stim_tabs)):
         for tab in tablist:
