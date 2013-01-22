@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Jan 16 09:50:05 2012 (+0530)
 # Version: 
-# Last-Updated: Wed Jan  2 11:08:46 2013 (+0530)
+# Last-Updated: Tue Jan 22 11:49:05 2013 (+0530)
 #           By: subha
-#     Update #: 431
+#     Update #: 456
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -54,7 +54,20 @@ import config
 import os
 from datetime import datetime
 
-def test_tcr_ss_spiking():
+def test_tcr_ss_spiking(offset=0.0):
+    """This for checking the effect of TCR cells on SpinyStellate (SS)
+    cells.
+
+    I want to see what is the minimum number of presynaptic TCR cells
+    needed to spike within a short interval to stimulate a
+    post-synaptic SS. Depending on the value of {offset}, the TCR
+    cells may receive stimulus at slightly different times (differing
+    by offset).
+
+    I create an array of SS cells and an array of TCR cells. SS_n
+    receives input from TCR_0 trough TCR_n.
+
+    """
     print 'test_tcr_ss_spiking: starting at', datetime.now().strftime('%Y%m%d_%H%M%S')
     datadir = 'data_%s' % (datetime.now().strftime('%Y%m%d_%H%M%S'))
     os.mkdir(datadir)
@@ -73,9 +86,11 @@ def test_tcr_ss_spiking():
     vm_tabs = []
     ca_tabs = []
     for index, cell in enumerate(ss):
-        # Select one
+        # Select the compartments for creating synapses. On n-th cell
+        # we create n+1 synapses (counting from 0).
         post_comp_list = [cell.comp[ii] for ii in random.sample(netdata.allowed_comps[tcr_idx][ss_idx], index+1)]
         print cell.path, 'receiving input on %d comps:' % (index+1)
+        # The first n+1 TCR cells will send input to n-th spiny stellate cell.
         for precell, postcomp in zip(tcr, post_comp_list):
             print '\t', precell.path, 'on', postcomp.name
             ampa = precell.comp[precell.presyn].makeSynapse(postcomp,
@@ -103,6 +118,8 @@ def test_tcr_ss_spiking():
             nmda_tabs[-1].stepMode = 3
             nmda_tabs[-1].connect('inputRequest', nmda, 'Gk')
     print 'test_tcr_ss_spiking: synapses created at', datetime.now().strftime('%Y%m%d_%H%M%S')
+    # Now create tables for recording Vm, [Ca2+] on soma of each cell
+    # (both TCR and SS).
     for cell in chain(tcr, ss):
         vm = moose.Table('%s/vm_soma_%s' % (sim.data.path, cell.name))
         vm.stepMode = 3
@@ -112,6 +129,7 @@ def test_tcr_ss_spiking():
         ca.stepMode = 3
         ca.connect('inputRequest', moose.CaConc('%s/CaPool' % (cell.soma.path)), 'Ca')
         ca_tabs.append(ca)
+    # Create PulseGen for stimulating each TCR cell.
     stim = [moose.PulseGen('%s/stim_%d' % (sim.model.path, ii)) for ii in range(num_tcr)]
     pulses = [1.0, 
               3.000, 3.040, 3.080, 3.120, 3.160, 3.200,
@@ -119,24 +137,24 @@ def test_tcr_ss_spiking():
               1e9]
     width = 2e-3
     level = 2e-9
-    offset=0.0
+    diff = 0.0
     stim_tabs = []
-    # Create stimuli that are slightly off each other 3 ms in this case
+    # Create stimuli that are slightly off each other by {offset}
     for st, cell in zip(stim, tcr):
         st.setCount(len(pulses)+1)
         st.level[0] = level
-        st.delay[0] = pulses[0] + offset
+        st.delay[0] = pulses[0] + diff
         st.width[0] = width
         for ii, delay in enumerate(np.diff(pulses)):
             st.level[ii+1] = level
-            st.delay[ii+1] = delay + offset
+            st.delay[ii+1] = delay + diff
             st.width[ii] = width
         st.connect('outputSrc', cell.soma, 'injectMsg')
         stim_tab = moose.Table('%s/stim' % (sim.data.path))
         stim_tab.stepMode = 3
         stim_tab.connect('inputRequest', st, 'output')
         stim_tabs.append(stim_tab)
-        offset += 0.003
+        diff += offset
         
     sim.schedule()    
     print 'test_tcr_ss_spiking: scheduling done at', datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -154,11 +172,12 @@ def test_tcr_ss_spiking():
         # axins = fig.add_axes([l, b, w, h]) 
         # axins.plot(ts, stimdata, label='stimulus')
         # axins.set_ylim(-1e-9, 2e-9)
+    # Save figures for Vm on soma of each cell
     for tab in vm_tabs:
         ts = np.linspace(0, sim.simtime, len(tab))
         plt.figure()
         plt.plot(ts, tab)
-        plt.savefig('%s/%s.svg' % (datadir, tab.name))
+        plt.savefig('%s/%s.png' % (datadir, tab.name))
         plt.close()
     print 'test_tcr_ss_spiking: finished at', datetime.now().strftime('%Y%m%d_%H%M%S')
 
@@ -166,7 +185,7 @@ def test_tcr_ss_spiking():
 
 if __name__ == '__main__':
     # test_tcr_spinstell_ampa()
-    test_tcr_ss_spiking()
+    test_tcr_ss_spiking(0.0)
     
 # 
 # test_tcr_spinstell.py ends here
