@@ -3477,3 +3477,5 @@ data_20120513_210447_9261.h5 [ 0.3]
   4. KP: what about the animated video of the activity?
   5. Ananth: What about stronger inputs? Inhibition on TCR cells?
   6. Me: what about associateing the immediate past acvtivity of neighbours?
+* <2013-02-12 Tue 15:39> Data description
+  Updated get_files_by_ts.py to print filenames with notes.
