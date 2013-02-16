@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Sat Feb 16 09:42:03 2013 (+0530)
+# Last-Updated: Sat Feb 16 11:01:58 2013 (+0530)
 #           By: subha
-#     Update #: 344
+#     Update #: 345
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -194,7 +194,6 @@ class MyCompartment(moose.Compartment):
         """
         classobj = eval('moose.' + classname)
         synapse = classobj(name, target)
-        print synapse, Ek, Gbar, tau1, tau2
         synapse.Ek = float(Ek) # TODO set value according to original model
         synapse.Gbar = float(Gbar) # TODO set value according to original model
         synapse.tau1 = float(tau1)

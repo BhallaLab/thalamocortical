@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Feb 16 09:49:02 2013 (+0530)
+# Last-Updated: Sat Feb 16 11:00:48 2013 (+0530)
 #           By: subha
-#     Update #: 2915
+#     Update #: 2923
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -880,6 +880,9 @@ class TraubNet(object):
             self.stim_container = stim_container
         else:
             raise Exception('Stimulus container must be a string or a Neutral object: got %s', stim_container.__class__.__name__)
+        if self.from_netfile is not None:
+            config.LOGGER.info('Do nothing. Using network file.')
+            return
         config.LOGGER.debug('Setting up stimulus protocol: bg_interval: %g, pulse_width: %g, isi: %g' % (bg_interval, pulse_width, isi))
         self.stim_gate = moose.PulseGen('stim_gate', self.stim_container)
         self.stim_gate.trigMode = moose.FREE_RUN
@@ -1457,6 +1460,9 @@ class TraubNet(object):
 
     def save_network_model(self,  filename):
         """Save the network structure in an hdf5 file"""
+        if self.from_netfile is not None:
+            config.LOGGER.info('Do nothing. Network was loaded from file.')
+            return
         config.LOGGER.debug('Start saving the network model')
         starttime =  datetime.now()
         compression_filter =  tables.Filters(complevel=9, complib='zlib', fletcher32=True)
@@ -1556,6 +1562,9 @@ class TraubNet(object):
         config.BENCHMARK_LOGGER.info('Saved network model in:% g s' %  (delta.days *  86400 +  delta.seconds +  1e-6 * delta.microseconds))
 
     def verify_saved_model(self, filename):
+        if self.from_netfile is not None:
+            config.LOGGER.info('Do nothing. Model was loaded from network file')
+            return
         starttime = datetime.now()
         h5file =  tables.openFile(filename)
         celltypes =  h5file.getNode('/network', name='celltype')
@@ -1609,7 +1618,7 @@ class TraubNet(object):
             self.read_cells(netf)
             self.update_hhchans_from_netfile(netf)
             self.create_synapses_from_netfile(netf)
-            self.create_stimulus_from_netfile(netf)
+            self.create_pulsegen_from_netfile(netf)
             self.from_netfile = filename
 
     def read_cells(self, netfile):
