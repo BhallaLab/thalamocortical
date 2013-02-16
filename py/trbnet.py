@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Feb 16 13:45:16 2013 (+0530)
+# Last-Updated: Sat Feb 16 20:34:47 2013 (+0530)
 #           By: subha
-#     Update #: 2993
+#     Update #: 3075
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1162,8 +1162,8 @@ class TraubNet(object):
 
         conductance-name sourcetype desttype scalefactor
         """
-        if filename is None:
-            return
+        if filename is None or self.from_netfile is not None:
+            return        
         with open(filename) as synfile:
             for line in synfile.readlines():
                 if line.strip().startswith('#'):
@@ -1173,8 +1173,8 @@ class TraubNet(object):
                     continue
                 [g_name, source, dest, scale_factor] = tokens                
                 scale_factor = float(scale_factor)
-                source_vertices = self.celltype_graph.select(label_eq=source)
-                dest_vertices = self.celltype_graph.select(label_eq=dest)
+                source_vertices = self.celltype_graph.vs.select(label_eq=source)
+                dest_vertices = self.celltype_graph.vs.select(label_eq=dest)
                 for src_v in source_vertices:
                     for dest_v in dest_vertices:
                         synid = self.celltype_graph.get_eid(src_v, dest_v)
@@ -1645,7 +1645,20 @@ class TraubNet(object):
     def create_synapses_from_netfile(self, netfile):
         start = datetime.now()
         syninfo = np.asarray(netfile['/network/synapse'])
+        nRT_gaba = defaultdict(dict)      
         for row in syninfo:
+            # GABA synapses from nRT cells to thalamus have two
+            # components - gaba_slow and gaba_fast and implemented as
+            # two SynChan objects.
+            # We store these for later
+            if row['source'].startswith('nRT'):
+                d = nRT_gaba[row['source']]
+                if row['dest'] in d:
+                    d[row['dest']].append(row)
+                else:
+                    d[row['dest']] = [row]
+                continue
+                    
             src = MyCompartment('%s/%s' % (self.network_container.path, row['source']))
             dst = MyCompartment('%s/%s' % (self.network_container.path, row['dest']))
             syntype = 'SynChan'
@@ -1667,10 +1680,46 @@ class TraubNet(object):
                             tau1=row['tau1'],
                             tau2=row['tau2'],
                             delay=delay)
+        self.create_nRT_synapses(nRT_gaba)
         end = datetime.now()
         delta = end - start
         config.BENCHMARK_LOGGER.info('Time to create %d synapses: %g s' % (len(syninfo), 
                                                                            delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))   
+
+    def create_nRT_synapses(self, nRT_gaba):
+        """Special handling for GABA synapses from nRT cells which
+        have a slow component."""
+        for source, dest_dict in nRT_gaba.items():            
+            for nRTsyn in dest_dict.values():
+                print '####', nRTsyn
+                if nRTsyn[0]['tau1'] > nRTsyn[1]['tau1']:
+                    slow = nRTsyn[0]
+                    regular = nRTsyn[1]
+                else:
+                    slow = nRTsyn[1]
+                    regular = nRTsyn[0]
+                src = MyCompartment('%s/%s' % (self.network_container.path, regular['source']))
+                dst = MyCompartment('%s/%s' % (self.network_container.path, regular['dest']))
+                delay = synapse.SYNAPTIC_DELAY_DEFAULT
+                if not (regular['dest'].startswith('nRT') or regular['dest'].startswith('TCR')):
+                    delay = synapse.SYNAPTIC_DELAY_THALAMOCORTICAL
+                src.makeSynapse(dst,
+                                classname='SynChan',
+                                name='gaba_from_nRT',
+                                Ek=regular['Ek'],
+                                Gbar=regular['Gbar'],
+                                tau1=regular['tau1'],
+                                tau2=regular['tau2'],
+                                delay=delay)
+                src.makeSynapse(dst,
+                                classname='SynChan',
+                                name='gaba_slow_from_nRT',
+                                Ek=slow['Ek'],
+                                Gbar=slow['Gbar'],
+                                tau1=slow['tau1'],
+                                tau2=slow['tau2'],
+                                delay=delay)
+        
 
     def create_pulsegen_from_netfile(self, netfile):
         start = datetime.now()        
@@ -1704,7 +1753,6 @@ class TraubNet(object):
         cfg = dict(netfile['/runconfig/stimulus'])
         self.stim_gate.firstDelay = float(cfg['onset'])
         
-
     def create_stimulus_objects(self, stim_container='/stim', data_container='/data'):
         """Create the stimulus objects"""
         if  isinstance(stim_container, str):
@@ -1735,6 +1783,27 @@ class TraubNet(object):
         probe_table.stepMode = 3
         probe_table.connect('inputRequest', self.stim_probe, 'output')
 
+    def scale_synapses(self, filename):
+        with open(filename) as synfile:
+            for line in synfile.readlines():
+                if line.strip().startswith('#'):
+                    continue
+                tokens = line.split()
+                if not tokens:
+                    continue
+                [g_name, source, dest, scale_factor] = tokens                
+                scale_factor = float(scale_factor)                
+                for cell_index in self.populations[dest]:
+                    cell = self.index_cell_map[cell_index]
+                    if g_name.startswith('nmda'):
+                        synchans = moose.context.getWildcardList(cell.path + '/##[ISA=NMDAChan]', True)
+                    else:
+                        synchans = moose.context.getWildcardList(cell.path + '/##[ISA=SynChan]', True)
+                    for chanId in synchans:
+                        chan = moose.HHChannel(chan)
+                        if chan.name.startswith(g_name) and chan.name.endswith('from_%s' % (source)):
+                            chan.Gbar *= scale_factor
+                self.tweaks_doc.append('%s[%s->%s] *= %g' % (source, dest, scale_factor))
         
 
 def test_generate_celltype_graph(celltype_file='celltype_graph.gml', format='gml'):
