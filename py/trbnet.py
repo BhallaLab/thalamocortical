@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Feb 16 11:00:48 2013 (+0530)
+# Last-Updated: Sat Feb 16 13:45:16 2013 (+0530)
 #           By: subha
-#     Update #: 2923
+#     Update #: 2993
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -874,24 +874,12 @@ class TraubNet(object):
         Updating stimulus protocol to ramdomize pulses.
 
         """
-        if  isinstance(stim_container, str):
-            self.stim_container = moose.Neutral(stim_container)
-        elif isinstance(stim_container, moose.Neutral):
-            self.stim_container = stim_container
-        else:
-            raise Exception('Stimulus container must be a string or a Neutral object: got %s', stim_container.__class__.__name__)
         if self.from_netfile is not None:
             config.LOGGER.info('Do nothing. Using network file.')
             return
         config.LOGGER.debug('Setting up stimulus protocol: bg_interval: %g, pulse_width: %g, isi: %g' % (bg_interval, pulse_width, isi))
-        self.stim_gate = moose.PulseGen('stim_gate', self.stim_container)
-        self.stim_gate.trigMode = moose.FREE_RUN
+        self.create_stimulus_objects(stim_container, data_container)
         self.stim_gate.firstDelay = stim_onset
-        self.stim_gate.firstWidth = 1e9 # Keep it on forever
-        self.stim_gate.firstLevel = 1.0                
-        self.stim_gate.secondDelay = 1e9
-        self.stim_bg = moose.PulseGen('stim_bg', self.stim_container)
-        self.stim_probe = moose.PulseGen('stim_probe', self.stim_container)
         delays = {}
         levels = {}
         widths = {}
@@ -957,20 +945,6 @@ class TraubNet(object):
 
         config.LOGGER.debug('Background stimulus: firstDelay: %g, firstWidth: %g, firstLevel: %g, secondDelay: %g, secondWidth: %g, secondLevel: %g' % (self.stim_bg.firstDelay, self.stim_bg.firstWidth, self.stim_bg.firstLevel, self.stim_bg.secondDelay, self.stim_bg.secondWidth, self.stim_bg.secondLevel))
         config.LOGGER.debug('Probe stimulus: firstDelay: %g, firstWidth: %g, firstLevel: %g, secondDelay: %g, secondWidth: %g, secondLevel: %g' % (self.stim_probe.firstDelay, self.stim_probe.firstWidth, self.stim_probe.firstLevel, self.stim_probe.secondDelay, self.stim_probe.secondWidth, self.stim_probe.secondLevel))
-        self.stim_gate.connect('outputSrc', self.stim_bg, 'input')
-        self.stim_gate.connect('outputSrc', self.stim_probe, 'input')
-        if isinstance(data_container, str):
-            data_container = moose.Neutral(data_container)
-        stim_data_container = moose.Neutral('stimulus', data_container)
-        gate_table = moose.Table(self.stim_gate.name, stim_data_container)
-        gate_table.stepMode = 3
-        gate_table.connect('inputRequest', self.stim_gate, 'output')
-        bg_table = moose.Table(self.stim_bg.name, stim_data_container)
-        bg_table.stepMode = 3
-        bg_table.connect('inputRequest', self.stim_bg, 'output')
-        probe_table = moose.Table(self.stim_probe.name, stim_data_container)
-        probe_table.stepMode = 3
-        probe_table.connect('inputRequest', self.stim_probe, 'output')
         
         bg_cell_indices = []
         probe_cell_indices = []
@@ -1032,13 +1006,9 @@ class TraubNet(object):
         else:
             for index in probe_cell_indices:
                 probe_cell_list.append(self.index_cell_map[index])
-        
-        protocol_file = open('%s/protocol_%s' % (config.data_dir, config.filename_suffix), 'w')
-        protocol_file.write('onset: %g\nbg_interval: %g\nisi: %g\nwidth: %g\nlevel: %g\n' % (stim_onset, bg_interval, isi, pulse_width, level))
-        protocol_file.write('background_cells:\n')
-        # print 'Printing background_cells and probe_cells'
+        bg_targets = []
+        probe_targets = []
         for cell in bg_cell_list:
-            # print 'background', cell
             if isinstance(cell, str):
                 comp = moose.Compartment('%s/%s/comp_1' % (self.network_container.path, cell))
             elif isinstance(cell, TraubCell):
@@ -1046,8 +1016,7 @@ class TraubNet(object):
             else:
                 raise Exception('Unknown type object for bg target: %s' % (cell))
             self.stim_bg.connect('outputSrc', comp, 'injectMsg')
-            protocol_file.write('%s\n' % (comp.path))
-        protocol_file.write('probe_cells:\n')
+            bg_targets.append(comp.path)
         for cell in probe_cell_list:
             # print 'probe:', cell
             if isinstance(cell, str):
@@ -1057,8 +1026,29 @@ class TraubNet(object):
             else:
                 raise Exception('Unknown type object for probe target: %s' % (cell))
             self.stim_probe.connect('outputSrc', comp, 'injectMsg')
-            protocol_file.write('%s\n' % (comp.path))
-        protocol_file.close()
+            probe_targets.append(comp.path)
+        self.save_stim_protocol({
+                'stim_onset': stim_onset,
+                'bg_interval': bg_interval,
+                'isi': isi,
+                'width': pulse_width,
+                'level': level,
+                'bg_targets': bg_targets,
+                'probe_targets': probe_targets})
+                
+    def save_stim_protocol(self,
+                           params):
+        config.LOGGER.debug('Writing stimulus protocol file')
+        with open('%s/protocol_%s' % (config.data_dir, config.filename_suffix), 'w') as protocol_file:
+            protocol_file.write('onset: %g\nbg_interval: %g\nisi: %g\nwidth: %g\nlevel: %g\n' % (params['stim_onset'], params['bg_interval'], params['isi'], params['pulse_width'], params['level']))
+            protocol_file.write('background_cells:\n')
+            # print 'Printing background_cells and probe_cells'
+            for path in params['bg_targets']:
+                protocol_file.write('%s\n' % (path))
+            protocol_file.write('probe_cells:\n')
+            for path in params['probe_targets']:
+                protocol_file.write('%s\n' % (path))
+        
 
     def scale_populations(self, scale):
         """Scale the number of cells in each population by a factor."""
@@ -1684,10 +1674,68 @@ class TraubNet(object):
 
     def create_pulsegen_from_netfile(self, netfile):
         start = datetime.now()        
+        self.create_stimulus_objects()        
+        pg = np.asarray(netfile['/stimulus/connection'])
+        for row in pg:
+            config.LOGGER.info('Connecting %s to %s' % (row[0], row[1]))            
+            if not moose.context.exists(row[0]):
+                config.LOGGER.debug('Target does not exist: %s' % (row[0]))
+                continue
+            if not moose.context.exists(row[1]):
+                config.LOGGER.debug('Target does not exist: %s' % (row[1]))
+                continue
+            moose.PulseGen(row[0]).connect('outputSrc',
+                                           moose.Compartment(row[1]),
+                                           'injectMsg')
+            config.LOGGER.info('Connected %s to %s' % (row[0], row[1]))
         end = datetime.now()
         delta = end - start
         config.BENCHMARK_LOGGER.info('Time to create stimuli: %g s' % (
                 delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))           
+
+    def restore_stimulus_settings_from_netfile(self, netfile):
+        """Use the runconfig section in netfile to restore the
+        stimulus settings. In case of randomized stimuli it does not
+        ensure identical stimulus times.
+
+        TODO complete this. Right now I shall ignore the stimulus when
+        using netfile.
+        """
+        cfg = dict(netfile['/runconfig/stimulus'])
+        self.stim_gate.firstDelay = float(cfg['onset'])
+        
+
+    def create_stimulus_objects(self, stim_container='/stim', data_container='/data'):
+        """Create the stimulus objects"""
+        if  isinstance(stim_container, str):
+            self.stim_container = moose.Neutral(stim_container)
+        elif isinstance(stim_container, moose.Neutral):
+            self.stim_container = stim_container
+        else:
+            raise Exception('Stimulus container must be a string or a Neutral object: got %s', stim_container.__class__.__name__)
+        self.stim_gate = moose.PulseGen('stim_gate', self.stim_container)
+        self.stim_gate.trigMode = moose.FREE_RUN
+        self.stim_gate.firstWidth = 1e9 # Keep it on forever
+        self.stim_gate.firstLevel = 1.0                
+        self.stim_gate.secondDelay = 1e9
+        self.stim_bg = moose.PulseGen('stim_bg', self.stim_container)
+        self.stim_probe = moose.PulseGen('stim_probe', self.stim_container)
+        self.stim_gate.connect('outputSrc', self.stim_bg, 'input')
+        self.stim_gate.connect('outputSrc', self.stim_probe, 'input')
+        if isinstance(data_container, str):
+            data_container = moose.Neutral(data_container)
+        stim_data_container = moose.Neutral('stimulus', data_container)
+        gate_table = moose.Table(self.stim_gate.name, stim_data_container)
+        gate_table.stepMode = 3
+        gate_table.connect('inputRequest', self.stim_gate, 'output')
+        bg_table = moose.Table(self.stim_bg.name, stim_data_container)
+        bg_table.stepMode = 3
+        bg_table.connect('inputRequest', self.stim_bg, 'output')
+        probe_table = moose.Table(self.stim_probe.name, stim_data_container)
+        probe_table.stepMode = 3
+        probe_table.connect('inputRequest', self.stim_probe, 'output')
+
+        
 
 def test_generate_celltype_graph(celltype_file='celltype_graph.gml', format='gml'):
     celltype_graph = ig.read(celltype_file, format=format)
