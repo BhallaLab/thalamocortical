@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Jan  7 17:47:05 2013 (+0530)
+# Last-Updated: Sat Feb 16 09:49:02 2013 (+0530)
 #           By: subha
-#     Update #: 2783
+#     Update #: 2915
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -84,7 +84,7 @@ sys.path.append('/data/subha/chamcham_moose/python')
 from collections import defaultdict
 from datetime import datetime
 import igraph
-import h5py
+import h5py as h5
 import numpy as np
 import tables
 import ConfigParser
@@ -95,6 +95,7 @@ import pymoose
 from trbnetdata import TraubFullNetData
 
 # The cell classes
+from compartment import MyCompartment
 from cell import TraubCell
 from spinystellate import SpinyStellate
 from suppyrRS import SupPyrRS
@@ -207,7 +208,7 @@ class TraubNet(object):
     cell_index_map -- dictionary mapping a cell instance to a global index
 
     """
-    def __init__(self, celltype_file=None, format=None, scale=None, container=None):
+    def __init__(self, celltype_file=None, format=None, scale=None, container=None, netfile=None):
         """
         celltype_file -- A file containing the celltype-celltype-graph.
 
@@ -215,6 +216,7 @@ class TraubNet(object):
 
         scale -- scale factor for all the populations.
         """
+        self.from_netfile = None
         self.celltype_file = celltype_file
         self.scale = scale
         self.graph_format = format
@@ -241,7 +243,11 @@ class TraubNet(object):
         self.electrode_container = moose.Neutral('lfp', container)
         self.instrumentation = moose.Neutral('instru', container) # Container for various devices used in testing
         self.tweaks_doc = []
-        
+        if netfile is not None:
+            self.read_network_model(netfile)
+            self.from_netfile = netfile
+            print 'Using netfile', netfile
+
     def setup_from_celltype_file(self, celltype_file=None, format=None, scale=None):
         """Set up the network from a celltype-celltype graph file.
 
@@ -251,6 +257,10 @@ class TraubNet(object):
 
         scale -- scale factor for the network
         """
+        # if self.from_netfile is not None:
+        #     config.LOGGER.info('Do nothing. Network loaded from %s' % (self.from_netfile))
+        #     return
+
         if self.cell_graph is not None:
             del self.cell_graph
             self.cell_graph = None
@@ -267,6 +277,9 @@ class TraubNet(object):
     def setup(self):
         """Set up the master graph.
         """
+        # if self.from_netfile is not None:
+        #     config.LOGGER.info('Do nothing. Network loaded from %s' % (self.from_netfile))
+        #     return
         if self.celltype_file is None:
             config.LOGGER.info('Setting up network from predefined structure with full network information.')
             self._generate_celltype_graph()
@@ -329,6 +342,10 @@ class TraubNet(object):
         self.celltype_graph = igraph.read(self.celltype_file, format=self.graph_format)
 
     def _generate_cell_graph(self):
+        if self.from_netfile is not None:
+            config.LOGGER.info('Do nothing. Network loaded from %s' % (self.from_netfile))
+            return
+        print 'Netfile is empty'
         start = datetime.now()
         self.cell_graph = igraph.Graph(0, directed=True)
         total_count = 0
@@ -415,6 +432,9 @@ class TraubNet(object):
 
     def create_network(self):
         """Instantiate the network in MOOSE"""
+        if self.from_netfile is not None:
+            config.LOGGER.info('Do nothing. Network loaded from %s' % (self.from_netfile))
+            return
         config.LOGGER.debug('Creating network')
         synchan_classname = 'SynChan'
         nmdachan_classname = 'NMDAChan'
@@ -1294,6 +1314,9 @@ class TraubNet(object):
         """Change the active conductances to be distributed normally
         around the original value with a standard deviation specified
         in the configuration file as a fraction of the original value."""
+        if self.from_netfile is not None:
+            config.LOGGER.info('Do nothing. Network loaded from %s' % (self.from_netfile))
+            return
         config.LOGGER.debug('START randomize_active_conductances')
         conductance_dict = {}
         for conductance_name, value in config.runconfig.items('sd_active'):
@@ -1357,7 +1380,7 @@ class TraubNet(object):
         """Save network model directly from MOOSE structure, rather
         than going through the graph-based version."""
         config.LOGGER.debug('START: save_cell_network to %s' % (filename))
-        h5file =  h5py.File(filename,  'w')
+        h5file =  h5.File(filename,  'w')
         h5file.attrs['TITLE'] = 'Traub Network: timestamp: %s' % (config.timestamp.strftime('%Y-%m-%d %H:%M:%S'))
         h5file.attrs['notes'] = '\n'.join(self.tweaks_doc)
         # Save simulation configuration data. I am saving it both in
@@ -1580,6 +1603,82 @@ class TraubNet(object):
         delta = endtime - starttime
         config.BENCHMARK_LOGGER.info('Finished verification of saved model in hdf5 in: %g s' % (delta.days * 86400 + delta.seconds + delta.microseconds * 1e-6))
         config.LOGGER.info('Verified model in: %s :: SUCCESS' %(filename))
+
+    def read_network_model(self, filename):
+        with h5.File(filename, 'r') as netf:
+            self.read_cells(netf)
+            self.update_hhchans_from_netfile(netf)
+            self.create_synapses_from_netfile(netf)
+            self.create_stimulus_from_netfile(netf)
+            self.from_netfile = filename
+
+    def read_cells(self, netfile):
+        start = datetime.now()
+        cellcounts = np.sort(np.asarray(netfile['/network/celltype']), order='index')
+        ci = 0 # cell index
+        for row in cellcounts:
+            ctype = row['name'] # Celltype
+            count = row['count'] # Cell count
+            cclass = eval(ctype) # Class object for the cell
+            for ii in range(count):
+                cell = cclass(cclass.prototype, '%s/%s_%d' % (self.network_container.path, ctype, ii))
+                self.index_cell_map[ci] = cell
+                self.populations[ctype].append(ci) # populations maps celltype to the indices of the cells.
+                ci += 1
+        end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('Time to read cell counts from file and to create %d cells: %g s' % (ci+1, 
+                                                                                                          delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))
+
+    def update_hhchans_from_netfile(self, netfile):
+        start = datetime.now()
+        chan_density = np.asarray(netfile['/network/hhchan'])        
+        for row in chan_density:
+            assert(config.context.exists(row[0]))
+            chan = moose.HHChannel(row[0])
+            chan.Gbar = row[1]
+            chan.Ek = row[2]
+        end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('Time to update %d channels: %g s' % (len(chan_density), 
+                                                                           delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))            
+
+    def create_synapses_from_netfile(self, netfile):
+        start = datetime.now()
+        syninfo = np.asarray(netfile['/network/synapse'])
+        for row in syninfo:
+            src = MyCompartment('%s/%s' % (self.network_container.path, row['source']))
+            dst = MyCompartment('%s/%s' % (self.network_container.path, row['dest']))
+            syntype = 'SynChan'
+            if row['type'] == 'nmda':
+                syntype = 'NMDAChan'
+            delay = synapse.SYNAPTIC_DELAY_DEFAULT
+            if (row['source'].startswith('nRT') or row['source'].startswith('TCR')):
+                if not (row['dest'].startswith('nRT') or row['dest'].startswith('TCR')):
+                    delay = synapse.SYNAPTIC_DELAY_THALAMOCORTICAL
+            elif row['dest'].startswith('nRT') or row['dest'].startswith('TCR'):
+                delay = synapse.SYNAPTIC_DELAY_CORTICOTHALAMIC
+            name = '%s_from_%s' % (row['type'], row['source'].split('_')[0])
+            config.LOGGER.debug('Creating %s with Ek=%g, type=%s' % (name, row['Ek'], type(row['Ek'])))            
+            src.makeSynapse(dst,
+                            classname=syntype,
+                            name=name,
+                            Ek=row['Ek'],
+                            Gbar=row['Gbar'],
+                            tau1=row['tau1'],
+                            tau2=row['tau2'],
+                            delay=delay)
+        end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('Time to create %d synapses: %g s' % (len(syninfo), 
+                                                                           delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))   
+
+    def create_pulsegen_from_netfile(self, netfile):
+        start = datetime.now()        
+        end = datetime.now()
+        delta = end - start
+        config.BENCHMARK_LOGGER.info('Time to create stimuli: %g s' % (
+                delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))           
 
 def test_generate_celltype_graph(celltype_file='celltype_graph.gml', format='gml'):
     celltype_graph = ig.read(celltype_file, format=format)

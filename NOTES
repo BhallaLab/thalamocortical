@@ -3479,3 +3479,11 @@ data_20120513_210447_9261.h5 [ 0.3]
   6. Me: what about associateing the immediate past acvtivity of neighbours?
 * <2013-02-12 Tue 15:39> Data description
   Updated get_files_by_ts.py to print filenames with notes.
+* <2013-02-15 Fri 18:21> Confirmations on saved network
+  I have been trying to replicate the network from old saved hdf5 files. Was
+  worried that I may not have the entire data after randomization. The
+  network_{id}.h5.new files get the values directly from the final MOOSE model
+  and the network is saved after the randomization etc are complete. However,
+  setting the RNG to a saved value does not replicate the network
+  exactly. Although cell to cell connectivity remains unchanged, the exact
+  target compartment of synapses change.
