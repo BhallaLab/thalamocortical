@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Fri Apr 24 10:01:45 2009 (+0530)
 # Version: 
-# Last-Updated: Tue Jan  1 12:20:40 2013 (+0530)
+# Last-Updated: Sat Feb 16 09:42:03 2013 (+0530)
 #           By: subha
-#     Update #: 339
+#     Update #: 344
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -194,15 +194,16 @@ class MyCompartment(moose.Compartment):
         """
         classobj = eval('moose.' + classname)
         synapse = classobj(name, target)
-        synapse.Ek = Ek # TODO set value according to original model
-        synapse.Gbar = Gbar # TODO set value according to original model
-        synapse.tau1 = tau1
-        synapse.tau2 = tau2
+        print synapse, Ek, Gbar, tau1, tau2
+        synapse.Ek = float(Ek) # TODO set value according to original model
+        synapse.Gbar = float(Gbar) # TODO set value according to original model
+        synapse.tau1 = float(tau1)
+        synapse.tau2 = float(tau2)
         target.connect('channel', synapse, 'channel')
         spikegen = None
         spikegen = moose.SpikeGen('%s/spike' % (self.path))
-        spikegen.threshold = threshold
-        spikegen.absRefract = absRefract
+        spikegen.threshold = float(threshold)
+        spikegen.absRefract = float(absRefract)
         self.connect('VmSrc', spikegen, 'Vm')
         if not spikegen.connect('event', synapse, 'synapse'):
             raise Exception('Error creating connection: %s->%s' % (spikegen.path, synapse.path))
@@ -218,8 +219,8 @@ class MyCompartment(moose.Compartment):
         # 2010-03-29 After making a mandatory call to updateNumSynapse()
         # in getNumSynapses(), this is fixed. 
         num_synapses = synapse.numSynapses
-        synapse.delay[num_synapses - 1] = delay
-        synapse.weight[num_synapses - 1] = weight
+        synapse.delay[num_synapses - 1] = float(delay)
+        synapse.weight[num_synapses - 1] = float(weight)
         if config.stochastic:
             synapse.initPr[num_synapses - 1] = Pr
         config.LOGGER.debug('Created synapse: %s of type %s' % (synapse.path, synapse.className))
