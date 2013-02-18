@@ -1,0 +1,3 @@
+gaba DeepBasket SpinyStellate 1.1
+gaba DeepBasket DeepBasket 1.1
+gaba DeepBasket DeepLTS 1.1
