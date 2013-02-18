@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Sat Feb 16 20:34:47 2013 (+0530)
+# Last-Updated: Mon Feb 18 13:48:06 2013 (+0530)
 #           By: subha
-#     Update #: 3075
+#     Update #: 3077
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1800,10 +1800,10 @@ class TraubNet(object):
                     else:
                         synchans = moose.context.getWildcardList(cell.path + '/##[ISA=SynChan]', True)
                     for chanId in synchans:
-                        chan = moose.HHChannel(chan)
+                        chan = moose.HHChannel(chanId)
                         if chan.name.startswith(g_name) and chan.name.endswith('from_%s' % (source)):
                             chan.Gbar *= scale_factor
-                self.tweaks_doc.append('%s[%s->%s] *= %g' % (source, dest, scale_factor))
+                self.tweaks_doc.append('%s[%s->%s] *= %g' % (chan.name, source, dest, scale_factor))
         
 
 def test_generate_celltype_graph(celltype_file='celltype_graph.gml', format='gml'):
