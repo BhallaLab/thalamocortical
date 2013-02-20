@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Feb 18 13:48:06 2013 (+0530)
+# Last-Updated: Wed Feb 20 11:41:32 2013 (+0530)
 #           By: subha
-#     Update #: 3077
+#     Update #: 3078
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1622,6 +1622,7 @@ class TraubNet(object):
             for ii in range(count):
                 cell = cclass(cclass.prototype, '%s/%s_%d' % (self.network_container.path, ctype, ii))
                 self.index_cell_map[ci] = cell
+                self.cell_index_map[cell] = ci
                 self.populations[ctype].append(ci) # populations maps celltype to the indices of the cells.
                 ci += 1
         end = datetime.now()
