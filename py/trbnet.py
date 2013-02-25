@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Feb 25 10:30:05 2013 (+0530)
+# Last-Updated: Mon Feb 25 15:11:43 2013 (+0530)
 #           By: subha
-#     Update #: 3111
+#     Update #: 3116
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1755,7 +1755,7 @@ class TraubNet(object):
             cfg = dict(df['/runconfig/stimulus'])
             simdt = float(dict(df['runconfig/scheduling'])['simdt'])
             bg = np.asarray(df['/stimulus/stim_bg'])
-            bgtimes = np.nonzero(np.diff(bg) > 0) * simdt
+            bgtimes = np.flatnonzero(np.diff(bg) > 0) * simdt
             self.stim_bg = moose.PulseGen('/stim/stim_bg')
             self.stim_bg.count = len(bgtimes)
             delays = np.diff(np.r_[0.0, bgtimes])
@@ -1764,14 +1764,14 @@ class TraubNet(object):
                 self.stim_bg.width[index] = float(cfg['pulse_width'])
                 self.stim_bg.level[index] = float(cfg['amplitude'])
             probe = np.asarray(df['/stimulus/stim_probe'])
-            probetimes = np.nonzero(np.diff(probe) > 0) * simdt
+            probetimes = np.flatnonzero(np.diff(probe) > 0) * simdt
             self.stim_probe = moose.PulseGen('/stim/stim_probe')
             self.stim_probe.count = len(probetimes+1)
             delays = np.diff(np.r_[0.0, probetimes])
             for index, t in enumerate(delays):
                 self.stim_probe.delay[index] = t
-                self.stim_probe.width[index] = float(cfg['pulse_width']))
-                self.stim_probe.level[index] = float(cfg['amplitude']))
+                self.stim_probe.width[index] = float(cfg['pulse_width'])
+                self.stim_probe.level[index] = float(cfg['amplitude'])
             self.stim_gate.firstDelay = float(cfg['onset'])
         
     def create_stimulus_objects(self, stim_container='/stim', data_container='/data'):
