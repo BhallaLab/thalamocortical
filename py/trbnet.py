@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Feb 20 11:41:32 2013 (+0530)
+# Last-Updated: Mon Feb 25 10:30:05 2013 (+0530)
 #           By: subha
-#     Update #: 3078
+#     Update #: 3111
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1738,21 +1738,41 @@ class TraubNet(object):
                                            moose.Compartment(row[1]),
                                            'injectMsg')
             config.LOGGER.info('Connected %s to %s' % (row[0], row[1]))
+        self.restore_stimulus_settings_from_netfile(netfile)
         end = datetime.now()
         delta = end - start
         config.BENCHMARK_LOGGER.info('Time to create stimuli: %g s' % (
                 delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))           
 
-    def restore_stimulus_settings_from_netfile(self, netfile):
+    def restore_stimulus_settings_from_netfile(self, netfile, replicate=None):
         """Use the runconfig section in netfile to restore the
         stimulus settings. In case of randomized stimuli it does not
         ensure identical stimulus times.
 
-        TODO complete this. Right now I shall ignore the stimulus when
-        using netfile.
         """
-        cfg = dict(netfile['/runconfig/stimulus'])
-        self.stim_gate.firstDelay = float(cfg['onset'])
+        datafilename = netfile.filename.replace('network', 'data').replace('.new','')
+        with h5.File(datafilename, 'r') as df:
+            cfg = dict(df['/runconfig/stimulus'])
+            simdt = float(dict(df['runconfig/scheduling'])['simdt'])
+            bg = np.asarray(df['/stimulus/stim_bg'])
+            bgtimes = np.nonzero(np.diff(bg) > 0) * simdt
+            self.stim_bg = moose.PulseGen('/stim/stim_bg')
+            self.stim_bg.count = len(bgtimes)
+            delays = np.diff(np.r_[0.0, bgtimes])
+            for index, t in enumerate(delays):
+                self.stim_bg.delay[index] = t
+                self.stim_bg.width[index] = float(cfg['pulse_width'])
+                self.stim_bg.level[index] = float(cfg['amplitude'])
+            probe = np.asarray(df['/stimulus/stim_probe'])
+            probetimes = np.nonzero(np.diff(probe) > 0) * simdt
+            self.stim_probe = moose.PulseGen('/stim/stim_probe')
+            self.stim_probe.count = len(probetimes+1)
+            delays = np.diff(np.r_[0.0, probetimes])
+            for index, t in enumerate(delays):
+                self.stim_probe.delay[index] = t
+                self.stim_probe.width[index] = float(cfg['pulse_width']))
+                self.stim_probe.level[index] = float(cfg['amplitude']))
+            self.stim_gate.firstDelay = float(cfg['onset'])
         
     def create_stimulus_objects(self, stim_container='/stim', data_container='/data'):
         """Create the stimulus objects"""
@@ -1769,6 +1789,8 @@ class TraubNet(object):
         self.stim_gate.secondDelay = 1e9
         self.stim_bg = moose.PulseGen('stim_bg', self.stim_container)
         self.stim_probe = moose.PulseGen('stim_probe', self.stim_container)
+        self.stim_bg.trigMode = moose.EXT_GATE
+        self.stim_probe.trigMode = moose.EXT_GATE
         self.stim_gate.connect('outputSrc', self.stim_bg, 'input')
         self.stim_gate.connect('outputSrc', self.stim_probe, 'input')
         if isinstance(data_container, str):
