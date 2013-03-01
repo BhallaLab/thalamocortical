@@ -1,4 +1,4 @@
-gaba DeepBasket SpinyStellate 0.7
-gaba DeepBasket DeepBasket 0.7
-gaba DeepBasket DeepLTS 0.7
+gaba DeepBasket SpinyStellate 0.8
+gaba DeepBasket DeepBasket 0.8
+gaba DeepBasket DeepLTS 0.8
 
