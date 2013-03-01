@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Thu Sep 16 16:19:39 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Dec 27 17:11:49 2012 (+0530)
+# Last-Updated: Fri Mar  1 16:56:57 2013 (+0530)
 #           By: subha
-#     Update #: 1248
+#     Update #: 1249
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -116,8 +116,8 @@ class TraubFullNetData(object):
                           100]
 
         # pre_post_ratio[i][j] is the number of presynaptic cells of type index i that can synapse on post synaptic cell of type index j
-        self.pre_post_ratio = [[50, 50, 90, 90, 90, 3,  60, 60, 30, 30, 30, 3,  0,  0],
-                               [5,  5,  5,	5,	5,	1,	3,	3,	3,	3,	3,	1,	0,	0],
+        self.pre_post_ratio = [[50,     50,     90,     90,     90,     3,      60,     60,     30,     30,     30,     3,      0,      0],
+                               [5,      5,      5,	5,	5,	1,	3,	3,	3,	3,	3,	1,	0,	0],
                                [20,	20,	20,	20,	20,	20,	0,	0,	0,	0,	0,	0,	0,	0],
                                [20,	20,	0,	0,	0,	5,	5,	5,	0,	0,	0,	5,	0,	0],
                                [20,	20,	20,	20,	20,	20,	20,	20,	20,	20,	20,	20,	0,	0],
