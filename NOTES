@@ -3487,3 +3487,12 @@ data_20120513_210447_9261.h5 [ 0.3]
   setting the RNG to a saved value does not replicate the network
   exactly. Although cell to cell connectivity remains unchanged, the exact
   target compartment of synapses change.
+* <2013-03-01 Fri 11:03> TCR->TCR connections?
+  Traub's model does not have any connectivity between TCR cells. But according to this paper:
+
+  Varga, C., Sı́k, A., Lavallée, P. & Deschênes, M. Dendroarchitecture of Relay
+  Cells in Thalamic Barreloids: A Substrate for Cross-Whisker
+  Modulation. J. Neurosci. 22, 6186–6194 (2002).
+
+  TCR cells seem to have thick proximal dendrites spread within same barreloid
+  and thin (11-54% in length) outside home barreloid.
