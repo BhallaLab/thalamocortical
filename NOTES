@@ -1,6 +1,7 @@
 -*- mode: org; fill-column: 78 -*-
 #+STARTUP: lognotedone
 #+TODO: TODO(t) WAIT(w@/!) | DONE(d@/!) CANCELED(c@)
+#+LATEX_HEADER: \bibliography{/home/subha/Documents/thesis/ZoteroLibrary}
 * Converting Kahp and Kc
    I_K(AHP) is calculated like this:
    I_K(AHP) = Gbar*m*(V-Ek)
@@ -3496,3 +3497,16 @@ data_20120513_210447_9261.h5 [ 0.3]
 
   TCR cells seem to have thick proximal dendrites spread within same barreloid
   and thin (11-54% in length) outside home barreloid.
+* Interlaminar connections to L4 SS
+  According to \cite{feldmeyer_excitatory_2012}, the fraction of connections
+  between excitatory cells within L4 is 25-36% far more than taken inyo
+  account by Traub. Out of these 20% - 30% are rciprocal.
+
+  Connection fraction from all other cortical layers is < 1% with some
+  possibility of L6->L4 connection.
+
+  
+
+
+\printbibliography
+
