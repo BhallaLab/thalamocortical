@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Mar  5 10:30:22 2013 (+0530)
+# Last-Updated: Tue Mar  5 10:58:37 2013 (+0530)
 #           By: subha
-#     Update #: 3132
+#     Update #: 3137
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -411,7 +411,7 @@ class TraubNet(object):
                 # g_ampa = np.random.normal(loc=g_ampa, scale=ampa_sd*g_ampa, size=len(syn_list))
                 norm_var = np.log(1 + (ampa_sd * ampa_sd) / (g_ampa * g_ampa))
                 norm_mean = np.log(g_ampa) - norm_var * 0.5
-                g_ampa = g_ampa + np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
+                g_ampa = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
             self.g_ampa_mat.put(g_ampa,
                                 syn_list[:, 0], syn_list[:,1])
             
@@ -424,7 +424,7 @@ class TraubNet(object):
                 # g_nmda = np.random.normal(loc=g_nmda, scale=nmda_sd*g_nmda, size=len(syn_list))
                 norm_var = np.log(1 + (nmda_sd * nmda_sd) / (g_nmda * g_nmda))
                 norm_mean = np.log(g_nmda) - norm_var * 0.5
-                g_nmda = g_nmda + np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
+                g_nmda = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
             self.g_nmda_mat.put(g_nmda,
                                 syn_list[:, 0], syn_list[:,1])
             if (pretype_vertex['label'] == 'nRT') and (posttype_vertex['label'] == 'TCR'):
@@ -435,13 +435,13 @@ class TraubNet(object):
                 gaba_sd = float(config.runconfig.get('GABA', 'sd'))
                 g_gaba = float(edge['ggaba'])
                 if gaba_sd > 0:
-                ## Tue Mar 5 10:16:22 IST 2013 - Using lognormal in
-                ## stead of normal distribution following Song et al
-                ## (doi:10.1371/journal.pbio.0030068)
-                # g_gaba = np.random.normal(loc=g_gaba, scale=gaba_sd*g_gaba, size=len(syn_list))
-                norm_var = np.log(1 + (gaba_sd * gaba_sd) / (g_gaba * g_gaba))
-                norm_mean = np.log(g_gaba) - norm_var * 0.5
-                g_gaba = g_gaba + np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
+                    ## Tue Mar 5 10:16:22 IST 2013 - Using lognormal in
+                    ## stead of normal distribution following Song et al
+                    ## (doi:10.1371/journal.pbio.0030068)
+                    # g_gaba = np.random.normal(loc=g_gaba, scale=gaba_sd*g_gaba, size=len(syn_list))
+                    norm_var = np.log(1 + (gaba_sd * gaba_sd) / (g_gaba * g_gaba))
+                    norm_mean = np.log(g_gaba) - norm_var * 0.5
+                    g_gaba = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
                 self.g_gaba_mat.put(g_gaba,
                                     syn_list[:,0], syn_list[:,1])                    
         end = datetime.now()
