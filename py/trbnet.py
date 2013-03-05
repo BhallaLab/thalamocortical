@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Mar  5 17:15:34 2013 (+0530)
+# Last-Updated: Tue Mar  5 18:41:59 2013 (+0530)
 #           By: subha
-#     Update #: 3141
+#     Update #: 3144
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -807,6 +807,10 @@ class TraubNet(object):
                     tab = moose.Table('gk_%s_%s_%s' % (cell.name, comp.name, syn.name), syn_gk_container)
                     tab.stepMode = 3
                     success = tab.connect('inputRequest', syn, 'Gk')
+                    config.LOGGER.info('Connected recording table: %s to %s: %s' % (tab.name, syn.name, success))
+                    tab = moose.Table('Ik_%s_%s_%s' % (cell.name, comp.name, syn.name), syn_gk_container)
+                    tab.stepMode = 3
+                    success = tab.connect('inputRequest', syn, 'Ik')
                     config.LOGGER.info('Connected recording table: %s to %s: %s' % (tab.name, syn.name, success))
 
 
