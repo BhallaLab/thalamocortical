@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Mar  5 11:14:18 2013 (+0530)
+# Last-Updated: Tue Mar  5 17:15:34 2013 (+0530)
 #           By: subha
-#     Update #: 3140
+#     Update #: 3141
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1049,7 +1049,7 @@ class TraubNet(object):
                 'stim_onset': stim_onset,
                 'bg_interval': bg_interval,
                 'isi': isi,
-                'width': pulse_width,
+                'pulse_width': pulse_width,
                 'level': level,
                 'bg_targets': bg_targets,
                 'probe_targets': probe_targets})
