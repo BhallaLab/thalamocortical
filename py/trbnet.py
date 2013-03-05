@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Mar  5 10:58:37 2013 (+0530)
+# Last-Updated: Tue Mar  5 11:14:18 2013 (+0530)
 #           By: subha
-#     Update #: 3137
+#     Update #: 3140
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -404,7 +404,7 @@ class TraubNet(object):
             self.ps_comp_mat.put(ps_comp_list, syn_list[:,0], syn_list[:, 1])
             ampa_sd = float(config.runconfig.get('AMPA', 'sd'))
             g_ampa = float(edge['gampa'])
-            if ampa_sd > 0:
+            if g_ampa > 0 and ampa_sd > 0:
                 ## Tue Mar 5 10:16:22 IST 2013 - Using lognormal in
                 ## stead of normal distribution following Song et al
                 ## (doi:10.1371/journal.pbio.0030068)
@@ -417,7 +417,7 @@ class TraubNet(object):
             
             g_nmda = float(edge['gnmda'])
             nmda_sd = float(config.runconfig.get('NMDA', 'sd'))
-            if nmda_sd > 0:
+            if g_nmda > 0 and nmda_sd > 0:
                 ## Tue Mar 5 10:16:22 IST 2013 - Using lognormal in
                 ## stead of normal distribution following Song et al
                 ## (doi:10.1371/journal.pbio.0030068)
@@ -434,7 +434,7 @@ class TraubNet(object):
             else:
                 gaba_sd = float(config.runconfig.get('GABA', 'sd'))
                 g_gaba = float(edge['ggaba'])
-                if gaba_sd > 0:
+                if g_gaba > 0 and gaba_sd > 0:
                     ## Tue Mar 5 10:16:22 IST 2013 - Using lognormal in
                     ## stead of normal distribution following Song et al
                     ## (doi:10.1371/journal.pbio.0030068)
