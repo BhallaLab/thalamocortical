@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Mar  5 18:41:59 2013 (+0530)
+# Last-Updated: Wed Mar  6 09:59:24 2013 (+0530)
 #           By: subha
-#     Update #: 3144
+#     Update #: 3154
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -403,30 +403,37 @@ class TraubNet(object):
             config.LOGGER.debug('ps_comps list has length: %d, syn_list has length: %d' % (len(ps_comp_list), len(syn_list)))
             self.ps_comp_mat.put(ps_comp_list, syn_list[:,0], syn_list[:, 1])
             ampa_sd = float(config.runconfig.get('AMPA', 'sd'))
-            g_ampa = float(edge['gampa'])
-            if g_ampa > 0 and ampa_sd > 0:
+            g_ampa_mean = float(edge['gampa'])
+            if g_ampa_mean > 0 and ampa_sd > 0:
                 ## Tue Mar 5 10:16:22 IST 2013 - Using lognormal in
                 ## stead of normal distribution following Song et al
                 ## (doi:10.1371/journal.pbio.0030068)
                 # g_ampa = np.random.normal(loc=g_ampa, scale=ampa_sd*g_ampa, size=len(syn_list))
-                norm_var = np.log(1 + (ampa_sd * ampa_sd) / (g_ampa * g_ampa))
-                norm_mean = np.log(g_ampa) - norm_var * 0.5
+                norm_var = np.log(1 + (ampa_sd * ampa_sd) / (g_ampa_mean * g_ampa_mean))
+                norm_mean = np.log(g_ampa_mean) - norm_var * 0.5
                 g_ampa = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
             self.g_ampa_mat.put(g_ampa,
                                 syn_list[:, 0], syn_list[:,1])
             
-            g_nmda = float(edge['gnmda'])
-            nmda_sd = float(config.runconfig.get('NMDA', 'sd'))
-            if g_nmda > 0 and nmda_sd > 0:
-                ## Tue Mar 5 10:16:22 IST 2013 - Using lognormal in
-                ## stead of normal distribution following Song et al
-                ## (doi:10.1371/journal.pbio.0030068)
-                # g_nmda = np.random.normal(loc=g_nmda, scale=nmda_sd*g_nmda, size=len(syn_list))
-                norm_var = np.log(1 + (nmda_sd * nmda_sd) / (g_nmda * g_nmda))
-                norm_mean = np.log(g_nmda) - norm_var * 0.5
-                g_nmda = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
+            g_nmda = float(edge['gnmda']) * g_ampa / g_ampa_mean
+            ## Wed Mar 6 09:56:51 IST 2013 - Since the ratio of
+            ## AMP/NMDA remains more or less constant between
+            ## celltypes (Myme et al; doi: 10.​1152/​jn.​00070.​2003 ),
+            ## scale NMDA conductance based on already generated AMPA
+            ## conductance. Hence commented out below
+            
+            # nmda_sd = float(config.runconfig.get('NMDA', 'sd'))
+            # if g_nmda > 0 and nmda_sd > 0:
+            #     ## Tue Mar 5 10:16:22 IST 2013 - Using lognormal in
+            #     ## stead of normal distribution following Song et al
+            #     ## (doi:10.1371/journal.pbio.0030068)
+            #     # g_nmda = np.random.normal(loc=g_nmda, scale=nmda_sd*g_nmda, size=len(syn_list))
+            #     norm_var = np.log(1 + (nmda_sd * nmda_sd) / (g_nmda * g_nmda))
+            #     norm_mean = np.log(g_nmda) - norm_var * 0.5
+            #     g_nmda = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
             self.g_nmda_mat.put(g_nmda,
                                 syn_list[:, 0], syn_list[:,1])
+
             if (pretype_vertex['label'] == 'nRT') and (posttype_vertex['label'] == 'TCR'):
                 self.g_gaba_mat.put(np.random.random_sample(len(syn_list)) * (self.nRT_TCR_ggaba_high - self.nRT_TCR_ggaba_low) + self.nRT_TCR_ggaba_low,
                                     syn_list[:,0],
