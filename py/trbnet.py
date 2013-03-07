@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Mar  6 09:59:24 2013 (+0530)
+# Last-Updated: Thu Mar  7 10:51:02 2013 (+0530)
 #           By: subha
-#     Update #: 3154
+#     Update #: 3160
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -412,13 +412,17 @@ class TraubNet(object):
                 norm_var = np.log(1 + (ampa_sd * ampa_sd) / (g_ampa_mean * g_ampa_mean))
                 norm_mean = np.log(g_ampa_mean) - norm_var * 0.5
                 g_ampa = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
+            else:
+                g_ampa = g_ampa_mean
             self.g_ampa_mat.put(g_ampa,
                                 syn_list[:, 0], syn_list[:,1])
             
-            g_nmda = float(edge['gnmda']) * g_ampa / g_ampa_mean
+            g_nmda = float(edge['gnmda']) 
+            if g_ampa_mean > 0:
+                g_nmda *= g_ampa / g_ampa_mean
             ## Wed Mar 6 09:56:51 IST 2013 - Since the ratio of
             ## AMP/NMDA remains more or less constant between
-            ## celltypes (Myme et al; doi: 10.​1152/​jn.​00070.​2003 ),
+            ## celltypes (Myme et al; doi: 10.1152/jn.00070.2003),
             ## scale NMDA conductance based on already generated AMPA
             ## conductance. Hence commented out below
             
