@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Mar  7 10:51:02 2013 (+0530)
+# Last-Updated: Wed Mar 13 22:33:42 2013 (+0530)
 #           By: subha
-#     Update #: 3160
+#     Update #: 3161
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -409,7 +409,7 @@ class TraubNet(object):
                 ## stead of normal distribution following Song et al
                 ## (doi:10.1371/journal.pbio.0030068)
                 # g_ampa = np.random.normal(loc=g_ampa, scale=ampa_sd*g_ampa, size=len(syn_list))
-                norm_var = np.log(1 + (ampa_sd * ampa_sd) / (g_ampa_mean * g_ampa_mean))
+                norm_var = np.log(1 + (ampa_sd * ampa_sd))
                 norm_mean = np.log(g_ampa_mean) - norm_var * 0.5
                 g_ampa = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
             else:
