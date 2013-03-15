@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Feb 25 15:11:43 2013 (+0530)
+# Last-Updated: Fri Mar 15 09:51:14 2013 (+0530)
 #           By: subha
-#     Update #: 3116
+#     Update #: 3118
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1772,7 +1772,9 @@ class TraubNet(object):
                 self.stim_probe.delay[index] = t
                 self.stim_probe.width[index] = float(cfg['pulse_width'])
                 self.stim_probe.level[index] = float(cfg['amplitude'])
-            self.stim_gate.firstDelay = float(cfg['onset'])
+            # We have the absolute times of stimulus. Gate should be
+            # turned on all the time - as if the bg and probe pulsegen were free running
+            self.stim_gate.firstDelay = 0
         
     def create_stimulus_objects(self, stim_container='/stim', data_container='/data'):
         """Create the stimulus objects"""
