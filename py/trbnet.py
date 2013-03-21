@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Feb 25 15:11:43 2013 (+0530)
+# Last-Updated: Thu Mar 21 14:00:24 2013 (+0530)
 #           By: subha
-#     Update #: 3116
+#     Update #: 3120
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1753,9 +1753,9 @@ class TraubNet(object):
         datafilename = netfile.filename.replace('network', 'data').replace('.new','')
         with h5.File(datafilename, 'r') as df:
             cfg = dict(df['/runconfig/stimulus'])
-            simdt = float(dict(df['runconfig/scheduling'])['simdt'])
+            plotdt = float(dict(df['runconfig/scheduling'])['plotdt'])
             bg = np.asarray(df['/stimulus/stim_bg'])
-            bgtimes = np.flatnonzero(np.diff(bg) > 0) * simdt
+            bgtimes = np.flatnonzero(np.diff(bg) > 0) * plotdt
             self.stim_bg = moose.PulseGen('/stim/stim_bg')
             self.stim_bg.count = len(bgtimes)
             delays = np.diff(np.r_[0.0, bgtimes])
@@ -1764,7 +1764,7 @@ class TraubNet(object):
                 self.stim_bg.width[index] = float(cfg['pulse_width'])
                 self.stim_bg.level[index] = float(cfg['amplitude'])
             probe = np.asarray(df['/stimulus/stim_probe'])
-            probetimes = np.flatnonzero(np.diff(probe) > 0) * simdt
+            probetimes = np.flatnonzero(np.diff(probe) > 0) * plotdt
             self.stim_probe = moose.PulseGen('/stim/stim_probe')
             self.stim_probe.count = len(probetimes+1)
             delays = np.diff(np.r_[0.0, probetimes])
