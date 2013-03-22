@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Mar 21 14:00:24 2013 (+0530)
+# Last-Updated: Fri Mar 22 10:36:37 2013 (+0530)
 #           By: subha
-#     Update #: 3120
+#     Update #: 3136
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1027,14 +1027,15 @@ class TraubNet(object):
                 raise Exception('Unknown type object for probe target: %s' % (cell))
             self.stim_probe.connect('outputSrc', comp, 'injectMsg')
             probe_targets.append(comp.path)
-        self.save_stim_protocol({
-                'stim_onset': stim_onset,
+        ret = { 'stim_onset': stim_onset,
                 'bg_interval': bg_interval,
                 'isi': isi,
-                'width': pulse_width,
+                'pulse_width': pulse_width,
                 'level': level,
                 'bg_targets': bg_targets,
-                'probe_targets': probe_targets})
+                'probe_targets': probe_targets }
+        self.save_stim_protocol(ret)
+        return ret
                 
     def save_stim_protocol(self,
                            params):
@@ -1726,6 +1727,8 @@ class TraubNet(object):
         start = datetime.now()        
         self.create_stimulus_objects()        
         pg = np.asarray(netfile['/stimulus/connection'])
+        bg_targets = []
+        probe_targets = []
         for row in pg:
             config.LOGGER.info('Connecting %s to %s' % (row[0], row[1]))            
             if not moose.context.exists(row[0]):
@@ -1734,15 +1737,24 @@ class TraubNet(object):
             if not moose.context.exists(row[1]):
                 config.LOGGER.debug('Target does not exist: %s' % (row[1]))
                 continue
+            if row[0].endswith('probe'):
+                probe_targets.append(row[1])
+            elif row[0].endswith('bg'):
+                bg_targets.append(row[1])
             moose.PulseGen(row[0]).connect('outputSrc',
                                            moose.Compartment(row[1]),
                                            'injectMsg')
             config.LOGGER.info('Connected %s to %s' % (row[0], row[1]))
         self.restore_stimulus_settings_from_netfile(netfile)
+
+        ret = { 'bg_targets': bg_targets,
+                'probe_targets': probe_targets }
+
         end = datetime.now()
         delta = end - start
         config.BENCHMARK_LOGGER.info('Time to create stimuli: %g s' % (
                 delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))           
+        return ret
 
     def restore_stimulus_settings_from_netfile(self, netfile, replicate=None):
         """Use the runconfig section in netfile to restore the
