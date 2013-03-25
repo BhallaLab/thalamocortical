@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Wed Mar 13 22:33:42 2013 (+0530)
+# Last-Updated: Mon Mar 25 20:06:04 2013 (+0530)
 #           By: subha
-#     Update #: 3161
+#     Update #: 3162
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -1060,14 +1060,15 @@ class TraubNet(object):
                 raise Exception('Unknown type object for probe target: %s' % (cell))
             self.stim_probe.connect('outputSrc', comp, 'injectMsg')
             probe_targets.append(comp.path)
-        self.save_stim_protocol({
-                'stim_onset': stim_onset,
+        ret = { 'stim_onset': stim_onset,
                 'bg_interval': bg_interval,
                 'isi': isi,
                 'pulse_width': pulse_width,
                 'level': level,
                 'bg_targets': bg_targets,
-                'probe_targets': probe_targets})
+                'probe_targets': probe_targets }
+        self.save_stim_protocol(ret)
+        return ret
                 
     def save_stim_protocol(self,
                            params):
@@ -1759,6 +1760,8 @@ class TraubNet(object):
         start = datetime.now()        
         self.create_stimulus_objects()        
         pg = np.asarray(netfile['/stimulus/connection'])
+        bg_targets = []
+        probe_targets = []
         for row in pg:
             config.LOGGER.info('Connecting %s to %s' % (row[0], row[1]))            
             if not moose.context.exists(row[0]):
@@ -1767,15 +1770,24 @@ class TraubNet(object):
             if not moose.context.exists(row[1]):
                 config.LOGGER.debug('Target does not exist: %s' % (row[1]))
                 continue
+            if row[0].endswith('probe'):
+                probe_targets.append(row[1])
+            elif row[0].endswith('bg'):
+                bg_targets.append(row[1])
             moose.PulseGen(row[0]).connect('outputSrc',
                                            moose.Compartment(row[1]),
                                            'injectMsg')
             config.LOGGER.info('Connected %s to %s' % (row[0], row[1]))
         self.restore_stimulus_settings_from_netfile(netfile)
+
+        ret = { 'bg_targets': bg_targets,
+                'probe_targets': probe_targets }
+
         end = datetime.now()
         delta = end - start
         config.BENCHMARK_LOGGER.info('Time to create stimuli: %g s' % (
                 delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))           
+        return ret
 
     def restore_stimulus_settings_from_netfile(self, netfile, replicate=None):
         """Use the runconfig section in netfile to restore the
@@ -1786,9 +1798,9 @@ class TraubNet(object):
         datafilename = netfile.filename.replace('network', 'data').replace('.new','')
         with h5.File(datafilename, 'r') as df:
             cfg = dict(df['/runconfig/stimulus'])
-            simdt = float(dict(df['runconfig/scheduling'])['simdt'])
+            plotdt = float(dict(df['runconfig/scheduling'])['plotdt'])
             bg = np.asarray(df['/stimulus/stim_bg'])
-            bgtimes = np.flatnonzero(np.diff(bg) > 0) * simdt
+            bgtimes = np.flatnonzero(np.diff(bg) > 0) * plotdt
             self.stim_bg = moose.PulseGen('/stim/stim_bg')
             self.stim_bg.count = len(bgtimes)
             delays = np.diff(np.r_[0.0, bgtimes])
@@ -1797,7 +1809,7 @@ class TraubNet(object):
                 self.stim_bg.width[index] = float(cfg['pulse_width'])
                 self.stim_bg.level[index] = float(cfg['amplitude'])
             probe = np.asarray(df['/stimulus/stim_probe'])
-            probetimes = np.flatnonzero(np.diff(probe) > 0) * simdt
+            probetimes = np.flatnonzero(np.diff(probe) > 0) * plotdt
             self.stim_probe = moose.PulseGen('/stim/stim_probe')
             self.stim_probe.count = len(probetimes+1)
             delays = np.diff(np.r_[0.0, probetimes])
@@ -1805,7 +1817,9 @@ class TraubNet(object):
                 self.stim_probe.delay[index] = t
                 self.stim_probe.width[index] = float(cfg['pulse_width'])
                 self.stim_probe.level[index] = float(cfg['amplitude'])
-            self.stim_gate.firstDelay = float(cfg['onset'])
+            # We have the absolute times of stimulus. Gate should be
+            # turned on all the time - as if the bg and probe pulsegen were free running
+            self.stim_gate.firstDelay = 0
         
     def create_stimulus_objects(self, stim_container='/stim', data_container='/data'):
         """Create the stimulus objects"""
