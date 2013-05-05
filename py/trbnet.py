@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Mar 25 20:06:04 2013 (+0530)
+# Last-Updated: Sun May  5 12:33:23 2013 (+0530)
 #           By: subha
-#     Update #: 3162
+#     Update #: 3166
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -946,8 +946,8 @@ class TraubNet(object):
                 print 'index:', index, 'delay:', self.stim_bg.delay[index]
                 self.stim_bg.level[index] = levels[index]
                 self.stim_bg.width[index] = widths[index]                    
-                if index % 2 == 0:
-                    self.stim_probe.delay[index/2] = delays[index]+delays[index+1]
+                if (index % 2 == 0) and ((index + 1) < len(delays)):
+                    self.stim_probe.delay[index/2] = delays[index] + delays[index+1]
                     self.stim_probe.level[index/2] = levels[index]
                     self.stim_probe.width[index/2] = widths[index]                    
         # A single delay value means we have an even pulse train
