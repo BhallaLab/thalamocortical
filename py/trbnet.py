@@ -408,10 +408,10 @@ class TraubNet(object):
                 ## Tue Mar 5 10:16:22 IST 2013 - Using lognormal in
                 ## stead of normal distribution following Song et al
                 ## (doi:10.1371/journal.pbio.0030068)
-                # g_ampa = np.random.normal(loc=g_ampa, scale=ampa_sd*g_ampa, size=len(syn_list))
-                norm_var = np.log(1 + (ampa_sd * ampa_sd))
-                norm_mean = np.log(g_ampa_mean) - norm_var * 0.5
-                g_ampa = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
+                g_ampa = np.random.normal(loc=g_ampa, scale=ampa_sd*g_ampa, size=len(syn_list))
+                #norm_var = np.log(1 + (ampa_sd * ampa_sd))
+                #norm_mean = np.log(g_ampa_mean) - norm_var * 0.5
+                #g_ampa = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
             else:
                 g_ampa = g_ampa_mean
             self.g_ampa_mat.put(g_ampa,
@@ -449,10 +449,10 @@ class TraubNet(object):
                     ## Tue Mar 5 10:16:22 IST 2013 - Using lognormal in
                     ## stead of normal distribution following Song et al
                     ## (doi:10.1371/journal.pbio.0030068)
-                    # g_gaba = np.random.normal(loc=g_gaba, scale=gaba_sd*g_gaba, size=len(syn_list))
-                    norm_var = np.log(1 + (gaba_sd * gaba_sd) / (g_gaba * g_gaba))
-                    norm_mean = np.log(g_gaba) - norm_var * 0.5
-                    g_gaba = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
+                    g_gaba = np.random.normal(loc=g_gaba, scale=gaba_sd*g_gaba, size=len(syn_list))
+                    #norm_var = np.log(1 + (gaba_sd * gaba_sd) / (g_gaba * g_gaba))
+                    #norm_mean = np.log(g_gaba) - norm_var * 0.5
+                    #g_gaba = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
                 self.g_gaba_mat.put(g_gaba,
                                     syn_list[:,0], syn_list[:,1])                    
         end = datetime.now()
