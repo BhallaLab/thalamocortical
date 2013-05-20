@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon Feb 25 15:11:43 2013 (+0530)
+# Last-Updated: Mon May 20 10:38:58 2013 (+0530)
 #           By: subha
-#     Update #: 3116
+#     Update #: 3117
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -404,14 +404,14 @@ class TraubNet(object):
             self.ps_comp_mat.put(ps_comp_list, syn_list[:,0], syn_list[:, 1])
             ampa_sd = float(config.runconfig.get('AMPA', 'sd'))
             g_ampa = float(edge['gampa'])
-            if ampa_sd > 0:
+            if ampa_sd > 0 and g_ampa > 0:
                 g_ampa = np.random.normal(loc=g_ampa, scale=ampa_sd*g_ampa, size=len(syn_list))
             self.g_ampa_mat.put(g_ampa,
                                 syn_list[:, 0], syn_list[:,1])
             
             g_nmda = float(edge['gnmda'])
             nmda_sd = float(config.runconfig.get('NMDA', 'sd'))
-            if nmda_sd > 0:
+            if nmda_sd > 0 and g_nmda > 0:
                 g_nmda = np.random.normal(loc=g_nmda, scale=nmda_sd*g_nmda, size=len(syn_list))
             self.g_nmda_mat.put(g_nmda,
                                 syn_list[:, 0], syn_list[:,1])
@@ -422,7 +422,7 @@ class TraubNet(object):
             else:
                 gaba_sd = float(config.runconfig.get('GABA', 'sd'))
                 g_gaba = float(edge['ggaba'])
-                if gaba_sd > 0:
+                if gaba_sd > 0 and g_gaba > 0:
                     g_gaba = np.random.normal(loc=g_gaba, scale=gaba_sd*g_gaba, size=len(syn_list))
                 self.g_gaba_mat.put(g_gaba,
                                     syn_list[:,0], syn_list[:,1])                    
