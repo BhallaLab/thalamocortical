@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Sun May  5 12:33:23 2013 (+0530)
+# Last-Updated: Fri May 24 17:02:59 2013 (+0530)
 #           By: subha
-#     Update #: 3166
+#     Update #: 3169
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -408,7 +408,8 @@ class TraubNet(object):
                 ## Tue Mar 5 10:16:22 IST 2013 - Using lognormal in
                 ## stead of normal distribution following Song et al
                 ## (doi:10.1371/journal.pbio.0030068)
-                g_ampa = np.random.normal(loc=g_ampa, scale=ampa_sd*g_ampa, size=len(syn_list))
+            if ampa_sd > 0 and g_ampa > 0:
+                g_ampa = np.random.normal(loc=g_ampa_mean, scale=ampa_sd*g_ampa, size=len(syn_list))
                 #norm_var = np.log(1 + (ampa_sd * ampa_sd))
                 #norm_mean = np.log(g_ampa_mean) - norm_var * 0.5
                 #g_ampa = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
@@ -435,6 +436,9 @@ class TraubNet(object):
             #     norm_var = np.log(1 + (nmda_sd * nmda_sd) / (g_nmda * g_nmda))
             #     norm_mean = np.log(g_nmda) - norm_var * 0.5
             #     g_nmda = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
+            nmda_sd = float(config.runconfig.get('NMDA', 'sd'))
+            if nmda_sd > 0 and g_nmda > 0:
+                g_nmda = np.random.normal(loc=g_nmda, scale=nmda_sd*g_nmda, size=len(syn_list))
             self.g_nmda_mat.put(g_nmda,
                                 syn_list[:, 0], syn_list[:,1])
 
