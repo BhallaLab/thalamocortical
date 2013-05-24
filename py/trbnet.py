@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri May 24 17:02:59 2013 (+0530)
+# Last-Updated: Fri May 24 18:15:09 2013 (+0530)
 #           By: subha
-#     Update #: 3169
+#     Update #: 3188
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -359,6 +359,12 @@ class TraubNet(object):
         self.g_ampa_mat = ll_mat(total_count, total_count)
         self.g_nmda_mat = ll_mat(total_count, total_count)
         self.ps_comp_mat = ll_mat(total_count, total_count)
+        syndistr = 'normal'
+        try:
+            syndistr = config.runconfig.get('synapse', 'distr')
+        except KeyError:
+            pass    
+        config.LOGGER.info('using %s distribution for synaptic conductances' % (syndistr))
         for edge in self.celltype_graph.es:
             pre = edge.source
             post = edge.target
@@ -408,11 +414,12 @@ class TraubNet(object):
                 ## Tue Mar 5 10:16:22 IST 2013 - Using lognormal in
                 ## stead of normal distribution following Song et al
                 ## (doi:10.1371/journal.pbio.0030068)
-            if ampa_sd > 0 and g_ampa > 0:
-                g_ampa = np.random.normal(loc=g_ampa_mean, scale=ampa_sd*g_ampa, size=len(syn_list))
-                #norm_var = np.log(1 + (ampa_sd * ampa_sd))
-                #norm_mean = np.log(g_ampa_mean) - norm_var * 0.5
-                #g_ampa = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
+                if syndistr == 'normal':
+                    g_ampa = np.random.normal(loc=g_ampa_mean, scale=ampa_sd*g_ampa, size=len(syn_list))
+                else:
+                    norm_var = np.log(1 + (ampa_sd * ampa_sd))
+                    norm_mean = np.log(g_ampa_mean) - norm_var * 0.5
+                    g_ampa = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
             else:
                 g_ampa = g_ampa_mean
             self.g_ampa_mat.put(g_ampa,
@@ -427,17 +434,11 @@ class TraubNet(object):
             ## scale NMDA conductance based on already generated AMPA
             ## conductance. Hence commented out below
             
-            # nmda_sd = float(config.runconfig.get('NMDA', 'sd'))
-            # if g_nmda > 0 and nmda_sd > 0:
-            #     ## Tue Mar 5 10:16:22 IST 2013 - Using lognormal in
-            #     ## stead of normal distribution following Song et al
-            #     ## (doi:10.1371/journal.pbio.0030068)
-            #     # g_nmda = np.random.normal(loc=g_nmda, scale=nmda_sd*g_nmda, size=len(syn_list))
-            #     norm_var = np.log(1 + (nmda_sd * nmda_sd) / (g_nmda * g_nmda))
-            #     norm_mean = np.log(g_nmda) - norm_var * 0.5
-            #     g_nmda = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
+            # nmda_sd should be set to 0 for lognorm
+            # distribution. otherwise it is normally distributed to
+            # replicate old settings.
             nmda_sd = float(config.runconfig.get('NMDA', 'sd'))
-            if nmda_sd > 0 and g_nmda > 0:
+            if g_nmda > 0 and nmda_sd > 0:
                 g_nmda = np.random.normal(loc=g_nmda, scale=nmda_sd*g_nmda, size=len(syn_list))
             self.g_nmda_mat.put(g_nmda,
                                 syn_list[:, 0], syn_list[:,1])
@@ -448,15 +449,17 @@ class TraubNet(object):
                                     syn_list[:,1])
             else:
                 gaba_sd = float(config.runconfig.get('GABA', 'sd'))
-                g_gaba = float(edge['ggaba'])
-                if g_gaba > 0 and gaba_sd > 0:
+                g_gaba_mean = float(edge['ggaba'])
+                if g_gaba_mean > 0 and gaba_sd > 0:
                     ## Tue Mar 5 10:16:22 IST 2013 - Using lognormal in
                     ## stead of normal distribution following Song et al
                     ## (doi:10.1371/journal.pbio.0030068)
-                    g_gaba = np.random.normal(loc=g_gaba, scale=gaba_sd*g_gaba, size=len(syn_list))
-                    #norm_var = np.log(1 + (gaba_sd * gaba_sd) / (g_gaba * g_gaba))
-                    #norm_mean = np.log(g_gaba) - norm_var * 0.5
-                    #g_gaba = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
+                    if syndistr == 'normal':
+                        g_gaba = np.random.normal(loc=g_gaba_mean, scale=gaba_sd*g_gaba_mean, size=len(syn_list))
+                    elif syndistr == 'lognorm':
+                        norm_var = np.log(1 + (gaba_sd * gaba_sd) / (g_gaba_mean * g_gaba_mean))
+                        norm_mean = np.log(g_gaba_mean) - norm_var * 0.5
+                        g_gaba = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
                 self.g_gaba_mat.put(g_gaba,
                                     syn_list[:,0], syn_list[:,1])                    
         end = datetime.now()
