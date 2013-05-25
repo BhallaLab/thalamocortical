@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri May 24 18:15:09 2013 (+0530)
+# Last-Updated: Sat May 25 14:29:45 2013 (+0530)
 #           By: subha
-#     Update #: 3188
+#     Update #: 3189
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -460,6 +460,8 @@ class TraubNet(object):
                         norm_var = np.log(1 + (gaba_sd * gaba_sd) / (g_gaba_mean * g_gaba_mean))
                         norm_mean = np.log(g_gaba_mean) - norm_var * 0.5
                         g_gaba = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
+                    else:
+                        g_gaba = g_gaba_mean
                 self.g_gaba_mat.put(g_gaba,
                                     syn_list[:,0], syn_list[:,1])                    
         end = datetime.now()
