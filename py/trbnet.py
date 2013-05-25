@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Sat May 25 14:29:45 2013 (+0530)
+# Last-Updated: Sat May 25 14:40:22 2013 (+0530)
 #           By: subha
-#     Update #: 3189
+#     Update #: 3200
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -442,14 +442,15 @@ class TraubNet(object):
                 g_nmda = np.random.normal(loc=g_nmda, scale=nmda_sd*g_nmda, size=len(syn_list))
             self.g_nmda_mat.put(g_nmda,
                                 syn_list[:, 0], syn_list[:,1])
-
+            g_gaba = 0.0
             if (pretype_vertex['label'] == 'nRT') and (posttype_vertex['label'] == 'TCR'):
-                self.g_gaba_mat.put(np.random.random_sample(len(syn_list)) * (self.nRT_TCR_ggaba_high - self.nRT_TCR_ggaba_low) + self.nRT_TCR_ggaba_low,
-                                    syn_list[:,0],
-                                    syn_list[:,1])
+                g_gaba = np.random.uniform(self.nRT_TCR_ggaba_low,
+                                           self.nRT_TCR_ggaba_high, 
+                                           size=len(syn_list))
             else:
                 gaba_sd = float(config.runconfig.get('GABA', 'sd'))
                 g_gaba_mean = float(edge['ggaba'])
+                g_gaba = g_gaba_mean
                 if g_gaba_mean > 0 and gaba_sd > 0:
                     ## Tue Mar 5 10:16:22 IST 2013 - Using lognormal in
                     ## stead of normal distribution following Song et al
@@ -460,10 +461,9 @@ class TraubNet(object):
                         norm_var = np.log(1 + (gaba_sd * gaba_sd) / (g_gaba_mean * g_gaba_mean))
                         norm_mean = np.log(g_gaba_mean) - norm_var * 0.5
                         g_gaba = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
-                    else:
-                        g_gaba = g_gaba_mean
-                self.g_gaba_mat.put(g_gaba,
-                                    syn_list[:,0], syn_list[:,1])                    
+            self.g_gaba_mat.put(g_gaba,
+                                syn_list[:,0],
+                                syn_list[:,1])
         end = datetime.now()
         delta = end - start
         config.BENCHMARK_LOGGER.info('cell-cell network generation in: %g s' % (delta.days * 86400 + delta.seconds + 1e-6 * delta.microseconds))
