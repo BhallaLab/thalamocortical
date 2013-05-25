@@ -438,7 +438,7 @@ class TraubNet(object):
             # distribution. otherwise it is normally distributed to
             # replicate old settings.
             nmda_sd = float(config.runconfig.get('NMDA', 'sd'))
-            if g_nmda > 0 and nmda_sd > 0:
+            if np.any(g_nmda > 0) and np.any(nmda_sd > 0):
                 g_nmda = np.random.normal(loc=g_nmda, scale=nmda_sd*g_nmda, size=len(syn_list))
             self.g_nmda_mat.put(g_nmda,
                                 syn_list[:, 0], syn_list[:,1])
