@@ -3504,7 +3504,13 @@ data_20120513_210447_9261.h5 [ 0.3]
 
   Connection fraction from all other cortical layers is < 1% with some
   possibility of L6->L4 connection.
-
+* References and notes
+** Renart et al 2010, Science
+   The decorrelation arises if E and I are simultaneous.
+** CastroAlmancos and Connors 1997
+   Must read
+** Lubke & Feldmeyer 2007
+   "Whether feedback amplification does indeed occur in the barrel cortex is a matter of debate."
   
 
 
