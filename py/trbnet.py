@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Mon May 27 19:57:17 2013 (+0530)
+# Last-Updated: Thu Jun  6 21:45:47 2013 (+0530)
 #           By: subha
-#     Update #: 3201
+#     Update #: 3210
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -410,10 +410,11 @@ class TraubNet(object):
             self.ps_comp_mat.put(ps_comp_list, syn_list[:,0], syn_list[:, 1])
             ampa_sd = float(config.runconfig.get('AMPA', 'sd'))
             g_ampa_mean = float(edge['gampa'])
-            if g_ampa_mean > 0 and ampa_sd > 0:
+            if pretype_vertex['label'] != 'TCR' and g_ampa_mean > 0 and ampa_sd > 0:
                 ## Tue Mar 5 10:16:22 IST 2013 - Using lognormal in
                 ## stead of normal distribution following Song et al
                 ## (doi:10.1371/journal.pbio.0030068)
+                # TODO for TCR avoid any randomization and scaling.
                 if syndistr == 'normal':
                     g_ampa = np.random.normal(loc=g_ampa_mean, scale=ampa_sd*g_ampa_mean, size=len(syn_list))
                 else:
@@ -426,7 +427,7 @@ class TraubNet(object):
                                 syn_list[:, 0], syn_list[:,1])
             
             g_nmda = float(edge['gnmda']) 
-            if g_ampa_mean > 0:
+            if pretype_vertex['label'] != 'TCR' and g_ampa_mean > 0:
                 g_nmda *= g_ampa / g_ampa_mean
             ## Wed Mar 6 09:56:51 IST 2013 - Since the ratio of
             ## AMP/NMDA remains more or less constant between
@@ -1151,10 +1152,12 @@ class TraubNet(object):
         presynaptic_scaling = {}
         for celltype, count in config.runconfig.items('cellcount'):
             vertices = self.celltype_graph.vs.select(label_eq=celltype)
-            for vertex in vertices:
+            for vertex in vertices:                
                 presynaptic_scaling[celltype] = float(count) / vertex['count']
                 vertex['count'] = int(count)
                 config.LOGGER.info('%s population size: %d' % (celltype, vertex['count']))
+        presynaptic_scaling['TCR'] = 1.0 # Thu Jun  6 21:45:34 IST 2013 disabling scaling for TCR.
+
         # 2012-05-07 18:24:53 (+0530) As discussed in last lab meet, I
         # need to scale the synaptic conductances according
         # reduction/increase in cell count of each type so that the
