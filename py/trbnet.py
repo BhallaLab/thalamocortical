@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Thu Jun  6 21:45:47 2013 (+0530)
+# Last-Updated: Fri Jun  7 13:59:54 2013 (+0530)
 #           By: subha
-#     Update #: 3210
+#     Update #: 3239
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -76,6 +76,11 @@
 # 2011-09-08 11:10:12 (+0530) changed set_population to use
 # ConfigParser object from config.py in stead of a custom cellcount
 # file.
+#
+# Fri Jun 7 13:58:57 IST 2013 - realized some of the synaptic
+# conductances were going negarive when generated from normal
+# distribution. Now I put code to set such entries to the mean value.
+
 
 
 # Code:
@@ -410,11 +415,13 @@ class TraubNet(object):
             self.ps_comp_mat.put(ps_comp_list, syn_list[:,0], syn_list[:, 1])
             ampa_sd = float(config.runconfig.get('AMPA', 'sd'))
             g_ampa_mean = float(edge['gampa'])
+            g_ampa = np.ones(len(synlist)) * g_ampa_mean
             if pretype_vertex['label'] != 'TCR' and g_ampa_mean > 0 and ampa_sd > 0:
                 ## Tue Mar 5 10:16:22 IST 2013 - Using lognormal in
                 ## stead of normal distribution following Song et al
                 ## (doi:10.1371/journal.pbio.0030068)
-                # TODO for TCR avoid any randomization and scaling.
+                ## Fri Jun  7 13:39:58 IST 2013 - discovered that normal distribution sample was going negative. - set them to mean
+
                 if syndistr == 'normal':
                     g_ampa = np.random.normal(loc=g_ampa_mean, scale=ampa_sd*g_ampa_mean, size=len(syn_list))
                 else:
@@ -423,12 +430,10 @@ class TraubNet(object):
                     g_ampa = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
             else:
                 g_ampa = g_ampa_mean
+            g_ampa[g_ampa < 0] = g_ampa_mean
             self.g_ampa_mat.put(g_ampa,
                                 syn_list[:, 0], syn_list[:,1])
             
-            g_nmda = float(edge['gnmda']) 
-            if pretype_vertex['label'] != 'TCR' and g_ampa_mean > 0:
-                g_nmda *= g_ampa / g_ampa_mean
             ## Wed Mar 6 09:56:51 IST 2013 - Since the ratio of
             ## AMP/NMDA remains more or less constant between
             ## celltypes (Myme et al; doi: 10.1152/jn.00070.2003),
@@ -438,9 +443,14 @@ class TraubNet(object):
             # nmda_sd should be set to 0 for lognorm
             # distribution. otherwise it is normally distributed to
             # replicate old settings.
+            g_nmda_mean = float(edge['gnmda'])
             nmda_sd = float(config.runconfig.get('NMDA', 'sd'))
-            if np.any(g_nmda > 0) and np.any(nmda_sd > 0):
-                g_nmda = np.random.normal(loc=g_nmda, scale=nmda_sd*g_nmda, size=len(syn_list))
+            g_nmda = np.ones(len(synlist)) * g_nmda_mean
+            if syndistr == 'normal' and g_nmda_mean > 0 and nmda_sd > 0:
+                g_nmda = np.random.normal(loc=g_nmda, scale=nmda_sd*g_nmda_mean, size=len(syn_list))
+            if syndistr == 'lognorm' and pretype_vertex['label'] != 'TCR' and g_ampa_mean > 0:
+                g_nmda *= g_ampa / g_ampa_mean
+            g_nmda[g_nmda < 0] = float(edge['gnmda'])
             self.g_nmda_mat.put(g_nmda,
                                 syn_list[:, 0], syn_list[:,1])
             g_gaba = 0.0
@@ -462,6 +472,7 @@ class TraubNet(object):
                         norm_var = np.log(1 + (gaba_sd * gaba_sd) / (g_gaba_mean * g_gaba_mean))
                         norm_mean = np.log(g_gaba_mean) - norm_var * 0.5
                         g_gaba = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
+                    g_gaba[g_gaba < 0] = g_gaba_mean
             self.g_gaba_mat.put(g_gaba,
                                 syn_list[:,0],
                                 syn_list[:,1])
@@ -553,7 +564,7 @@ class TraubNet(object):
                     if postcomp is None:
                         continue
                     g_ampa = self.g_ampa_mat[pre_index, post_index]
-                    if g_ampa != 0.0:
+                    if g_ampa > 0.0:
                         synchan = precomp.makeSynapse(postcomp, 
                                             name='ampa_from_%s' % (pretype_vertex['label']), 
                                             classname=synchan_classname, 
@@ -572,7 +583,7 @@ class TraubNet(object):
                             synchan.tauD2 = ampa_tauD2
                             synchan.initPr[synchan.numSynapses-1] = ampa_initPr
                     g_nmda = self.g_nmda_mat[pre_index, post_index]
-                    if g_nmda != 0.0:
+                    if g_nmda > 0.0:
                         # NMDA synapse model is weird in that we use
                         # the product of saturation and Gbar as an
                         # upper limit on the conductance. On the other
@@ -599,7 +610,7 @@ class TraubNet(object):
                             synchan.tauD2 = nmda_tauD2
                             synchan.initPr[synchan.numSynapses-1] = nmda_initPr
                     g_gaba = self.g_gaba_mat[pre_index, post_index]
-                    if g_gaba != 0.0:
+                    if g_gaba > 0.0:
                         g_gaba_slow = 0.0
                         if syn_edge['taugabaslow'] > 0.0:
                             if pretype_vertex['label'] == 'nRT':
