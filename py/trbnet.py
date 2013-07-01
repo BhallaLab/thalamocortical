@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Fri Jun  7 13:59:54 2013 (+0530)
+# Last-Updated: Tue Jun 11 16:40:51 2013 (+0530)
 #           By: subha
-#     Update #: 3239
+#     Update #: 3245
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -78,7 +78,7 @@
 # file.
 #
 # Fri Jun 7 13:58:57 IST 2013 - realized some of the synaptic
-# conductances were going negarive when generated from normal
+# conductances were going negative when generated from normal
 # distribution. Now I put code to set such entries to the mean value.
 
 
@@ -415,7 +415,7 @@ class TraubNet(object):
             self.ps_comp_mat.put(ps_comp_list, syn_list[:,0], syn_list[:, 1])
             ampa_sd = float(config.runconfig.get('AMPA', 'sd'))
             g_ampa_mean = float(edge['gampa'])
-            g_ampa = np.ones(len(synlist)) * g_ampa_mean
+            g_ampa = np.ones(len(syn_list)) * g_ampa_mean
             if pretype_vertex['label'] != 'TCR' and g_ampa_mean > 0 and ampa_sd > 0:
                 ## Tue Mar 5 10:16:22 IST 2013 - Using lognormal in
                 ## stead of normal distribution following Song et al
@@ -428,8 +428,6 @@ class TraubNet(object):
                     norm_var = np.log(1 + (ampa_sd * ampa_sd))
                     norm_mean = np.log(g_ampa_mean) - norm_var * 0.5
                     g_ampa = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
-            else:
-                g_ampa = g_ampa_mean
             g_ampa[g_ampa < 0] = g_ampa_mean
             self.g_ampa_mat.put(g_ampa,
                                 syn_list[:, 0], syn_list[:,1])
@@ -445,7 +443,7 @@ class TraubNet(object):
             # replicate old settings.
             g_nmda_mean = float(edge['gnmda'])
             nmda_sd = float(config.runconfig.get('NMDA', 'sd'))
-            g_nmda = np.ones(len(synlist)) * g_nmda_mean
+            g_nmda = np.ones(len(syn_list)) * g_nmda_mean
             if syndistr == 'normal' and g_nmda_mean > 0 and nmda_sd > 0:
                 g_nmda = np.random.normal(loc=g_nmda, scale=nmda_sd*g_nmda_mean, size=len(syn_list))
             if syndistr == 'lognorm' and pretype_vertex['label'] != 'TCR' and g_ampa_mean > 0:
