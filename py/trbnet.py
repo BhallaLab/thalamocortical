@@ -6,9 +6,9 @@
 # Maintainer: 
 # Created: Mon Oct 11 17:52:29 2010 (+0530)
 # Version: 
-# Last-Updated: Tue Jun 11 16:40:51 2013 (+0530)
+# Last-Updated: Mon Jul  1 20:45:50 2013 (+0530)
 #           By: subha
-#     Update #: 3245
+#     Update #: 3310
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -80,6 +80,13 @@
 # Fri Jun 7 13:58:57 IST 2013 - realized some of the synaptic
 # conductances were going negative when generated from normal
 # distribution. Now I put code to set such entries to the mean value.
+# 
+# Mon Jul 1 10:40:47 IST 2013 - replace TCR cells with TimeTable
+# objects. The TCR are just serving as spike generators, so no point
+# doing the computationally expensive simulation of these cells. Add
+# another config option for replacing these cells with TimeTable
+# objects. The synaptic strengths should not be scaled.
+
 
 
 
@@ -114,7 +121,20 @@ from deepaxoaxonic import DeepAxoaxonic
 from deepLTS import DeepLTS
 from tuftedRS import TuftedRS
 from nontuftedRS import NontuftedRS
-from tcr import TCR
+try:
+    tcrtype = config.runconfig.get('stimulus', 'type').strip()
+    config.LOGGER.debug('cell type for stimulus `%s, %s`' % (tcrtype, str(tcrtype == 'SpikeGen')))
+    if tcrtype == 'SpikeGen':
+        config.LOGGER.debug('###### here')
+        from tcr_spikegen import TCR
+        config.LOGGER.info('Imported TCR from tcr_spikegen')
+    else:
+        from tcr import TCR
+        config.LOGGER.info('Imported TCR from tcr')
+except KeyError:
+    from tcr import TCR
+    config.LOGGER.info('KeyError: Imported TCR from tcr')
+
 from nRT import nRT
 import synapse
 
@@ -669,8 +689,10 @@ class TraubNet(object):
                 randspike.maxAmp = 0.4e-9
                 randspike.reset = 1
                 randspike.resetValue = 0.0
-                success = randspike.connect('outputSrc', cell.comp[cell.presyn], 'injectMsg')
-                config.LOGGER.debug('Connected %s to %s: %s' % (randspike.path, cell.comp[cell.presyn].path, str(success)))
+                target = cell.comp[cell.presyn]
+                if target.className == 'Compartment':
+                    success = randspike.connect('outputSrc', target, 'injectMsg')
+                    config.LOGGER.debug('Connected %s to %s: %s' % (randspike.path, cell.comp[cell.presyn].path, str(success)))
 
     def setup_current_injection_test(self, inject_values, first_delay, width, data_container):
         """Set up a test for each cell with a set of current injections."""
@@ -777,10 +799,12 @@ class TraubNet(object):
         # Is it correct to record the spikes from soma or the SpikeGen ?
         # 2012-07-14 12:28:38 (+0530) Switching to recording from presynaptic compartment.
         for cell in self.cell_index_map.keys():            
-            tab = cell.comp[cell.presyn].insertRecorder(cell.name, 'Vm', spike_container)
-            config.LOGGER.info('Recording spike from: %s' % (cell.comp[cell.presyn].path))
-            tab.stepMode = moose.TAB_SPIKE
-            tab.stepSize = -20e-3
+            comp = cell.comp[cell.presyn]                
+            tab = comp.insertRecorder(cell.name, 'Vm', spike_container)
+            config.LOGGER.info('Recording spike from: %s' % (comp.path))
+            if not isinstance(comp, moose.TimeTable):
+                tab.stepMode = moose.TAB_SPIKE
+                tab.stepSize = -20e-3
         ectopic_container = moose.Neutral('%s/ectopic_spikes' % (data_container.path))
         for ch in self.ectopic_container.children():
             spike = moose.Neutral(ch)
@@ -822,6 +846,10 @@ class TraubNet(object):
                     cell_list = pop
             for cellindex in cell_list:
                 cell = self.index_cell_map[cellindex]
+                # Skip timetables replacing TCR cells
+                if not isinstance(cell.comp[cell.presyn], moose.Compartment):
+                    config.LOGGER.info('Skipping %s as it does not have Compartment for presyn.' % (cell.path))
+                    continue
                 cell.soma.insertRecorder(cell.name, 'Vm', vm_container)
                 cell.soma.insertCaRecorder(cell.name, ca_container)
                 if config.runconfig.get('record', 'gk_syn') not in ['YES', 'Yes', 'yes', '1', 'TRUE', 'True', 'true']:
@@ -1063,21 +1091,29 @@ class TraubNet(object):
         for cell in bg_cell_list:
             if isinstance(cell, str):
                 comp = moose.Compartment('%s/%s/comp_1' % (self.network_container.path, cell))
-            elif isinstance(cell, TraubCell):
+            elif isinstance(cell, moose.Cell): # Changing TraubCell to moose.Cell as it will include tcr_spikegen.TCR
                 comp = cell.soma
             else:
                 raise Exception('Unknown type object for bg target: %s' % (cell))
-            self.stim_bg.connect('outputSrc', comp, 'injectMsg')
+            if comp.className == 'Compartment':
+                self.stim_bg.connect('outputSrc', comp, 'injectMsg')
+            elif comp.className == 'SpikeGen':
+                self.stim_bg.connect('outputSrc', comp, 'Vm')
+                comp.threshold = level/2.0                
             bg_targets.append(comp.path)
         for cell in probe_cell_list:
             # print 'probe:', cell
             if isinstance(cell, str):
                 comp = moose.Compartment('%s/%s/comp_1' % (self.network_container.path, cell))
-            elif isinstance(cell, TraubCell):
+            elif isinstance(cell, moose.Cell):
                 comp = cell.soma
             else:
                 raise Exception('Unknown type object for probe target: %s' % (cell))
-            self.stim_probe.connect('outputSrc', comp, 'injectMsg')
+            if comp.className == 'Compartment':
+                self.stim_probe.connect('outputSrc', comp, 'injectMsg')
+            elif comp.className == 'SpikeGen':
+                self.stim_probe.connect('outputSrc', comp, 'Vm')
+                comp.threshold = level/2.0                
             probe_targets.append(comp.path)
         ret = { 'stim_onset': stim_onset,
                 'bg_interval': bg_interval,
@@ -1318,6 +1354,8 @@ class TraubNet(object):
             if indices is None or len(indices) == 0:
                 continue
             cell0 = self.index_cell_map[indices[0]]
+            if cell0.soma.className != 'Compartment': # This is for spikegen replacing cells
+                continue
             cells = [self.index_cell_map[index] for index in indices]
             if initVm_sd > 0.0:
                 initVm_mean = cell0.soma.Em
@@ -1376,6 +1414,8 @@ class TraubNet(object):
             if not indices:
                 continue
             cell0 = self.index_cell_map[indices[0]]
+            if cell0.soma.className != 'Compartment': # Handle case of spikegen replacing cell
+                continue 
             channels = []
             conductances = []
             for comp_no in range(1, cell0.num_comp+1):
@@ -1469,8 +1509,11 @@ class TraubNet(object):
                         chan = moose.HHChannel(chan_id)
                         conductances.append((chan.path, chan.Gbar, chan.Ek))
                         
-                presyn_comp = cell.comp[cell.presyn]     
-                spikegen = moose.SpikeGen('spike', presyn_comp)
+                presyn_comp = cell.comp[cell.presyn]    
+                if comp.className == 'Compartment':
+                    spikegen = moose.SpikeGen('spike', presyn_comp)
+                elif comp.className == 'SpikeGen':
+                    spikegen = comp
                 for synchan_id in spikegen.neighbours('event', moose.OUTGOING):
                     synchan = moose.SynChan(synchan_id)
                     post_comp = moose.Compartment(synchan.parent)
