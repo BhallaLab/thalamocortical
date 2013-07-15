@@ -7,9 +7,9 @@
 # Maintainer: 
 # Created: Fri Apr 17 14:36:30 2009 (+0530)
 # Version: 
-# Last-Updated: Wed Dec 26 09:40:15 2012 (+0530)
+# Last-Updated: Fri Mar  8 10:45:40 2013 (+0530)
 #           By: subha
-#     Update #: 341
+#     Update #: 342
 # URL: 
 # Keywords: 
 # Compatibility: 
@@ -111,7 +111,7 @@ def moose_reseed(seed):
 # configuration for saving simulation data
 #---------------------------------------------------------------------
 
-data_dir = os.path.join('data', timestamp.strftime('%Y_%m_%d'))
+data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', timestamp.strftime('%Y_%m_%d'))
 if not os.access(data_dir, os.F_OK):
     os.mkdir(data_dir)
 
