@@ -10,8 +10,12 @@
 *.jpeg
 *.pyc
 *~
+*.dat
 *.pickle
 moose.py.*
+nohup*
+*.out
+*.err
 py/data/*
 gen/Cinfolist.txt
 gen/Vm_gen.plot
