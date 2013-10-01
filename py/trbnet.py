@@ -802,7 +802,7 @@ class TraubNet(object):
             comp = cell.comp[cell.presyn]                
             tab = comp.insertRecorder(cell.name, 'Vm', spike_container)
             config.LOGGER.info('Recording spike from: %s' % (comp.path))
-            if not isinstance(comp, moose.TimeTable):
+            if not isinstance(comp, moose.TimeTable) and not isinstance(comp, moose.SpikeGen):
                 tab.stepMode = moose.TAB_SPIKE
                 tab.stepSize = -20e-3
         ectopic_container = moose.Neutral('%s/ectopic_spikes' % (data_container.path))
@@ -1099,6 +1099,7 @@ class TraubNet(object):
                 self.stim_bg.connect('outputSrc', comp, 'injectMsg')
             elif comp.className == 'SpikeGen':
                 self.stim_bg.connect('outputSrc', comp, 'Vm')
+                config.LOGGER.debug('connected %s to %s' % (self.stim_bg.path, comp.path))
                 comp.threshold = level/2.0                
             bg_targets.append(comp.path)
         for cell in probe_cell_list:
@@ -1113,7 +1114,9 @@ class TraubNet(object):
                 self.stim_probe.connect('outputSrc', comp, 'injectMsg')
             elif comp.className == 'SpikeGen':
                 self.stim_probe.connect('outputSrc', comp, 'Vm')
-                comp.threshold = level/2.0                
+                config.LOGGER.debug('connected %s to %s' % (self.stim_probe.path, comp.path))
+                comp.threshold = level/2.0   
+                config.LOGGER.debug('%s: threshold=%g' % (comp.path, comp.threshold))
             probe_targets.append(comp.path)
         ret = { 'stim_onset': stim_onset,
                 'bg_interval': bg_interval,
