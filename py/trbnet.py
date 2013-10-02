@@ -1204,7 +1204,9 @@ class TraubNet(object):
                 presynaptic_scaling[celltype] = float(count) / vertex['count']
                 vertex['count'] = int(count)
                 config.LOGGER.info('%s population size: %d' % (celltype, vertex['count']))
-        presynaptic_scaling['TCR'] = 1.0 # Thu Jun  6 21:45:34 IST 2013 disabling scaling for TCR.
+        # presynaptic_scaling['TCR'] = 1.0 # Thu Jun  6 21:45:34 IST 2013 disabling scaling for TCR. 
+        # <- Wed Oct  2 18:15:57 IST 2013 keep scaling for TCR.
+
 
         # 2012-05-07 18:24:53 (+0530) As discussed in last lab meet, I
         # need to scale the synaptic conductances according
