@@ -2576,11 +2576,11 @@ c START EXECUTION PHASE
 
 
 
-!         timtot =  750.d0
+         timtot =  750.d0
 !         timtot = 1600.d0
 !          timtot = 0.02d0 ! tiny debug time doesn't test 0.05 interval
-          timtot = 0.12d0 ! debug time does test 0.05 interval (~4 minutes)
-          timtot = 1.2d0 ! debug time does test 0.05 interval 
+c$$$          timtot = 0.12d0 ! debug time does test 0.05 interval (~4 minutes)
+c$$$          timtot = 1.2d0 ! debug time does test 0.05 interval 
 
 c Setup tables for calculating exponentials
           call dexptablesmall_setup (dexptablesmall)
