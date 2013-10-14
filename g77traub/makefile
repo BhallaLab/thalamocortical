@@ -14,9 +14,10 @@ FFLAGS = -w -finit-local-zero -fno-automatic -O3
 #FLAGS1 = -O3 -c -w -xW -save
 #FLAGS1 = -C -g -d1 -c -w -xW -save
 
-FC=gfortran
+# FC=gfortran
 #FC=ifc
 #FC=g77
+FC=mpif77
 
 # STRUCT = gettime.o dexptablesmall_setup.o dexptablebig_setup.o synaptic_map_construct.o synaptic_compmap_construct.o groucho_gapbld.o groucho_gapbld_mix.o durand.o
 
@@ -29,7 +30,7 @@ EXTRA=trapfpe.o
 OUTPUT_FILE=-o groucho
 #OUTPUT_FILE=
 
-GROUCHO = groucho_nogettime.f
+GROUCHO = groucho.f
 
 groucho : $(GROUCHO) $(STRUCT) $(INTEGRATE) makefile $(EXTRA)
 	$(FC) $(FFLAGS) $(GROUCHO) $(STRUCT) $(INTEGRATE) $(EXTRA) $(OUTPUT_FILE)
