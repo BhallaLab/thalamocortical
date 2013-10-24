@@ -7291,7 +7291,7 @@ c Construct gap-junction tables
 
 c CODE BELOW FOR "PICROTOXIN": scale all GABA-A
 !        GOTO 30
-         z1 = 0.05d0  ! for intracortical IPSCs
+         z1 = 0.1d0  ! for intracortical IPSCs
          z2 = 1.00d0  ! for intrathalamic IPSCs, usual 1.00
       gGABA_supbask_to_suppyrRS   =  z1 * gGABA_supbask_to_suppyrRS
       gGABA_supbask_to_suppyrFRB  =  z1 * gGABA_supbask_to_suppyrFRB
