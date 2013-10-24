@@ -3516,3 +3516,10 @@ data_20120513_210447_9261.h5 [ 0.3]
 
 \printbibliography
 
+* <2013-10-22 Tue 18:17> Reproducing figures from Traub 2005 using g77 port
+  Started with fig 7 (at Helena's request) - reproduced A, going on B. In
+  groucho.f line # 7294 (z1 = 0.1) the following comment marks the code area:
+
+  CODE BELOW FOR "PICROTOXIN": scale all GABA-A
+
+   z1 = 0.1d0  ! for intracortical IPSCs
