@@ -3523,3 +3523,18 @@ data_20120513_210447_9261.h5 [ 0.3]
   CODE BELOW FOR "PICROTOXIN": scale all GABA-A
 
    z1 = 0.1d0  ! for intracortical IPSCs
+
+* <2013-10-24 Thu 15:40> 
+  STarting with fig 2:
+  z1 ... z4 = 1.0 for picrotoxin code (gaba) as well as nbqx (ampa)
+  NMDA is left as is:
+
+         z1 = 0.2d0 ! to interneurons
+c        z1 = 0.5d0 ! to interneurons
+! Usual scaling of NMDA to princ. cells, including FRB, is 0.5
+         z2 = 2.5d0 ! to  cort. principal cells, except FRB
+         z3 = 2.5d0 ! to suppyrFRB
+         z4 = 0.2d0  ! to TCR and nRT and from TCR to cort. princ.
+
+
+	 these were not mentioned in fig 7. so i am confused and leaving them alone.
