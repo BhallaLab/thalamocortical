@@ -175,7 +175,7 @@ class MyCompartment(moose.Compartment):
                     classname='SynChan', 
                     name='synapse', 
                     threshold=0.0, 
-                    absRefract=0.0, 
+                    absRefract=1.5e-3, 
                     Ek=0.0, 
                     Gbar=None, 
                     tau1=None, 
