@@ -3538,3 +3538,6 @@ c        z1 = 0.5d0 ! to interneurons
 
 
 	 these were not mentioned in fig 7. so i am confused and leaving them alone.
+* <2013-10-27 Sun 11:30> Absolute refratory period
+  Found in the fortran code that the axons are assigned 1.5 ms absolute
+  refractory period which I did not include in the model.
