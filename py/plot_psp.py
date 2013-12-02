@@ -156,7 +156,8 @@ def plot_psp(pretype, posttype, chantype):
         plt.subplot(2, int((len(datatables) - 1)*0.5 + 0.5), ii+1)
         plt.plot(ts, np.asarray(tab))
         plt.title(tab.name)
-    plt.show()
+        plt.savefig('%s/%s.pdf' % (datadir, tab.name))
+        plt.close()
 
 if __name__ == '__main__':
     # test_tcr_spinstell_ampa()
