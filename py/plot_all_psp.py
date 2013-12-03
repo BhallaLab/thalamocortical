@@ -160,6 +160,8 @@ def setup(pretype, posttype, chantype, sim):
         gbar = netdata.g_gaba_baseline[preidx][postidx]
         tau1 = netdata.tau_gaba[preidx][postidx]
         tau2 = 0.0
+        if (pretype == 'nRT') and (posttype=='TCR'):
+            gbar = 1.4e-9 # since the G_gaba in this case is taken from a uniform distribution in 0.7-2.1 nS
     if gbar <= 0.0:
         print 'No %s synapse from %s to %s' % (chantype, pretype, posttype)
         return 
@@ -172,6 +174,23 @@ def setup(pretype, posttype, chantype, sim):
                       Ek=Ek,
                       Gbar=gbar,
                       tau1=tau1, 
+                      tau2=tau2)
+    if pretype == 'nRT':
+        if posttype == 'TCR':
+            syn.Gbar = netdata.frac_nRT_TCR_gaba_fast * syn.Gbar
+            syn1 = makeSynapse(precell, postcell.comp[postcomp], chantype,
+                      name='%s_%s_%s_slow' % (chantype, pretype, posttype),
+                      Ek=Ek,
+                      Gbar=gbar - syn.Gbar,
+                      tau1=netdata.nRT_TCR_tau_gaba_slow, 
+                      tau2=tau2)
+        else:
+            syn.Gbar = netdata.frac_nRT_nRT_gaba_fast * syn.Gbar
+            syn1 = makeSynapse(precell, postcell.comp[postcomp], chantype,
+                      name='%s_%s_%s_slow' % (chantype, pretype, posttype),
+                      Ek=Ek,
+                      Gbar=gbar - syn.Gbar ,
+                      tau1=netdata.nRT_nRT_tau_gaba_slow, 
                       tau2=tau2)
     if chantype == 'nmda':
         syn.MgConc = netdata.MgConc
