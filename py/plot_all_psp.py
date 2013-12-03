@@ -109,6 +109,24 @@ def simulate_psp(simdt, plotdt, simtime):
         print 'Saved data from %s to %s' % (tab.name, fname)
     print 'Finished saving data'
     
+
+def makeSynapse(sg, comp, syntype, name, Ek, Gbar, tau1, tau2, delay=0.0):
+    syn = None
+    if syntype == 'nmda':
+        syn = moose.NMDAChan(name, comp)
+    else:
+        syn = moose.SynChan(name, comp)
+    syn.Ek = Ek
+    syn.Gbar = Gbar
+    syn.tau1 = tau1
+    syn.tau2 = tau2
+    comp.connect('channel', syn, 'channel')
+    sg.threshold = 0.0
+    sg.absRefract = 0.0
+    if not sg.connect('event', syn, 'synapse'):
+        raise Exception('Error creating connection: %s->%s' % (sg.path, syn.path))
+    return syn
+
 def setup(pretype, posttype, chantype, sim):
     """Plot the PSP in`posttype` cell from `chantype` synapse due to spiking in `pretype` cell.
 
@@ -130,9 +148,9 @@ def setup(pretype, posttype, chantype, sim):
     tau2 = 1.0
     gbar = 1.0
     if chantype == 'ampa':
-        gbar = netdata.g_ampa_baseline[preidx][postidx]
         tau1 = netdata.tau_ampa[preidx][postidx]
         tau2 = tau1
+        gbar = netdata.g_ampa_baseline[preidx][postidx] * tau1 * 1e3 / np.e
     elif chantype == 'nmda':
         gbar = netdata.g_nmda_baseline[preidx][postidx]
         tau1 = netdata.tau_nmda[preidx][postidx]
@@ -146,31 +164,34 @@ def setup(pretype, posttype, chantype, sim):
         print 'No %s synapse from %s to %s' % (chantype, pretype, posttype)
         return 
     model_container = moose.Neutral('%s/%s_%s_%s' % (sim.model.path, chantype, pretype, posttype))
-    precell = preclass(preclass.prototype, '%s/%s_pre' % (model_container.path, pretype))
+    # precell = preclass(preclass.prototype, '%s/%s_pre' % (model_container.path, pretype))
+    precell = moose.SpikeGen('%s/%s_pre' % (model_container.path, pretype))
     postcell = postclass(postclass.prototype, '%s/%s_post' % (model_container.path, posttype))
-    syn = precell.comp[precell.presyn].makeSynapse(postcell.comp[postcomp],
-                                                   name='%s_%s_%s' % (chantype, pretype, posttype),
-                                                   Ek=Ek,
-                                                   Gbar=gbar,
-                                                   tau1=tau1, 
-                                                   tau2=tau2,
-                                                   delay=1e-3)
+    syn = makeSynapse(precell, postcell.comp[postcomp], chantype,
+                      name='%s_%s_%s' % (chantype, pretype, posttype),
+                      Ek=Ek,
+                      Gbar=gbar,
+                      tau1=tau1, 
+                      tau2=tau2)
     if chantype == 'nmda':
         syn.MgConc = netdata.MgConc
         syn.saturation = 1.0
     stim = moose.PulseGen('%s/stimulus' % (model_container.path))
+    stim.baseLevel = -1e-9
     stim.delay[0] = 2.0
     stim.level[0] = 1e-9
     stim.width[0] = 10e-3
-    stim.connect('outputSrc', precell.soma, 'injectMsg')
+    stim.connect('outputSrc', precell, 'Vm')
     data_container = moose.Neutral('%s/%s_%s_%s' % (sim.data.path, chantype, pretype, posttype))
     datatables = []
-    datatables.append(moose.Table('%s/preVm_%s_%s_%s' % (data_container.path, chantype, pretype, posttype)))
-    datatables[-1].connect('inputRequest', precell.soma, 'Vm')
+    datatables.append(moose.Table('%s/stimulus_%s_%s_%s' % (data_container.path, chantype, pretype, posttype)))
+    datatables[-1].connect('inputRequest', stim, 'output')
     datatables.append(moose.Table('%s/postVm_%s_%s_%s' % (data_container.path, chantype, pretype, posttype)))
     datatables[-1].connect('inputRequest', postcell.soma, 'Vm')
     datatables.append(moose.Table('%s/synIk_%s_%s_%s' % (data_container.path, chantype, pretype, posttype)))
     datatables[-1].connect('inputRequest', syn, 'Ik')
+    datatables.append(moose.Table('%s/synGk_%s_%s_%s' % (data_container.path, chantype, pretype, posttype)))
+    datatables[-1].connect('inputRequest', syn, 'Gk')
     for tab in datatables:
         tab.stepMode = 3
 
