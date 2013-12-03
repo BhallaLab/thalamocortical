@@ -47,6 +47,9 @@ from cell import *
 from simulation import Simulation
 from trbnetdata import TraubFullNetData
 
+import config
+config.solver = 'hsolve'
+
 from spinystellate import SpinyStellate
 from suppyrRS import SupPyrRS
 from suppyrFRB import SupPyrFRB
@@ -66,36 +69,34 @@ import synapse
 import random
 from itertools import cycle, izip, chain
 from compartment import compare_compartment
-import config
 import os
 from datetime import datetime
 
 netdata = TraubFullNetData()
-
-config.solver = 'hsolve'
-
+celltypes = ['SpinyStellate', 'DeepBasket', 'DeepLTS', 'DeepAxoaxonic', 'TCR', 'nRT'] # netdata.celltype
 def simulate_psp(simdt, plotdt, simtime):
     sim = Simulation('dump_psp')
-    for pretype in netdata.celltype:
-        for posttype in netdata.celltype:
+    for pretype in celltypes:
+        for posttype in celltypes:
             for chantype in ['ampa', 'nmda', 'gaba']:                
                 setup(pretype, posttype, chantype, sim)
-    sim.simdt = simdt
-    sim.plotdt = plotdt
-    print 'Scheduling'
-    sim.schedule()
+        #         break
+        #     break
+        # break
+    config.clockjob.autoschedule = 1
     print 'Starting simulation'
-    sim.run(simtime)
+    sim.reset_and_run(simtime=simtime, simdt=simdt, plotdt=plotdt)
     print 'Simulation over'
     datadir = 'all_pair_psp'
     try:
         os.mkdir(datadir)
     except OSError, e:
         print e
-    for tab in config.context.getWildcardList('%s/##[TYPE=Table]' % (sim.data.path), True):
+    for tabid in config.context.getWildcardList('%s/##[TYPE=Table]' % (sim.data.path), True):
+        tab = moose.Table(tabid)
         ts = np.linspace(0, simtime, len(tab))
-        data = np.vstack((ts, data)).transpose()
-        dpath = os.path.join(datadir, tab.parent.name)
+        data = np.vstack((ts, tab)).transpose()
+        dpath = os.path.join(datadir, moose.Neutral(tab.parent).name)
         try:
             os.mkdir(dpath)
         except OSError, e:
@@ -103,7 +104,8 @@ def simulate_psp(simdt, plotdt, simtime):
         fname = '%s/%s.dat' % (dpath, tab.name)
         np.savetxt(fname, data)
         if 'postVm' in tab.name:
-            print '##### ',  tab.path, ': max=', np.max(tab)
+            tdata = np.array(tab)
+            print '##### ',  tab.path, ': max=', np.max(tdata[ts > 2.0]), 'psp peak:', (np.max(tdata[ts > 2.0]) - np.min(tdata[(ts > 1.5) & (ts < 2.0)])) * 1e3, 'mV'
         print 'Saved data from %s to %s' % (tab.name, fname)
     print 'Finished saving data'
     
