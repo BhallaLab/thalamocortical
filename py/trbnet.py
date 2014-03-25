@@ -1435,6 +1435,7 @@ class TraubNet(object):
                     conductances = np.random.normal(loc=mean,
                                                        scale=sd,
                                                        size=len(indices))
+                    conductances[conductances < 0] = mean # Subha: 2014-03-25 - avoid risk of negative conductance                
                     ii = 0
                     for index in indices:
                         cell = self.index_cell_map[index]
