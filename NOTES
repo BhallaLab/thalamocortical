@@ -3541,3 +3541,42 @@ c        z1 = 0.5d0 ! to interneurons
 * <2013-10-27 Sun 11:30> Absolute refratory period
   Found in the fortran code that the axons are assigned 1.5 ms absolute
   refractory period which I did not include in the model.
+* <2014-04-03 Thu 10:03> Lognormal distributions sampled earlier
+  - data_20131015_205657_16289.h5: 50
+  - data_20131017_091142_17255.h5: 50
+  - data_20131018_092637_17874.h5: 50
+  - data_20131019_180749_18739.h5: 50
+  - data_20131020_141729_19409.h5: 50
+  - data_20131021_113706_20086.h5: 60
+  - data_20131022_084830_22422.h5: 60
+  - data_20131023_130438_23485.h5: 60
+  - data_20131024_125817_24015.h5: 60
+  - data_20131025_104328_25152.h5: 60
+  - data_20131026_075942_25561.h5: 70
+  - data_20131027_111356_26165.h5: 70
+  - data_20131028_085137_27046.h5: 70
+  - data_20131029_083716_27601.h5: 70
+  - data_20131030_171545_28122.h5: 70
+
+    Spiny stellate only simulation with normally distributed/constant synaptic
+    conductance:
+
+    2014_03_24/data_20140324_123836_31910.h5
+
+    Check for effect of deep axoaxonic cells:
+
+    2014_02_28/data_20140228_103300_20533.h5 (30 DB)
+    2014_03_01/data_20140301_171224_21051.h5 (40 DB)
+    - looks like more spiking in spiny stellates between synchronized bursts
+
+  30 Deepbasket with Lognormal synaptic conductance
+  - 2014_03_25/data_20140325_152129_3148.h5
+  - 2014_03_26/data_20140326_101841_3603.h5
+  - 2014_03_27/data_20140327_051218_3860.h5
+  - 2014_03_28/data_20140328_000600_4382.h5
+  - 2014_03_28/data_20140328_185716_4748.h5
+  - 2014_03_29/data_20140329_134740_5249.h5
+  - 2014_03_30/data_20140330_082942_5678.h5
+  - 2014_03_31/data_20140331_033137_6077.h5
+  - 2014_03_31/data_20140331_221932_6500.h5
+  - 2014_04_01/data_20140401_170914_7024.h5
