@@ -3,7 +3,7 @@ count=10
 if (($# > 0)); then
     count=$1
 fi
-dbcount=30
+dbcount=40
 if (($# > 1)); then
     dbcount=$2
 fi
