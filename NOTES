@@ -3580,3 +3580,120 @@ c        z1 = 0.5d0 ! to interneurons
   - 2014_03_31/data_20140331_033137_6077.h5
   - 2014_03_31/data_20140331_221932_6500.h5
   - 2014_04_01/data_20140401_170914_7024.h5
+
+* <2014-04-11 Fri 21:04> List of runs with various distributions
+  Coded a script to dump info about distributions for different simulations
+  for lognormal, normal distribution. Turns out I did some normal distribution
+  tests but had lost track in between.
+
+  
+** Normal distribution of both AMPA and GABA with 30 basket cells std=10% mean
+
+   data_20130926_175557_23146.h5, distr=normal, sd_gaba=0.1, sd_ampa=0.1, basket=30
+   data_20130927_130032_23546.h5, distr=normal, sd_gaba=0.1, sd_ampa=0.1, basket=30
+   data_20130928_080248_24083.h5, distr=normal, sd_gaba=0.1, sd_ampa=0.1, basket=30
+   data_20130929_030046_24339.h5, distr=normal, sd_gaba=0.1, sd_ampa=0.1, basket=30
+   data_20130929_220020_24746.h5, distr=normal, sd_gaba=0.1, sd_ampa=0.1, basket=30
+   data_20130930_165908_25439.h5, distr=normal, sd_gaba=0.1, sd_ampa=0.1, basket=30
+   data_20131001_135346_28969.h5, distr=normal, sd_gaba=0.1, sd_ampa=0.1, basket=30
+   data_20131002_085713_29287.h5, distr=normal, sd_gaba=0.1, sd_ampa=0.1, basket=30
+   data_20131003_040158_30053.h5, distr=normal, sd_gaba=0.1, sd_ampa=0.1, basket=30
+   data_20131003_092701_30287.h5, distr=normal, sd_gaba=0.1, sd_ampa=0.1, basket=30
+   data_20131003_145246_30810.h5, distr=normal, sd_gaba=0.1, sd_ampa=0.1, basket=30
+   data_20131004_121723_31136.h5, distr=normal, sd_gaba=0.1, sd_ampa=0.1, basket=30
+   data_20131005_094752_31458.h5, distr=normal, sd_gaba=0.1, sd_ampa=0.1, basket=30
+   data_20131006_072246_31658.h5, distr=normal, sd_gaba=0.1, sd_ampa=0.1, basket=30
+   data_20131007_045415_31995.h5, distr=normal, sd_gaba=0.1, sd_ampa=0.1, basket=30
+   data_20131008_022708_32336.h5, distr=normal, sd_gaba=0.1, sd_ampa=0.1, basket=30
+   
+   
+** Very high (100% std in normal distr of AMPA, GABA constant)
+   data_20130305_171638_2787.h5, distr=unspecified, sd_gaba=0, sd_ampa=1, basket=30
+   data_20130307_105110_5837.h5, distr=unspecified, sd_gaba=0, sd_ampa=1, basket=30
+   data_20130313_223752_9754.h5, distr=unspecified, sd_gaba=0, sd_ampa=1, basket=30
+
+   data_20130509_195650_27584.h5, distr=unspecified, sd_gaba=0, sd_ampa=1, basket=30
+
+   data_20130511_113233_29060.h5, distr=unspecified, sd_gaba=1, sd_ampa=1, basket=30
+   data_20130513_090344_30246.h5, distr=unspecified, sd_gaba=1, sd_ampa=1, basket=30
+   data_20130515_144005_31732.h5, distr=unspecified, sd_gaba=1, sd_ampa=1, basket=30
+   data_20130520_111217_3183.h5, distr=unspecified, sd_gaba=1, sd_ampa=1, basket=30
+   data_20130522_140239_4972.h5, distr=unspecified, sd_gaba=1, sd_ampa=1, basket=30
+
+   data_20130527_195823_9935.h5, distr=normal, sd_gaba=1, sd_ampa=1, basket=30
+   data_20130531_151641_12116.h5, distr=normal, sd_gaba=1, sd_ampa=1, basket=30
+
+   With 10 each of basket, lts and axoaxonic cells - but 240 ss and 100 tcr:
+   behaves with sync spike: 
+
+   data_20130325_201502_5406.h5, distr=unspecified, sd_gaba=0, sd_ampa=1, basket=10
+   data_20130327_092801_6262.h5, distr=unspecified, sd_gaba=0, sd_ampa=1, basket=10
+   data_20130328_160048_7192.h5, distr=unspecified, sd_gaba=0, sd_ampa=1, basket=10
+   data_20130401_085146_8864.h5, distr=unspecified, sd_gaba=0, sd_ampa=1, basket=10
+   data_20130402_144141_9426.h5, distr=unspecified, sd_gaba=0, sd_ampa=1, basket=10
+   data_20130412_200054_14340.h5, distr=unspecified, sd_gaba=0, sd_ampa=1, basket=10
+   data_20130415_113322_15560.h5, distr=unspecified, sd_gaba=0, sd_ampa=1, basket=10
+   data_20130416_203346_16206.h5, distr=unspecified, sd_gaba=0, sd_ampa=1, basket=10
+   data_20130505_123616_25015.h5, distr=unspecified, sd_gaba=0, sd_ampa=1, basket=10
+   data_20130508_105955_26372.h5, distr=unspecified, sd_gaba=0, sd_ampa=1, basket=10
+
+   data_20130603_151249_13824.h5, distr=normal, sd_gaba=1, sd_ampa=1, basket=50
+   data_20130604_130038_14430.h5, distr=normal, sd_gaba=1, sd_ampa=1, basket=50
+   data_20130606_214805_16457.h5, distr=normal, sd_gaba=1, sd_ampa=1, basket=50
+   data_20130607_184007_17341.h5, distr=normal, sd_gaba=1, sd_ampa=1, basket=50
+   data_20130611_164312_19342.h5, distr=normal, sd_gaba=1, sd_ampa=1, basket=50
+   data_20130701_120534_29527.h5, distr=normal, sd_gaba=1, sd_ampa=1, basket=10
+   data_20130701_163030_30420.h5, distr=normal, sd_gaba=1, sd_ampa=1, basket=10
+   data_20130701_204723_30581.h5, distr=normal, sd_gaba=1, sd_ampa=1, basket=10
+   data_20130702_164810_32251.h5, distr=normal, sd_gaba=1, sd_ampa=1, basket=30
+
+
+** Lognormal distr:
+
+   data_20130525_144104_8301.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=30
+
+   data_20130602_174634_13200.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=50
+
+   data_20131014_153702_15212.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=50
+   data_20131015_205657_16289.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=50
+   data_20131017_091142_17255.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=50
+   data_20131018_092637_17874.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=50
+   data_20131019_180749_18739.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=50
+   data_20131020_141729_19409.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=50
+   data_20131021_113706_20086.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=60
+   data_20131022_084830_22422.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=60
+   data_20131023_130438_23485.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=60
+   data_20131024_125817_24015.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=60
+   data_20131025_104328_25152.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=60
+   data_20131026_075942_25561.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=70
+   data_20131027_111356_26165.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=70
+   data_20131028_085137_27046.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=70
+   data_20131029_083716_27601.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=70
+   data_20131030_171545_28122.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=70
+   data_20131101_103408_29492.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=30 <- why this stray simulation? test?
+
+   Recent lognorm ones ti fill the repeat count of 10:
+
+   
+   data_20140228_103300_20533.h5, distr=normal, sd_gaba=1, sd_ampa=1, basket=30
+   data_20140301_171224_21051.h5, distr=normal, sd_gaba=1, sd_ampa=1, basket=40
+   data_20140324_123836_31910.h5, distr=normal, sd_gaba=1, sd_ampa=1, basket=0
+   data_20140325_152129_3148.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=30
+   data_20140326_101841_3603.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=30
+   data_20140327_051218_3860.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=30
+   data_20140328_000600_4382.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=30
+   data_20140328_185716_4748.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=30
+   data_20140329_134740_5249.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=30
+   data_20140330_082942_5678.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=30
+   data_20140331_033137_6077.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=30
+   data_20140331_221932_6500.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=30
+   data_20140401_170914_7024.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=30
+   data_20140403_111502_8499.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=40
+   data_20140404_064035_8820.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=40
+   data_20140405_021232_9230.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=40
+   data_20140405_214425_9643.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=40
+   data_20140406_171436_10050.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=40
+   data_20140407_124615_10623.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=40
+   data_20140408_081744_11037.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=40
+   data_20140409_042649_11447.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=40
+
