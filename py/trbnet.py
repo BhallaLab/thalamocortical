@@ -297,7 +297,8 @@ class TraubNet(object):
             self.scale = 1.0
         if format is not None:
             self.format = format
-        self._generate_celltype_graph()
+        # self._generate_celltype_graph()
+        self._read_celltype_graph()
                 
     def setup(self):
         """Set up the master graph.
