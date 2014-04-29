@@ -5,62 +5,77 @@
          http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
 <!-- Created by igraph -->
   <key id="count" for="node" attr.name="count" attr.type="double"/>
+  <key id="ectopicinterval" for="node" attr.name="ectopicinterval" attr.type="double"/>
   <key id="label" for="node" attr.name="label" attr.type="string"/>
   <graph id="G" edgedefault="undirected">
     <node id="n0">
       <data key="count">1000</data>
+      <data key="ectopicinterval">10</data>
       <data key="label">SupPyrRS</data>
     </node>
     <node id="n1">
       <data key="count">50</data>
+      <data key="ectopicinterval">10</data>
       <data key="label">SupPyrFRB</data>
     </node>
     <node id="n2">
       <data key="count">90</data>
+      <data key="ectopicinterval">-1</data>
       <data key="label">SupBasket</data>
     </node>
     <node id="n3">
       <data key="count">90</data>
+      <data key="ectopicinterval">-1</data>
       <data key="label">SupAxoaxonic</data>
     </node>
     <node id="n4">
       <data key="count">90</data>
+      <data key="ectopicinterval">-1</data>
       <data key="label">SupLTS</data>
     </node>
     <node id="n5">
       <data key="count">240</data>
+      <data key="ectopicinterval">1</data>
       <data key="label">SpinyStellate</data>
     </node>
     <node id="n6">
       <data key="count">800</data>
+      <data key="ectopicinterval">1</data>
       <data key="label">TuftedIB</data>
     </node>
     <node id="n7">
       <data key="count">200</data>
+      <data key="ectopicinterval">1</data>
       <data key="label">TuftedRS</data>
     </node>
     <node id="n8">
       <data key="count">100</data>
+      <data key="ectopicinterval">-1</data>
       <data key="label">DeepBasket</data>
     </node>
     <node id="n9">
       <data key="count">100</data>
+      <data key="ectopicinterval">-1</data>
       <data key="label">DeepAxoaxonic</data>
     </node>
     <node id="n10">
       <data key="count">100</data>
+      <data key="ectopicinterval">-1</data>
       <data key="label">DeepLTS</data>
     </node>
     <node id="n11">
       <data key="count">500</data>
+      <data key="ectopicinterval">1</data>
       <data key="label">NontuftedRS</data>
     </node>
     <node id="n12">
       <data key="count">100</data>
+      <data key="ectopicinterval">1</data>
       <data key="label">TCR</data>
     </node>
     <node id="n13">
       <data key="count">100</data>
+      <data key="ectopicinterval">-1</data>
       <data key="label">nRT</data>
     </node>
   </graph>
