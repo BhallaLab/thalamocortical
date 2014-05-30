@@ -76,7 +76,7 @@ netdata = TraubFullNetData()
 celltypes = ['SpinyStellate', 'DeepBasket', 'DeepLTS', 'DeepAxoaxonic', 'TCR', 'nRT'] # netdata.celltype
 def simulate_psp(simdt, plotdt, simtime):
     sim = Simulation('dump_psp')
-    for pretype in celltypes:
+    for pretype in ['nRT']: #celltypes:
         for posttype in celltypes:
             for chantype in ['ampa', 'nmda', 'gaba']:                
                 setup(pretype, posttype, chantype, sim)
