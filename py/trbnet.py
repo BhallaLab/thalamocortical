@@ -446,7 +446,7 @@ class TraubNet(object):
                 if syndistr == 'normal':
                     g_ampa = np.random.normal(loc=g_ampa_mean, scale=ampa_sd*g_ampa_mean, size=len(syn_list))
                 else:
-                    norm_var = np.log(1 + (ampa_sd * ampa_sd))
+                    norm_var = np.log(1 + (ampa_sd * ampa_sd)) # AMPA SD is specified as fraction of mean, hence v/m^2 becomes v = sd^2
                     norm_mean = np.log(g_ampa_mean) - norm_var * 0.5
                     g_ampa = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
             g_ampa[g_ampa < 0] = g_ampa_mean
@@ -488,7 +488,7 @@ class TraubNet(object):
                     if syndistr == 'normal':
                         g_gaba = np.random.normal(loc=g_gaba_mean, scale=gaba_sd*g_gaba_mean, size=len(syn_list))
                     elif syndistr == 'lognorm':
-                        norm_var = np.log(1 + (gaba_sd * gaba_sd) / (g_gaba_mean * g_gaba_mean))
+                        norm_var = np.log(1 + (gaba_sd * gaba_sd))
                         norm_mean = np.log(g_gaba_mean) - norm_var * 0.5
                         g_gaba = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
                     g_gaba[g_gaba < 0] = g_gaba_mean
