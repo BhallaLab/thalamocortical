@@ -449,10 +449,16 @@ class TraubNet(object):
                     norm_var = np.log(1 + (ampa_sd * ampa_sd)) # AMPA SD is specified as fraction of mean, hence v/m^2 becomes v = sd^2
                     norm_mean = np.log(g_ampa_mean) - norm_var * 0.5
                     g_ampa = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
-                if abs((np.mean(g_ampa) - g_ampa_mean) / g_ampa_mean) > 0.1:
-                    raise Exception('computed g_ampa_mean is has error > 10%')
-                if abs((np.std(g_ampa)/g_ampa_mean - ampa_sd) / ampa_sd) > 0.1:
-                    raise Exception('computed g_ampa_sd is has error > 10%')
+                sample_g_ampa_mean = np.mean(g_ampa)
+                sample_error = abs((sample_g_ampa_mean - g_ampa_mean) / g_ampa_mean)
+                config.LOGGER.info('computed g_ampa_mean is %g and specified is %g' % (sample_g_ampa_mean, g_ampa_mean))
+                if sample_error > 0.1:
+                    config.LOGGER.warning('computed mean gampa has error > 10 percent: %g' % (sample_error*100))
+                sample_g_ampa_std = np.std(g_ampa)
+                config.LOGGER.info('computed g_ampa_sd is %g and specified is %g' % (sample_g_ampa_std/g_ampa_mean, ampa_sd))
+                sample_error = abs((sample_g_ampa_std / g_ampa_mean - ampa_sd) / ampa_sd)
+                if sample_error > 0.1:
+                    config.LOGGER.warning('computed gampa std has error > 10 percent: %g' % (sample_error * 100))
             g_ampa[g_ampa < 0] = g_ampa_mean
             self.g_ampa_mat.put(g_ampa,
                                 syn_list[:, 0], syn_list[:,1])
@@ -500,12 +506,12 @@ class TraubNet(object):
                     sample_error = abs((sample_g_gaba_mean - g_gaba_mean) / g_gaba_mean)
                     config.LOGGER.info('computed g_gaba_mean is %g and specified is %g' % (sample_g_gaba_mean, g_gaba_mean))
                     if sample_error > 0.1:
-                        config.LOGGER.warning('computed mean ggaba has error > 10\%: %g' % (sample_error*100))
+                        config.LOGGER.warning('computed mean ggaba has error > 10 per cent: %g' % (sample_error*100))
                     sample_g_gaba_std = np.std(g_gaba)
                     config.LOGGER.info('computed g_gaba_sd is %g and specified is %g' % (sample_g_gaba_std/g_gaba_mean, gaba_sd))
                     sample_error = abs((sample_g_gaba_std / g_gaba_mean - gaba_sd) / gaba_sd)
                     if sample_error > 0.1:
-                        config.LOGGER.warning('computed ggaba std has error > 10\%: %g' % (sample_error * 100))
+                        config.LOGGER.warning('computed ggaba std has error > 10 percent: %g' % (sample_error * 100))
             self.g_gaba_mat.put(g_gaba,
                                 syn_list[:,0],
                                 syn_list[:,1])
