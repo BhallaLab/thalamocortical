@@ -502,8 +502,8 @@ class TraubNet(object):
                     if sample_error > 0.1:
                         config.LOGGER.warning('computed mean ggaba has error > 10\%: %g' % (sample_error*100))
                     sample_g_gaba_std = np.std(g_gaba)
-                    config.LOGGER.info('computed g_gaba_sd is %g and specified is %g' % (sample_g_gaba_std/g_gaba_mean, gaba_sd)
-                    sample_error =abs(sample_g_gaba_std / g_gaba_mean - gaba_sd) / gaba_sd) 
+                    config.LOGGER.info('computed g_gaba_sd is %g and specified is %g' % (sample_g_gaba_std/g_gaba_mean, gaba_sd))
+                    sample_error = abs((sample_g_gaba_std / g_gaba_mean - gaba_sd) / gaba_sd)
                     if sample_error > 0.1:
                         config.LOGGER.warning('computed ggaba std has error > 10\%: %g' % (sample_error * 100))
             self.g_gaba_mat.put(g_gaba,
