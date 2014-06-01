@@ -496,10 +496,16 @@ class TraubNet(object):
                         norm_mean = np.log(g_gaba_mean) - norm_var * 0.5
                         g_gaba = np.random.lognormal(mean=norm_mean, sigma=np.sqrt(norm_var), size=len(syn_list))
                     g_gaba[g_gaba < 0] = g_gaba_mean
-                    if abs((np.mean(g_gaba) - g_gaba_mean) / g_gaba_mean) > 0.1:
-                        raise Exception('computed g_gaba_mean is has error > 10%')
-                    if abs((np.std(g_gaba)/g_gaba_mean - gaba_sd) / gaba_sd) > 0.1:
-                        raise Exception('computed g_gaba_sd is has error > 10%')
+                    sample_g_gaba_mean = np.mean(g_gaba)
+                    sample_error = abs((sample_g_gaba_mean - g_gaba_mean) / g_gaba_mean)
+                    config.LOGGER.info('computed g_gaba_mean is %g and specified is %g' % (sample_g_gaba_mean, g_gaba_mean))
+                    if sample_error > 0.1:
+                        config.LOGGER.warning('computed mean ggaba has error > 10\%: %g' % (sample_error*100))
+                    sample_g_gaba_std = np.std(g_gaba)
+                    config.LOGGER.info('computed g_gaba_sd is %g and specified is %g' % (sample_g_gaba_std/g_gaba_mean, gaba_sd)
+                    sample_error =abs(sample_g_gaba_std / g_gaba_mean - gaba_sd) / gaba_sd) 
+                    if sample_error > 0.1:
+                        config.LOGGER.warning('computed ggaba std has error > 10\%: %g' % (sample_error * 100))
             self.g_gaba_mat.put(g_gaba,
                                 syn_list[:,0],
                                 syn_list[:,1])
