@@ -3697,3 +3697,6 @@ c        z1 = 0.5d0 ! to interneurons
    data_20140408_081744_11037.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=40
    data_20140409_042649_11447.h5, distr=lognorm, sd_gaba=1, sd_ampa=1, basket=40
 
+* 2014-06-26 simtime in file attribute of data file is wrong 
+  realized that it defaults to 0.5 s while the correct value goes into runconfig. Simulation.reset_and_run should set the Simulation.simtime to the simtime passed. But save_data_h5 seems to ignore that.
+
