@@ -53,6 +53,7 @@
 
 import sys
 import os
+import socket
 from datetime import datetime
 import ConfigParser as configparser
 import logging
@@ -69,6 +70,7 @@ import moose
 
 timestamp = datetime.now()
 mypid = os.getpid()
+myhostname = socket.gethostname()
 numpy_reseeded = False
 numpy_rngseed = None
 stochastic = False # If set to True, the synapses are stochastic, otherwise the deterministic ones are used.
@@ -110,19 +112,18 @@ def moose_reseed(seed):
 #---------------------------------------------------------------------
 # configuration for saving simulation data
 #---------------------------------------------------------------------
-
-data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', timestamp.strftime('%Y_%m_%d'))
+data_dir_base = '/cluster/share/subhasis/traub2005'
+data_dir_with_ts = os.path.join(data_dir_base, timestamp.strftime('%Y_%m_%d'))
+if not os.access(data_dir_with_ts, os.F_OK):
+    os.mkdir(data_dir_with_ts)
+data_dir = os.path.join(data_dir_with_ts, myhostname)
 if not os.access(data_dir, os.F_OK):
     os.mkdir(data_dir)
 
-filename_suffix = '_%s_%d' % (timestamp.strftime('%Y%m%d_%H%M%S'), mypid)
+
+filename_suffix = '_%s_%d_%s' % (timestamp.strftime('%Y%m%d_%H%M%S'), mypid, myhostname)
 DATA_FILENAME = os.path.join(data_dir, 'data%s.h5' % (filename_suffix))
 MODEL_FILENAME = os.path.join(data_dir, 'network%s.h5' % (filename_suffix))
-
-LOGGER = logging.getLogger('traub2005')
-BENCHMARK_LOGGER = logging.getLogger('traub2005.benchmark')
-BENCHMARK_LOGGER.setLevel(logging.DEBUG)
-benchmarking=True # Dump benchmarking information
 
 
 #---------------------------------------------------------------------
@@ -183,8 +184,8 @@ logging.Handler.handleError = handleError
 logging.basicConfig(filename=LOG_FILENAME, level=LOG_LEVEL, format='%(asctime)s %(levelname)s %(name)s %(filename)s %(funcName)s: %(message)s', filemode='w')
 # logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s %(levelname)s %(name)s %(filename)s %(funcName)s: %(message)s', filemode='w')
 
-LOGGER = logging.getLogger('traub2005')
-BENCHMARK_LOGGER = logging.getLogger('traub2005.benchmark')
+LOGGER = logging.getLogger('{}.traub2005'.format(myhostname))
+BENCHMARK_LOGGER = logging.getLogger('{}.traub2005.benchmark'.format(myhostname))
 BENCHMARK_LOGGER.setLevel(logging.DEBUG)
 benchmarking=True # Dump benchmarking information
 
