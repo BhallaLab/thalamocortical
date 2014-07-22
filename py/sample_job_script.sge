@@ -1,0 +1,27 @@
+#!/bin/bash -l
+#$ -S /bin/bash
+#$ -cwd
+#$ -V
+
+## Change the name below (after -N) to suite your requirement
+#$ -N traub2005_40db_norm
+
+## Change the number of cores demanded (after orte) to suite your code-run requirement
+#$ -pe orte 10
+
+echo "Starting MPI job at: " `date`
+echo "Starting MPI job on: " `hostname`
+echo "Total cores demanded: " $NSLOTS
+echo "Job name given: " $JOB_NAME
+echo "Job ID: " $JOB_ID
+echo "Starting MPI job..."
+
+## Change the executable to match your path and executable filename (last line with ./xxx)
+/usr/lib64/openmpi/bin/mpirun  \
+	--mca btl sm,openib  \
+	-x LD_LIBRARY_PATH \
+	-x PYTHONPATH=$PYTHONPATH:/home/subhasis/moose_trunk_20131016/python \
+	-hostfile ./hostfile \
+		/usr/local/bin/python2.7 trbsim.py -n "Running 40 db on `hostname`"
+
+exit 0

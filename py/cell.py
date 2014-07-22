@@ -50,7 +50,7 @@ import numpy as np
 # from enthought.mayavi import mlab
 import moose
 import config
-import pymoose
+# import pymoose
 
 from nachans import *
 from kchans import *

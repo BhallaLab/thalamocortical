@@ -51,7 +51,7 @@ import numpy
 import config
 import gzip
 import numpy
-from scipy import signal
+# from scipy import signal
 
 def almost_equal(left, right, epsilon=1e-6):
     """check if two floats are almost equal"""

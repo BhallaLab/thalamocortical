@@ -100,10 +100,11 @@ import h5py as h5
 import numpy as np
 import tables
 import ConfigParser
-from pysparse.sparse.spmatrix import ll_mat
+from pysparse.spmatrix import ll_mat
+# from pysparse.sparse.spmatrix import ll_mat
 import config
 import moose
-import pymoose
+#import pymoose
 from trbnetdata import TraubFullNetData
 
 # The cell classes
@@ -335,7 +336,7 @@ class TraubNet(object):
             for posttype in self.celltype_graph.vs:
                 pre_post_ratio = tn.pre_post_ratio[celltype.index][posttype.index]
                 if pre_post_ratio > 0:
-                    self.celltype_graph.add_edges((celltype.index, posttype.index))
+                    self.celltype_graph.add_edges([(celltype.index, posttype.index)])
                     new_edge = self.celltype_graph.es[edge_count]
                     new_edge['weight'] = 1.0 * pre_post_ratio / celltype['count']
                     g_ampa_baseline = tn.g_ampa_baseline[celltype.index][posttype.index] 
