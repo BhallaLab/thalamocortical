@@ -4,14 +4,18 @@
 #$ -V
 
 ## Change the name below (after -N) to suite your requirement
-#$ -N traub2005_40db_norm
+#$ -N traub2005_30db_lognorm
 
 ## Change the number of cores demanded (after orte) to suite your code-run requirement
-#$ -pe orte 10
+#$ -pe orte-rr 5
+
+## Change the memory requirements
+#$ -l h_vmem=40G
 
 echo "Starting MPI job at: " `date`
 echo "Starting MPI job on: " `hostname`
 echo "Total cores demanded: " $NSLOTS
+echo "Maximum memory demanded: " $h_vmem
 echo "Job name given: " $JOB_NAME
 echo "Job ID: " $JOB_ID
 echo "Starting MPI job..."
@@ -21,7 +25,6 @@ echo "Starting MPI job..."
 	--mca btl sm,openib  \
 	-x LD_LIBRARY_PATH \
 	-x PYTHONPATH=$PYTHONPATH:/home/subhasis/moose_trunk_20131016/python \
-	-hostfile ./hostfile \
-		/usr/local/bin/python2.7 trbsim.py -n "Running 40 db on `hostname`"
+		/usr/local/bin/python2.7 trbsim.py -n "Running on 30db lognorm `hostname`"
 
 exit 0
