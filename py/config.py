@@ -138,6 +138,7 @@ solver = 'hsolve'
 simdt = 0.5e-4
 plotdt = 1e-3
 gldt = 1e-2
+syncdt = 10e-3 # dt for checking sync pop spiking
 vmin = -120e-3
 vmax = 40e-3
 ndivs = 640
@@ -185,6 +186,7 @@ logging.basicConfig(filename=LOG_FILENAME, level=LOG_LEVEL, format='%(asctime)s 
 # logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s %(levelname)s %(name)s %(filename)s %(funcName)s: %(message)s', filemode='w')
 
 LOGGER = logging.getLogger('{}.traub2005'.format(myhostname))
+LOGGER.addHandler(logging.StreamHandler())
 BENCHMARK_LOGGER = logging.getLogger('{}.traub2005.benchmark'.format(myhostname))
 BENCHMARK_LOGGER.setLevel(logging.DEBUG)
 benchmarking=True # Dump benchmarking information
@@ -249,6 +251,7 @@ solver = runconfig.get('numeric', 'solver')
 simtime = float(runconfig.get('scheduling', 'simtime'))
 simdt = float(runconfig.get('scheduling', 'simdt'))
 plotdt = float(runconfig.get('scheduling', 'plotdt'))
+syncdt = float(runconfig.get('scheduling', 'syncdt'))
 clockjob.autoschedule = runconfig.get('scheduling', 'autoschedule') in ['Yes', 'yes', 'True', 'true', '1']
 default_releasep = float(runconfig.get('synapse', 'releasep')) 
 if reseed_numpy:
@@ -276,7 +279,6 @@ def update_timestamp():
     LOG_LEVEL = logging.DEBUG
     logging.Handler.handleError = handleError
     logging.basicConfig(filename=LOG_FILENAME, level=LOG_LEVEL, format='%(asctime)s %(levelname)s %(name)s %(filename)s %(funcName)s: %(message)s', filemode='w')
-
 
 # 
 # config.py ends here
