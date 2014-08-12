@@ -86,6 +86,9 @@
 # doing the computationally expensive simulation of these cells. Add
 # another config option for replacing these cells with TimeTable
 # objects. The synaptic strengths should not be scaled.
+#
+# 2014-08-10 adding Calculator object to detect synchronized firing 
+# and stimulate based on that.
 
 
 
@@ -975,68 +978,24 @@ class TraubNet(object):
 
         Updating stimulus protocol to ramdomize pulses.
 
+	2014-08-10 Updating stimulus protocol to detect synchronized 
+        spiking and apply stimulus within a range of periods after that.
+
         """
         if self.from_netfile is not None:
             config.LOGGER.info('Do nothing. Using network file.')
             return
         config.LOGGER.debug('Setting up stimulus protocol: bg_interval: %g, pulse_width: %g, isi: %g' % (bg_interval, pulse_width, isi))
         self.create_stimulus_objects(stim_container, data_container)
-        self.stim_gate.firstDelay = stim_onset
-        delays = {}
-        levels = {}
-        widths = {}
-        if bg_interval_spread > 0.0 and num_bg_pulses > 0:
-            delay_list = np.random.uniform(low=bg_interval, high=bg_interval_spread+bg_interval, size=num_bg_pulses)
-            print 'Delays:', delay_list
-            for ii in range(len(delay_list)):
-                delays[ii] = delay_list[ii]
-                levels[ii] = level
-                widths[ii] = pulse_width
-        else:
-            for key, value in config.runconfig.items('stimulus'):
-                if key.startswith('delay_'):
-                    index = int(key.rpartition('_')[-1])
-                    delays[index] = float(value)
-                elif key.startswith('level_'):
-                    index = int(key.rpartition('_')[-1])
-                    levels[index] = float(value)
-                elif key.startswith('width_'):
-                    index = int(key.rpartition('_')[-1])
-                    widths[index] = float(value)
-        # More than 1 delay values indicate we want to explicitly set
-        # each pulse time and duration, with probe pulses with every
-        # alternet background pulse.
-        print delays, len(delays)
-        if len(delays) > 1:
-            self.stim_bg.count = len(delays)
-            self.stim_probe.count = len(delays)/2+1
-            for index in range(len(delays)):
-                self.stim_bg.delay[index] = delays[index]
-                print 'index:', index, 'delay:', self.stim_bg.delay[index]
-                self.stim_bg.level[index] = levels[index]
-                self.stim_bg.width[index] = widths[index]                    
-                if (index % 2 == 0) and ((index + 1) < len(delays)):
-                    self.stim_probe.delay[index/2] = delays[index] + delays[index+1]
-                    self.stim_probe.level[index/2] = levels[index]
-                    self.stim_probe.width[index/2] = widths[index]                    
-        # A single delay value means we have an even pulse train
-        else:
-            self.stim_bg.firstLevel = level
-            self.stim_bg.secondLevel = level
-            self.stim_bg.firstDelay = bg_interval
-            self.stim_bg.firstWidth = pulse_width
-            self.stim_bg.secondDelay = isi
-            self.stim_bg.secondWidth = pulse_width        
-            self.stim_bg.trigMode = moose.EXT_GATE
-
-            self.stim_probe.firstLevel = level
-            self.stim_probe.secondLevel = level
-            self.stim_probe.firstDelay = 2 * self.stim_bg.firstDelay + self.stim_bg.secondDelay + pulse_width
-            self.stim_probe.secondDelay = isi
-            self.stim_probe.firstWidth = pulse_width
-            self.stim_probe.secondWidth = pulse_width            
-            self.stim_probe.trigMode = moose.EXT_GATE
-        # 2012-08-25 14:18:21 (+0530): Commenting out the following
+       # A single delay value  for applying stimulus at that delay after a synchronized spike
+       
+        self.stim_bg.firstLevel = level
+        self.stim_bg.secondLevel = level
+        self.stim_bg.firstDelay = bg_interval
+        self.stim_bg.firstWidth = pulse_width
+        self.stim_bg.secondDelay = isi
+	self.stim_bg.secondWidth = pulse_width        
+	# 2012-08-25 14:18:21 (+0530): Commenting out the following
         # line because we do not want to start probe after all
         # background pulses in one set are delivered, but with every
         # alternet pulse, which is achieved above.
@@ -1046,7 +1005,7 @@ class TraubNet(object):
         
 
         config.LOGGER.debug('Background stimulus: firstDelay: %g, firstWidth: %g, firstLevel: %g, secondDelay: %g, secondWidth: %g, secondLevel: %g' % (self.stim_bg.firstDelay, self.stim_bg.firstWidth, self.stim_bg.firstLevel, self.stim_bg.secondDelay, self.stim_bg.secondWidth, self.stim_bg.secondLevel))
-        config.LOGGER.debug('Probe stimulus: firstDelay: %g, firstWidth: %g, firstLevel: %g, secondDelay: %g, secondWidth: %g, secondLevel: %g' % (self.stim_probe.firstDelay, self.stim_probe.firstWidth, self.stim_probe.firstLevel, self.stim_probe.secondDelay, self.stim_probe.secondWidth, self.stim_probe.secondLevel))
+#        config.LOGGER.debug('Probe stimulus: firstDelay: %g, firstWidth: %g, firstLevel: %g, secondDelay: %g, secondWidth: %g, secondLevel: %g' % (self.stim_probe.firstDelay, self.stim_probe.firstWidth, self.stim_probe.firstLevel, self.stim_probe.secondDelay, self.stim_probe.secondWidth, self.stim_probe.secondLevel))
         
         bg_cell_indices = []
         probe_cell_indices = []
@@ -1132,14 +1091,14 @@ class TraubNet(object):
                 comp = cell.soma
             else:
                 raise Exception('Unknown type object for probe target: %s' % (cell))
-            if comp.className == 'Compartment':
-                self.stim_probe.connect('outputSrc', comp, 'injectMsg')
-            elif comp.className == 'SpikeGen':
-                self.stim_probe.connect('outputSrc', comp, 'Vm')
-                config.LOGGER.debug('connected %s to %s' % (self.stim_probe.path, comp.path))
-                comp.threshold = level/2.0   
-                config.LOGGER.debug('%s: threshold=%g' % (comp.path, comp.threshold))
-            probe_targets.append(comp.path)
+            # if comp.className == 'Compartment':
+            #    self.stim_probe.connect('outputSrc', comp, 'injectMsg')
+            # elif comp.className == 'SpikeGen':
+            #    self.stim_probe.connect('outputSrc', comp, 'Vm')
+            #    config.LOGGER.debug('connected %s to %s' % (self.stim_probe.path, comp.path))
+            #    comp.threshold = level/2.0   
+            #    config.LOGGER.debug('%s: threshold=%g' % (comp.path, comp.threshold))
+            # probe_targets.append(comp.path)
         ret = { 'stim_onset': stim_onset,
                 'bg_interval': bg_interval,
                 'isi': isi,
@@ -1542,8 +1501,10 @@ class TraubNet(object):
                     spikegen = moose.SpikeGen('spike', presyn_comp)
                 elif comp.className == 'SpikeGen':
                     spikegen = comp
-                for synchan_id in spikegen.neighbours('event', moose.OUTGOING):
+                for synchan_id in spikegen.neighbours('event', moose.OUTGOING):		    
                     synchan = moose.SynChan(synchan_id)
+		    if synchan.className not in ('SynChan', 'NMDAChan'):
+			continue
                     post_comp = moose.Compartment(synchan.parent)
                     synchans.append((presyn_comp.path[path_start:], 
                                      post_comp.path[path_start:], 
@@ -1565,7 +1526,7 @@ class TraubNet(object):
         targets = []
         for stim in self.stim_container.children():
             for neighbour in config.context.getNeighbours(stim, 'outputSrc', moose.OUTGOING):
-                print stim.path(), 'Stimulus to', neighbour.path()
+                config.LOGGER.info('%s %s %s' % (stim.path(), 'Stimulus to', neighbour.path()))
                 if moose.Neutral(neighbour).className == 'Compartment':
                     targets.append([stim.path(), neighbour.path()])
         if targets:
@@ -1900,18 +1861,18 @@ class TraubNet(object):
                 self.stim_bg.delay[index] = t
                 self.stim_bg.width[index] = float(cfg['pulse_width'])
                 self.stim_bg.level[index] = float(cfg['amplitude'])
-            probe = np.asarray(df['/stimulus/stim_probe'])
-            probetimes = np.flatnonzero(np.diff(probe) > 0) * plotdt
-            self.stim_probe = moose.PulseGen('/stim/stim_probe')
-            self.stim_probe.count = len(probetimes+1)
-            delays = np.diff(np.r_[0.0, probetimes])
-            for index, t in enumerate(delays):
-                self.stim_probe.delay[index] = t
-                self.stim_probe.width[index] = float(cfg['pulse_width'])
-                self.stim_probe.level[index] = float(cfg['amplitude'])
+#            probe = np.asarray(df['/stimulus/stim_probe'])
+#            probetimes = np.flatnonzero(np.diff(probe) > 0) * plotdt
+#            self.stim_probe = moose.PulseGen('/stim/stim_probe')
+#            self.stim_probe.count = len(probetimes+1)
+#            delays = np.diff(np.r_[0.0, probetimes])
+#            for index, t in enumerate(delays):
+#                self.stim_probe.delay[index] = t
+#                self.stim_probe.width[index] = float(cfg['pulse_width'])
+#                self.stim_probe.level[index] = float(cfg['amplitude'])
             # We have the absolute times of stimulus. Gate should be
             # turned on all the time - as if the bg and probe pulsegen were free running
-            self.stim_gate.firstDelay = 0
+#            self.stim_gate.firstDelay = 0
         
     def create_stimulus_objects(self, stim_container='/stim', data_container='/data'):
         """Create the stimulus objects"""
@@ -1921,29 +1882,30 @@ class TraubNet(object):
             self.stim_container = stim_container
         else:
             raise Exception('Stimulus container must be a string or a Neutral object: got %s', stim_container.__class__.__name__)
-        self.stim_gate = moose.PulseGen('stim_gate', self.stim_container)
-        self.stim_gate.trigMode = moose.FREE_RUN
-        self.stim_gate.firstWidth = 1e9 # Keep it on forever
-        self.stim_gate.firstLevel = 1.0                
-        self.stim_gate.secondDelay = 1e9
+	self.spike_counter = moose.Calculator('spike_counter', self.stim_container)
+	self.spike_counter.initValue = 0.0
+	# Create a calculator to sum event times from all spiny stellate cell spikegens
+	for cell_index in self.populations['SpinyStellate']:
+            cell = self.index_cell_map[cell_index]
+	    spikegen_list = moose.context.getWildcardList(cell.path + '/##[ISA=SpikeGen]', True)
+	    for id_ in spikegen_list:
+	        spikegen = moose.SpikeGen(id_)
+		spikegen.connect('event', self.spike_counter, 'cnt')
+	self.sync_detector = moose.SpikeGen('sync_detector', self.stim_container)
+	self.spike_counter.connect('valueSrc', self.sync_detector, 'Vm')
+	self.sync_detector.threshold = len(self.populations['SpinyStellate'])/5.0
         self.stim_bg = moose.PulseGen('stim_bg', self.stim_container)
-        self.stim_probe = moose.PulseGen('stim_probe', self.stim_container)
-        self.stim_bg.trigMode = moose.EXT_GATE
-        self.stim_probe.trigMode = moose.EXT_GATE
-        self.stim_gate.connect('outputSrc', self.stim_bg, 'input')
-        self.stim_gate.connect('outputSrc', self.stim_probe, 'input')
+        self.stim_bg.trigMode = moose.EXT_TRIG
+        self.sync_detector.connect('event', self.stim_bg, 'input')
         if isinstance(data_container, str):
             data_container = moose.Neutral(data_container)
         stim_data_container = moose.Neutral('stimulus', data_container)
-        gate_table = moose.Table(self.stim_gate.name, stim_data_container)
-        gate_table.stepMode = 3
-        gate_table.connect('inputRequest', self.stim_gate, 'output')
         bg_table = moose.Table(self.stim_bg.name, stim_data_container)
         bg_table.stepMode = 3
         bg_table.connect('inputRequest', self.stim_bg, 'output')
-        probe_table = moose.Table(self.stim_probe.name, stim_data_container)
-        probe_table.stepMode = 3
-        probe_table.connect('inputRequest', self.stim_probe, 'output')
+	count_table  = moose.Table(self.spike_counter.name, stim_data_container)
+	count_table.stepMode = 3
+	count_table.connect('inputRequest', self.spike_counter, 'value')
 
     def scale_synapses(self, filename):
         with open(filename) as synfile:
