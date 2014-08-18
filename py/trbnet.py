@@ -1099,6 +1099,8 @@ class TraubNet(object):
             #    comp.threshold = level/2.0   
             #    config.LOGGER.debug('%s: threshold=%g' % (comp.path, comp.threshold))
             # probe_targets.append(comp.path)
+	# config.LOGGER.debug('sync_detector table length: %d, xmin=%g, xmax=%g, xdivs=%d' % (len(self.sync_detector), self.sync_detector.xmin, self.sync_detector.xmax, self.sync_detector.xdivs))
+
         ret = { 'stim_onset': stim_onset,
                 'bg_interval': bg_interval,
                 'isi': isi,
@@ -1892,11 +1894,21 @@ class TraubNet(object):
 	        spikegen = moose.SpikeGen(id_)
 		spikegen.connect('event', self.spike_counter, 'cnt')
 	self.sync_detector = moose.SpikeGen('sync_detector', self.stim_container)
+	self.sync_detector.threshold =  1.0 * len(self.populations['SpinyStellate'])/2
 	self.spike_counter.connect('valueSrc', self.sync_detector, 'Vm')
-	self.sync_detector.threshold = len(self.populations['SpinyStellate'])/5.0
-        self.stim_bg = moose.PulseGen('stim_bg', self.stim_container)
+#	self.event_to_bool = moose.Table('event_to_bool', self.stim_container)
+#	self.event_to_bool.stepMode = moose.TAB_IO
+#	self.event_to_bool.xmin = 0.0
+#	self.event_to_bool.xmax = config.simdt
+#	self.event_to_bool.xdivs = 1
+#	self.event_to_bool[0] = 0.0
+#	self.event_to_bool[len(self.event_to_bool)-1] = 1.0
+#	self.sync_detector.connect('event', self.event_to_bool, 'input')
+	self.stim_bg = moose.PulseGen('stim_bg', self.stim_container)
         self.stim_bg.trigMode = moose.EXT_TRIG
-        self.sync_detector.connect('event', self.stim_bg, 'input')
+	self.stim_bg.trigTime = 0.0
+	self.sync_detector.connect('stateSrc', self.stim_bg, 'input')
+#       self.event_to_bool.connect('outputSrc', self.stim_bg, 'input')
         if isinstance(data_container, str):
             data_container = moose.Neutral(data_container)
         stim_data_container = moose.Neutral('stimulus', data_container)
@@ -1906,6 +1918,10 @@ class TraubNet(object):
 	count_table  = moose.Table(self.spike_counter.name, stim_data_container)
 	count_table.stepMode = 3
 	count_table.connect('inputRequest', self.spike_counter, 'value')
+	sync_table  = moose.Table(self.sync_detector.name, stim_data_container)
+	config.LOGGER.debug('created %s' % (sync_table.path))
+	sync_table.stepMode = 3
+	sync_table.connect('inputRequest', self.sync_detector, 'state')
 
     def scale_synapses(self, filename):
         with open(filename) as synfile:
