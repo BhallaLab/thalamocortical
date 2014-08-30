@@ -92,7 +92,6 @@
 
 # Code:
 import sys
-sys.path.append('/data/subha/chamcham_moose/python')
 from collections import defaultdict
 from datetime import datetime
 import igraph
