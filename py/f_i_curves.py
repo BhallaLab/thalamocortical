@@ -45,11 +45,13 @@ def current_step_test(celltype, low, high, step, h5file):
         stimulus.firstDelay = DELAY
         stimulus.firstWidth = WIDTH
         stimulus.firstLevel = low + ii * step
+        stimulus.secondDelay = 1e9
         stimulus.connect('outputSrc', cell.soma, 'injectMsg')
         vm_table = moose.Table('%s/Vm' % (data.path))
         vm_table.stepMode = moose.TAB_BUF
         vm_table.connect('inputRequest', cell.soma, 'Vm')
         spike_table = moose.Table('%s/spiketimes' % (data.path))
+        spike_table.stepMode = moose.TAB_SPIKE
         spike_table.connect('inputRequest', cell.comp[cell.presyn], 'Vm')
         stim_table = moose.Table('%s/stimulus' % (data.path))
         stim_table.stepMode = moose.TAB_BUF
