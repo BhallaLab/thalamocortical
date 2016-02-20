@@ -1,38 +1,63 @@
-- Code is organized into four directories according to simulator, 
-gen = genesis
-mus = moose
-nrn = neuron
-py = pymoose
+This is the PyMOOSE version of Single-column thalamocortical model by
+Traub et al 2005 with enhancements to add variability in single cell
+properties as well as synaptic condctances. 
 
+Code is organized into four directories according to language/simulation system:
 
+for: original fortran code
 
-py
- - channel.py: channel base class
+g77traub: My update of the g77 port to compile and run on mpif77.
 
- - kchans.py : all K+ channel definitions
+nrn: neuron model with additional scripts/updates for dumping information and testing.
 
- - nachans.py: all Na+ channel definitions
+py: pymoose version. This evolved with moose from 2009 till 2013 when a
+    drastic overhaul in te API was made (dh_branch). By the time the
+    new stuff stabilized, it was too much work to convert the entire
+    model into this new API. Still, the single cell models and ion
+    channels have been translated and are available as part of
+    moose-examples. They are yet to be extensively tested.
 
- - compartment.py: an extension of compartment class
+    The files in this diectory are as follows:
 
- - cachans.py: Ca2+ channels
+    {Cell}.p - prototype file for cells of type {Cell}. These are in
+    	       GENESIS prototype format and are read by moose to
+    	       create the prototype cell model. The prototype is
+    	       copied in moose to make the cell population.  py -
+    	       channel.py: channel base class
 
- - capool.py: extended version of CaConc
+    {cell}.py - Script defining the Python class for Cell. The
+	        __init__ method can take an existing object and a path
+	        and make a copy of the existing object in the
+	        specified path.
 
- - archan.py: the combined cation current
+    trbsim.py - main script for running the simulation. It takes a
+		large number of options.
 
- - test.py: code for running the simulation
+    trbnetdata.py: network information from Traub et al 2005.
 
- - connection.py: network information in the form of graphs using
-   networkX module.
+    trbnet.py - class TraubNet in this script creates the actual
+    	      	thalamocortical network based on specified
+    	      	cell-to-cell or celltype-to-celltype graphs or with
+    	      	default values from the original Traub et al 2005
+    	      	model.
 
-nrn
+    connection.py - superseeded by trbnet.py			
 
- - test.hoc: code for running the simulation rest of the files are
-  from original model
+    kchans.py : all K+ channel definitions
+    
+    nachans.py: all Na+ channel definitions
+    
+    compartment.py: an extension of compartment class
+    
+    cachans.py: Ca2+ channels
+    
+    capool.py: extended version of CaConc
+    
+    archan.py: the combined cation current
 
-2009-04-27 22:03:31 (+0530)
-	   Currently py/data/<date> is where the python code dumps its
-	   data.
-	   nrn/mydata/Vm.plot is the recorded membrane potential for
-	   NEURON simulation.
+    defaults.ini: default simulation configuration parameters.
+
+    custom.ini: customizations to override the default simulation
+    		parameters.
+
+Currently py/data/<date> is where the python code dumps its data.
